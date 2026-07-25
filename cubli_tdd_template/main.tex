@@ -1,0 +1,99 @@
+\documentclass[11pt,a4paper]{article}
+
+% ---------- Packages ----------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{hyperref}
+\usepackage{parskip}
+\usepackage[
+    backend=biber,
+    style=numeric,
+    sorting=none,
+    maxbibnames=6
+]{biblatex}
+\addbibresource{references.bib}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue,
+    pdftitle={Technical Design Document - Cubli}
+}
+
+% ---------- Header / Footer ----------
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{14pt}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[L]{\textbf{Technical Design Document}}
+\fancyhead[R]{Cubli}
+\fancyfoot[L]{\leftmark}
+\fancyfoot[R]{Page \thepage\ of \pageref{LastPage}}
+
+\fancypagestyle{plain}{%
+    \fancyhf{}%
+    \setlength{\headheight}{14pt}%
+    \renewcommand{\headrulewidth}{0.4pt}%
+    \renewcommand{\footrulewidth}{0.4pt}%
+    \fancyhead[L]{\textbf{Technical Design Document}}%
+    \fancyhead[R]{Cubli \textbar\ Space Challenges 2026}%
+    \fancyfoot[R]{Page \thepage\ of \pageref{LastPage}}%
+}
+
+\title{\textbf{Technical Design Document}\\[0.5em]\Large Cubli}
+\author{[Team Member 1], [Team Member 2], [Team Member 3], [Team Member 4], [Team Member 5], [Team Member 6]}
+\date{Space Challenges 2026}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{1.5cm}
+    {\LARGE \textbf{Technical Design Document}\par}
+    \vspace{0.8cm}
+    {\Large Cubli \par}
+    \vspace{1cm}
+
+    \begin{minipage}{0.6\textwidth}
+        \centering
+        \fbox{\parbox[c][6cm][c]{\linewidth}{\centering \itshape Figure placeholder\\(insert cover image here)}}
+    \end{minipage}
+    \par
+    \vspace{1.2cm}
+
+    {\large Athanasia Nikolova, Andrea Liang,\\[0.3em]
+            Deyan Nikolaev Vlaev, Niccolo, Suvanna viriyanti wu, Pablo Urioste \par}
+    \vspace{1cm}
+    {\large Space Challenges 2026 \par}
+    \vfill
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\input{sections/01_introduction}
+\clearpage
+\input{sections/02_project_organization}
+\clearpage
+\input{sections/03_analysis}
+\clearpage
+\input{sections/04_design}
+\clearpage
+\input{sections/05_system_integration}
+\clearpage
+\input{sections/06_testing}
+\clearpage
+\input{sections/07_future_work}
+\clearpage
+\input{sections/08_literature}
+
+\end{document}
