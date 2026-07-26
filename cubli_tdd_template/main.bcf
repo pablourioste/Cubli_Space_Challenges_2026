@@ -2379,6 +2379,8 @@
     <bcf:citekey order="3" intorder="1">yoshimitsu1999minerva</bcf:citekey>
     <bcf:citekey order="4" intorder="1">ho2017mascot</bcf:citekey>
     <bcf:citekey order="5" intorder="1">spiridonov2024spacehopper</bcf:citekey>
+    <bcf:citekey order="6" intorder="1">gajamohan2013cubli</bcf:citekey>
+    <bcf:citekey order="7" intorder="1">hofer2023onewheelcubli</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="none">

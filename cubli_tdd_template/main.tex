@@ -16,6 +16,7 @@
 \usepackage{xcolor}     % \textcolor for TODO placeholders + workstream colours
 \usepackage{pgfgantt}   % Gantt chart for the project schedule (Sec. 2)
 \usepackage{hyperref}
+\usepackage{caption}    % consistent, compact table/figure caption styling
 \usepackage{parskip}
 \usepackage[
     backend=biber,
@@ -33,7 +34,7 @@
 }
 
 % ---------- siunitx & table column type (used by the BOM tables, App. A) ----------
-\sisetup{range-phrase={--}, range-units=single, per-mode=symbol, group-separator={,}}
+\sisetup{range-phrase={--}, range-units=single, per-mode=symbol, group-separator={,}, detect-weight=true}
 \DeclareSIUnit{\rpm}{rpm}   % motor speed
 \DeclareSIUnit{\bit}{bit}   % data-rate unit (Mbit/s)
 \DeclareSIUnit{\awg}{AWG}   % wire gauge
@@ -46,6 +47,10 @@
 \definecolor{mfcol}{HTML}{C55A11} % manufacturing & circuits
 \definecolor{mscol}{HTML}{7F7F7F} % milestones
 \definecolor{p0col}{HTML}{C00000} % P0 (critical-path) priority highlight
+
+% ---------- Table & caption styling ----------
+\renewcommand{\arraystretch}{1.15}                 % consistent, slightly tighter rows
+\captionsetup{font=small, labelfont=bf, skip=6pt}  % compact bold "Table N" captions
 
 % ---------- Header / Footer ----------
 \pagestyle{fancy}
@@ -117,7 +122,5 @@
 \printbibliography[title={References}]
 \clearpage
 \input{sections/08_bom}
-\clearpage
-\input{sections/09_task_dictionary}
 
 \end{document}

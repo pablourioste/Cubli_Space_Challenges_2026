@@ -4,51 +4,50 @@
 \contentsline {subsection}{\numberline {1.3}Objectives}{4}{subsection.1.3}%
 \contentsline {section}{\numberline {2}Project Organization}{5}{section.2}%
 \contentsline {subsection}{\numberline {2.1}Team Organization}{5}{subsection.2.1}%
-\contentsline {paragraph}{Responsibilities.}{5}{section*.2}%
-\contentsline {subsection}{\numberline {2.2}Timeline and Contingency Plan}{5}{subsection.2.2}%
-\contentsline {section}{\numberline {3}System Analysis \& Requirements}{6}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Scope of Work \& Use Cases}{6}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Actuation Trade-off --- Why Reaction Wheels}{6}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}Requirements \& Objectives Traceability}{6}{subsection.3.3}%
-\contentsline {subsection}{\numberline {3.4}Coordinate Frames \& Conventions}{6}{subsection.3.4}%
-\contentsline {section}{\numberline {4}Dynamic Modeling \& Control}{7}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Modeling Approach: Why 2D First}{7}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}2D Reaction-Wheel Pendulum}{7}{subsection.4.2}%
-\contentsline {subsubsection}{\numberline {4.2.1}Equations of Motion}{7}{subsubsection.4.2.1}%
-\contentsline {subsubsection}{\numberline {4.2.2}Equilibria \& Linearization}{7}{subsubsection.4.2.2}%
-\contentsline {subsection}{\numberline {4.3}Parameter Identification \& the 2D Testbed}{7}{subsection.4.3}%
-\contentsline {subsection}{\numberline {4.4}Jump-Up Feasibility Analysis}{8}{subsection.4.4}%
-\contentsline {subsubsection}{\numberline {4.4.1}Torque-Limited Wheel-Inertia Target}{8}{subsubsection.4.4.1}%
-\contentsline {subsection}{\numberline {4.5}Control Design on the 2D Model}{9}{subsection.4.5}%
-\contentsline {subsubsection}{\numberline {4.5.1}LQR Baseline Control}{9}{subsubsection.4.5.1}%
-\contentsline {subsubsection}{\numberline {4.5.2}Gain Scheduling \& Mode Transitions}{9}{subsubsection.4.5.2}%
-\contentsline {subsubsection}{\numberline {4.5.3}Jump-Up Strategy}{9}{subsubsection.4.5.3}%
-\contentsline {subsection}{\numberline {4.6}Generalization to the 3D Cube}{9}{subsection.4.6}%
-\contentsline {subsubsection}{\numberline {4.6.1}Full-Body Equations of Motion}{9}{subsubsection.4.6.1}%
-\contentsline {subsubsection}{\numberline {4.6.2}Axis Coupling}{9}{subsubsection.4.6.2}%
-\contentsline {subsubsection}{\numberline {4.6.3}Edge vs.\ Corner Equilibria \& Linearization}{9}{subsubsection.4.6.3}%
-\contentsline {section}{\numberline {5}Preliminary Hardware Design}{10}{section.5}%
-\contentsline {subsection}{\numberline {5.1}System Architecture}{10}{subsection.5.1}%
-\contentsline {subsection}{\numberline {5.2}Mass and Inertia Budget}{10}{subsection.5.2}%
-\contentsline {paragraph}{Volume constraint.}{10}{section*.3}%
-\contentsline {paragraph}{Mass constraint.}{10}{section*.4}%
-\contentsline {paragraph}{Inertia constraint (corner-critical).}{10}{section*.5}%
-\contentsline {subsection}{\numberline {5.3}Mechanical Design}{11}{subsection.5.3}%
-\contentsline {subsubsection}{\numberline {5.3.1}2D Prototype Build}{11}{subsubsection.5.3.1}%
-\contentsline {subsubsection}{\numberline {5.3.2}3D Cube Frame}{11}{subsubsection.5.3.2}%
-\contentsline {subsubsection}{\numberline {5.3.3}Reaction-Wheel Sizing}{11}{subsubsection.5.3.3}%
-\contentsline {paragraph}{Radial fit caveat.}{11}{section*.6}%
-\contentsline {subsection}{\numberline {5.4}Electrical Design}{12}{subsection.5.4}%
-\contentsline {subsubsection}{\numberline {5.4.1}Components}{12}{subsubsection.5.4.1}%
-\contentsline {subsubsection}{\numberline {5.4.2}Electrical Diagram}{12}{subsubsection.5.4.2}%
-\contentsline {subsection}{\numberline {5.5}System Integration}{12}{subsection.5.5}%
-\contentsline {section}{\numberline {6}Testing and Validation Plan}{13}{section.6}%
-\contentsline {subsection}{\numberline {6.1}Simulation-First Validation}{13}{subsection.6.1}%
-\contentsline {subsection}{\numberline {6.2}Bring-up Sequence}{13}{subsection.6.2}%
-\contentsline {subsection}{\numberline {6.3}Sensor Testing}{13}{subsection.6.3}%
-\contentsline {subsection}{\numberline {6.4}Milestone Acceptance Criteria}{13}{subsection.6.4}%
-\contentsline {subsection}{\numberline {6.5}Control Performance Evaluation}{13}{subsection.6.5}%
-\contentsline {section}{\numberline {7}Future Work}{14}{section.7}%
-\contentsline {subsection}{\numberline {7.1}NMPC \& Warm-Start Control (Future Implementation)}{14}{subsection.7.1}%
-\contentsline {subsection}{\numberline {7.2}Autonomous Stand-up \& Disturbance Rejection}{14}{subsection.7.2}%
-\contentsline {subsection}{\numberline {7.3}Single-Wheel Variant / Extensions}{14}{subsection.7.3}%
+\contentsline {paragraph}{Responsibilities.}{5}{section*.3}%
+\contentsline {subsection}{\numberline {2.2}Work Breakdown Structure}{5}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Schedule and Contingency Plan}{6}{subsection.2.3}%
+\contentsline {section}{\numberline {3}System Analysis \& Requirements}{8}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Scope of Work \& Use Cases}{8}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Actuation Trade-off --- Why Reaction Wheels}{8}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Requirements \& Objectives Traceability}{8}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Coordinate Frames \& Conventions}{8}{subsection.3.4}%
+\contentsline {section}{\numberline {4}Dynamic Modeling \& Control}{9}{section.4}%
+\contentsline {subsection}{\numberline {4.1}2D Reaction-Wheel Pendulum}{9}{subsection.4.1}%
+\contentsline {subsubsection}{\numberline {4.1.1}Equations of Motion}{9}{subsubsection.4.1.1}%
+\contentsline {subsubsection}{\numberline {4.1.2}Equilibria \& Linearization}{9}{subsubsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.2}Parameter Identification \& the 2D Testbed}{10}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Jump-Up Feasibility Analysis}{10}{subsection.4.3}%
+\contentsline {subsubsection}{\numberline {4.3.1}Torque-Limited Wheel-Inertia Target}{10}{subsubsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.4}Control Design on the 2D Model}{11}{subsection.4.4}%
+\contentsline {subsubsection}{\numberline {4.4.1}LQR Baseline Control}{11}{subsubsection.4.4.1}%
+\contentsline {subsubsection}{\numberline {4.4.2}Gain Scheduling \& Mode Transitions}{12}{subsubsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.5}Generalization to the 3D Cube}{13}{subsection.4.5}%
+\contentsline {subsubsection}{\numberline {4.5.1}Full-Body Equations of Motion}{13}{subsubsection.4.5.1}%
+\contentsline {subsubsection}{\numberline {4.5.2}Edge vs.\ Corner Equilibria \& Linearization}{14}{subsubsection.4.5.2}%
+\contentsline {section}{\numberline {5}Preliminary Hardware Design}{15}{section.5}%
+\contentsline {subsection}{\numberline {5.1}System Architecture}{15}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Mass and Inertia Budget}{15}{subsection.5.2}%
+\contentsline {paragraph}{Volume constraint.}{15}{section*.13}%
+\contentsline {paragraph}{Mass constraint.}{15}{section*.14}%
+\contentsline {paragraph}{Inertia constraint (corner-critical).}{15}{section*.16}%
+\contentsline {subsection}{\numberline {5.3}Mechanical Design}{16}{subsection.5.3}%
+\contentsline {subsubsection}{\numberline {5.3.1}2D Prototype Build}{16}{subsubsection.5.3.1}%
+\contentsline {subsubsection}{\numberline {5.3.2}3D Cube Frame}{16}{subsubsection.5.3.2}%
+\contentsline {subsubsection}{\numberline {5.3.3}Reaction-Wheel Sizing}{16}{subsubsection.5.3.3}%
+\contentsline {paragraph}{Radial fit caveat.}{16}{section*.19}%
+\contentsline {subsection}{\numberline {5.4}Electrical Design}{17}{subsection.5.4}%
+\contentsline {subsubsection}{\numberline {5.4.1}Components}{17}{subsubsection.5.4.1}%
+\contentsline {subsubsection}{\numberline {5.4.2}Electrical Diagram}{17}{subsubsection.5.4.2}%
+\contentsline {subsection}{\numberline {5.5}System Integration}{17}{subsection.5.5}%
+\contentsline {section}{\numberline {6}Testing and Validation Plan}{18}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Simulation-First Validation}{18}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Bring-up Sequence}{18}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Sensor Testing}{18}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4}Milestone Acceptance Criteria}{18}{subsection.6.4}%
+\contentsline {subsection}{\numberline {6.5}Control Performance Evaluation}{18}{subsection.6.5}%
+\contentsline {section}{\numberline {7}Future Work}{19}{section.7}%
+\contentsline {subsection}{\numberline {7.1}NMPC \& Warm-Start Control (Future Implementation)}{19}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Autonomous Stand-up \& Disturbance Rejection}{19}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Single-Wheel Variant / Extensions}{19}{subsection.7.3}%
+\contentsline {section}{\numberline {A}Bill of Materials}{21}{appendix.A}%

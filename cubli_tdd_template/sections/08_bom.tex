@@ -35,7 +35,6 @@ count would force the reduced-actuation one-wheel variant
 % ------------------------------------------------------------------
 {\small
 \setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.2}
 \begin{longtable}{@{} c L{2.5cm} c L{5.4cm} L{3.7cm} @{}}
 \caption{Supplied bill of materials, grouped by subsystem.}
 \label{tab:bom-supplied}\\
@@ -98,3 +97,74 @@ build, so four of each are procured.}\\
 \end{longtable}
 }
 
+<<<<<<< Updated upstream
+=======
+% ------------------------------------------------------------------
+% TABLE 2 -- DERIVED ACTUATION PARAMETERS
+% ------------------------------------------------------------------
+{\small
+\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{} L{3.5cm} L{5.2cm} L{3.3cm} L{2.5cm} @{}}
+\caption{Derived actuation parameters (computed from the supplied BOM; order-of-magnitude, assuming a \qty{150}{\milli\metre}, \qty{2}{\kilo\gram} cube).}
+\label{tab:bom-derived}\\
+\toprule
+Quantity & Basis / expression & Value & Source \\
+\midrule
+\endfirsthead
+\multicolumn{4}{c}{\footnotesize\itshape \tablename~\thetable\ (continued)}\\
+\toprule
+Quantity & Basis / expression & Value & Source \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\footnotesize\itshape Continued on next page}\\
+\endfoot
+\bottomrule
+\endlastfoot
+Torque constant $K_t$ & $9.5493/K_v$, $K_v=\qty{380}{\rpm\per\volt}$ & \qty{0.0251}{\newton\metre\per\ampere} & Derived (datasheet $K_v$) \\
+Peak torque & $K_t\times\qty{16}{\ampere}$ (\qty{180}{\second} rating) & ${\approx}\,\qty{0.40}{\newton\metre}$ & Derived \\
+Continuous torque & $K_t\times\qtyrange{5}{8}{\ampere}$ (motor-thermal limit) & \qtyrange{0.13}{0.20}{\newton\metre} & Derived; measure-TBD \\
+Usable wheel speed (6S) & $K_v\,V$; \qty{8436}{\rpm} no-load nominal, derated & ${\approx}\,\qty{7000}{\rpm}$ (${\approx}\,\qty{733}{\radian\per\second}$) & Derived \\
+Electrical frequency & 12 pole pairs $\times\,116.7\,\mathrm{s^{-1}}$ at \qty{7000}{\rpm} & \qty{1400}{\hertz} vs \qty{2000}{\hertz} driver ceiling & Derived \\
+Required jump-up momentum & inelastic-collision model, $1.5\times$ margin (edge) & ${\approx}\,\qty{0.29}{\kilogram\metre\squared\per\second}$ & Derived (estimate) \\
+Target wheel inertia & $H/\omega$ at \qty{733}{\radian\per\second} (edge; corner ${\approx}\,1.7\times$) & ${\ge}\,\qty{3.9e-4}{\kilogram\metre\squared}$ & Derived; measure-TBD \\
+Stored kinetic energy / wheel & $\tfrac12 J\omega^2$ at \qty{733}{\radian\per\second} & ${\approx}\,\qty{105}{\joule}$ (${\approx}\,\qty{320}{\joule}$ for 3) & Derived \\
+\end{longtable}
+}
+
+% ------------------------------------------------------------------
+% TABLE 3 -- ITEMS NOT COVERED BY THE SUPPLIED BOM
+% ------------------------------------------------------------------
+{\small
+\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{} L{3.8cm} L{1.3cm} L{7.3cm} L{1.7cm} @{}}
+\caption{Items not covered by the supplied BOM --- still to be bought or fabricated. Lead-time risk H/M/L.}
+\label{tab:bom-gaps}\\
+\toprule
+Item & Qty & Requirement driving it & Lead-time risk \\
+\midrule
+\endfirsthead
+\multicolumn{4}{c}{\footnotesize\itshape \tablename~\thetable\ (continued)}\\
+\toprule
+Item & Qty & Requirement driving it & Lead-time risk \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\footnotesize\itshape Continued on next page}\\
+\endfoot
+\bottomrule
+\endlastfoot
+Reaction-wheel rims & 3 & Target wheel inertia (Table~\ref{tab:bom-derived}); density-at-radius $\Rightarrow$ laser-/water-cut steel ring, ${\approx}\,\qty{120}{\milli\metre}$ OD, \qtyrange{3}{4}{\milli\metre} thick & H \\
+Frame stock (Al angle / extrusion / CF tube) & 1 set & Three mutually orthogonal, rigid motor faces & H \\
+Spare motor + spare moteus-n1 & 1 each & Resilience against in-service failure; long resupply lead time & H \\
+E-stop / anti-spark switch + inline fuse & 1 & Safety: cut energy input on the \qtyrange{40}{60}{\ampere} bus & M \\
+Bench PSU (current-limited, \qtyrange{0}{30}{\volt}, ${\ge}\,\qty{5}{\ampere}$) & 1 & Safe firmware bring-up (never on the battery) & M \\
+LiPo charger + safe bag + cell alarm & 1 & Battery charging and storage safety & M \\
+Bus bulk capacitor & 1 & Regen-braking transient (${\approx}\,\qty{105}{\joule}$/wheel); \qtyrange{470}{1000}{\micro\farad}, ${\ge}\,\qty{50}{\volt}$ low-ESR & L \\
+XT30 connector pairs & 3+ & moteus-n1 power connector (BOM supplies XT90 only) & L \\
+M3 fasteners + heat-set inserts + threadlocker & 1 set & Vibration-proof assembly & L \\
+Wire (\qty{14}{\awg} bus, \qtyrange{24}{26}{\awg} signal) + bullets, heat-shrink & 1 set & Power and signal harness & L \\
+Filament (PETG, TPU, CF-nylon) & --- & All printed structure and brackets & L \\
+\end{longtable}
+}
+>>>>>>> Stashed changes
