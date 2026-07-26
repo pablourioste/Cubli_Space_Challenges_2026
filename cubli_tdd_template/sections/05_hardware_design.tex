@@ -1,0 +1,46 @@
+% ================= 5. PRELIMINARY HARDWARE DESIGN =================
+\section{Preliminary Hardware Design}
+\label{sec:hardware}
+
+This design is preliminary: final actuator and sensor specifications are not yet
+confirmed, so the mechanical and electrical architecture is kept modular and
+largely parametric (Section~\ref{sec:background}).
+
+\subsection{System Architecture}
+\label{sec:architecture}
+
+% High-level block diagram tying together actuation, sensing, processing, and
+% power for both the 2D prototype and the 3D cube.
+
+\subsection{Mechanical Design}
+\label{sec:mechanical}
+
+\subsubsection{2D Prototype Build}
+
+% Structural concept of the single-face rig: 3D-printed plate, central
+% motor/wheel mount, corner bearing, and servo brake (cross-reference
+% Sec.~\ref{sec:2dmodel}).
+
+\subsubsection{3D Cube Frame}
+
+% Structural concept for the full cube: three orthogonal wheel/motor modules,
+% frame, and corner/edge contact features.
+
+\subsection{Electrical Design}
+\label{sec:electrical}
+
+\subsubsection{Components}
+
+The electronics and software will be built around a microcontroller communicating over a CAN bus with a motor driver that closes the current loop for the selected brushless motor. Wheel speed will be measured with a magnetic encoder on the motor shaft, and body tilt will be estimated from an onboard IMU. Braking will be actuated by a digital servo driven directly from the microcontroller, and a wireless module will provide a telemetry and debugging link. Power will be supplied by a LiPo battery, stepped down through a DC-DC converter for the logic-level electronics, with the motor driver powered directly from the battery bus.
+
+\subsubsection{Electrical Diagram}
+
+% Wiring / power-distribution diagram: battery bus, DC-DC converter, motor
+% driver, microcontroller, encoder, IMU, servo, and telemetry link.
+
+\subsection{System Integration}
+\label{sec:integration}
+
+% How the actuation, sensing, processing, and power subsystems are assembled and
+% coordinated: mechanical mounting, interface management, and the software
+% coordination that runs the control loop derived in Sec.~\ref{sec:modeling}.

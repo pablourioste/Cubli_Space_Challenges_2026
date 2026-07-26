@@ -1,12 +1,32 @@
 % ================= 6. TESTING AND VALIDATION PLAN =================
 \section{Testing and Validation Plan}
+\label{sec:testing}
 
-\subsection{Edge Cases}
+This plan covers system-level validation. Parameter-identification tests that
+feed the model directly (swing test, current-step identification) are described
+with the model they validate in Section~\ref{sec:paramid}.
 
 \subsection{Simulation-First Validation}
 
+% Validate the control law in simulation on the identified 2D model
+% (Sec.~\ref{sec:control2d}) before any hardware bring-up.
+
 \subsection{Bring-up Sequence}
+
+% Staged hardware bring-up: power and comms check, sensor read-back, open-loop
+% wheel spin, closed-loop balance, then jump-up.
 
 \subsection{Sensor Testing}
 
+% IMU and encoder characterization: noise, bias, and fusion for the tilt estimate.
+
+\subsection{Milestone Acceptance Criteria}
+
+% Pass/fail criteria for each objective in the traceability table
+% (Table~\ref{tab:traceability}): edge balance, corner balance, controlled
+% rotation, and walking.
+
 \subsection{Control Performance Evaluation}
+
+% Metrics: recovery angle, settling time, disturbance-rejection bandwidth, and
+% tracking error for slew maneuvers.

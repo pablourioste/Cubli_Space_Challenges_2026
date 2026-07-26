@@ -1,8 +1,46 @@
-% ================= 3. ANALYSIS =================
-\section{Analysis}
+% ================= 3. SYSTEM ANALYSIS & REQUIREMENTS =================
+\section{System Analysis \& Requirements}
 
-\subsection{Scope of Work}
+\subsection{Scope of Work \& Use Cases}
+\label{sec:scope}
 
-\subsection{Use Cases}
+% Define the boundaries of this design effort and the concrete scenarios the
+% system must support. Reference the four target behaviors from Sec.~\ref{sec:objectives}
+% (edge balance, corner balance, controlled rotation, walking) as the primary use cases.
 
-\subsection{Why Reaction Wheels (Actuation Trade-off)}
+\subsection{Actuation Trade-off --- Why Reaction Wheels}
+\label{sec:tradeoff}
+
+% Justify momentum-exchange actuation over alternatives (e.g. control moment
+% gyros, external actuation). Build on the ADCS framing of Sec.~\ref{sec:application}
+% and the RW-vs-CMG distinction \cite{votel2012cmgvsrw, tensortech2026rwcmg}.
+
+\subsection{Requirements \& Objectives Traceability}
+\label{sec:requirements}
+
+Each project objective (Section~\ref{sec:objectives}) imposes a required capability,
+which in turn is confirmed by a specific test in the validation plan
+(Section~\ref{sec:testing}). The mapping below keeps every requirement traceable
+from motivation to verification.
+
+\begin{table}[h]
+\centering
+\caption{Objective-to-requirement-to-verification traceability.}
+\label{tab:traceability}
+\begin{tabular}{lll}
+\toprule
+Objective & Required capability & Verified by \\
+\midrule
+Edge balance        & Regulation about a line-contact equilibrium & Sec.~\ref{sec:testing} \\
+Corner balance      & Regulation about a point-contact equilibrium, all axes & Sec.~\ref{sec:testing} \\
+Controlled rotation & Reference tracking / slew between equilibria & Sec.~\ref{sec:testing} \\
+Walking (stretch)   & Chained jump-up + re-stabilization & Sec.~\ref{sec:testing} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Coordinate Frames \& Conventions}
+\label{sec:frames}
+
+% Define the body frame, world/inertial frame, and the sign conventions for
+% tilt angle and wheel angle used consistently throughout the modeling section.
