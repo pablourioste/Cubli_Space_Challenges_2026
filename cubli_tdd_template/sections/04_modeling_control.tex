@@ -81,7 +81,7 @@ With $I_b$, $I_w$, $m_b$, $l_b$, $m_w$, and $l$ established from CAD simulation,
 This simulation-derived value of $\omega_w$ will be used to verify, ahead of fabrication, that the selected motor can reach the required speed within the available bus voltage, and to size the wheel's inertia --- via its radius and any added rim mass --- so that the required speed remains within the motor's practical operating range without excessively reducing the recovery angle available for balancing. Once the prototype is built, the current-step and swing-test identification described above will be used to refine $\omega_w$ experimentally, together with an iterative trial-and-error adjustment to account for any deviation from the idealized inelastic-collision assumption (e.g., a non-zero coefficient of restitution or parameter uncertainty).
 
 The braking mechanism will consist of a servo-driven barrier that is swung into a bolt head attached to the momentum wheel to stop it abruptly. The servo's response time will be a design constraint on the validity of the ``instantaneous stop'' assumption underlying the jump-up equation above; a slower stop than assumed will yield a lower effective post-impact body velocity than predicted, which will be compensated for through the same iterative tuning process rather than relying on the analytical estimate alone.
-
+\newpage
 \subsubsection{Torque-Limited Wheel-Inertia Target}
 \label{sec:jumpup_target}
 
@@ -150,14 +150,35 @@ $I_{w,\text{target}}$ & \textbf{Target wheel inertia} & $\mathbf{3.15\times10^{-
 
 \subsubsection{LQR Baseline Control}
 
-% Design an LQR regulator on the linearized 2D model (Sec.~\ref{sec:2dequilibria})
-% for edge-balance stabilization; state weighting rationale and expected margins.
+The nonlinear dynamics will be linearized about the upright equilibrium $(\theta_b,\dot\theta_b,\dot\theta_w)=(0,0,0)$, giving
+\begin{equation}
+\dot x(t) = Ax(t) + Bu(t), \qquad x := (\theta_b,\dot\theta_b,\dot\theta_w),
+\end{equation}
+with $A, B$ built from the identified parameters $m_b, m_w, I_b, I_w, l, l_b, C_b, C_w, K_m$. Zero-order-hold discretization at a rate set relative to the open-loop unstable pole (with a safety margin) gives $x[k+1] = A_dx[k] + B_du[k]$.
+\newpage
+A discrete LQR gain $K_d = (K_{d1}, K_{d2}, K_{d3})$ will minimize
+\begin{equation}
+J(u) = \sum_k x^{\mathrm T}[k]Qx[k] + u^{\mathrm T}[k]Ru[k],
+\end{equation}
+giving the control law $u[k] = -K_d(\hat\theta_b[k], \hat{\dot\theta}_b[k], \hat{\dot\theta}_w[k])$ from IMU tilt/rate and encoder wheel-speed feedback.
 
+To prevent a constant tilt-sensor offset from appearing as a nonzero steady-state wheel speed, a low-pass filter state $x_f[k+1] = (1-\alpha)x_f[k] + \alpha\hat\theta_b[k]$ will be subtracted from the tilt feedback:
+\begin{equation}
+u[k] = -K_d(\hat\theta_b[k]-x_f[k],\, \hat{\dot\theta}_b[k],\, \hat{\dot\theta}_w[k]).
+\end{equation}
+Any offset $d$ is then absorbed by $x_f$ at steady state. This fixed-gain design will serve as the baseline balancing controller.
 \subsubsection{Gain Scheduling \& Mode Transitions}
 
+The controller will switch from the open-loop jump-up sequence to the LQR balancing law once the estimated tilt enters a threshold window, $|\hat\theta_b|<\theta_{\text{th}}$, where the linearized model is expected to hold; a hysteresis band around $\theta_{\text{th}}$ will prevent chattering between modes if the body oscillates near the switching point. The baseline will use a single fixed gain $K_d$ computed at the upright equilibrium. If testing shows degraded recovery near the edges of the operating range — where the small-angle linearization becomes less accurate — gain scheduling will be added as an extension: additional gains $K_d^{(i)}$ computed at several linearization points across the tilt range, with the controller interpolating or switching between them based on $\hat\theta_b$, while keeping the same discrete structure and offset-correction filter.
 % Handling of the transition between jump-up, capture, and balance regimes.
 
 \subsubsection{Jump-Up Strategy}
+
+Using the CAD-derived $I_b, I_w, m_b, l_b, m_w, l$, the wheel speed $\omega_w$ required for jump-up will be estimated before fabrication assuming a perfectly inelastic wheel-body collision, via conservation of angular momentum at impact and conservation of energy from impact to the edge-standing position:
+\begin{equation}
+\omega_w^2 = (2-\sqrt2)\,\frac{I_w+I_b+m_wl^2}{I_w^2}\,(m_bl_b+m_wl)\,g.
+\end{equation}
+This value will be checked against the selected motor's achievable speed at the available bus voltage, and used to size wheel inertia (radius, rim mass) so the required speed stays in range without excessively reducing the balancing recovery angle. After fabrication, $\omega_w$ will be refined experimentally with iterative trial-and-error tuning to account for deviations from the ideal inelastic-collision assumption. The braking barrier's servo response time will bound how well the "instantaneous stop" assumption holds; a slower stop will be compensated through the same tuning process.
 
 % Control sequence that spins up the wheel and triggers the brake to execute the
 % jump-up analyzed in Sec.~\ref{sec:jumpup}.
@@ -168,18 +189,43 @@ $I_{w,\text{target}}$ & \textbf{Target wheel inertia} & $\mathbf{3.15\times10^{-
 The dynamics, identification workflow, and control approach validated on the 2D
 model extend to the full three-dimensional cube, where three orthogonal
 reaction wheels must stabilize the body about its edge and corner equilibria.
-
+\newpage
 \subsubsection{Full-Body Equations of Motion}
 
-% Present the 3D reaction-wheel inverted-pendulum equations of motion, following
-% the ETH formulation \cite{gajamohan2013cubli, muehlebach2017cubli}.
+Let $R \in SO(3)$ denote the orientation of the cube body relative to the world frame, $\omega_b \in \mathbb{R}^3$ the body's angular velocity expressed in the body frame, and $\omega_w = (\omega_{w,1},\omega_{w,2},\omega_{w,3})^{\mathrm T}$ the angular velocities of the three reaction wheels relative to the body, each about the axis $e_i$ normal to the face it is mounted on. The attitude kinematics are
+\begin{equation}
+\dot R = R\,[\omega_b]_\times,
+\end{equation}
+where $[\cdot]_\times$ is the skew-symmetric cross-product matrix.
+
+The total angular momentum of the assembly about the pivot point, expressed in the body frame, generalizes the single-axis momentum term from the 2D model:
+\begin{equation}
+H = I\omega_b + \sum_{i=1}^{3} I_{w,i}\,\omega_{w,i}\,e_i,
+\end{equation}
+where $I$ is the $3\times3$ inertia tensor of the body-plus-wheels assembly about the pivot, generalizing $I_b + m_w l^2$. Euler's equation for a body under external torque gives
+\begin{equation}
+\dot H + \omega_b \times H = \tau_g - C_b\,\omega_b,
+\end{equation}
+where $\tau_g = m\,r_{cm}\times(R^{\mathrm T}\hat g)$ is the gravity torque about the pivot, $m$ the total assembly mass, $r_{cm}$ the body-frame vector from the pivot to the assembly's center of mass (the 3D generalization of $l_b$), $\hat g$ the world vertical unit vector, and $C_b$ a (generally diagonal) $3\times3$ damping matrix. Each wheel's dynamics generalize the single-wheel relation directly:
+\begin{equation}
+I_{w,i}\big(\dot\omega_{b,i} + \dot\omega_{w,i}\big) = T_{m,i} - C_{w,i}\,\omega_{w,i}, \qquad i=1,2,3,
+\end{equation}
+with $\omega_{b,i} = e_i^{\mathrm T}\omega_b$ and $T_{m,i} = K_{m,i}u_i$. Restricting motion to a single vertical plane and setting two of the three wheel torques to zero recovers the single-axis prototype model exactly, with $I_b$, $l_b$, $m_b$, $m_w$, $I_w$, $C_b$, $C_w$ corresponding to the relevant single-axis projections of $I$, $r_{cm}$, $m$, $I_{w,i}$, $C_{w,i}$.
 
 \subsubsection{Axis Coupling}
-
+In the 2D prototype, body and wheel dynamics were coupled through a single scalar reaction torque. In the 3D cube this coupling becomes fully multi-axis, arising from two sources. First, gyroscopic coupling enters through the $\omega_b \times H$ term: whenever the body has angular velocity about more than one axis, momentum stored in one wheel produces a reaction torque about the \emph{other} two axes even with no motor torque commanded there. This term is bilinear in $\omega_b$ and $H$ and vanishes only near equilibria where $\omega_b\approx 0$. Second, inertial coupling can arise if wheel placement or the body's own mass distribution introduces off-diagonal (product-of-inertia) terms in $I$. For a symmetric cube with wheels centered on each face along the face normals, $I$ is expected to be near-diagonal; any residual coupling from wiring, battery placement, or asymmetric hardware will be characterized using the same CAD-plus-experimental identification process developed for the 2D prototype, extended from a single scalar $I_b$ to a full inertia tensor. Because of these two coupling mechanisms, each wheel cannot be treated as an independent 1D subsystem, and the balancing controller must be designed on the coupled multi-axis model rather than as three decoupled copies of the 2D LQR baseline.
+\newpage
 % Explain how the single-axis 2D result generalizes and where cross-axis coupling
 % appears as the contact geometry shrinks from an edge (line) to a corner (point).
 
 \subsubsection{Edge vs.\ Corner Equilibria \& Linearization}
 
+The cube's jump-up will proceed in the same two stages used in the original strategy: Flat-to-Edge, where a single wheel brakes to bring the cube onto one edge, followed by Edge-to-Corner, where a second wheel brakes to bring it onto a corner. Balancing on an edge constrains the body to rotate about a single fixed axis, so the dynamics reduce to the same single-axis form as the 2D prototype model, and the LQR baseline and offset-correction filter developed earlier apply directly, with $m_b$, $l_b$, $I_b$ replaced by their edge-balancing equivalents.
+
+Balancing on a corner is genuinely three-dimensional: the body has three rotational degrees of freedom about the corner, and all three wheels contribute. Linearizing the full-body equations of motion about the corner-up equilibrium $(\theta,\omega_b,\omega_w)=(0,0,0)$, where $\theta\in\mathbb{R}^3$ parameterizes small orientation error from corner-up, gives a state-space model of the same form as the 2D case:
+\begin{equation}
+\dot x(t) = Ax(t) + Bu(t), \qquad x := (\theta,\omega_b,\omega_w) \in \mathbb{R}^9,
+\end{equation}
+with $A\in\mathbb{R}^{9\times9}$ and $B\in\mathbb{R}^{9\times3}$ built from the full inertia tensor $I$, the mass distribution $r_{cm}$, and the per-wheel parameters $I_{w,i}, C_{w,i}, K_{m,i}$. The discrete LQR design generalizes directly: $K_d$ becomes a $3\times9$ gain matrix rather than a $1\times3$ vector, with the same zero-order-hold discretization, quadratic cost, and offset-correction filtering reused, and $Q,R$ sized to weight all three tilt axes, body rates, and wheel speeds. The mode-transition logic will be extended with a third mode — Edge-to-Corner jump-up, triggered once edge balancing is stable — followed by a second threshold-based switch into the full 3D corner LQR once estimated orientation enters a neighborhood of the corner-up equilibrium.
 % Linearize about the edge and corner equilibria; contrast stability structure
 % and controllability with the 2D case.
