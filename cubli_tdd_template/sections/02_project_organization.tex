@@ -73,10 +73,13 @@ CAD modeling, prototype building/assembly, and product presentation
 \subsection{Work Breakdown Structure}
 \label{sec:wbs}
 
-This plan covers the effort up to the Technical Design Document deliverable on
-3~August 2026. The work is grouped into three streams --- investigation,
-requirements and documentation; control and software; and hardware design and
-build --- led by the owners assigned in Table~\ref{tab:team_roles}. The
+This plan runs from project start to the final presentation on 20~August 2026.
+The documentation stream is front-loaded and closes with the Technical Design
+Document deliverable on 3~August, while the control and hardware streams continue
+through the build, balancing and jump-up demonstrations up to the presentation.
+The work is grouped into three streams --- investigation, requirements and
+documentation; control and software; and hardware design and build --- led by
+the owners assigned in Table~\ref{tab:team_roles}. The
 investigation is kept to the essentials needed to substantiate the design:
 a focused literature review, the dynamics derivation, and the wheel sizing that
 follows from it. The table below breaks the three streams into individual tasks, each with its
@@ -88,17 +91,20 @@ scope, owner and dates.
 \label{sec:schedule}
 
 The full-page schedule in Figure~\ref{fig:gantt} places every task of
-Section~\ref{sec:wbs} on the 23~July--3~August 2026 calendar, and
-Table~\ref{tab:gates} states the gate that closes each phase. The critical path runs through the dynamics investigation and
-wheel sizing, which feed both the control design and the hardware design; the
-single-axis (S1) rig is the protected item, since its balance result is the
-experimental evidence in the document. If any modeling or rig task slips, the TDD
-is still submitted on schedule with simulation-only evidence and the affected
-result carried as future work.
+Section~\ref{sec:wbs} on the 23~July--20~August 2026 calendar, and
+Table~\ref{tab:gates} states the gate that closes each phase. The documentation
+stream is deliberately completed early, at the TDD deliverable on 3~August, so
+the remaining weeks are free for the build, balancing and jump-up work that
+culminates in the final presentation. The critical path runs through the
+dynamics investigation and wheel sizing, which feed both the control and the
+hardware streams; the single-axis (S1) rig is the protected item, since its
+balance result is the experimental evidence in the document. If any modeling or
+rig task slips, the TDD is still submitted on schedule with simulation-only
+evidence and the affected result carried into the later build weeks.
 
 \begin{table}[h]
 \centering
-\caption{Milestone gates to the deliverable.}
+\caption{Milestone gates, from kick-off to the final presentation.}
 \label{tab:gates}
 \small
 \begin{tabular}{@{}l L{7.0cm} l@{}}
@@ -108,7 +114,12 @@ result carried as future work.
 G1 & Long-lead order placed; requirements and plan locked & 24 Jul \\
 G2 & Dynamics, control design and wheel sizing complete & 1 Aug \\
 G3 & 1-DoF rig balances $\geq$60 s; plant parameters measured & 2 Aug \\
-G4 & TDD delivered (deliverable) & 3 Aug \\
+G4 & TDD delivered (documentation deliverable) & 3 Aug \\
+G5 & Cube integrated and powered; all axes addressable & 9 Aug \\
+G6 & Edge balance (S2a) for $\geq$60 s with disturbance recovery & 13 Aug \\
+G7 & Corner balance and commanded slew (S2b/c) & 16 Aug \\
+G8 & Face-to-edge jump-up (S3) captured on video & 18 Aug \\
+G9 & Final presentation and demonstration & 20 Aug \\
 \bottomrule
 \end{tabular}
 \end{table}
