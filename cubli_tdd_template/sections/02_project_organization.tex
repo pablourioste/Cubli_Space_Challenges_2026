@@ -71,4 +71,28 @@ CAD modeling, prototype building/assembly, and product presentation
     and pitching the product.
 \end{itemize}
 
-\subsection{Timeline and Contingency Plan}
+\subsection{Work Breakdown Structure}
+\label{sec:wbs}
+
+The project is decomposed into five workstreams --- formulation and
+documentation, control and software, CAD design, manufacturing and circuits, and
+milestone gates --- each led by the owner assigned in Table~\ref{tab:team_roles}.
+The task lists below give, for every task, its code, priority, effort in
+person-days, planned dates and owner; tasks on the critical path are flagged
+\textcolor{p0col}{\textbf{P0}}. The full specification of what each task entails
+is collected, by code, in Appendix~\ref{app:taskdict}.
+
+\input{sections/02_project_organization_tasks}
+
+\subsection{Schedule and Contingency Plan}
+\label{sec:schedule}
+
+Figures~\ref{fig:gantt-pf}--\ref{fig:gantt-ms} place every task of
+Section~\ref{sec:wbs} on the 23~July--19~August 2026 calendar, one chart per
+workstream over a shared week/day axis. The schedule builds
+in explicit contingency: a distributed rework buffer (task MF-18) and hard
+milestone gates M0--M7. Should the edge-balance gate (M5) slip, the jump-up stage
+(S3) is dropped the same day and effort is redirected to corner balance and
+documentation, protecting the committed deliverables.
+
+\input{sections/02_project_organization_gantt}

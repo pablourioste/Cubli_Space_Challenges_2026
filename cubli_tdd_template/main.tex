@@ -9,10 +9,12 @@
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
+\usepackage{ragged2e}   % \RaggedRight for the L{} prose columns (BOM + WBS tables)
 \usepackage{fancyhdr}
 \usepackage{lastpage}
 \usepackage{siunitx}    % SI units via \qty/\num for the BOM tables (App. A)
-\usepackage{xcolor}     % \textcolor for visible TODO placeholders in tables
+\usepackage{xcolor}     % \textcolor for TODO placeholders + workstream colours
+\usepackage{pgfgantt}   % Gantt chart for the project schedule (Sec. 2)
 \usepackage{hyperref}
 \usepackage{parskip}
 \usepackage[
@@ -35,7 +37,15 @@
 \DeclareSIUnit{\rpm}{rpm}   % motor speed
 \DeclareSIUnit{\bit}{bit}   % data-rate unit (Mbit/s)
 \DeclareSIUnit{\awg}{AWG}   % wire gauge
-\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}  % ragged fixed-width prose column
+\newcolumntype{L}[1]{>{\RaggedRight\arraybackslash}p{#1}}  % ragged fixed-width prose column (BOM + WBS tables)
+
+% ---------- Project-planning colours (WBS task tables & Gantt, Sec. 2) ----------
+\definecolor{pfcol}{HTML}{70AD47} % formulation & documentation
+\definecolor{ctcol}{HTML}{2E75B6} % control & software
+\definecolor{cdcol}{HTML}{BF8F00} % CAD design
+\definecolor{mfcol}{HTML}{C55A11} % manufacturing & circuits
+\definecolor{mscol}{HTML}{7F7F7F} % milestones
+\definecolor{p0col}{HTML}{C00000} % P0 (critical-path) priority highlight
 
 % ---------- Header / Footer ----------
 \pagestyle{fancy}
@@ -107,5 +117,7 @@
 \printbibliography[title={References}]
 \clearpage
 \input{sections/08_bom}
+\clearpage
+\input{sections/09_task_dictionary}
 
 \end{document}

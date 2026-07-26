@@ -1,0 +1,174 @@
+% ================= APPENDIX: TASK DICTIONARY =================
+% NOTE: \appendix is already issued in 08_bom.tex; this file only adds a section.
+\section{Task Dictionary}
+\label{app:taskdict}
+
+This appendix gives the full specification of every task code used in the work
+breakdown structure and schedule of Section~\ref{sec:wbs}. The condensed tables
+in the main body carry only the code, priority, effort, dates and owner; the
+detailed description of what each task entails is collected here, grouped by the
+same five workstreams. Notes flagged \textcolor{p0col}{$\triangleright$} mark the
+highest-leverage or highest-risk items.
+
+\subsection{Formulation \& Documentation (PF)}
+{\small
+\setlength{\tabcolsep}{4pt}%
+\begin{longtable}{@{}L{1.1cm} L{3.0cm} L{11.0cm}@{}}
+\toprule
+\textbf{Code} & \textbf{Task} & \textbf{Specification} \\
+\midrule\endfirsthead
+\toprule
+\textbf{Code} & \textbf{Task} & \textbf{Specification} \\
+\midrule\endhead
+\bottomrule\endfoot
+\textbf{PF-01} & Close open questions & Get written answers from the organisers: (1) motor/driver/encoder quantities per team, (2) servo intent - brake, leg or other, (3) 1N5819 intent - power-ORing or flyback, (4) is frame material supplied or do we source it, (5) laser/waterjet/lathe access, (6) is the 150 mm cube dimension locked or free, (7) bench PSU availability. \newline\textcolor{p0col}{\footnotesize$\triangleright$ Highest-leverage task in the plan - it is what unblocks the MF-01 order} \\[2pt]
+\textbf{PF-02} & Problem statement \& narrative & Write the problem statement and lock the ADCS application framing: momentum-exchange actuation, reaction wheels as the standard spacecraft attitude actuator, Hayabusa2 MINERVA-II / MASCOT hopping as the low-gravity mobility precedent. One paragraph that every other section refers back to. \\[2pt]
+\textbf{PF-03} & Scope \& requirements & Define what is in and out of scope. Build the requirements table split into Functional (F), Performance (P) and Design constraint (D), each with an ID, a statement and a verification method. \\[2pt]
+\textbf{PF-04} & Milestones \& staging & Define the three prototype stages (S1 1-DoF rig, S2 3D cube, S3 jump) and write a quantitative, binary acceptance criterion for each gate - e.g. 'balances $\geq$60 s and recovers from a finger poke', not 'works well'. \\[2pt]
+\textbf{PF-05} & Roles \& RACI & Assign a named owner per workstream (control, CAD, manufacturing, documentation) and per TDD section. Produce a one-page RACI so nobody is waiting on an unassigned task. \\[2pt]
+\textbf{PF-06} & EoM - 1-DoF pendulum & Derive the equations of motion of the reaction-wheel inverted pendulum by the Lagrangian method. Four states: body angle, body rate, wheel angle, wheel rate. Input = motor torque. Include viscous friction terms. \\[2pt]
+\textbf{PF-07} & EoM - 3D cube & Derive the 3D equations of motion for the cube with three orthogonal wheels, for both the edge pivot and the corner pivot. Define body and inertial frames, the attitude parameterisation, and the coupled wheel/body angular momentum terms. \\[2pt]
+\textbf{PF-08} & Linearisation \& controllability & Identify the equilibria (edge and corner), linearise about each, and check controllability and observability of the resulting linear systems. Confirm the corner case is fully unstable with coupled axes. \\[2pt]
+\textbf{PF-09} & Mass / inertia / CoM budget & Build the mass, inertia and centre-of-mass budget parametrically (symbols, not numbers) so the model stands up before hardware exists. Replace with CAD values at CD-18 and measured values at PF-16. \\[2pt]
+\textbf{PF-10} & Jump-up analysis & Energy method for the face-to-edge and edge-to-corner tips: CoM rise, inertia about the contact edge, required body rate, required stored angular momentum under an inelastic-collision model, and hence the minimum wheel inertia. Derive the brake impulse requirement dH/dt. \newline\textcolor{p0col}{\footnotesize$\triangleright$ This is what sizes the wheel - it must be done before CD-02 is frozen} \\[2pt]
+\textbf{PF-11a} & TDD - draft body & EVERY MEMBER WRITES THEIR OWN SECTION, Dejan integrates. Section owners: Introduction, background and ADCS application narrative = Dejan. Project organisation, roles and timeline = Dejan. Scope, use cases and requirements table = Dejan with all leads reviewing. Mathematical modelling = Dejan + Andrea. Control architecture = Nicc + Andrea. Mechanical design intent = Neisa + Suvanna. Electrical design intent, architecture diagram and power budget = Pablo. Testing and validation plan = Nicc. Literature = Suvanna. Placeholder figures are acceptable at this point. \newline\textcolor{p0col}{\footnotesize$\triangleright$ Anti-Parkinson checkpoint: due 26 Jul regardless of the 3 Aug deadline} \\[2pt]
+\textbf{PF-11b} & TDD - deepen + S1 data & Upgrade the technical sections: full 3D equations of motion, linearisation and controllability argument, jump-up momentum budget, control architecture. Then insert the S1 hardware evidence - rig photos, balance trace, disturbance-recovery plot, and the measured Kt / J\_wheel / friction from CT-11. \newline\textcolor{p0col}{\footnotesize$\triangleright$ Tight - consumes CT-10/CT-11 results almost same-day. Pull CT-10 left if you can} \\[2pt]
+\textbf{PF-11c} & TDD - assemble \& submit & Final assembly: make every figure presentable, run a full read-through for internal consistency, tighten the application story, format references, submit. \newline\textcolor{p0col}{\footnotesize$\triangleright$ DELIVERABLE - Monday 3 August} \\[2pt]
+\textbf{PF-12} & Literature \& references & Collect and format the reference set: ETH Cubli (IROS 2012, ECC 2013), One-Wheel Cubli (Mechatronics 2023), CubeSat ADCS design guides, MINERVA-II / MASCOT mission reports, LQR and optimal-control texts. Pull the ETH PDFs for the modelling section. \\[2pt]
+\textbf{PF-13} & Risk register & Tabulate the risks with trigger, impact, owner and mitigation. Minimum set: rim lead time, rotor unbalance, printed-bracket compliance, 5 V rail brownout, yaw drift, wrong motor quantity. \\[2pt]
+\textbf{PF-14} & Test \& validation plan & Define how each milestone is verified and which numbers get reported: pointing accuracy, slew settling time, jitter / pointing stability, disturbance-recovery time. These are the metrics a real ADCS is graded on - use them instead of 'it balances'. \\[2pt]
+\textbf{PF-15} & System-ID plan & Specify the experiments that will produce the plant parameters: Kt by torque arm or known-inertia spin-up, J\_wheel by J=tau/alpha, viscous friction by coast-down, loop latency by step-response timing. \\[2pt]
+\textbf{PF-16} & Model update - real params & Substitute the measured parameters from CT-11 and the CAD mass properties from CD-18 into the model, then re-run the torque-authority and jump-up sizing calculations with real numbers. \\[2pt]
+\textbf{PF-17a} & Progress note \#1 & Short written status against the milestone gates, plus an incremental update to the TDD sections affected by that week's results. \\[2pt]
+\textbf{PF-17b} & Progress note \#2 & Same as PF-17a for the following week. \\[2pt]
+\textbf{PF-18} & Final report (TDD v2) & Extend the TDD into the final deliverable: experimental results and plots for every stage reached, the ADCS metrics table, lessons learned, and an explicit honest statement of what was achieved versus what was scoped. \newline\textcolor{p0col}{\footnotesize$\triangleright$ FINAL DELIVERABLE} \\[2pt]
+\textbf{PF-19} & Demo video \& deck & Film the demonstrations including 240 fps slow-motion of the jump-up, cut a short video, and build the presentation deck around the stabilise $>$ reorient $>$ propel $>$ traverse capability ladder. \\[2pt]
+\end{longtable}
+}
+
+\subsection{Control \& Software (CT)}
+{\small
+\setlength{\tabcolsep}{4pt}%
+\begin{longtable}{@{}L{1.1cm} L{3.0cm} L{11.0cm}@{}}
+\toprule
+\textbf{Code} & \textbf{Task} & \textbf{Specification} \\
+\midrule\endfirsthead
+\toprule
+\textbf{Code} & \textbf{Task} & \textbf{Specification} \\
+\midrule\endhead
+\bottomrule\endfoot
+\textbf{CT-01} & Sim environment + 1-DoF plant & Set up the simulation environment (Python + CasADi, or MATLAB). Implement the PF-06 plant and validate it: with zero input and zero friction, total energy must be conserved. \\[2pt]
+\textbf{CT-02} & LQR 1-DoF (sim) & Design and tune an LQR about the upright equilibrium in simulation. Sweep robustness against J\_wheel error, added loop delay and torque saturation so the gains survive contact with real hardware. \\[2pt]
+\textbf{CT-03} & Complementary filter & Implement tilt estimation v1: gravity vector from the accelerometer for low-frequency tilt, gyro integration for high-frequency rate, blended by a complementary filter. Tune the crossover in simulation with injected noise and bias. \\[2pt]
+\textbf{CT-04} & Firmware architecture & Decide and document the firmware structure: inner/outer loop rates (the 500 vs 1000 Hz decision driven by the BMI270 I2C read cost), task scheduling, state-machine skeleton, logging hooks, and where safety logic lives. \newline\textcolor{p0col}{\footnotesize$\triangleright$ The IMU interface decision constrains the whole firmware - make it in week 1} \\[2pt]
+\textbf{CT-05} & CAN-FD comms layer & Write the Teensy-to-moteus communication layer: transmit torque commands, parse the reply frame for wheel position, velocity, current and temperature. The reply frame IS the wheel-state feedback - no separate wiring. \\[2pt]
+\textbf{CT-06} & BMI270 driver & Write the IMU driver and resolve the interface question: check whether the breakout exposes SPI pads; if not, use the FIFO plus a data-ready interrupt, or drop the outer loop to 500 Hz. A blocking 400 kHz I2C read costs \textasciitilde{}300 us. \\[2pt]
+\textbf{CT-07} & IMU cal + lever arm & Calibrate gyro bias and accelerometer scale, record the mounting rotation matrix, and implement the lever-arm correction a\_meas = g\_body + w x (w x r) + alpha x r. The cube rotates about the contact corner, not about the IMU. \newline\textcolor{p0col}{\footnotesize$\triangleright$ Skip the lever arm and your tilt estimate is corrupted exactly during fast recovery} \\[2pt]
+\textbf{CT-08} & Telemetry link & Define the Teensy-to-ESP32 UART protocol, stream state over Wi-Fi, and build a ground-station live plot plus command path for start/stop and gain changes. Treat the link as strictly non-safety-critical. \newline\textcolor{p0col}{\footnotesize$\triangleright$ Pays for itself: tune LQR gains in an afternoon instead of a week} \\[2pt]
+\textbf{CT-09} & Safety layer & Implement the software safety envelope: enable the moteus watchdog, tilt-limit auto-disarm, wheel-speed cap, explicit arm/disarm command, and latching fault states that require a deliberate reset. \\[2pt]
+\textbf{CT-10} & S1 - balance 1-DoF rig & Bring the full chain up on the rig: IMU $>$ Teensy $>$ CAN-FD $>$ moteus $>$ wheel. Port the LQR and estimator to hardware, then tune gains against live telemetry until the pendulum balances and rejects disturbance. \newline\textcolor{p0col}{\footnotesize$\triangleright$ STAGE S1 GATE - protect this task at all costs} \\[2pt]
+\textbf{CT-11} & System ID on rig & Execute the PF-15 experiments on the rig: measure real Kt, wheel inertia by spin-up, viscous friction by coast-down, and end-to-end loop latency. Produce a parameter table that replaces every symbolic value. \\[2pt]
+\textbf{CT-12} & 3D plant model (sim) & Implement the PF-07 3D model in simulation for both edge and corner pivots, and validate it against the analytical derivation and against conserved quantities. \\[2pt]
+\textbf{CT-13} & LQR edge (sim) & Design and tune the LQR for edge balance in simulation, using the CD-18 inertia tensor. Verify torque authority against the recoverable-tilt calculation. \\[2pt]
+\textbf{CT-14} & LQR corner (sim) & Design the fully coupled three-axis LQR for corner balance in simulation. This is the hardest equilibrium - all axes coupled, fully unstable. \\[2pt]
+\textbf{CT-15} & EKF / MEKF estimator & Upgrade the estimator to a 3D EKF or multiplicative EKF with gyro bias states. Characterise and document the yaw-drift behaviour: with no magnetometer, absolute heading is unobservable. \newline\textcolor{p0col}{\footnotesize$\triangleright$ Yaw unobservability is the hook that ties this project to the star-tracker team} \\[2pt]
+\textbf{CT-16} & Momentum management & Add the outer wheel-speed regulation loop that bleeds stored momentum back toward zero so the wheels do not saturate during long holds. This is the direct analogue of spacecraft momentum desaturation. \newline\textcolor{p0col}{\footnotesize$\triangleright$ The strongest single ADCS talking point in the project} \\[2pt]
+\textbf{CT-17} & Mode state machine & Implement the mode logic and the guarded transitions between them: idle $>$ arm $>$ edge balance $>$ corner balance $>$ slew $>$ wheel spin-up $>$ jump $>$ catch $>$ safe, with a defined abort path from every state. \\[2pt]
+\textbf{CT-18} & S2a - edge balance & Port the edge controller to the assembled cube and retune against the real inertia, real sensor noise and real actuator saturation. Log the disturbance-recovery response. \newline\textcolor{p0col}{\footnotesize$\triangleright$ STAGE S2a GATE} \\[2pt]
+\textbf{CT-19} & S2b - corner balance & Bring up the coupled three-axis controller on the corner equilibrium. Measure and report pointing accuracy and jitter as ADCS metrics rather than a qualitative claim. \newline\textcolor{p0col}{\footnotesize$\triangleright$ STAGE S2b GATE} \\[2pt]
+\textbf{CT-20} & S2c - commanded slew & Command a rotation to a specified angle and track it. Report settling time and steady-state error - this is the reference-tracking half of the ADCS story. \\[2pt]
+\textbf{CT-21} & S3a - jump-up & Implement the jump sequence: wheel spin-up profile to target angular momentum, scripted brake release with tuned timing, open loop. Iterate the release timing against slow-motion footage. \newline\textcolor{p0col}{\footnotesize$\triangleright$ STAGE S3 GATE} \\[2pt]
+\textbf{CT-22} & S3b - catch controller & Add the gain-scheduled transition that catches the cube after the jump and settles it into edge or corner balance rather than letting it fall. \newline\textcolor{p0col}{\footnotesize$\triangleright$ Only attempt if CT-21 works on Monday the 17th} \\[2pt]
+\textbf{CT-23} & Log post-processing & Write the scripts that turn raw telemetry logs into the reported metrics and into publication-quality plots for the report and the deck. \\[2pt]
+\textbf{CT-24} & Walking (stretch) & Sequence controlled falls between edges and corners, re-stabilising after each, to achieve a multi-step directional traverse. \newline\textcolor{p0col}{\footnotesize$\triangleright$ NOT SCHEDULED - first item to cut} \\[2pt]
+\textbf{CT-25} & NMPC warm start (stretch) & Explore nonlinear MPC with warm-started IPOPT via CasADi in simulation only, as the future-work section of the report. \newline\textcolor{p0col}{\footnotesize$\triangleright$ NOT SCHEDULED - future work section only} \\[2pt]
+\end{longtable}
+}
+
+\subsection{CAD Design (CD)}
+{\small
+\setlength{\tabcolsep}{4pt}%
+\begin{longtable}{@{}L{1.1cm} L{3.0cm} L{11.0cm}@{}}
+\toprule
+\textbf{Code} & \textbf{Task} & \textbf{Specification} \\
+\midrule\endfirsthead
+\toprule
+\textbf{Code} & \textbf{Task} & \textbf{Specification} \\
+\midrule\endhead
+\bottomrule\endfoot
+\textbf{CD-01} & Global layout study & Envelope study in CAD: cube dimension, largest wheel OD the face allows, packaging of three drivers, battery, avionics and perfboard, with the battery centred so the CoM sits at the geometric centre. \\[2pt]
+\textbf{CD-02} & Reaction wheel design & Design the reaction wheel to the PF-10 inertia requirement: \textasciitilde{}120-130 mm OD, 3-4 mm steel rim, printed hub bolting straight to the motor bell via the M6 mount and bolt circle. Maximise radius, minimise added mass. \newline\textcolor{p0col}{\footnotesize$\triangleright$ Long-lead item, design it FIRST. Buy inertia with radius, not with mass} \\[2pt]
+\textbf{CD-03} & Motor mount bracket & Design the face bracket that carries all reaction torque into the frame. Design the interface so a machined aluminium part can be substituted without redesigning anything else. \newline\textcolor{p0col}{\footnotesize$\triangleright$ Printed brackets flex - that compliance is an unmodelled resonance that caps control bandwidth} \\[2pt]
+\textbf{CD-04} & Ring-magnet carrier & Design the carrier that holds the diametrically magnetised ring magnet concentric on the rotating bell. Non-ferrous material. Concentricity error propagates straight into commutation error and torque ripple. \newline\textcolor{p0col}{\footnotesize$\triangleright$ Precision part} \\[2pt]
+\textbf{CD-05} & MA600 encoder bracket & Design the bracket that holds the MA600 centred on the magnet's 4 mm thickness with a gap of 0.5 mm or less. Use slotted holes so the gap can be adjusted during assembly. \newline\textcolor{p0col}{\footnotesize$\triangleright$ You will not hit the gap first try - design for adjustment} \\[2pt]
+\textbf{CD-06} & 1-DoF rig CAD & Design the single-axis test rig: low-friction pivot, motor and wheel mount, IMU mount, counterweight for tuning the equilibrium, and mechanical hard stops to limit travel during failed tuning attempts. \\[2pt]
+\textbf{CD-07} & Tooling \& jigs CAD & Design the tooling: knife-edge or arbor wheel-balancing stand, magnet bonding fixture that holds concentricity while adhesive cures, 0.5 mm encoder feeler gauge, and a motor-mount drilling jig for frame orthogonality. \newline\textcolor{p0col}{\footnotesize$\triangleright$ Highest value-per-gram-of-filament on the whole list} \\[2pt]
+\textbf{CD-08} & moteus board tray & Design the driver mounting tray with standoffs, an airflow gap and cable strain relief. Position it so its SPI cable to the MA600 stays under 20 cm. \\[2pt]
+\textbf{CD-09} & Avionics tray & Design the tray for the Teensy, CAN-FD adapter and ESP32-C6, keeping the Wi-Fi antenna clear of metal structure and away from the motor phase wiring. \\[2pt]
+\textbf{CD-10} & Perfboard mount & Design the mount for the 15 x 9 cm power and signal board, sized to a cube face with clearance for the XT90 entry and the DC-DC module. \\[2pt]
+\textbf{CD-11} & Battery cradle & Design a rigid, symmetric, centrally located cradle with strap slots for the 6S pack. A battery that shifts during a jump changes the plant mid-flight. \newline\textcolor{p0col}{\footnotesize$\triangleright$ The battery is \textasciitilde{}30\% of cube mass - it sets the CoM and the inertia tensor} \\[2pt]
+\textbf{CD-12} & Frame design & Design the primary structure: three mutually orthogonal motor faces in a closed, torsionally stiff assembly, with corner joints if rod or extrusion based. Verify stiffness by hand before committing to fabrication. \\[2pt]
+\textbf{CD-13} & Wheel burst shields & Design 3 mm or thicker shields over each wheel. They contain a burst and they stop fingers reaching a rim moving at \textasciitilde{}47 m/s. \\[2pt]
+\textbf{CD-14} & Corner caps \& edge protectors & Design TPU caps for the eight corners and protectors for the twelve edges. Note that these are the balancing contact surface, so their geometry and compliance enter the plant model. \\[2pt]
+\textbf{CD-15} & Cable clips & Design clips and strain reliefs that route every cable clear of the rotating wheels. \newline\textcolor{p0col}{\footnotesize$\triangleright$ A cable that snags a spinning wheel ends the project} \\[2pt]
+\textbf{CD-16} & Brake caliper \& linkage & Design the brake: caliper or pawl acting on the wheel rim, plus the servo horn linkage. This is a mechanical-advantage problem - the MG92B gives \textasciitilde{}3 kg.cm, so it needs a lever ratio, not a direct push. \\[2pt]
+\textbf{CD-17} & Face panels & Design ribbed face panels that add torsional stiffness and give the demonstrator a finished appearance. \\[2pt]
+\textbf{CD-18} & Mass properties export & Extract the assembled inertia tensor and CoM location from the CAD model and hand them to the control team as the numbers that replace the PF-09 symbols. \\[2pt]
+\textbf{CD-19} & CAD freeze v1 & Freeze the design and release the manufacturing package: drawings, DXF for laser cutting, and the print-ready STL set. After this point changes go through a change note. \\[2pt]
+\end{longtable}
+}
+
+\subsection{Manufacturing \& Circuits (MF)}
+{\small
+\setlength{\tabcolsep}{4pt}%
+\begin{longtable}{@{}L{1.1cm} L{3.0cm} L{11.0cm}@{}}
+\toprule
+\textbf{Code} & \textbf{Task} & \textbf{Specification} \\
+\midrule\endfirsthead
+\toprule
+\textbf{Code} & \textbf{Task} & \textbf{Specification} \\
+\midrule\endhead
+\bottomrule\endfoot
+\textbf{MF-01} & Procurement order & Place the order for everything missing from the BOM: laser-cut steel rims, frame stock, M3 fasteners with heat-set inserts and threadlocker, 3x XT30 pairs, 470-1000 uF / $\geq$50 V low-ESR bus capacitor, E-stop and XT90-S anti-spark connector, 40-60 A fuse, 14 AWG silicone wire, bullet connectors, PETG/TPU/CF-nylon filament, LiPo charger, safe bag and cell alarm, plus one spare motor and one spare moteus. \newline\textcolor{p0col}{\footnotesize$\triangleright$ 3-10 day lead time. This date does NOT move with the document deadline} \\[2pt]
+\textbf{MF-02} & Bench PSU \& safety kit & Secure a current-limited bench supply (0-30 V, $\geq$5 A), set up the test area, and assemble the safety kit: burst shields, eye protection, LiPo-safe storage and charging location. \newline\textcolor{p0col}{\footnotesize$\triangleright$ A current-limited supply is the difference between a bug and a fire} \\[2pt]
+\textbf{MF-03} & Bench bring-up (1 axis) & Bring up one motor, one moteus and one MA600 on the bench supply. Set the unique CAN ID first, run moteus\_tool calibration and the MA600 bias-current trim, then verify in tview: encoder counts monotonic over a full revolution, commanded current tracks measured, no cogging faults. \newline\textcolor{p0col}{\footnotesize$\triangleright$ Set CAN IDs before the boards are bussed together or you cannot address them} \\[2pt]
+\textbf{MF-04} & Print queue A - jigs & Print the tooling from CD-07: balancing arbor, magnet bonding fixture, feeler gauge, drilling jig. These go first because everything downstream depends on them. \newline\textcolor{p0col}{\footnotesize$\triangleright$ The printer is a serial bottleneck - queue order is a scheduling decision} \\[2pt]
+\textbf{MF-05} & Print queue B - S1 parts & Print the single-axis rig parts: rig frame, motor bracket, wheel hub, magnet carrier, encoder bracket. Expect two or three iterations on the encoder bracket gap. \\[2pt]
+\textbf{MF-06} & Fabricate wheels x4 & Fabricate four reaction wheels - three for the cube and one spare so the 1-DoF rig survives cube integration. Cut or receive the rims, print the hubs, bolt them together, bond the ring magnets in the fixture. \newline\textcolor{p0col}{\footnotesize$\triangleright$ Build FOUR, not three - keep a development bench alive} \\[2pt]
+\textbf{MF-07} & Balance \& spin test & Statically balance every wheel on the arbor, then spin each to full speed inside a containment box behind a shield while logging vibration on the IMU. Rebalance until the vibration floor is acceptable. \newline\textcolor{p0col}{\footnotesize$\triangleright$ 1 g of unbalance at 60 mm and 7000 rpm produces 32 N. Most-skipped step, commonest cause of a noisy filter} \\[2pt]
+\textbf{MF-08} & Assemble 1-DoF rig & Assemble the rig: motor, balanced wheel, encoder set to the 0.5 mm gap with the feeler gauge, IMU mounted rigidly and aligned, wiring, and mechanical hard stops. \\[2pt]
+\textbf{MF-09} & Power \& signal schematic & Draw the full power and signal schematic before any soldering: bus distribution, DC-DC, decoupling, CAN split termination, connector pinouts, star ground point. \newline\textcolor{p0col}{\footnotesize$\triangleright$ An ad-hoc perfboard is undebuggable and will eat two days} \\[2pt]
+\textbf{MF-10} & Build perfboard & Build the power and signal board: XT90 input, LM2596 set to 5.00 V and verified with a multimeter BEFORE anything is connected, 5 V bulk capacitance, CAN split termination (2x 60.4 ohm plus 4.7 nF) at each bus end, headers for Teensy, adapter, ESP32, IMU and servo, single star ground. \newline\textcolor{p0col}{\footnotesize$\triangleright$ The 100 uF caps are 16 V parts - they must never touch the 25.2 V bus} \\[2pt]
+\textbf{MF-11} & Harness fabrication & Build the harnesses: XT90 to 3x XT30 power distribution, JST-PH3 CAN daisy chain, motor phase leads, inline E-stop and fuse, and a separate 5 V feed for the servo. \\[2pt]
+\textbf{MF-12} & Print queue C - Tier 1 & Print the structural set: 3x motor bracket, 3x wheel hub, 3x magnet carrier, 3x encoder bracket, 3x moteus tray, avionics tray, battery cradle, frame corner joints. \\[2pt]
+\textbf{MF-13} & Fabricate frame & Cut and drill the frame stock using the drilling jig, assemble it, and verify that the three motor faces are mutually orthogonal before anything else is mounted. \\[2pt]
+\textbf{MF-14} & Print queue D - Tier 2 & Print the protective set: 8x TPU corner caps, 12x edge protectors, 3x burst shields, cable clips and strain reliefs. \\[2pt]
+\textbf{MF-15} & Cube integration & Assemble the complete cube: three motor, wheel and encoder assemblies onto the frame, battery centred and strapped, drivers, avionics and perfboard mounted, full harness installed, all cabling clipped clear of the wheels. \\[2pt]
+\textbf{MF-16} & Power-on / smoke test & First power-up on the bench supply, then the battery: confirm all three moteus are addressable on one bus, the IMU streams, telemetry is live, the E-stop cuts power, and the 5 V rail does not brown out when three motors step simultaneously. \\[2pt]
+\textbf{MF-17} & Brake mechanism build & Fabricate and fit the brake caliper and servo linkage, then bench-test it on the rig wheel: measure the achieved deceleration and compare it against the PF-10 impulse requirement. \\[2pt]
+\textbf{MF-18} & Rework buffer & Reserved capacity for repairs, reprints, resoldering and replacing whatever breaks. Distributed across the build weeks rather than booked as a block. \newline\textcolor{p0col}{\footnotesize$\triangleright$ You will need it} \\[2pt]
+\end{longtable}
+}
+
+\subsection{Milestone Gates (M)}
+{\small
+\setlength{\tabcolsep}{4pt}%
+\begin{longtable}{@{}L{1.1cm} L{3.0cm} L{11.0cm}@{}}
+\toprule
+\textbf{Code} & \textbf{Gate} & \textbf{Pass criterion} \\
+\midrule\endfirsthead
+\toprule
+\textbf{Code} & \textbf{Gate} & \textbf{Pass criterion} \\
+\midrule\endhead
+\bottomrule\endfoot
+\textbf{M0} & Procurement & All open questions answered in writing, and the full MF-01 order confirmed as placed. \\[2pt]
+\textbf{M0b} & TDD draft body & PF-11a complete internally. Not a submission - this exists purely to stop the 3 August deadline from absorbing build time. \\[2pt]
+\textbf{M1} & Electrical chain & A motor spins under a torque command issued by the Teensy over CAN-FD, and the MA600 reads cleanly and monotonically over a full revolution. \\[2pt]
+\textbf{M2} & Stage S1 complete & The 1-DoF pendulum balances for at least 60 s and recovers from a finger poke; Kt, J\_wheel and friction are measured and tabulated. \\[2pt]
+\textbf{M3} & TDD v1 submitted & Document delivered, including the S1 experimental results and the measured plant parameters. \newline\textcolor{p0col}{\footnotesize$\triangleright$ DELIVERABLE} \\[2pt]
+\textbf{M4} & Cube integrated & Powered cube with all three moteus addressable, IMU streaming, telemetry live, and no brownout under a simultaneous three-motor step. \\[2pt]
+\textbf{M5} & Stage S2a - edge & The cube balances on an edge for at least 60 s and rejects a disturbance. \newline\textcolor{p0col}{\footnotesize$\triangleright$ If this fails, kill stage S3 the same day and redirect to corner balance plus documentation} \\[2pt]
+\textbf{M6} & Stage S2b/c - corner \& slew & The cube balances on a corner with pointing accuracy and jitter measured, and completes a commanded slew with a reported settling time. \\[2pt]
+\textbf{M7} & Stage S3 - jump & A face-to-edge jump-up executed and captured on slow-motion video. \\[2pt]
+\end{longtable}
+}

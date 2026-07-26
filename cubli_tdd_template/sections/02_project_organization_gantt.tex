@@ -1,0 +1,183 @@
+% !TEX root = main.tex
+% Cubli project Gantt. Generated from cubli_wbs_tasklist.xlsx.
+% Requires in preamble: \usepackage{pgfgantt}
+% Timeline: day 1 = 23 Jul 2026 ... day 28 = 19 Aug 2026.
+% Colours (pfcol, ctcol, cdcol, mfcol, mscol, p0col) are defined once in main.tex preamble.
+% Split into one chart per workstream so each fits a page at readable size;
+% all charts share the same 28-day (1..28) axis.
+
+% Shared week/day title rows, reused by every chart below.
+\newcommand{\cubligantttitles}{%
+  \gantttitle{Week 1 (23--29 Jul)}{7}
+  \gantttitle{Week 2 (30 Jul--5 Aug)}{7}
+  \gantttitle{Week 3 (6--12 Aug)}{7}
+  \gantttitle{Week 4 (13--19 Aug)}{7} \\
+  \gantttitle{23}{1} \gantttitle{24}{1} \gantttitle{25}{1} \gantttitle{26}{1} \gantttitle{27}{1} \gantttitle{28}{1} \gantttitle{29}{1} \gantttitle{30}{1} \gantttitle{31}{1} \gantttitle{1}{1} \gantttitle{2}{1} \gantttitle{3}{1} \gantttitle{4}{1} \gantttitle{5}{1} \gantttitle{6}{1} \gantttitle{7}{1} \gantttitle{8}{1} \gantttitle{9}{1} \gantttitle{10}{1} \gantttitle{11}{1} \gantttitle{12}{1} \gantttitle{13}{1} \gantttitle{14}{1} \gantttitle{15}{1} \gantttitle{16}{1} \gantttitle{17}{1} \gantttitle{18}{1} \gantttitle{19}{1} \\%
+}
+
+% Shared chart options, applied to every chart below via \ganttset
+% (safe: a macro inside the [ ] optional argument would be mis-parsed by pgfkeys).
+\ganttset{
+  hgrid, vgrid={*6{draw=none}, *1{draw=black!15}},
+  x unit=0.32cm, y unit title=0.55cm, y unit chart=0.42cm,
+  title height=1, bar height=0.6, bar top shift=0.2,
+  group top shift=0.1, group height=0.5, milestone top shift=0.15,
+  bar label font=\scriptsize, group label font=\bfseries\footnotesize,
+  milestone label font=\scriptsize\itshape, title label font=\scriptsize,
+  bar/.append style={draw=none},
+}
+
+% ---------- Workstream 1: Formulation & Documentation ----------
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{ganttchart}{1}{28}
+  \cubligantttitles
+  \ganttgroup[group/.append style={fill=pfcol!55}]{Formulation \& Documentation}{1}{28} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-01 Close open questions}{1}{1} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-02 Problem statement \& narrative}{1}{1} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-03 Scope \& requirements}{2}{2} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-04 Milestones \& staging}{3}{3} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-05 Roles \& RACI}{1}{1} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-06 EoM - 1-DoF pendulum}{2}{3} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-07 EoM - 3D cube}{5}{6} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-08 Linearisation \& controllability}{7}{7} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-09 Mass / inertia / CoM budget}{3}{3} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-10 Jump-up analysis}{8}{8} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-11a TDD - draft body}{3}{4} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-11b TDD - deepen + S1 data}{10}{11} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-11c TDD - assemble \& submit}{12}{12} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-12 Literature \& references}{3}{3} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-13 Risk register}{7}{7} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-14 Test \& validation plan}{8}{8} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-15 System-ID plan}{6}{6} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-16 Model update - real params}{12}{13} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-17a Progress note \#1}{18}{18} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-17b Progress note \#2}{25}{25} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-18 Final report (TDD v2)}{24}{28} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{PF-19 Demo video \& deck}{26}{28}
+\end{ganttchart}%
+}
+\caption{Project schedule --- Formulation \& Documentation workstream (green), 23 July--19 August 2026.}
+\label{fig:gantt-pf}
+\end{figure}
+
+% ---------- Workstream 2: Control & Software ----------
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{ganttchart}{1}{28}
+  \cubligantttitles
+  \ganttgroup[group/.append style={fill=ctcol!55}]{Control \& Software}{1}{28} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-01 Sim environment + 1-DoF plant}{1}{2} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-02 LQR 1-DoF (sim)}{4}{5} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-03 Complementary filter}{5}{6} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-04 Firmware architecture}{2}{3} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-05 CAN-FD comms layer}{5}{6} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-06 BMI270 driver}{6}{7} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-07 IMU cal + lever arm}{7}{8} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-08 Telemetry link}{8}{10} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-09 Safety layer}{8}{9} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-10 S1 - balance 1-DoF rig}{9}{11} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-11 System ID on rig}{10}{11} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-12 3D plant model (sim)}{12}{13} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-13 LQR edge (sim)}{14}{14} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-14 LQR corner (sim)}{14}{15} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-15 EKF / MEKF estimator}{15}{17} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-16 Momentum management}{19}{19} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-17 Mode state machine}{16}{16} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-18 S2a - edge balance}{19}{22} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-19 S2b - corner balance}{23}{25} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-20 S2c - commanded slew}{24}{25} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-21 S3a - jump-up}{26}{27} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-22 S3b - catch controller}{27}{28} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{CT-23 Log post-processing}{15}{16}
+\end{ganttchart}%
+}
+\caption{Project schedule --- Control \& Software workstream (blue).}
+\label{fig:gantt-ct}
+\end{figure}
+
+% ---------- Workstream 3: CAD Design ----------
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{ganttchart}{1}{28}
+  \cubligantttitles
+  \ganttgroup[group/.append style={fill=cdcol!55}]{CAD Design}{1}{20} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{CD-01 Global layout study}{1}{2} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{CD-02 Reaction wheel design}{2}{4} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{CD-03 Motor mount bracket}{5}{5} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{CD-04 Ring-magnet carrier}{5}{6} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{CD-05 MA600 encoder bracket}{6}{7} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{CD-06 1-DoF rig CAD}{5}{6} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{CD-07 Tooling \& jigs CAD}{3}{3} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{CD-08 moteus board tray}{10}{10} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{CD-09 Avionics tray}{10}{10} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{CD-10 Perfboard mount}{11}{11} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{CD-11 Battery cradle}{9}{9} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{CD-12 Frame design}{7}{9} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{CD-13 Wheel burst shields}{10}{10} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{CD-14 Corner caps \& edge protectors}{11}{11} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{CD-15 Cable clips}{11}{11} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{CD-16 Brake caliper \& linkage}{15}{18} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{CD-17 Face panels}{19}{20} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{CD-18 Mass properties export}{11}{11} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{CD-19 CAD freeze v1}{12}{12}
+\end{ganttchart}%
+}
+\caption{Project schedule --- CAD Design workstream (gold).}
+\label{fig:gantt-cd}
+\end{figure}
+
+% ---------- Workstream 4: Manufacturing & Circuits ----------
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{ganttchart}{1}{28}
+  \cubligantttitles
+  \ganttgroup[group/.append style={fill=mfcol!55}]{Manufacturing \& Circuits}{1}{28} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{MF-01 Procurement order}{1}{2} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{MF-02 Bench PSU \& safety kit}{1}{2} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{MF-03 Bench bring-up (1 axis)}{3}{5} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{MF-04 Print queue A - jigs}{3}{4} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{MF-05 Print queue B - S1 parts}{5}{6} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{MF-06 Fabricate wheels x4}{6}{8} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{MF-07 Balance \& spin test}{8}{9} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{MF-08 Assemble 1-DoF rig}{9}{10} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{MF-09 Power \& signal schematic}{7}{7} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{MF-10 Build perfboard}{12}{14} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{MF-11 Harness fabrication}{14}{15} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{MF-12 Print queue C - Tier 1}{12}{15} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{MF-13 Fabricate frame}{12}{14} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{MF-14 Print queue D - Tier 2}{16}{17} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{MF-15 Cube integration}{16}{17} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{MF-16 Power-on / smoke test}{18}{18} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{MF-17 Brake mechanism build}{19}{22} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{MF-18 Rework buffer}{12}{28}
+\end{ganttchart}%
+}
+\caption{Project schedule --- Manufacturing \& Circuits workstream (orange).}
+\label{fig:gantt-mf}
+\end{figure}
+
+% ---------- Milestone gates ----------
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{ganttchart}{1}{28}
+  \cubligantttitles
+  \ganttmilestone[milestone/.append style={fill=mscol}]{M0 Procurement}{2} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{M0b TDD draft body}{4} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{M1 Electrical chain}{9} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{M2 Stage S1 complete}{11} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{M3 TDD v1 submitted}{12} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{M4 Cube integrated}{18} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{M5 Stage S2a - edge}{22} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{M6 Stage S2b/c - corner \& slew}{25} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{M7 Stage S3 - jump}{27}
+\end{ganttchart}%
+}
+\caption{Project schedule --- milestone gates M0--M7 (grey diamonds).}
+\label{fig:gantt-ms}
+\end{figure}
