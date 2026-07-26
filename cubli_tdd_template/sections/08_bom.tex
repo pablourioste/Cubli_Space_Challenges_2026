@@ -1,0 +1,170 @@
+% ================= APPENDIX: BILL OF MATERIALS =================
+\appendix
+\section{Bill of Materials}
+\label{app:bom}
+
+The components supplied for this project constitute an \emph{electronics} bill of
+materials: the actuation chain, wheel and attitude sensing, on-board compute,
+communications and power distribution are specified, but no structural or
+mechanical hardware is. The reaction wheels, the frame, the motor mounts, the
+fasteners and every printed bracket are the team's design responsibility, and are
+treated as such in Section~\ref{sec:hardware}. Table~\ref{tab:bom-supplied} lists
+the supplied items grouped by subsystem; Table~\ref{tab:bom-derived} collects the
+actuation figures that are \emph{computed} from those parts rather than read off a
+datasheet --- the torque constant, the achievable torque and wheel speed, and the
+inertia and stored energy that size the wheel; and Table~\ref{tab:bom-gaps}
+enumerates what must still be bought or fabricated.
+
+The architecture the BOM implies is a two-level control stack: each mjbots
+moteus-n1 closes a high-rate field-oriented current loop on its motor, using the
+MA600 encoder for rotor angle, while the Teensy~4.1 runs the outer
+attitude-estimation and state-feedback loop over CAN-FD --- the same
+inner-tachometer / outer-attitude layering used in spacecraft reaction-wheel
+assemblies. A mechanical wheel brake, following the original ETH Cubli
+\cite{gajamohan2013cubli}, provides the near-impulsive momentum transfer required
+for the jump-up.
+
+Procurement is the single largest schedule risk. The long-lead items are not
+electronic but mechanical: laser-cut steel wheel rims and frame stock
+(Table~\ref{tab:bom-gaps}) gate the entire build, and a shortfall in the motor
+count would force the reduced-actuation one-wheel variant
+\cite{hofer2023onewheelcubli}. These items are ordered first.
+
+% ------------------------------------------------------------------
+% TABLE 1 -- SUPPLIED BOM
+% ------------------------------------------------------------------
+{\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{@{} c L{2.5cm} c L{5.4cm} L{3.7cm} @{}}
+\caption{Supplied bill of materials, grouped by subsystem.}
+\label{tab:bom-supplied}\\
+\toprule
+Ref & Item & Qty\textsuperscript{a} & Key specifications & Function \\
+\midrule
+\endfirsthead
+\multicolumn{5}{c}{\footnotesize\itshape \tablename~\thetable\ (continued)}\\
+\toprule
+Ref & Item & Qty\textsuperscript{a} & Key specifications & Function \\
+\midrule
+\endhead
+\midrule
+\multicolumn{5}{r}{\footnotesize\itshape Continued on next page}\\
+\endfoot
+\bottomrule
+\multicolumn{5}{@{}p{15.5cm}@{}}{\footnotesize\textsuperscript{a}\,Quantity per
+assembled cube; motors, drivers and encoders are 3 each. A fourth actuation set
+(motor + moteus-n1 + MA600) is retained on the 1-DoF bench rig (S1) throughout the
+build, so four of each are procured.}\\
+\endlastfoot
+% --- Actuation ---
+\multicolumn{5}{@{}l}{\textbf{Actuation}}\\
+\midrule
+1 & T-Motor MN4006 KV380 & 3 & 18N24P outrunner; \qty{380}{\rpm\per\volt}; \qty{68}{\gram}; $\varnothing$\qtyproduct{44.35 x 21}{\milli\metre}; \qty{194}{\milli\ohm}; peak \qty{16}{\ampere}, \qty{380}{\watt} & Reaction-wheel torque source \\
+2 & mjbots moteus-n1 & 3 & \qtyrange{10}{54}{\volt}; \qty{100}{\ampere} peak / \qty{9}{\ampere} cont.; \qtyrange{15}{30}{\kilo\hertz} FOC; \qty{5}{\mega\bit\per\second} CAN-FD; \qty{14.6}{\gram} & FOC current/torque driver (inner loop) \\
+11 & TowerPro MG92B servo & 1--3 & metal-gear micro servo; $\approx$\qty{0.29}{\newton\metre} ($\approx$\qty{3}{\kilo\gram\centi\metre}) at \qty{6}{\volt}; \qty{50}{\hertz} PWM & Wheel brake actuator (jump-up) \\
+\midrule
+% --- Sensing ---
+\multicolumn{5}{@{}l}{\textbf{Sensing}}\\
+\midrule
+3 & mjbots MA600 breakout + ring magnet & 3 & TMR absolute angle; SPI \qty{6}{\mega\hertz}, \qty{3.3}{\volt}; 16-bit (\num{65536} counts/rev); air-gap ${\le}\,\qty{0.5}{\milli\metre}$ & Wheel angle: commutation + state feedback \\
+10 & SparkFun BMI270 6-DoF IMU & 1 & 3-axis accel + 3-axis gyro (no magnetometer); I\textsuperscript{2}C \qty{400}{\kilo\hertz} (Qwiic); ODR up to ${\approx}\,\qty{1}{\kilo\hertz}$ & Body attitude reference (tilt + rates) \\
+\midrule
+% --- Compute and Communications ---
+\multicolumn{5}{@{}l}{\textbf{Compute and Communications}}\\
+\midrule
+4 & Teensy 4.1 & 1 & \qty{600}{\mega\hertz} Cortex-M7 + FPU; native CAN-FD (CAN3); \qty{5}{\volt} supply & Flight computer: estimator + control law \\
+5 & CAN-FD adapter (Teensy 4.1) & 1 & CAN-FD transceiver, logic-level $\rightarrow$ differential; \qty{5}{\mega\bit\per\second} & Bus transceiver for the MCU \\
+6 & mjbots mjcanfd-usb-1x & 1 & USB $\leftrightarrow$ CAN-FD, \qty{5}{\mega\bit\per\second} & Bench interface (calibration, tuning) \\
+7 & JST-PH3 CAN cables & ${\ge}4$ & \textcolor{red}{TODO: conductor gauge / current rating not in source}; 3-conductor daisy-chain & CAN bus interconnect \\
+8 & Seeed XIAO ESP32-C6 + antenna & 1 & Wi-Fi; \qty{3.3}{\volt} UART to MCU; TX burst ${\approx}\,\qty{300}{\milli\ampere}$ & Wi-Fi telemetry / command link \\
+9 & \qty{60.4}{\ohm} \qty{0.5}{\watt} resistor & 4 & split termination, $2\times\qty{60.4}{\ohm}\approx\qty{120}{\ohm}$ bus impedance & CAN bus termination \\
+17 & \qty{4.7}{\nano\farad} capacitor & 2 & common-mode filter, bus midpoint to ground & CAN split-termination filter \\
+\midrule
+% --- Power ---
+\multicolumn{5}{@{}l}{\textbf{Power}}\\
+\midrule
+12 & Turnigy 6S LiPo (XT90) & 1 & \qty{22.2}{\volt} nom / \qty{25.2}{\volt} charged; \qty{3600}{\milli\ampere\hour}; \num{60}C; ${\approx}\,\qty{80}{\watt\hour}$; ${\approx}\,\qty{600}{\gram}$ & Primary energy store \\
+13 & LM2596 buck module & 1 & step-down to \qty{5.0}{\volt}; rated \qtyrange{2}{3}{\ampere} (derates without heatsink) & \qty{5}{\volt} logic rail \\
+14 & XT90 connector pair & 1--2 & rated ${\approx}\,\qty{90}{\ampere}$ & Battery power connector \\
+15 & \qty{100}{\micro\farad} \qty{16}{\volt} electrolytic & 2--4 & \qty{16}{\volt} part --- \qty{5}{\volt} rail only & \qty{5}{\volt}-rail bulk reservoir \\
+19 & 1N5819 Schottky diode & 1--2 & \qty{1}{\ampere}, \qty{40}{\volt} & \qty{5}{\volt}-rail back-feed protection \\
+\midrule
+% --- Integration ---
+\multicolumn{5}{@{}l}{\textbf{Integration}}\\
+\midrule
+16 & \qty{100}{\nano\farad} \qty{50}{\volt} capacitor & 6--10 & local decoupling at each IC & Per-IC supply decoupling \\
+18 & Double-sided perfboard & 1 & \qtyproduct{15 x 9}{\centi\metre}, double-sided & Power / signal distribution board \\
+\end{longtable}
+}
+
+% ------------------------------------------------------------------
+% TABLE 2 -- DERIVED ACTUATION PARAMETERS
+% ------------------------------------------------------------------
+{\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{@{} L{3.5cm} L{5.2cm} L{3.3cm} L{2.5cm} @{}}
+\caption{Derived actuation parameters (computed from the supplied BOM; order-of-magnitude, assuming a \qty{150}{\milli\metre}, \qty{2}{\kilo\gram} cube).}
+\label{tab:bom-derived}\\
+\toprule
+Quantity & Basis / expression & Value & Source \\
+\midrule
+\endfirsthead
+\multicolumn{4}{c}{\footnotesize\itshape \tablename~\thetable\ (continued)}\\
+\toprule
+Quantity & Basis / expression & Value & Source \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\footnotesize\itshape Continued on next page}\\
+\endfoot
+\bottomrule
+\endlastfoot
+Torque constant $K_t$ & $9.5493/K_v$, $K_v=\qty{380}{\rpm\per\volt}$ & \qty{0.0251}{\newton\metre\per\ampere} & Derived (datasheet $K_v$) \\
+Peak torque & $K_t\times\qty{16}{\ampere}$ (\qty{180}{\second} rating) & ${\approx}\,\qty{0.40}{\newton\metre}$ & Derived \\
+Continuous torque & $K_t\times\qtyrange{5}{8}{\ampere}$ (motor-thermal limit) & \qtyrange{0.13}{0.20}{\newton\metre} & Derived; measure-TBD \\
+Usable wheel speed (6S) & $K_v\,V$; \qty{8436}{\rpm} no-load nominal, derated & ${\approx}\,\qty{7000}{\rpm}$ (${\approx}\,\qty{733}{\radian\per\second}$) & Derived \\
+Electrical frequency & 12 pole pairs $\times\,116.7\,\mathrm{s^{-1}}$ at \qty{7000}{\rpm} & \qty{1400}{\hertz} vs \qty{2000}{\hertz} driver ceiling & Derived \\
+Required jump-up momentum & inelastic-collision model, $1.5\times$ margin (edge) & ${\approx}\,\qty{0.29}{\kilogram\metre\squared\per\second}$ & Derived (estimate) \\
+Target wheel inertia & $H/\omega$ at \qty{733}{\radian\per\second} (edge; corner ${\approx}\,1.7\times$) & ${\ge}\,\qty{3.9e-4}{\kilogram\metre\squared}$ & Derived; measure-TBD \\
+Stored kinetic energy / wheel & $\tfrac12 J\omega^2$ at \qty{733}{\radian\per\second} & ${\approx}\,\qty{105}{\joule}$ (${\approx}\,\qty{320}{\joule}$ for 3) & Derived \\
+\end{longtable}
+}
+
+% ------------------------------------------------------------------
+% TABLE 3 -- ITEMS NOT COVERED BY THE SUPPLIED BOM
+% ------------------------------------------------------------------
+{\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{@{} L{3.8cm} L{1.3cm} L{7.3cm} L{1.7cm} @{}}
+\caption{Items not covered by the supplied BOM --- still to be bought or fabricated. Lead-time risk H/M/L.}
+\label{tab:bom-gaps}\\
+\toprule
+Item & Qty & Requirement driving it & Lead-time risk \\
+\midrule
+\endfirsthead
+\multicolumn{4}{c}{\footnotesize\itshape \tablename~\thetable\ (continued)}\\
+\toprule
+Item & Qty & Requirement driving it & Lead-time risk \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\footnotesize\itshape Continued on next page}\\
+\endfoot
+\bottomrule
+\endlastfoot
+Reaction-wheel rims & 3 & Target wheel inertia (Table~\ref{tab:bom-derived}); density-at-radius $\Rightarrow$ laser-/water-cut steel ring, ${\approx}\,\qty{120}{\milli\metre}$ OD, \qtyrange{3}{4}{\milli\metre} thick & H \\
+Frame stock (Al angle / extrusion / CF tube) & 1 set & Three mutually orthogonal, rigid motor faces & H \\
+Spare motor + spare moteus-n1 & 1 each & Resilience against in-service failure; long resupply lead time & H \\
+E-stop / anti-spark switch + inline fuse & 1 & Safety: cut energy input on the \qtyrange{40}{60}{\ampere} bus & M \\
+Bench PSU (current-limited, \qtyrange{0}{30}{\volt}, ${\ge}\,\qty{5}{\ampere}$) & 1 & Safe firmware bring-up (never on the battery) & M \\
+LiPo charger + safe bag + cell alarm & 1 & Battery charging and storage safety & M \\
+Bus bulk capacitor & 1 & Regen-braking transient (${\approx}\,\qty{105}{\joule}$/wheel); \qtyrange{470}{1000}{\micro\farad}, ${\ge}\,\qty{50}{\volt}$ low-ESR & L \\
+XT30 connector pairs & 3+ & moteus-n1 power connector (BOM supplies XT90 only) & L \\
+M3 fasteners + heat-set inserts + threadlocker & 1 set & Vibration-proof assembly & L \\
+Wire (\qty{14}{\awg} bus, \qtyrange{24}{26}{\awg} signal) + bullets, heat-shrink & 1 set & Power and signal harness & L \\
+Filament (PETG, TPU, CF-nylon) & --- & All printed structure and brackets & L \\
+\end{longtable}
+}

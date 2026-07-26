@@ -11,6 +11,8 @@
 \usepackage{array}
 \usepackage{fancyhdr}
 \usepackage{lastpage}
+\usepackage{siunitx}    % SI units via \qty/\num for the BOM tables (App. A)
+\usepackage{xcolor}     % \textcolor for visible TODO placeholders in tables
 \usepackage{hyperref}
 \usepackage{parskip}
 \usepackage[
@@ -27,6 +29,13 @@
     urlcolor=blue,
     pdftitle={Technical Design Document - Cubli}
 }
+
+% ---------- siunitx & table column type (used by the BOM tables, App. A) ----------
+\sisetup{range-phrase={--}, range-units=single, per-mode=symbol, group-separator={,}}
+\DeclareSIUnit{\rpm}{rpm}   % motor speed
+\DeclareSIUnit{\bit}{bit}   % data-rate unit (Mbit/s)
+\DeclareSIUnit{\awg}{AWG}   % wire gauge
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}  % ragged fixed-width prose column
 
 % ---------- Header / Footer ----------
 \pagestyle{fancy}
@@ -96,5 +105,7 @@
 \input{sections/07_future_work}
 \clearpage
 \printbibliography[title={References}]
+\clearpage
+\input{sections/08_bom}
 
 \end{document}
