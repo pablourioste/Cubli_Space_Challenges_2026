@@ -1,12 +1,14 @@
 % !TEX root = main.tex
-% Cubli project Gantt - conceptual work packages to the 3 August TDD deliverable.
+% Cubli project Gantt - detailed schedule to the 3 August TDD deliverable.
 % Requires in preamble: \usepackage{pgfgantt}
 % Timeline: day 1 = 23 Jul 2026 ... day 12 = 3 Aug 2026.
 % Colours (pfcol, ctcol, cdcol, mscol) are defined once in main.tex preamble.
+% Sized to fill its own page: scaled to a fraction of \textheight (tall chart,
+% so scaling by height keeps the width inside \textwidth).
 
 \ganttset{
   hgrid, vgrid={*6{draw=none}, *1{draw=black!15}},
-  x unit=0.75cm, y unit title=0.55cm, y unit chart=0.5cm,
+  x unit=0.62cm, y unit title=0.6cm, y unit chart=0.52cm,
   title height=1, bar height=0.6, bar top shift=0.2,
   group top shift=0.1, group height=0.5, milestone top shift=0.15,
   bar label font=\small, group label font=\bfseries\small,
@@ -14,30 +16,59 @@
   bar/.append style={draw=none},
 }
 
-\begin{figure}[htbp]
+\begin{figure}[p]
 \centering
-\resizebox{\textwidth}{!}{%
+\resizebox{!}{0.88\textheight}{%
 \begin{ganttchart}{1}{12}
   \gantttitle{Week 1 (23--29 Jul)}{7}
   \gantttitle{Week 2 (30 Jul--3 Aug)}{5} \\
   \gantttitle{23}{1} \gantttitle{24}{1} \gantttitle{25}{1} \gantttitle{26}{1} \gantttitle{27}{1} \gantttitle{28}{1} \gantttitle{29}{1} \gantttitle{30}{1} \gantttitle{31}{1} \gantttitle{1}{1} \gantttitle{2}{1} \gantttitle{3}{1} \\
+  % --- Investigation, Requirements & Documentation ---
   \ganttgroup[group/.append style={fill=pfcol!55}]{Investigation, Requirements \& Documentation}{1}{12} \ganttnewline
-  \ganttbar[bar/.append style={fill=pfcol}]{I1 Literature \& state of the art}{1}{3} \ganttnewline
-  \ganttbar[bar/.append style={fill=pfcol}]{I2 Dynamics investigation}{2}{10} \ganttnewline
-  \ganttbar[bar/.append style={fill=pfcol}]{P1 Requirements \& planning}{1}{4} \ganttnewline
-  \ganttbar[bar/.append style={fill=pfcol}]{D1 TDD writing \& submission}{3}{12} \ganttnewline
-  \ganttgroup[group/.append style={fill=ctcol!55}]{Control \& Software}{2}{10} \ganttnewline
-  \ganttbar[bar/.append style={fill=ctcol}]{C1 Control design (simulation)}{2}{10} \ganttnewline
-  \ganttgroup[group/.append style={fill=cdcol!55}]{Hardware Design \& Build}{1}{11} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol}]{H1 Preliminary CAD \& wheel sizing}{2}{10} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol}]{H2 Procurement \& 1-DoF rig}{1}{11} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{A1 Literature review}{1}{3} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{A2 Problem statement}{1}{2} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{A3 Scope \& requirements}{2}{3} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{A4 Milestones \& roles}{1}{3} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{A5 Risk register}{6}{7} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{A6 1-DoF EoM}{2}{3} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{A7 3D EoM}{5}{6} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{A8 Linearisation}{7}{7} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{A9 Jump-up sizing \& budget}{8}{10} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{A10 TDD draft}{3}{4} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{A11 TDD + S1 data}{10}{11} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{A12 TDD submit}{12}{12} \ganttnewline
+  % --- Control & Software ---
+  \ganttgroup[group/.append style={fill=ctcol!55}]{Control \& Software}{1}{11} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B1 Sim env + plant}{1}{2} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B2 LQR 1-DoF (sim)}{4}{5} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B3 State estimator}{5}{6} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B4 Firmware \& comms}{2}{6} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B5 Sensor drivers + cal}{6}{8} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B6 Safety \& mode logic}{8}{9} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B7 S1 bring-up \& balance}{9}{11} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B8 System identification}{10}{11} \ganttnewline
+  % --- Hardware Design & Build ---
+  \ganttgroup[group/.append style={fill=cdcol!55}]{Hardware Design \& Build}{1}{12} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C1 Envelope \& layout}{1}{2} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C2 Reaction-wheel design}{2}{4} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C3 Mounts \& brackets}{5}{7} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C4 1-DoF rig CAD + jigs}{3}{6} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C5 Mass properties \& freeze}{11}{12} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C6 Procurement order}{1}{2} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C7 Bench PSU \& bring-up}{3}{5} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C8 Fabricate wheels ($\times$4)}{5}{8} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C9 Balance \& spin-test}{8}{9} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C10 Assemble 1-DoF rig}{9}{10} \ganttnewline
   \ganttnewline
+  % --- Milestone gates ---
   \ganttmilestone[milestone/.append style={fill=mscol}]{G1 Kick-off}{2} \ganttnewline
   \ganttmilestone[milestone/.append style={fill=mscol}]{G2 Modeling complete}{10} \ganttnewline
   \ganttmilestone[milestone/.append style={fill=mscol}]{G3 S1 rig balances}{11} \ganttnewline
   \ganttmilestone[milestone/.append style={fill=mscol}]{G4 TDD submitted}{12}
 \end{ganttchart}%
 }
-\caption{Project schedule to the TDD deliverable, 23 July--3 August 2026. Green: investigation, requirements \& documentation; blue: control \& software; gold: hardware design \& build; grey diamonds: milestone gates.}
+\caption{Detailed project schedule to the TDD deliverable, 23 July--3 August 2026.
+Green: investigation, requirements \& documentation; blue: control \& software;
+gold: hardware design \& build; grey diamonds: milestone gates.}
 \label{fig:gantt}
 \end{figure}

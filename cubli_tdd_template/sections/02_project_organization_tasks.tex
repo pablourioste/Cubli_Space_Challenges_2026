@@ -1,31 +1,54 @@
 % !TEX root = main.tex
-% Cubli WBS - conceptual work packages up to the 3 August TDD deliverable.
+% Cubli WBS - detailed task breakdown up to the 3 August TDD deliverable.
 % Requires in preamble: longtable, booktabs, array, ragged2e + \newcolumntype{L}.
 
 {\small
 \setlength{\tabcolsep}{4pt}%
-\begin{longtable}{@{}L{0.9cm} L{2.9cm} L{6.3cm} L{2.2cm} L{2.0cm}@{}}
+\begin{longtable}{@{}L{0.8cm} L{3.0cm} L{6.2cm} L{2.2cm} L{1.8cm}@{}}
 \toprule
-\textbf{ID} & \textbf{Work package} & \textbf{Scope} & \textbf{Owner} & \textbf{Window} \\
+\textbf{ID} & \textbf{Task} & \textbf{Scope} & \textbf{Owner} & \textbf{Dates} \\
 \midrule\endfirsthead
 \toprule
-\textbf{ID} & \textbf{Work package} & \textbf{Scope} & \textbf{Owner} & \textbf{Window} \\
+\textbf{ID} & \textbf{Task} & \textbf{Scope} & \textbf{Owner} & \textbf{Dates} \\
 \midrule\endhead
 \bottomrule\endfoot
 \multicolumn{5}{@{}l}{\textbf{Investigation, Requirements \& Documentation}} \\
 \midrule
-I1 & Literature \& state of the art & Review the ETH Cubli, the one-wheel Cubli, CubeSat ADCS and hopping-mission precedents, and lock the application framing & Suvanna \textit{(+Dejan)} & 23--25 Jul \\
-I2 & Dynamics investigation & Derive the 1-DoF and 3D equations of motion, linearise and check controllability, and size the wheel from the jump-up energy budget & Dejan \textit{(+Andrea)} & 24 Jul--1 Aug \\
-P1 & Requirements \& planning & Scope, requirements table, milestone staging, roles and risk register & Dejan & 23--26 Jul \\
-D1 & TDD writing \& submission & Each member drafts their section; integrate, insert the S1 evidence, and submit the deliverable & All \textit{(Dejan integrates)} & 25 Jul--3 Aug \\
+A1 & Literature \& state of the art & Review the ETH Cubli, the one-wheel Cubli, CubeSat ADCS practice and the hopping-mission precedents & Suvanna \textit{(+Dejan)} & 23--25 Jul \\
+A2 & Problem statement \& framing & Lock the ADCS application narrative that the rest of the document refers back to & Dejan & 23--24 Jul \\
+A3 & Scope \& requirements & Define scope and build the requirements table (functional, performance, design constraint) with verification methods & Dejan \textit{(+Pablo)} & 24--25 Jul \\
+A4 & Milestones \& roles & Prototype staging, binary gate criteria, and a one-page RACI of owners & Dejan & 23--25 Jul \\
+A5 & Risk register & Trigger, impact, owner and mitigation for the leading risks & All \textit{(+Pablo)} & 28--29 Jul \\
+A6 & 1-DoF equations of motion & Lagrangian derivation of the reaction-wheel pendulum with friction terms & Dejan \textit{(+Andrea)} & 24--25 Jul \\
+A7 & 3D equations of motion & Coupled three-wheel dynamics for the edge and corner pivots & Dejan \textit{(+Andrea)} & 27--28 Jul \\
+A8 & Linearisation \& controllability & Equilibria, linear models, controllability/observability checks & Dejan \textit{(+Andrea)} & 29 Jul \\
+A9 & Jump-up sizing \& budget & Energy-method wheel sizing and the parametric mass/inertia/CoM budget & Dejan \textit{(+Andrea)} & 30 Jul--1 Aug \\
+A10 & TDD draft (all sections) & Every member drafts their section; placeholder figures acceptable & All & 25--26 Jul \\
+A11 & TDD deepen + S1 data & Full modelling and control sections; insert the rig evidence and measured parameters & All & 1--2 Aug \\
+A12 & TDD assemble \& submit & Consistency pass, figures, references, submission & All \textit{(Dejan integrates)} & 3 Aug \\
 \midrule
 \multicolumn{5}{@{}l}{\textbf{Control \& Software}} \\
 \midrule
-C1 & Control design (simulation) & Implement the plant model, design and tune the LQR for edge and corner balance, and prototype the state estimator in simulation & Andrea \textit{(+Nicc)} & 24 Jul--1 Aug \\
+B1 & Sim environment + plant & Simulation setup and the 1-DoF plant, validated by energy conservation & Andrea & 23--24 Jul \\
+B2 & LQR design (1-DoF, sim) & Tune the regulator and sweep robustness to inertia error, delay and saturation & Andrea \textit{(+Dejan)} & 26--27 Jul \\
+B3 & State estimator & Complementary tilt filter with injected noise and bias in simulation & Nicc & 27--28 Jul \\
+B4 & Firmware \& comms & Firmware architecture, loop rates, and the CAN-FD command/reply layer & Nicc \textit{(+Pablo)} & 24--28 Jul \\
+B5 & Sensor drivers + cal & IMU and encoder drivers, gyro/accel calibration and the lever-arm correction & Nicc \textit{(+Andrea)} & 28--30 Jul \\
+B6 & Safety \& mode logic & Watchdog, tilt-limit disarm, wheel-speed cap and the mode state machine & Nicc \textit{(+Andrea)} & 30--31 Jul \\
+B7 & S1 bring-up \& balance & Port estimator and LQR to the rig and tune to a stable balance & Nicc \textit{(+Andrea)} & 31 Jul--2 Aug \\
+B8 & System identification & Measure $K_t$, wheel inertia, friction and loop latency on the rig & Andrea \textit{(+Nicc)} & 1--2 Aug \\
 \midrule
 \multicolumn{5}{@{}l}{\textbf{Hardware Design \& Build}} \\
 \midrule
-H1 & Preliminary CAD \& wheel sizing & Envelope study, reaction-wheel design to the inertia target, motor and encoder mounts, and CAD mass-properties export & Neisa, Suvanna & 24 Jul--1 Aug \\
-H2 & Procurement \& 1-DoF rig & Order the long-lead items, bench bring-up of one axis, and build and balance the single-axis test rig & Pablo \textit{(+Neisa)} & 23 Jul--2 Aug \\
+C1 & Envelope \& layout study & Packaging of wheels, drivers, battery and electronics with a central CoM & Neisa \textit{(+Suvanna)} & 23--24 Jul \\
+C2 & Reaction-wheel design & Wheel to the inertia target: radius, rim, hub bolting to the motor bell & Suvanna \textit{(+Neisa)} & 24--26 Jul \\
+C3 & Mounts \& brackets & Motor mount, ring-magnet carrier and adjustable encoder bracket & Neisa, Suvanna & 27--29 Jul \\
+C4 & 1-DoF rig CAD + jigs & Single-axis rig and the balancing/assembly tooling & Suvanna \textit{(+Neisa)} & 25--28 Jul \\
+C5 & Mass properties \& freeze & Export the inertia tensor/CoM and release the manufacturing package & Neisa \textit{(+Suvanna)} & 2--3 Aug \\
+C6 & Procurement order & Order the long-lead items (rims, frame stock, connectors, spares) & Pablo \textit{(+Neisa)} & 23--24 Jul \\
+C7 & Bench PSU \& bring-up & Current-limited supply, safety kit, and single-axis electrical bring-up & Pablo \textit{(+Nicc)} & 25--27 Jul \\
+C8 & Fabricate wheels ($\times$4) & Cut/receive rims, print hubs, bond magnets --- three plus one rig spare & Neisa, Suvanna & 27--30 Jul \\
+C9 & Balance \& spin-test & Static-balance and containment spin-test every wheel & Suvanna \textit{(+Neisa)} & 30--31 Jul \\
+C10 & Assemble 1-DoF rig & Motor, balanced wheel, encoder gap, IMU and hard stops & Pablo \textit{(+Neisa)} & 31 Jul--1 Aug \\
 \end{longtable}
 }
