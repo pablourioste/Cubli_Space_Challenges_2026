@@ -82,6 +82,69 @@ This simulation-derived value of $\omega_w$ will be used to verify, ahead of fab
 
 The braking mechanism will consist of a servo-driven barrier that is swung into a bolt head attached to the momentum wheel to stop it abruptly. The servo's response time will be a design constraint on the validity of the ``instantaneous stop'' assumption underlying the jump-up equation above; a slower stop than assumed will yield a lower effective post-impact body velocity than predicted, which will be compensated for through the same iterative tuning process rather than relying on the analytical estimate alone.
 
+\subsubsection{Torque-Limited Wheel-Inertia Target}
+\label{sec:jumpup_target}
+
+The idealized relation above returns the required wheel speed for a given
+inertia, but it assumes an instantaneous, lossless momentum transfer. For
+preliminary sizing we invert the problem---given the achievable motor speed,
+\emph{what per-wheel inertia does the maneuver demand?}---using a momentum
+budget that additionally penalizes the finite brake torque. The maneuver must
+supply enough post-impact angular momentum to raise the cube's center of mass
+from its resting contact to the balancing equilibrium, scaled by an energy
+margin $\eta$. This defines an ideal per-wheel angular momentum
+\begin{equation}
+h_{w,\text{ideal}} = \sqrt{\eta}\;\frac{\sqrt{2 g\,\lambda\,\kappa}}{n}\;M L^{3/2},
+\label{eq:hw_ideal}
+\end{equation}
+where $M$ and $L$ are the cube mass and edge length, $g$ is gravity, and
+$\kappa$, $\lambda$, $n$ are dimensionless geometric factors set by the contact
+case: the normalized moment of inertia about the pivot ($\kappa$), the relative
+rise of the center of mass to the equilibrium ($\lambda$), and the
+momentum-transfer factor of the contact ($n$). The corner case
+($\kappa=\tfrac{11}{12}$, $\lambda=\tfrac{\sqrt3}{2}-\tfrac12$, $n=\sqrt2$)
+governs the design as it is the more demanding of the two; the edge case
+($\kappa=\tfrac{2}{3}$, $\lambda=\tfrac{1}{\sqrt2}-\tfrac12$, $n=1$) is less
+strenuous.
+
+A brake of finite torque $\tau_b$ cannot deliver the impulse instantaneously:
+during the stop the cube must still overcome the gravitational tip-over torque
+$\tau_g = MgL/2$, which sets a hard floor $\tau_b > \tau_g$ below which the cube
+can never tip. The resulting loss is captured by a brake-amplification factor
+\begin{equation}
+\beta = \frac{\tau_b}{\tau_b - \tau_g},
+\qquad
+h_w = \beta\,h_{w,\text{ideal}},
+\qquad
+I_{w,\text{target}} = \frac{h_w}{\omega_{\max}},
+\label{eq:Iw_target}
+\end{equation}
+where $\omega_{\max}$ is the maximum practical wheel speed. Table
+\ref{tab:jumpup_budget} lists the resulting target for the current baseline
+cube. This per-wheel inertia $I_{w,\text{target}}$ is the requirement that the
+reaction-wheel design of Section~\ref{sec:rw_sizing} must meet.
+
+\begin{table}[h]
+\centering
+\caption{Torque-limited wheel-inertia target (corner case, baseline cube).}
+\label{tab:jumpup_budget}
+\begin{tabular}{llr}
+\toprule
+Symbol & Description & Value \\
+\midrule
+$M$                & Cube mass                    & $1.45$ kg \\
+$L$                & Cube edge length             & $180$ mm \\
+$\eta$             & Energy margin                & $1.05$ \\
+$\tau_b$           & Brake torque per wheel       & $5.0$ N\,m \\
+$\tau_g$           & Gravitational tip-over floor & $1.28$ N\,m \\
+$\beta$            & Brake-amplification factor   & $1.34$ \\
+$\omega_{\max}$    & Max wheel speed              & $8400$ rpm ($880$ rad/s) \\
+$h_w$              & Required angular momentum    & $0.277$ kg\,m$^2$/s \\
+$I_{w,\text{target}}$ & \textbf{Target wheel inertia} & $\mathbf{3.15\times10^{-4}}$ \textbf{kg\,m}$^\mathbf{2}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Control Design on the 2D Model}
 \label{sec:control2d}
 

@@ -12,6 +12,81 @@ largely parametric (Section~\ref{sec:background}).
 % High-level block diagram tying together actuation, sensing, processing, and
 % power for both the 2D prototype and the 3D cube.
 
+\subsection{Mass and Inertia Budget}
+\label{sec:massbudget}
+
+Before committing to component geometry, the preliminary design is bounded by
+three coupled constraints that must be satisfied simultaneously. Sizing to the
+worst case of each fixes the envelope within which the mechanical and electrical
+design then iterate.
+
+\paragraph{Volume constraint.} Every subsystem---the three orthogonal
+reaction-wheel/motor modules, the battery, and the electronics stack---must fit
+inside the $180$~mm cube envelope. The binding dimension is the reaction wheel:
+its outer diameter must clear the internal frame and corner/edge contact
+features while leaving room for the motor and the servo brake. This caps the
+usable wheel diameter and, with it, the radius at which ballast mass can be
+placed---directly limiting the inertia achievable at a given wheel mass
+(Section~\ref{sec:rw_sizing}).
+
+\paragraph{Mass constraint.} The cube is designed to a total mass target of
+$M = 1.45$~kg. This is not merely a logistics figure: it feeds back into the
+dynamics, since the gravitational tip-over torque $\tau_g = MgL/2$ and the
+required jump-up angular momentum both scale with $M$ (Section~\ref{sec:jumpup_target}).
+A heavier cube demands a more capable brake and a larger wheel inertia, so the
+mass target and the inertia target are coupled and must be closed together. The
+preliminary allocation is given in Table~\ref{tab:massbudget}, with the
+reaction-wheel set (the one firmly-sized item) committed and the remaining
+subsystems held as allowances to be refined as components are selected.
+
+\begin{table}[h]
+\centering
+\caption{Preliminary mass budget (per cube). Reaction wheels sized; others allocated.}
+\label{tab:massbudget}
+\small
+\begin{tabular}{lrl}
+\toprule
+Subsystem & Allocated mass (g) & Status \\
+\midrule
+Reaction wheels ($3\times$)   & $395$  & Sized (Sec.~\ref{sec:rw_sizing}) \\
+Motors ($3\times$)            & TBD    & Allowance --- pending motor selection \\
+Frame / structure             & TBD    & Allowance --- pending CAD \\
+Battery                       & TBD    & Allowance --- pending capacity sizing \\
+Electronics (MCU, drivers, IMU, servo) & TBD & Allowance \\
+Wiring / fasteners / margin   & TBD    & Allowance \\
+\midrule
+\textbf{Total (target)}       & $\mathbf{1450}$ & \textbf{Design target} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Inertia constraint (corner-critical).} Each reaction wheel must store
+enough angular momentum at the motor's maximum speed to execute the jump-up
+maneuver. The two contact cases are not equally demanding: the corner
+equilibrium requires a larger rise of the center of mass and a less favorable
+momentum-transfer geometry than the edge equilibrium, so for a common maximum
+wheel speed $\omega_{\max}$ it demands the greater wheel inertia. Evaluating the
+torque-limited budget of Section~\ref{sec:jumpup_target} for both cases
+(Table~\ref{tab:inertia_cases}), the corner case requires
+$3.15\times10^{-4}$ kg\,m$^2$ against $2.85\times10^{-4}$ kg\,m$^2$ for the edge
+---about $10\%$ more. The corner jump-up is therefore the critical condition,
+and the reaction wheel is sized to it; a wheel that satisfies the corner
+requirement satisfies the edge requirement with margin.
+
+\begin{table}[h]
+\centering
+\caption{Required per-wheel inertia by contact case, at $\omega_{\max}=8400$~rpm.}
+\label{tab:inertia_cases}
+\begin{tabular}{lrr}
+\toprule
+Contact case & $h_w$ (kg\,m$^2$/s) & $I_{w,\text{target}}$ ($10^{-4}$ kg\,m$^2$) \\
+\midrule
+Edge                       & $0.251$ & $2.85$ \\
+\textbf{Corner (critical)} & $\mathbf{0.277}$ & $\mathbf{3.15}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Mechanical Design}
 \label{sec:mechanical}
 
@@ -25,6 +100,74 @@ largely parametric (Section~\ref{sec:background}).
 
 % Structural concept for the full cube: three orthogonal wheel/motor modules,
 % frame, and corner/edge contact features.
+
+\subsubsection{Reaction-Wheel Sizing}
+\label{sec:rw_sizing}
+
+The reaction wheel must supply the per-wheel inertia
+$I_{w,\text{target}} = 3.15\times10^{-4}$ kg\,m$^2$ derived from the jump-up
+budget of Section~\ref{sec:jumpup_target}, while remaining light enough not to
+dominate the cube mass. Rather than adjusting inertia by scaling a solid disc,
+the wheel is built as a printed \emph{ring plus spokes} whose inertia is then
+tuned by \emph{ballast}: standard steel hex nuts dropped into hexagonal pockets
+distributed around the ring. Each pocket both removes plastic and adds steel, so
+the net inertia gain per pocket is large and the design target is reached by
+choosing how many nuts to install---a discrete, easily-adjustable knob that also
+lets the physical wheel be re-tuned after fabrication to absorb parameter
+uncertainty.
+
+The structure is printed in PET-CF ($\rho = 1290$ kg/m$^3$): a
+$120$~mm outer-diameter ring of $15$~mm radial width and $10$~mm thickness,
+carried by three radial spokes $10$~mm wide of the same thickness. The hub and
+motor interface are neglected in the inertia budget. The ballast is standard
+M5 steel hex nuts ($\rho = 7850$ kg/m$^3$, $11$~mm across flats,
+measured mass $3.12$~g), seated in blind hexagonal pockets machined at the
+mid-width of the ring. Accounting for the plastic each pocket displaces, the
+\emph{net} contribution per installed nut is $+2.39$~g of mass and
+$+1.55\times10^{-5}$ kg\,m$^2$ of inertia at the ring radius.
+
+Table~\ref{tab:rw_sizing} sweeps the outer diameter, solving for the number of
+nuts needed to reach $I_{w,\text{target}}$ and checking that the pockets
+physically fit. Small wheels need so many nuts that no plastic wall survives
+between adjacent pockets; wheels of $140$~mm and above reach the target from the
+bare ring alone (no tuning margin, and heavier). The selected design is
+$\mathbf{OD = 120}$~\textbf{mm with 21 nuts}: it meets the inertia target with a
+$\sim\!2.5$~mm circumferential wall between pockets, splits the inertia roughly
+evenly between structure ($45\%$) and ballast ($55\%$) so the wheel can be
+trimmed in either direction, and keeps the three-wheel set to $\sim\!395$~g
+($27\%$ of the $1.45$~kg cube).
+
+\begin{table}[h]
+\centering
+\caption{Reaction-wheel outer-diameter trade study. Selected design in bold.}
+\label{tab:rw_sizing}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{rrrrrrl}
+\toprule
+OD & Nuts & Wheel mass & Wheel $I_w$ & $I_w$/target & 3 wheels & Pocket fit \\
+(mm) & $N$ & (g) & ($10^{-4}$ kg\,m$^2$) & (\%) & (g) & \\
+\midrule
+80  & 105 & 300.6 & 3.17 & 100.7 & 901.7 & fails --- no wall \\
+90  & 72  & 229.6 & 3.16 & 100.5 & 688.7 & fails --- no wall \\
+100 & 51  & 187.3 & 3.25 & 103.3 & 561.9 & fails --- no wall \\
+110 & 33  & 152.2 & 3.22 & 102.3 & 456.7 & fails --- thin wall \\
+\textbf{120} & \textbf{21} & \textbf{131.5} & \textbf{3.31} & \textbf{105.2} & \textbf{394.6} & \textbf{OK ($\sim$2.5 mm)} \\
+130 & 9   & 110.8 & 3.23 & 102.7 & 332.4 & OK (loose) \\
+140 & 0   & ---   & 3.23 & ---   & ---   & bare ring exceeds target \\
+150 & 0   & ---   & 4.07 & ---   & ---   & bare ring exceeds target \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Radial fit caveat.} The circumferential fit is satisfied at
+$120$~mm, but the \emph{radial} fit is marginal: an $11$~mm across-flats pocket
+in a $15$~mm-wide ring leaves only $1.8$~mm of wall on each side (dropping to
+$0.9$~mm if a nut is seated corner-out), below the $2$~mm minimum-wall target.
+The ring width should therefore be increased to $\gtrsim\!17$~mm, or the nut
+orientation constrained flats-radial, in the next design iteration. This does
+not change the inertia budget, only the ring's structural robustness around the
+pockets.
 
 \subsection{Electrical Design}
 \label{sec:electrical}
