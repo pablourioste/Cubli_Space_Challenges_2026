@@ -9,11 +9,10 @@ communications and power distribution are specified, but no structural or
 mechanical hardware is. The reaction wheels, the frame, the motor mounts, the
 fasteners and every printed bracket are the team's design responsibility, and are
 treated as such in Section~\ref{sec:hardware}. Table~\ref{tab:bom-supplied} lists
-the supplied items grouped by subsystem; Table~\ref{tab:bom-derived} collects the
-actuation figures that are \emph{computed} from those parts rather than read off a
-datasheet --- the torque constant, the achievable torque and wheel speed, and the
-inertia and stored energy that size the wheel; and Table~\ref{tab:bom-gaps}
-enumerates what must still be bought or fabricated.
+the supplied items grouped by subsystem. The actuation figures derived from these
+parts --- the torque constant, the achievable torque and wheel speed, and the
+inertia that sizes the wheel --- are developed where they are used, in
+Sections~\ref{sec:jumpup_target} and~\ref{sec:rw_sizing}.
 
 The architecture the BOM implies is a two-level control stack: each mjbots
 moteus-n1 closes a high-rate field-oriented current loop on its motor, using the
@@ -25,10 +24,13 @@ assemblies. A mechanical wheel brake, following the original ETH Cubli
 for the jump-up.
 
 Procurement is the single largest schedule risk. The long-lead items are not
-electronic but mechanical: laser-cut steel wheel rims and frame stock
-(Table~\ref{tab:bom-gaps}) gate the entire build, and a shortfall in the motor
-count would force the reduced-actuation one-wheel variant
-\cite{hofer2023onewheelcubli}. These items are ordered first.
+electronic but mechanical: the frame stock and the printed structure gate the
+entire build, and with three actuation sets and no spare, the loss of a motor
+or driver in service would force the reduced-actuation one-wheel variant
+\cite{hofer2023onewheelcubli}. These items are ordered first. Consumables and
+bench equipment not covered by the supplied set --- wire, connectors,
+fasteners, filament, the current-limited bench supply and the battery-safety
+kit --- are tracked separately in the build documentation.
 
 % ------------------------------------------------------------------
 % TABLE 1 -- SUPPLIED BOM

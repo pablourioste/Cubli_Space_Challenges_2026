@@ -12,17 +12,25 @@ Severity: **BLOCKER** (document is wrong or will not build) / **MAJOR**
 
 ## BLOCKER
 
-### B-1. `08_bom.tex` contains unresolved merge-conflict markers
-`LATEX/sections/08_bom.tex` lines 100, 101, 170:
-```
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
-```
-Tables 2 (derived actuation parameters) and 3 (procurement gaps) are inside
-the stashed half. **The document does not compile.** Section 5.4 references
-`tab:bom-derived` and `tab:bom-gaps`, so those references are also broken.
-Owner: whoever stashed it. Fix before anything else.
+### B-1. `08_bom.tex` merge conflict — RESOLVED 28 Jul
+The `<<<<<<<` / `=======` / `>>>>>>>` markers are gone; the document compiles.
+The conflict was resolved by keeping the empty side, so Tables 2 (derived
+actuation parameters) and 3 (procurement gaps) are **deliberately deleted** —
+confirmed as intended.
+
+Follow-up applied the same day: the prose in `08_bom.tex` and
+`05_hardware_design.tex` still referenced both deleted tables, which would
+have rendered as "Table ??". Those references have been rewritten to point at
+Sections~\ref{sec:jumpup_target} and~\ref{sec:rw_sizing} instead, and the
+stale `main.aux` (which still carried the deleted labels) was cleared.
+Verified: **43 labels, 50 references, 0 undefined, 0 duplicates.**
+
+One consequence to note: the deleted gap table was the only record of the
+consumables and bench equipment not in the supplied BOM — bench PSU, LiPo
+charger and safety kit, E-stop and fuse, bus bulk capacitor, XT30 pairs, wire,
+fasteners, filament. Several of these are mine to buy under C6. They are now
+tracked in `electrical/PROCUREMENT.md` and the BOM prose points there
+generically ("tracked separately in the build documentation").
 
 ### B-2. Wheel OD is sized for the wrong cube
 Section 5.3 selects **OD = 120 mm with 21 nuts** and states this meets
