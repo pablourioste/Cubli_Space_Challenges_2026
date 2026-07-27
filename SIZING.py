@@ -47,16 +47,22 @@ t_mm          = 10.0      # [mm]  UNIFORM thickness of ring + spokes
 # The apothem is the measurable one (half the across-flats size, which
 # is what a caliper or a spanner reads), so it is the input and the
 # side is derived.
-nut_apothem_mm  = 6.5     # [mm]  hexagon APOTHEM m = (across-flats)/2
+nut_apothem_mm  = 5.0     # [mm]  hexagon APOTHEM m = (across-flats)/2
+                          #       M6 hex nut, ISO 4032: 10.0 mm across flats.
 nut_side_mm     = 2*nut_apothem_mm/math.sqrt(3)   # [mm] DERIVED side a
-nut_bore_d_mm   = 6.6     # [mm]  central bore DIAMETER (threaded hole)
+nut_bore_d_mm   = 5.35    # [mm]  central bore DIAMETER (threaded hole)
+                          #       M6 thread MINOR diameter -- the thread is
+                          #       metal, so the minor dia is the honest hole
+                          #       for a mass estimate (6.0 mm nominal would
+                          #       over-remove and under-predict the mass).
 nut_mass_g      = 2.5     # [g]   MEASURED nut mass -- put one on a scale and
                           #       type the number here. Leave as None to have
                           #       it ESTIMATED from the hexagon + bore geometry.
                           #       A measured value overrides the geometry for
                           #       mass, but the geometric SHAPE is still used
                           #       for the mass distribution (radius of gyration).
-nut_t_mm        = 5.0     # [mm]  nut thickness; None -> equals wheel t
+nut_t_mm        = 5.2     # [mm]  nut thickness; None -> equals wheel t
+                          #       M6 hex nut, ISO 4032 nominal.
 pocket_depth_mm = None    # [mm]  POCKET depth into the ring. None -> equals
                           #       the nut thickness, i.e. a BLIND pocket just
                           #       deep enough to swallow the nut, leaving a
