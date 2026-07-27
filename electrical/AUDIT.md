@@ -116,19 +116,24 @@ error. See M-4.
 Computed on the wrong cube (150 mm, 2 kg), so they disagree with the real
 sizing:
 
-| Quantity | BOM Table 2 | §4/§5 (correct) |
-|---|---|---|
-| Required jump-up momentum | ~0.29 kg m^2/s (edge, 1.5x margin) | 0.277 corner / 0.251 edge (eta=1.05) |
-| Target wheel inertia | >= 3.9e-4 | 3.15e-4 |
-| omega_max | 7000 rpm (733 rad/s) | **8400 rpm (880 rad/s)** |
+| Quantity | BOM Table 2 | §4/§5 (as written) | **DECIDED** |
+|---|---|---|---|
+| Required jump-up momentum | ~0.29 kg m^2/s (edge, 1.5x margin) | 0.277 corner / 0.251 edge | 0.2767 corner |
+| Target wheel inertia | >= 3.9e-4 | 3.15e-4 | **4.404e-4** |
+| omega_max | 7000 rpm (733 rad/s) | 8400 rpm (880 rad/s) | **6000 rpm (628 rad/s)** |
 
-The omega_max discrepancy is the important one: **7000 rpm in the BOM versus
-8400 rpm in the sizing.** `I_w = h_w/omega_max`, so this alone moves the
-inertia target by 20%. Which is the design value? If 7000 rpm is the honest
-derated figure, then the wheel is undersized by 20% and the 180 mm
-justification needs redoing at 7000 rpm. **This is the single most
-consequential open number in the document.** Owner: Dejan + Andrea, needs
-closing before the 3 Aug TDD.
+**RESOLVED 28 Jul: the design speed is 6000 rpm.** Neither of the two figures
+in the document was right — both were optimistic. 8400 rpm is `Kv x 22.2 V`,
+i.e. nominal pack with no load and no losses. The realistic ceiling once
+winding IR drop, sinusoidal-drive derating and end-of-charge pack voltage are
+included is ~6900 rpm, and 6000 rpm is set deliberately below that so the
+machine performs across the whole discharge curve rather than only on a fresh
+pack. Full derivation and the justification paragraph for the TDD are in
+`MOTOR_SPEED.md`.
+
+Every occurrence of 7000, 8400 or 733/880 rad/s in the document must be
+replaced. The inertia target rises to **4.404e-4 kg m^2** (corner), which the
+selected 130 mm wheel meets at 4.5115e-4 (102.4%).
 
 ### M-5. Brake torque 5.0 N m is asserted with no source, and the supplied servo cannot produce it
 `SIZING.py` and `tab:jumpup_budget` use `tau_b = 5.0 N m` per wheel. The BOM
@@ -161,7 +166,25 @@ four are procured; you now confirm three. The table body happens to be right
 for the wrong reason. Fix the footnote, delete the spare row in Table 3, and
 update the procurement narrative (B-3).
 
-### M-8. Section 5.2 claims three coupled constraints, then only closes two
+### M-8. BOM procures a steel wheel; Section 5.3 designs a plastic one
+BOM Table 3 orders "Reaction-wheel rims, qty 3 ... laser-/water-cut steel
+ring, ~120 mm OD, 3-4 mm thick", flagged **H** lead-time risk and described in
+the BOM intro as gating the entire build. Section 5.3 designs a **printed
+PET-CF ring with steel hex-nut ballast** — no cut steel rim at all. These are
+two incompatible wheels, and the one being procured is the one with the long
+lead time. Either the procurement line is obsolete (likely, since the ballast
+scheme post-dates it) or the wheel design is not the one being built.
+Given C6 procurement was due 24 Jul, this needs checking against what was
+actually ordered. Now also wrong on diameter: 130 mm, not 120 mm.
+
+### M-9. Driver electrical-frequency ceiling is misrepresented
+BOM Table 2: "Electrical frequency: 12 pole pairs x 116.7 s^-1 at 7000 rpm =
+1400 Hz vs 2000 Hz driver ceiling" — framed as though the driver constrains
+top speed. A 2000 Hz ceiling is 10000 rpm mechanical, above every
+voltage-limited figure. The binding constraint is the battery, not the driver.
+See `MOTOR_SPEED.md`.
+
+### M-10. Section 5.2 claims three coupled constraints, then only closes two
 The volume constraint paragraph says the wheel OD is capped by the envelope
 but never states the cap. No number is given for the maximum wheel OD that
 fits, which is precisely the number needed to justify 180 mm (see
@@ -223,7 +246,8 @@ traceability chain the table claims to establish does not exist yet.
 ### m-8. Inconsistent decimal/unit style in `tab:jumpup_budget`
 `omega_max` given as "8400 rpm (880 rad/s)". 8400 rpm = 879.6 rad/s, fine, but
 elsewhere the BOM uses 733 rad/s for 7000 rpm. Mixing the two speeds across
-tables (M-4) makes the rounding look like a third value.
+tables (M-4) makes the rounding look like a third value. Now superseded: the
+design value is **6000 rpm = 628 rad/s**, to be stated identically everywhere.
 
 ---
 
@@ -231,14 +255,20 @@ tables (M-4) makes the rounding look like a third value.
 
 Ranked by how much else depends on them:
 
-| # | Open number | Blocks | Owner |
-|---|---|---|---|
-| 1 | omega_max: 7000 or 8400 rpm | inertia target, wheel design, 180 mm justification | Dejan + Andrea |
-| 2 | Real total mass M | h_w, tau_g, beta, the whole jump-up budget | Neisa + Dejan |
-| 3 | tau_b provenance (5.0 N m) | beta, inertia target | Dejan + Suvanna |
-| 4 | Nut identity (2.5 g vs geometry) | wheel inertia, ballast count | Suvanna |
-| 5 | Max wheel OD inside 180 mm frame | ring OD selection | Neisa |
-| 6 | 3-motor architecture consequences | bench rig survival, spares, risk register | Pablo (me) + you |
+| # | Open number | Blocks | Owner | State |
+|---|---|---|---|---|
+| 1 | ~~omega_max~~ | inertia target, wheel design | Pablo | **CLOSED: 6000 rpm** |
+| 2 | Real total mass M | h_w, tau_g, beta, the whole jump-up budget | Neisa + Dejan | open, urgent |
+| 3 | tau_b provenance (5.0 N m) | beta, inertia target | Dejan + Suvanna | open |
+| 4 | ~~Nut identity~~ | wheel inertia, ballast count | Suvanna | **CLOSED: M6, -4.5%** |
+| 5 | Max wheel OD inside 180 mm frame | ring OD selection | Neisa | open |
+| 6 | 3-motor architecture consequences | bench rig survival, spares, risk register | Pablo + you | open |
+| 7 | Nut retention method | wheel safety at 54 N/nut | Suvanna/Neisa | open, new |
+| 8 | Pocket placement vs spokes | wheel CAD | Neisa | open, new |
+
+With omega_max and the nut geometry closed, **the mass budget (row 2) is now
+the single most consequential open number** — it feeds h_w linearly, and the
+wheels+battery+motors alone are already 83% of the 1.45 kg target.
 
 ---
 

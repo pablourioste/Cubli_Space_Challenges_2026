@@ -27,19 +27,26 @@ import math
 # FIXED INPUT VARIABLES  (edit here)
 # =================================================================
 # --- cube / jump-up ---
-M          = 1.45         # [kg]   total cube mass
+M          = 1.45        # [kg]   total cube mass
 L          = 0.18         # [m]    cube edge length
 g          = 9.81         # [m/s^2]
 eta        = 1.05         # [-]    energy margin (1.02-1.05 recommended)
 tau_b      = 5.0          # [N*m]  brake torque per wheel
-rpm_max    = 8400         # [rpm]  max wheel speed
+rpm_max    = 6000         # [rpm]  max wheel speed
 case       = "corner"     # "edge" or "corner" -- corner sizes the design
 
 # --- wheel geometry ---
-ring_width_mm = 17.0      # [mm]  ring radial width (r_out - r_in), FIXED
+ring_width_mm = 20.0      # [mm]  ring radial width (r_out - r_in), FIXED
+                          #       20 mm: leaves 4.0 mm radial wall each side of
+                          #       an M6 pocket (12.01 mm across corners), above
+                          #       the 2 mm minimum in BOTH nut orientations.
 spoke_w_mm    = 10.0      # [mm]  spoke width
 N_spokes      = 3         # [-]   number of spokes
-t_mm          = 10.0      # [mm]  UNIFORM thickness of ring + spokes
+t_mm          = 12.0      # [mm]  UNIFORM thickness of ring + spokes
+                          #       12 mm: a 5.2 mm blind pocket leaves a 6.8 mm
+                          #       plastic floor under each nut. At 10 mm the
+                          #       ring needs so many nuts that the
+                          #       circumferential wall goes negative.
 
 # --- hex nut geometry ---
 # For a REGULAR hexagon the side and apothem are not independent:
@@ -331,3 +338,29 @@ for label, dim in (("flats radial", across_flats_mm),
     wall = (ring_width_mm - dim) / 2.0
     status = "OK" if wall >= min_wall_mm else "TOO THIN"
     print(f"  orientation '{label:<15s}': wall each side = {wall:5.2f} mm  [{status}]")
+
+# =================================================================
+# BLIND-POCKET FLOOR CHECK
+# =================================================================
+# The pockets are BLIND, not through-holes: each nut sits in a recess with a
+# plastic floor beneath it. That floor is what retains the nut against
+# centrifugal load, so it is a structural item and not just leftover material.
+print("\n=== Blind-pocket floor (nut retention) ===")
+print(f"wheel thickness  = {t_mm:.1f} mm")
+print(f"pocket depth     = {t_pkt*1e3:.1f} mm  (= nut thickness)")
+floor_status = "OK" if floor_mm >= min_wall_mm else "TOO THIN"
+print(f"plastic floor    = {floor_mm:.1f} mm  [{floor_status}]")
+if floor_mm <= 0:
+    print("  !! floor <= 0: this is a THROUGH hole, nuts are not retained")
+elif floor_mm < min_wall_mm:
+    print(f"  !! floor below the {min_wall_mm:.1f} mm minimum -- increase t_mm "
+          f"to at least {t_pkt*1e3 + min_wall_mm:.1f} mm")
+
+# Centrifugal load on one nut at max speed, for the floor/adhesive check.
+# The floor carries this in shear+bending if the nut is not otherwise bonded.
+r_nut_max = (max(OD_list_mm)/2*1e-3) - ring_width*0.5
+F_c = m_nut * omega_max**2 * r_nut_max
+print(f"centrifugal force per nut at {rpm_max} rpm, r={r_nut_max*1e3:.0f} mm:")
+print(f"  F = m*omega^2*r = {F_c:.0f} N  ({F_c/9.81:.1f} kgf)")
+print("  -> nuts must be bonded or capped; the floor alone is not a retention "
+      "plan at this load.")
