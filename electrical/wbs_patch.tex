@@ -1,0 +1,88 @@
+% =====================================================================
+% PROPOSED WBS ADDITIONS -- ELECTRICAL STREAM
+% From: Pablo.  For: Dejan (owner of 02_project_organization_*.tex).
+% Prepared 27 Jul 2026.  Day numbering unchanged: day 1 = 23 Jul 2026,
+% day 29 = 20 Aug 2026.
+%
+% NOTHING HERE IS APPLIED.  These are NEW rows and NEW bars only, in the
+% style of the existing files, for you to paste in if you agree.
+% No existing row, bar, date or owner is modified by this patch.
+%
+% Rationale in electrical/PLAN.md; risk rows in electrical/RISKS.md.
+%
+% Three of these tasks exist today only inside C12's four-day block or in
+% the BOM gap table, with no schedule row of their own:
+%   C15  board outline to CAD  -- gates C5, hard date 1 Aug, currently implicit
+%   C16  power distribution harness -- XT90 battery to XT30 drivers
+%   C17  CAN bus build and validation at 5 Mbps
+% C15 in particular is a hard 1 Aug deliverable to Neisa that no current row
+% names, while C5 (2--3 Aug) depends on it.
+% =====================================================================
+
+
+% ---------------------------------------------------------------------
+% PART 1 -- rows for 02_project_organization_tasks.tex
+% Insert in the "Hardware Design & Build" block, after the C14 row.
+% Column spec is unchanged: L{0.8cm} L{3.0cm} L{6.2cm} L{2.2cm} L{1.8cm}
+% ---------------------------------------------------------------------
+
+C15 & Board outline to CAD & Perfboard floorplan, driver placement from the encoder cable limit, and the connector positions and keep-outs released to CAD & Pablo \textit{(+Neisa)} & 29 Jul--1 Aug \\
+C16 & Power distribution harness & Battery-to-driver harness (XT90 to XT30), anti-spark switch, inline fuse and the bus bulk capacitor & Pablo & 3--4 Aug \\
+C17 & CAN bus build \& validation & Linear-topology harness, split termination at the two bus ends, and signal-integrity validation at \qty{5}{\mega\bit\per\second} & Pablo \textit{(+Nicc)} & 4--5 Aug \\
+
+
+% ---------------------------------------------------------------------
+% PART 2 -- bars for 02_project_organization_gantt.tex
+% Insert in the "Hardware Design & Build" group, after the C14 bar
+% (line 74) and before the "Deliverables" group.
+%
+% NOTE: the hardware group header is currently \ganttgroup{...}{1}{22}.
+% C16 and C17 fall inside days 12--15 so the group span still holds; C15
+% spans days 7--10, likewise inside. No group edit needed.
+% ---------------------------------------------------------------------
+
+  \ganttbar[bar/.append style={fill=cdcol}]{C15 Board outline to CAD}{7}{10} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C16 Power distribution harness}{12}{13} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C17 CAN bus build \& validation}{13}{14} \ganttnewline
+
+
+% ---------------------------------------------------------------------
+% PART 3 -- optional milestone
+% If you want the 1 Aug CAD hand-off visible as a gate, add this to the
+% milestone block. It sits on day 10 (1 Aug), immediately before the
+% existing G3 (day 11). Numbering it G2b avoids renumbering G3--G9.
+% ---------------------------------------------------------------------
+
+  \ganttmilestone[milestone/.append style={fill=mscol}]{G2b Board outline released}{10} \ganttnewline
+
+
+% ---------------------------------------------------------------------
+% PART 4 -- optional gate-table row for 02_project_organization.tex
+% Table tab:gates, between the G2 and G3 rows.
+% ---------------------------------------------------------------------
+
+G2b & Board outline and connector positions released to CAD & 1 Aug \\
+
+
+% ---------------------------------------------------------------------
+% NOT PATCHED -- flagged for your decision, listed in PLAN.md
+%
+% 1. C12 currently reads "Perfboard + harness ... 3--6 Aug". If C16 and C17
+%    are adopted, C12's scope should narrow to the board itself, or the
+%    three rows double-count four days of my time. Your call which way.
+%
+% 2. The BOM (Table tab:bom-supplied) states qty 3 for motors, drivers and
+%    encoders, with a footnote saying four sets are procured, while
+%    Table tab:bom-gaps lists the spare motor and driver as items still to
+%    be bought. Four complete sets is the design decision. The three places
+%    disagree.
+%
+% 3. Section 5 (sec:massbudget) states a 180 mm cube envelope; the design
+%    baseline is 150 mm and the introduction cites ETH's 15 cm. This
+%    changes the electronics keep-out, so I need the number fixed.
+%
+% 4. 08_bom.tex currently contains unresolved merge-conflict markers
+%    (<<<<<<< Updated upstream / >>>>>>> Stashed changes) around lines
+%    100 and 170. Tables 2 and 3 are inside the stashed half and the file
+%    will not compile as it stands.
+% ---------------------------------------------------------------------
