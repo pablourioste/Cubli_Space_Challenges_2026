@@ -1,0 +1,203 @@
+% ================= APPENDIX: CAD & CONSTRUCTION =================
+\section{CAD and Construction Detail}
+\label{app:cad}
+
+This appendix holds the mechanical detail deliberately kept out of
+Section~\ref{sec:mechanical}: the model tree, the drawing set, the fabrication
+settings and the assembly sequence. The rationale for the architecture --- why
+the frame is split, what fixes the envelope, how the wheel is tuned --- stays in
+Section~\ref{sec:mechanical} and is not repeated here. Anything in this appendix
+may change without the design intent changing; anything in
+Section~\ref{sec:mechanical} may not.
+
+\subsection{Design Parameter Table}
+\label{app:cad_params}
+
+Table~\ref{tab:cad_params} is the single source of the driving dimensions
+referenced by every part in the model, per convention~1 of
+Section~\ref{sec:cad_method}. It is the CAD-side mirror of the envelope closure
+of Section~\ref{sec:massbudget} and is updated on each iteration.
+
+\begin{table}[h]
+\centering
+\caption{Driving CAD parameters. Every dependent feature references these; no
+part carries a duplicated hard-coded value.}
+\label{tab:cad_params}
+\small
+\begin{tabular}{l L{6.6cm} c}
+\toprule
+Symbol & Parameter & Value \\
+\midrule
+$L$         & Cube edge length (outer)                & \textcolor{red}{TBD} \\
+$t_w$       & Frame wall thickness                    & \textcolor{red}{TBD} \\
+$D_w$       & Wheel outer diameter (Sec.~\ref{sec:rw_sizing}) & \textcolor{red}{TBD} \\
+$d_m$       & Motor axis offset from cube centre      & \textcolor{red}{TBD} \\
+$h_m$       & Motor mounting face height on its axis  & \textcolor{red}{TBD} \\
+$c_w$       & Wheel-to-subframe axial clearance       & \textcolor{red}{TBD} \\
+$c_o$       & Clearance between orthogonal wheel modules & \textcolor{red}{TBD} \\
+$V_{\min}$  & Minimum internal clear volume           & \textcolor{red}{TBD} \\
+$r_c$       & Corner contact feature radius           & \textcolor{red}{TBD} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Model Tree and Part List}
+\label{app:cad_tree}
+
+Table~\ref{tab:cad_parts} lists the modelled parts by assembly, with their
+fabrication route and current status. It is the mechanical counterpart to the
+electronics bill of materials of Appendix~\ref{app:bom}: the parts here are the
+team's design responsibility and are not supplied.
+
+\begin{table}[h]
+\centering
+\caption{CAD model tree and part list. Quantities are per assembled cube unless
+noted; the 1-DoF rig parts are listed separately.}
+\label{tab:cad_parts}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{c L{4.0cm} c L{3.4cm} L{3.0cm}}
+\toprule
+Ref & Part & Qty & Fabrication route & Status \\
+\midrule
+\multicolumn{5}{@{}l}{\textbf{Inner structure}}\\
+\midrule
+M1 & Motor subframe             & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+M2 & Motor mount ($\times$axis) & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+M3 & Battery cradle / retention & 1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+M4 & Electronics tray           & 1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+M5 & Brake servo bracket        & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\midrule
+\multicolumn{5}{@{}l}{\textbf{Reaction wheel assembly}}\\
+\midrule
+W1 & Ballasted ring (Sec.~\ref{sec:rw_sizing}) & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+W2 & Wheel hub / rotor adapter  & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+W3 & Ballast bolt and nut set   & \textcolor{red}{TBD} & Standard hardware & \textcolor{red}{TBD} \\
+W4 & Brake strike feature       & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\midrule
+\multicolumn{5}{@{}l}{\textbf{Outer frame}}\\
+\midrule
+F1 & Frame member / edge rail   & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+F2 & Corner contact feature     & 8 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+F3 & Face panel / wheel guard   & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\midrule
+\multicolumn{5}{@{}l}{\textbf{1-DoF rig (Sec.~\ref{sec:cad_2d})}}\\
+\midrule
+R1 & Face plate                 & 1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+R2 & Pivot bearing mount        & 1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+R3 & Rig motor mount            & 1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+R4 & Hard stops / containment   & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{2D Prototype Construction}
+\label{app:cad_2d}
+
+% Rig drawings and construction notes: plate geometry, pivot bearing seat,
+% motor mount, brake barrier travel, hard-stop placement, and the mounting
+% location of the IMU relative to the pivot (Sec.~\ref{sec:control2d}).
+
+% Figure placeholder: rig general-assembly view with the pivot, motor axis and
+% brake labelled.
+
+\subsection{3D Cube Construction}
+\label{app:cad_3d}
+
+% Cube drawings: inner structure general assembly, the three motor modules on
+% their orthogonal axes, outer frame and contact features, and the section view
+% showing the battery at the geometric centre.
+
+% Figure placeholder: cube exploded view.
+% Figure placeholder: section view through two orthogonal wheel modules,
+% showing the clearances c_w and c_o of Table~\ref{tab:cad_params}.
+
+\subsection{Fabrication and Assembly}
+\label{app:cad_fab}
+
+\subsubsection{Print and Manufacturing Settings}
+
+The printed parts are structural, not cosmetic: the wheel ring carries
+centrifugal load at the ballast pockets and the motor mounts carry the brake
+impulse, which is the design load case identified in
+Section~\ref{sec:background}. Settings are therefore recorded per part in
+Table~\ref{tab:print_settings} and treated as part of the design, since a part
+reprinted at a different orientation or infill is not the part that was
+analysed.
+
+\begin{table}[h]
+\centering
+\caption{Fabrication settings for the structural printed parts. Layer
+orientation is specified relative to the principal load direction.}
+\label{tab:print_settings}
+\small
+\begin{tabular}{l L{2.8cm} L{3.0cm} L{3.6cm}}
+\toprule
+Ref & Material & Infill / walls & Orientation and rationale \\
+\midrule
+W1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+W2 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+M1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+M2 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+F1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+F2 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Assembly Sequence}
+
+The sequence of Table~\ref{tab:assembly_seq} is ordered by access: each step is
+one whose verification becomes impossible or destructive once a later step is
+complete. The encoder air gap in particular is re-checked after mechanical
+assembly, since it can shift when the structure is bolted up
+(Table~\ref{tab:signal_rules}).
+
+\begin{table}[h]
+\centering
+\caption{Assembly sequence. Ordering is set by access: each check must be
+completed before the step that encloses it.}
+\label{tab:assembly_seq}
+\small
+\begin{tabular}{c L{5.6cm} L{6.4cm}}
+\toprule
+Step & Operation & Check before proceeding \\
+\midrule
+1 & Wheel assembly: ring, hub, ballast bolts to the selected count & Balance check; bolt retention per Sec.~\ref{sec:rw_sizing} \\
+2 & Motor to mount, encoder magnet to rotor & Encoder air gap and centring to the assembly spec \\
+3 & Motor modules to inner structure, three axes & Axis orthogonality; wheel clearance $c_w$, $c_o$ \\
+4 & Battery and electronics tray into inner structure & Pack centring; board keep-out clearances \\
+5 & Harness install and dressing & Continuity and isolation (Sec.~\ref{sec:electrical_safety}) \\
+6 & Inner structure into outer frame & Encoder air gaps re-checked after bolt-up \\
+7 & Contact features and guards & Contact geometry; wheel guard clearance \\
+8 & Mass properties measurement & Measured mass against Table~\ref{tab:massbudget} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Mass Properties Verification}
+\label{app:cad_mass}
+
+The CAD roll-up is an estimate until the assembly is weighed. Step~8 above
+closes the loop of Section~\ref{sec:massbudget}: the measured mass is compared
+against the modelled value, and any discrepancy is carried back into
+$I_{w,\text{target}}$ and absorbed, where possible, by the ballast trim of
+Section~\ref{sec:rw_sizing} rather than by a re-design.
+
+\begin{table}[h]
+\centering
+\caption{Modelled versus measured mass properties. A discrepancy here is
+absorbed by ballast trim where the margin allows.}
+\label{tab:mass_verification}
+\small
+\begin{tabular}{L{4.6cm} c c c}
+\toprule
+Quantity & CAD value & Measured & Discrepancy \\
+\midrule
+Total cube mass $M$          & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Wheel mass $m_w$ (each)      & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Wheel inertia $I_w$ (each)   & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+CoM offset from cube centre  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\bottomrule
+\end{tabular}
+\end{table}

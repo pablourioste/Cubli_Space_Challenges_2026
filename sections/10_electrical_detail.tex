@@ -1,0 +1,209 @@
+% ================= APPENDIX: ELECTRICAL SYSTEM DETAIL =================
+\section{Electrical System Detail}
+\label{app:electrical}
+
+This appendix holds the electrical detail kept out of
+Section~\ref{sec:electrical}: the schematic sheets indexed in
+Table~\ref{tab:schematic_sheets}, the connector and pin assignments, the harness
+drawings, the board layout and the bring-up checklists. The architectural
+decisions --- two rails behind one E-stop, linear bus topology, perfboard rather
+than fabricated board --- remain in Section~\ref{sec:electrical}. The part
+specifications are in Appendix~\ref{app:bom} and are not repeated.
+
+\subsection{Schematic Sheets}
+\label{app:schematics}
+
+\subsubsection{Sheet 1 --- Power Entry and Protection}
+
+% Figure placeholder: power entry schematic. Pack connector, anti-spark inrush
+% path, combined E-stop and fuse, split to motor bus and logic rail.
+% Verify against: fuse rating vs. worst-case bus current (Table~\ref{tab:power_budget});
+% inrush into the driver bulk capacitance.
+
+\subsubsection{Sheet 2 --- Logic Rail}
+
+% Figure placeholder: buck converter, back-feed protection diode, rail bulk
+% capacitance, per-device decoupling.
+% Verify against: converter rating vs. the 5 V worst-case total; capacitor
+% voltage ratings -- low-voltage parts on the logic rail only, never the pack bus.
+
+\subsubsection{Sheet 3 --- CAN-FD Bus}
+
+% Figure placeholder: linear bus chain across the three drivers and the flight
+% computer, with split termination at the two physical ends.
+% Verify against: the topology rules of Table~\ref{tab:signal_rules}.
+
+\subsubsection{Sheet 4 --- Encoder Interfaces}
+
+% Figure placeholder: SPI interface, one per axis, driver to encoder.
+% Verify against: cable length limit and air-gap spec; these fix the driver
+% positions (Sec.~\ref{sec:bus_topology}).
+
+\subsubsection{Sheet 5 --- Flight Computer and IMU}
+
+% Figure placeholder: MCU, IMU interface, orientation relative to the body
+% frame of Sec.~\ref{sec:cad_method}, and the mounting location relative to the
+% pivot required by Sec.~\ref{sec:control2d}.
+
+\subsubsection{Sheet 6 --- Telemetry Link}
+
+% Figure placeholder: telemetry module, serial interface to the MCU, and its
+% supply decoupling sized for the transmit burst.
+
+\subsubsection{Sheet 7 --- Brake Servo Drive}
+
+% Figure placeholder: servo supply, decoupling and PWM routing.
+% Verify against: stall-current headroom on the logic rail; PWM routed clear of
+% the encoder SPI.
+
+\subsection{Connector and Pin Assignments}
+\label{app:pinout}
+
+Table~\ref{tab:connectors} is the connector schedule. It exists so that a
+harness can be built and re-built from this document alone, and so that a
+mis-mate is a documented impossibility rather than a discovered one: no two
+connectors carrying different voltages share a housing type on this machine.
+
+\begin{table}[h]
+\centering
+\caption{Connector schedule. Keying and housing types are chosen so that two
+connectors carrying different voltages cannot be mated.}
+\label{tab:connectors}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{c L{3.0cm} L{3.0cm} L{2.4cm} L{3.2cm}}
+\toprule
+Ref & From & To & Housing / keying & Signals \\
+\midrule
+J1 & Battery pack        & Protection / E-stop   & \textcolor{red}{TBD} & Pack $+$, pack $-$ \\
+J2 & Protection          & Distribution board    & \textcolor{red}{TBD} & Motor bus \\
+J3 & Distribution board  & Driver, axis 1        & \textcolor{red}{TBD} & Motor bus \\
+J4 & Distribution board  & Driver, axis 2        & \textcolor{red}{TBD} & Motor bus \\
+J5 & Distribution board  & Driver, axis 3        & \textcolor{red}{TBD} & Motor bus \\
+J6 & Board               & CAN chain, end A      & \textcolor{red}{TBD} & CAN-H, CAN-L, GND \\
+J7 & CAN chain, end B    & Termination network   & \textcolor{red}{TBD} & CAN-H, CAN-L, GND \\
+J8 & Driver, axis $i$    & Encoder, axis $i$     & \textcolor{red}{TBD} & SPI, \qty{3.3}{\volt}, GND \\
+J9 & Board               & IMU                   & \textcolor{red}{TBD} & Serial bus, supply, GND \\
+J10 & Board              & Telemetry module      & \textcolor{red}{TBD} & UART, supply, GND \\
+J11 & Board              & Brake servo, axis $i$ & \textcolor{red}{TBD} & PWM, \qty{5}{\volt}, GND \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Harness Drawings and Wire Schedule}
+\label{app:harness}
+
+Table~\ref{tab:wire_schedule} is the wire schedule. Conductor gauge on the motor
+bus is set by the spin-up current rather than the balancing current, since
+spin-up is the sustained high-current phase; the signal runs are set by length
+limits rather than by current.
+
+\begin{table}[h]
+\centering
+\caption{Wire schedule. Motor-bus gauge is sized on spin-up current; signal runs
+are length-limited (Table~\ref{tab:signal_rules}).}
+\label{tab:wire_schedule}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{c L{3.4cm} c c L{3.8cm}}
+\toprule
+Ref & Run & Gauge & Length & Sizing basis \\
+\midrule
+H1 & Pack to protection      & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Peak bus current \\
+H2 & Protection to board     & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Peak bus current \\
+H3 & Board to driver drops (3) & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Per-axis spin-up current \\
+H4 & Motor phase leads (3)   & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Motor phase current \\
+H5 & CAN chain segments      & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Topology, not current \\
+H6 & Encoder SPI runs (3)    & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Length limit governs \\
+H7 & Servo drives (3)        & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Stall current \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% Figure placeholder: distribution harness drawing -- pack lead, protection
+% element, and the three driver drops, with labelling scheme.
+% Figure placeholder: as-built harness photograph, labelled and strain-relieved.
+
+\subsection{Board Layout}
+\label{app:board_layout}
+
+% Figure placeholder: perfboard floorplan -- bus entry, converter, logic rail,
+% bulk capacitance, flight computer, IMU, telemetry module, servo headers and
+% the CAN termination network.
+% Figure placeholder: board outline drawing with the mounting-hole pattern,
+% keep-out heights and connector exit directions delivered to the mechanical
+% design as the electronics-mount interface of Table~\ref{tab:mech_interfaces}.
+
+The floorplan is constrained before it is aesthetic: the driver positions follow
+from the encoder cable limit, the bus route follows from the driver positions,
+and the board is placed around what remains
+(Section~\ref{sec:bus_topology}). Rail separation is maintained physically on
+the board, not only schematically, so that motor-current return does not share
+copper with the sensing ground.
+
+\subsection{Bring-Up and Isolation Checklists}
+\label{app:checklists}
+
+These checks are performed on every re-assembly, not only on first build, since
+the encoder gaps and connector seating are exactly what mechanical work
+disturbs.
+
+\paragraph{Before any power is applied.}
+\begin{enumerate}
+  \item Isolation: motor bus to chassis, logic rail to motor bus, each rail to
+        ground.
+  \item Capacitor voltage ratings confirmed by position --- no low-voltage part
+        on the pack bus.
+  \item Polarity of every fabricated connector verified against
+        Table~\ref{tab:connectors}.
+  \item Protection element in circuit: E-stop functional, fuse fitted and rated,
+        anti-spark path intact.
+  \item Encoder air gaps re-measured after mechanical assembly.
+\end{enumerate}
+
+\paragraph{First power-on, current-limited bench supply.}
+\begin{enumerate}
+  \item Current limit verified against a known load before connecting the
+        assembly.
+  \item Logic rail voltage and ripple under load; converter thermal check.
+  \item All drivers enumerate on the bus; encoders read back with no error
+        flags; IMU responds.
+  \item Bus integrity at the full data rate: sustained soak with all nodes
+        addressed, error-frame count logged.
+  \item Open-loop wheel motion, wheels contained, one axis at a time.
+\end{enumerate}
+
+\paragraph{First battery power-on.} Performed only after the bench sequence
+passes in full, with the pack protection verified, cell monitoring active and
+the assembly in a fire-safe area. Inrush is measured against the bulk
+capacitance on connection.
+
+\subsection{As-Built Measurements}
+\label{app:electrical_measured}
+
+Table~\ref{tab:electrical_measured} records the measured electrical figures that
+replace the estimates used during design. These are the numbers reported back to
+the modelling and control work, and they are the reason the parameter
+identification of Section~\ref{sec:paramid} runs on measured rather than assumed
+values.
+
+\begin{table}[h]
+\centering
+\caption{As-built electrical measurements. Each replaces an estimate used
+earlier in the design.}
+\label{tab:electrical_measured}
+\small
+\begin{tabular}{L{5.0cm} c L{5.4cm}}
+\toprule
+Quantity & Measured & Replaces / feeds \\
+\midrule
+Motor torque constant $K_m$    & \textcolor{red}{TBD} & Table~\ref{tab:params}, datasheet value \\
+Wheel inertia $I_w$ (spin-down)& \textcolor{red}{TBD} & Table~\ref{tab:params}, CAD value \\
+Viscous and Coulomb friction   & \textcolor{red}{TBD} & $C_b$, $C_w$ estimates \\
+Command-to-encoder latency     & \textcolor{red}{TBD} & Loop timing, Sec.~\ref{sec:control_sw} \\
+Achievable wheel speed on bus  & \textcolor{red}{TBD} & $\omega_{\max}$, Sec.~\ref{sec:jumpup_target} \\
+Logic rail load, worst case    & \textcolor{red}{TBD} & Table~\ref{tab:power_budget} \\
+Runtime per charge under balance load & \textcolor{red}{TBD} & Demonstration planning \\
+\bottomrule
+\end{tabular}
+\end{table}

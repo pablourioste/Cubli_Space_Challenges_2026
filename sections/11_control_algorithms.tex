@@ -1,0 +1,259 @@
+% ================= APPENDIX: CONTROL ALGORITHMS =================
+\section{Control Algorithms}
+\label{app:control_algorithms}
+
+This appendix holds the implementation detail of the control software whose
+architecture is given in Section~\ref{sec:control_sw}. The derivations remain in
+Section~\ref{sec:modeling} and are not repeated; what follows is the executable
+form --- the loop, the estimator, the control law, the mode logic and the fault
+responses --- together with the gains and timing figures that are re-tuned
+against hardware and therefore change more often than the design does.
+
+\subsection{Control Loop}
+\label{app:loop}
+
+The top-level loop is the fixed sequence of Figure~\ref{fig:software_pipeline},
+executed at the sample period $\Delta t$ of
+Table~\ref{tab:control2d_vars}. Its ordering is a real-time requirement, not a
+convenience: with no dynamic allocation and no blocking call, the worst-case
+cycle is bounded by construction.
+
+\begin{verbatim}
+every dt:
+    t0 <- now()
+
+    # 1. Sensor ingest -- fixed-size, non-blocking reads only
+    imu      <- read_imu()                # rates and specific force
+    wheels   <- read_driver_replies()     # wheel angle and speed, per axis
+    flag_stale(imu, wheels)               # feeds the fault logic below
+
+    # 2. Estimation -- propagate on rates, correct on the absolute reference
+    xhat     <- estimator_predict(xhat, imu.rates, dt)
+    xhat     <- estimator_correct(xhat, imu.accel)
+
+    # 3. State assembly
+    x        <- assemble_state(xhat, wheels)
+
+    # 4. Supervision -- mode first, so the control law below is unambiguous
+    mode     <- supervisor_update(mode, x, faults)
+
+    # 5. Control law for the current mode
+    u        <- control_law(mode, x, gains[mode])
+    u        <- apply_limits(u)           # torque and momentum saturation
+
+    # 6. Output
+    send_torque_commands(u)
+    set_brake(mode)
+
+    # 7. Telemetry -- side-branch, never in the control path
+    telemetry_publish_nonblocking(x, u, mode)
+
+    log_cycle_time(now() - t0)            # feeds the timing budget
+\end{verbatim}
+
+Telemetry sits after the output stage and is non-blocking by construction, so
+that logging cannot perturb loop timing --- the property that makes the sample
+period a guarantee rather than an average.
+
+\subsection{Attitude Estimation}
+\label{app:estimator}
+
+The estimator propagates attitude on the measured rates and corrects it against
+the absolute reference, while estimating the rate-sensor bias. The two error
+sources it must handle pull in opposite directions and are the reason a single
+sensor will not do: the rate measurement is clean over a cycle but its bias
+drifts, and the absolute reference is drift-free but is corrupted by the
+vibration the machine itself generates by spinning the wheels
+(Section~\ref{sec:background}).
+
+\begin{verbatim}
+estimator_predict(xhat, rates, dt):
+    w_corrected <- rates - xhat.bias
+    xhat.att    <- integrate_attitude(xhat.att, w_corrected, dt)
+    xhat.P      <- propagate_covariance(xhat.P, dt)   # bias random walk
+    return xhat
+
+estimator_correct(xhat, accel):
+    # Gate the correction: during high-acceleration phases the absolute
+    # reference is not measuring the vertical, and applying it would inject
+    # the manoeuvre into the attitude estimate.
+    if not accel_trustworthy(accel):
+        return xhat
+    innovation <- reference_direction(accel) - predicted_direction(xhat.att)
+    K          <- gain(xhat.P, R_accel)
+    xhat       <- apply_correction(xhat, K, innovation)   # attitude and bias
+    return xhat
+\end{verbatim}
+
+The gating in \texttt{estimator\_correct} is the load-bearing part. The jump-up
+and any aggressive recovery are exactly the phases in which the accelerometer
+does not measure the vertical, so an ungated correction would drive the estimate
+with the manoeuvre. The trust test and its threshold are recorded in
+Table~\ref{tab:control_params}.
+
+\subsection{Control Law}
+\label{app:control_law}
+
+The balancing law is the state feedback of
+Sections~\ref{sec:control2d} and~\ref{sec:3dmodel}, with two additions required
+by hardware: the stored-momentum penalty that bleeds off wheel speed, and the
+offset filter that absorbs a constant tilt-sensor bias without a calibration
+stage.
+
+\begin{verbatim}
+control_law(mode, x, K):
+    if mode in {EDGE_BALANCE, CORNER_BALANCE, SLEW}:
+        e        <- x.att - reference(mode)   # zero for pure regulation
+        x_f      <- lowpass(x_f, e)           # absorbs constant sensor offset
+        u        <- -K @ [e - x_f, x.rates, x.wheel_speeds]
+        return u
+
+    if mode == SPINUP:
+        return speed_ramp(x.wheel_speeds, target_speed)
+
+    if mode == JUMPUP:
+        return open_loop_jump_sequence(t_since_mode_entry)
+
+    return zero_torque()                      # IDLE and FAULT
+\end{verbatim}
+
+The wheel-speed term in the feedback is not merely a damping state. Under any
+persistent disturbance the wheels drift toward their speed limit, so the gain on
+stored momentum is what keeps the actuators inside their envelope; without it
+the machine balances correctly until it saturates and then does not.
+
+\paragraph{Saturation handling.} \texttt{apply\_limits} enforces the torque
+limit and the momentum envelope. Torque is clipped per axis; momentum saturation
+is handled by the speed penalty above rather than by clipping, since clipping a
+saturated wheel removes control authority precisely when it is needed. When a
+wheel reaches its limit despite the penalty, the supervisor is notified and
+treats it as the fault of Section~\ref{app:faults}.
+
+\subsection{Mode Supervision}
+\label{app:modes}
+
+The supervisor implements the transitions of Table~\ref{tab:sw_modes}. Every
+threshold carries hysteresis, and every mode has a disarm exit.
+
+\begin{verbatim}
+supervisor_update(mode, x, faults):
+    if faults.critical:
+        return FAULT                      # from any mode, unconditionally
+
+    switch mode:
+      IDLE:            if arm_command:            -> SPINUP
+      SPINUP:          if wheel_speed >= target:  -> JUMPUP
+      JUMPUP:          if |tilt| < capture_band:  -> EDGE_BALANCE
+                       if timeout:                -> FAULT
+      EDGE_BALANCE:    if |tilt| > release_band:  -> FAULT     # fall detected
+                       if corner_command:         -> CORNER_BALANCE
+      CORNER_BALANCE:  if |tilt| > release_band:  -> FAULT
+                       if slew_command:           -> SLEW
+      SLEW:            if reference_reached:      -> CORNER_BALANCE
+                       if |tilt| > release_band:  -> FAULT
+      FAULT:           if manual_reset and safe:  -> IDLE
+    return mode
+\end{verbatim}
+
+The capture and release bands differ deliberately --- entry into balancing is
+stricter than the condition for staying in it --- which is the hysteresis that
+prevents chattering at a mode boundary.
+
+\subsection{Fault Detection and Response}
+\label{app:faults}
+
+Table~\ref{tab:fault_responses} gives the detection test and response for each
+failure case. The distinction that matters is between faults the machine can
+continue through and faults it cannot: only the loss of the balancing
+equilibrium terminates the run, because a body outside its capture region cannot
+be recovered by the linear law, and continued actuation adds energy to a fall
+that is already happening.
+
+\begin{table}[h]
+\centering
+\caption{Fault detection and response. Only loss of equilibrium terminates the
+run; the remaining cases keep the machine controlled.}
+\label{tab:fault_responses}
+\small
+\begin{tabular}{L{3.2cm} L{4.6cm} L{5.4cm}}
+\toprule
+Fault & Detection & Response \\
+\midrule
+Sensor dropout / stale data & Missing or repeated sample within the cycle deadline & Propagate on the remaining sensor; escalate to FAULT if persistent beyond the tolerance \\
+Bus error       & Error-frame count or missed driver reply & Retry within the cycle; escalate on repetition \\
+Encoder error flag & Flag set, or angle discontinuity beyond the physical rate limit & Disarm the affected axis; FAULT if it is load-bearing for the current mode \\
+Wheel saturation & Speed at limit despite the momentum penalty & Notify supervisor; reduce reference authority; FAULT if sustained \\
+Loss of equilibrium & Tilt outside the release band & FAULT: wheels commanded down, drivers disarmed \\
+Loop overrun    & Measured cycle time exceeds the deadline & Log; FAULT if repeated, since the timing guarantee no longer holds \\
+Watchdog        & Loop fails to service the timer & Hardware disarm, independent of the software path \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Timing Budget}
+\label{app:timing}
+
+Table~\ref{tab:timing_budget} records the per-stage timing budget and the
+measured margin. It is re-measured whenever a stage changes, because the
+guarantee of Section~\ref{sec:control_sw} is a claim about the worst case and
+not about the mean.
+
+\begin{table}[h]
+\centering
+\caption{Per-cycle timing budget against the sample period. Re-measured
+whenever a stage changes.}
+\label{tab:timing_budget}
+\small
+\begin{tabular}{L{4.6cm} c c}
+\toprule
+Stage & Budget & Measured worst case \\
+\midrule
+Sensor ingest        & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Estimation           & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+State assembly       & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Supervision          & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Control law          & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Command output       & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\midrule
+\textbf{Total cycle} & \textcolor{red}{\textbf{TBD}} & \textcolor{red}{\textbf{TBD}} \\
+\textbf{Margin to deadline} & --- & \textcolor{red}{\textbf{TBD}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Gains and Tuning Parameters}
+\label{app:gains}
+
+Table~\ref{tab:control_params} is the tuning record: every constant the control
+software carries, with the source that fixes it. Values computed from the model
+are distinguished from values tuned against hardware, since only the latter must
+be re-established when the machine is re-built.
+
+\begin{table}[h]
+\centering
+\caption{Control and estimation parameters. ``Model'' values follow from the
+design; ``bench'' values are tuned against hardware and re-established after a
+re-build.}
+\label{tab:control_params}
+\small
+\begin{tabular}{l L{5.4cm} c c}
+\toprule
+Symbol & Parameter & Source & Value \\
+\midrule
+$\Delta t$        & Sample period                      & Model & \textcolor{red}{TBD} \\
+$Q, R$            & State and input weights            & Model & \textcolor{red}{TBD} \\
+$K_d$ (edge)      & Feedback gain, edge balance        & Model & \textcolor{red}{TBD} \\
+$K_d$ (corner)    & Feedback gain, corner balance      & Model & \textcolor{red}{TBD} \\
+---               & Momentum-penalty weight            & Bench & \textcolor{red}{TBD} \\
+$\gamma$          & Estimator correction weight        & Bench & \textcolor{red}{TBD} \\
+---               & Accelerometer trust threshold      & Bench & \textcolor{red}{TBD} \\
+$\alpha$          & Offset-filter coefficient          & Bench & \textcolor{red}{TBD} \\
+$\theta_{\text{th}}$ & Balancing capture band          & Bench & \textcolor{red}{TBD} \\
+---               & Balancing release band (hysteresis)& Bench & \textcolor{red}{TBD} \\
+---               & Spin-up target wheel speed         & Model & \textcolor{red}{TBD} \\
+---               & Brake actuation timing             & Bench & \textcolor{red}{TBD} \\
+---               & Torque limit per axis              & Model & \textcolor{red}{TBD} \\
+---               & Watchdog timeout                   & Model & \textcolor{red}{TBD} \\
+\bottomrule
+\end{tabular}
+\end{table}
