@@ -15,29 +15,36 @@ specifications are in Appendix~\ref{app:bom} and are not repeated.
 
 \subsubsection{Sheet 1 --- Power Entry and Protection}
 
-% Figure placeholder: power entry schematic. Pack connector, anti-spark inrush
-% path, combined E-stop and fuse, split to motor bus and logic rail.
-% Verify against: fuse rating vs. worst-case bus current (Table~\ref{tab:power_budget});
-% inrush into the driver bulk capacitance.
+% Figure placeholder: power entry schematic. XT90 pack connector, XT90-S
+% anti-spark inrush path, combined E-stop and inline fuse, split to motor bus
+% and logic rail, 470-1000 uF / >= 50 V bulk cap on the pack bus.
+% Verify against: fuse rating vs. worst-case bus current
+% (Table~\ref{tab:power_budget}); inrush into the driver bulk capacitance --
+% the anti-spark path is what prevents welding a bare connector.
 
 \subsubsection{Sheet 2 --- Logic Rail}
 
-% Figure placeholder: buck converter, back-feed protection diode, rail bulk
-% capacitance, per-device decoupling.
-% Verify against: converter rating vs. the 5 V worst-case total; capacitor
-% voltage ratings -- low-voltage parts on the logic rail only, never the pack bus.
+% Figure placeholder: LM2596 buck converter 22 V -> 5 V, 1N5819 back-feed
+% protection diode, 100 uF/16 V rail bulk capacitance, 100 nF per-device
+% decoupling.
+% Verify against: 2-3 A converter rating (derates without heatsink) vs. the
+% 5 V worst-case total; capacitor voltage ratings -- the 16 V parts belong on
+% the logic rail ONLY and must never be fitted to the ~25 V pack bus.
 
 \subsubsection{Sheet 3 --- CAN-FD Bus}
 
-% Figure placeholder: linear bus chain across the three drivers and the flight
-% computer, with split termination at the two physical ends.
-% Verify against: the topology rules of Table~\ref{tab:signal_rules}.
+% Figure placeholder: linear bus chain across the three moteus-n1 drivers and
+% the Teensy, with split termination (2 x 60.4 ohm + 4.7 nF) at the two
+% physical ends.
+% Verify against: the topology rules of Table~\ref{tab:signal_rules} --
+% linear chain, stubs < 10 cm, termination at the two ends only.
 
 \subsubsection{Sheet 4 --- Encoder Interfaces}
 
-% Figure placeholder: SPI interface, one per axis, driver to encoder.
-% Verify against: cable length limit and air-gap spec; these fix the driver
-% positions (Sec.~\ref{sec:bus_topology}).
+% Figure placeholder: MA600 SPI interface, one per axis, driver to encoder.
+% Verify against: SPI run < 20 cm and air gap <= 0.5 mm with the sensor
+% centred on the magnet thickness; these fix the driver positions
+% (Sec.~\ref{sec:bus_topology}), not the reverse.
 
 \subsubsection{Sheet 5 --- Flight Computer and IMU}
 
@@ -75,20 +82,25 @@ connectors carrying different voltages cannot be mated.}
 \toprule
 Ref & From & To & Housing / keying & Signals \\
 \midrule
-J1 & Battery pack        & Protection / E-stop   & \textcolor{red}{TBD} & Pack $+$, pack $-$ \\
-J2 & Protection          & Distribution board    & \textcolor{red}{TBD} & Motor bus \\
-J3 & Distribution board  & Driver, axis 1        & \textcolor{red}{TBD} & Motor bus \\
-J4 & Distribution board  & Driver, axis 2        & \textcolor{red}{TBD} & Motor bus \\
-J5 & Distribution board  & Driver, axis 3        & \textcolor{red}{TBD} & Motor bus \\
-J6 & Board               & CAN chain, end A      & \textcolor{red}{TBD} & CAN-H, CAN-L, GND \\
-J7 & CAN chain, end B    & Termination network   & \textcolor{red}{TBD} & CAN-H, CAN-L, GND \\
+J1 & Battery pack        & Protection / E-stop   & XT90 & Pack $+$, pack $-$ \\
+J2 & Protection          & Distribution board    & XT90 & Motor bus \\
+J3 & Distribution board  & Driver, axis 1        & XT30 & Motor bus \\
+J4 & Distribution board  & Driver, axis 2        & XT30 & Motor bus \\
+J5 & Distribution board  & Driver, axis 3        & XT30 & Motor bus \\
+J6 & Board               & CAN chain, end A      & JST-PH3 & CAN-H, CAN-L, GND \\
+J7 & CAN chain, end B    & Termination network   & JST-PH3 & CAN-H, CAN-L, GND \\
 J8 & Driver, axis $i$    & Encoder, axis $i$     & \textcolor{red}{TBD} & SPI, \qty{3.3}{\volt}, GND \\
-J9 & Board               & IMU                   & \textcolor{red}{TBD} & Serial bus, supply, GND \\
+J9 & Board               & IMU                   & Qwiic & I\textsuperscript{2}C, supply, GND \\
 J10 & Board              & Telemetry module      & \textcolor{red}{TBD} & UART, supply, GND \\
-J11 & Board              & Brake servo, axis $i$ & \textcolor{red}{TBD} & PWM, \qty{5}{\volt}, GND \\
+J11 & Board              & Brake servo, axis $i$ & \qty{2.54}{\milli\metre} header & PWM, \qty{5}{\volt}, GND \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+Note the connector mismatch at J2--J5: the pack terminates in XT90 while the
+drivers accept XT30, so a distribution harness must be fabricated rather than
+bought. It is the item H3 of Table~\ref{tab:wire_schedule} and it is on the
+critical path for first power-on.
 
 \subsection{Harness Drawings and Wire Schedule}
 \label{app:harness}
@@ -109,16 +121,21 @@ are length-limited (Table~\ref{tab:signal_rules}).}
 \toprule
 Ref & Run & Gauge & Length & Sizing basis \\
 \midrule
-H1 & Pack to protection      & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Peak bus current \\
-H2 & Protection to board     & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Peak bus current \\
-H3 & Board to driver drops (3) & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Per-axis spin-up current \\
+H1 & Pack to protection      & \qty{14}{\awg} & \textcolor{red}{TBD} & Peak bus current \\
+H2 & Protection to board     & \qty{14}{\awg} & \textcolor{red}{TBD} & Peak bus current \\
+H3 & Board to driver drops (3) & \qty{14}{\awg} & \textcolor{red}{TBD} & Per-axis spin-up current \\
 H4 & Motor phase leads (3)   & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Motor phase current \\
-H5 & CAN chain segments      & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Topology, not current \\
-H6 & Encoder SPI runs (3)    & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Length limit governs \\
-H7 & Servo drives (3)        & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Stall current \\
+H5 & CAN chain segments      & \textcolor{red}{TBD} & stubs $<\qty{10}{\centi\metre}$ & Topology, not current \\
+H6 & Encoder SPI runs (3)    & \qtyrange{24}{26}{\awg} & $<\qty{20}{\centi\metre}$ & Length limit governs \\
+H7 & Servo drives (3)        & \qtyrange{24}{26}{\awg} & \textcolor{red}{TBD} & Stall current \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+The conductor gauge of the supplied three-conductor CAN cable is not stated by
+its supplier, so H5 is an open item: whether stock cables can be used or the bus
+harness must be hand-made is decided by that figure, and it affects the
+floorplan only marginally but the build time appreciably.
 
 % Figure placeholder: distribution harness drawing -- pack lead, protection
 % element, and the three driver drops, with labelling scheme.
@@ -193,17 +210,30 @@ values.
 earlier in the design.}
 \label{tab:electrical_measured}
 \small
-\begin{tabular}{L{5.0cm} c L{5.4cm}}
+\begin{tabular}{L{4.4cm} c c L{4.0cm}}
 \toprule
-Quantity & Measured & Replaces / feeds \\
+Quantity & Design value & Measured & Replaces / feeds \\
 \midrule
-Motor torque constant $K_m$    & \textcolor{red}{TBD} & Table~\ref{tab:params}, datasheet value \\
-Wheel inertia $I_w$ (spin-down)& \textcolor{red}{TBD} & Table~\ref{tab:params}, CAD value \\
-Viscous and Coulomb friction   & \textcolor{red}{TBD} & $C_b$, $C_w$ estimates \\
-Command-to-encoder latency     & \textcolor{red}{TBD} & Loop timing, Sec.~\ref{sec:control_sw} \\
-Achievable wheel speed on bus  & \textcolor{red}{TBD} & $\omega_{\max}$, Sec.~\ref{sec:jumpup_target} \\
-Logic rail load, worst case    & \textcolor{red}{TBD} & Table~\ref{tab:power_budget} \\
-Runtime per charge under balance load & \textcolor{red}{TBD} & Demonstration planning \\
+Motor torque constant $K_m$    & \qty{0.02513}{\newton\metre\per\ampere} & \textcolor{red}{TBD} & Table~\ref{tab:params}, datasheet value \\
+Phase resistance               & \qty{194}{\milli\ohm} & \textcolor{red}{TBD} & Incoming inspection; speed ceiling \\
+Wheel inertia $I_w$ (spin-down)& $4.341\times10^{-4}$ & \textcolor{red}{TBD} & Table~\ref{tab:params}; ballast count \\
+Viscous and Coulomb friction   & Estimated & \textcolor{red}{TBD} & $C_b$, $C_w$ estimates \\
+Command-to-encoder latency     & --- & \textcolor{red}{TBD} & Loop timing, Sec.~\ref{sec:control_sw} \\
+Achievable wheel speed on bus  & \qty{6000}{\rpm} & \textcolor{red}{TBD} & $\omega_{\max}$, Sec.~\ref{sec:jumpup_target} \\
+Brake torque $\tau_b$          & \qty{5.0}{\newton\metre} (assumed) & \textcolor{red}{TBD} & $\beta$, Sec.~\ref{sec:brake_torque} \\
+Logic rail load, worst case    & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Table~\ref{tab:power_budget} \\
+Populated board mass           & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Table~\ref{tab:massbudget} \\
+Runtime per charge, balancing  & --- & \textcolor{red}{TBD} & Demonstration planning \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+Two rows here gate design decisions rather than merely confirming them. The
+brake torque is the unsubstantiated input identified in
+Section~\ref{sec:brake_torque}, and it must be measured on the 1-DoF rig before
+the wheel geometry is frozen, since $\beta$ propagates straight into the inertia
+target. The achievable wheel speed is checked against the design value on a
+clamped motor during single-axis bring-up: if the measured ceiling falls below
+\qty{6000}{\rpm} on a partly-discharged pack, the conservatism argument of
+Section~\ref{sec:jumpup_target} has not been realised and the wheel is
+undersized rather than over-margined.

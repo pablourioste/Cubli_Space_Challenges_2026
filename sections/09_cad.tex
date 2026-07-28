@@ -24,13 +24,17 @@ of Section~\ref{sec:massbudget} and is updated on each iteration.
 part carries a duplicated hard-coded value.}
 \label{tab:cad_params}
 \small
-\begin{tabular}{l L{6.6cm} c}
+\begin{tabular}{l L{6.2cm} c}
 \toprule
 Symbol & Parameter & Value \\
 \midrule
-$L$         & Cube edge length (outer)                & \textcolor{red}{TBD} \\
+$L$         & Cube edge length (outer)                & \qty{180}{\milli\metre} \\
+$D_w$       & Wheel outer diameter (Sec.~\ref{sec:rw_sizing}) & \qty{130}{\milli\metre} \\
+$w_r$       & Wheel ring radial width                 & \qty{20}{\milli\metre} \\
+$t_r$       & Wheel ring axial thickness              & \qty{12}{\milli\metre} \\
+$r_b$       & Ballast pocket circle radius            & \qty{55}{\milli\metre} \\
+--          & Board outline (Sec.~\ref{sec:layout})   & \qtyproduct{150 x 90}{\milli\metre} \\
 $t_w$       & Frame wall thickness                    & \textcolor{red}{TBD} \\
-$D_w$       & Wheel outer diameter (Sec.~\ref{sec:rw_sizing}) & \textcolor{red}{TBD} \\
 $d_m$       & Motor axis offset from cube centre      & \textcolor{red}{TBD} \\
 $h_m$       & Motor mounting face height on its axis  & \textcolor{red}{TBD} \\
 $c_w$       & Wheel-to-subframe axial clearance       & \textcolor{red}{TBD} \\
@@ -40,6 +44,14 @@ $r_c$       & Corner contact feature radius           & \textcolor{red}{TBD} \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\paragraph{Open input.} The frame wall thickness and internal clearance that
+set the ``$L$ minus \qtyrange{30}{40}{\milli\metre}'' wheel-diameter allowance
+used in Table~\ref{tab:envelope_trade} are an estimate rather than a CAD result.
+The envelope argument holds anywhere in that band, but the selected ring
+diameter depends on where in it the real frame lands, so the maximum wheel
+diameter that actually fits the \qty{180}{\milli\metre} frame must be confirmed
+from the model before the ring is frozen.
 
 \subsection{Model Tree and Part List}
 \label{app:cad_tree}
@@ -70,10 +82,11 @@ M5 & Brake servo bracket        & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD
 \midrule
 \multicolumn{5}{@{}l}{\textbf{Reaction wheel assembly}}\\
 \midrule
-W1 & Ballasted ring (Sec.~\ref{sec:rw_sizing}) & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-W2 & Wheel hub / rotor adapter  & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-W3 & Ballast bolt and nut set   & \textcolor{red}{TBD} & Standard hardware & \textcolor{red}{TBD} \\
-W4 & Brake strike feature       & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+W1 & Ballasted ring, \qty{130}{\milli\metre} OD & 3 & Printed PET-CF & Geometry fixed \\
+W2 & Wheel hub / rotor adapter  & 3 & Printed & \textcolor{red}{TBD} \\
+W3 & M6 hex nut ballast (ISO 4032) & 45 & Standard hardware & 15 per wheel \\
+W4 & Ballast retaining cover    & 3 & \textcolor{red}{TBD} & Required, not yet designed \\
+W5 & Brake strike feature       & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
 \midrule
 \multicolumn{5}{@{}l}{\textbf{Outer frame}}\\
 \midrule
@@ -112,6 +125,35 @@ R4 & Hard stops / containment   & \textcolor{red}{TBD} & \textcolor{red}{TBD} & 
 % Figure placeholder: section view through two orthogonal wheel modules,
 % showing the clearances c_w and c_o of Table~\ref{tab:cad_params}.
 
+\paragraph{Wheel pocket placement --- a CAD constraint the sizing cannot
+check.} The ballast pockets must be drawn in three groups of five within the
+inter-spoke sectors, \emph{not} at a uniform angular pitch. The reasoning and
+the angular figures are in Section~\ref{sec:rw_sizing}; what matters here is
+that the sizing calculation models the ring as a bare annulus with no knowledge
+of the spokes, so it will report a feasible design for a uniform layout that in
+fact places pockets on the spoke roots. The layout rule is
+Table~\ref{tab:pocket_layout} and it governs the drawing.
+
+\begin{table}[h]
+\centering
+\caption{Ballast pocket layout rule. Grouping by sector preserves three-fold
+symmetry and caps the ring at 21 pockets.}
+\label{tab:pocket_layout}
+\small
+\begin{tabular}{L{7.0cm} c}
+\toprule
+Quantity & Value \\
+\midrule
+Spoke half-angle at ring inner diameter & \ang{6.38} \\
+Pocket half-angle at $r_b = \qty{55}{\milli\metre}$ & \ang{6.27} \\
+Required spoke-centre to pocket-centre separation & \ang{12.65} \\
+Usable arc per sector, after spoke keep-outs & \ang{94.7} \\
+Pockets per sector at $N = 15$ & 5 \\
+Maximum pockets per sector & 7 (21 total) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Fabrication and Assembly}
 \label{app:cad_fab}
 
@@ -131,19 +173,26 @@ analysed.
 orientation is specified relative to the principal load direction.}
 \label{tab:print_settings}
 \small
-\begin{tabular}{l L{2.8cm} L{3.0cm} L{3.6cm}}
+\begin{tabular}{l L{2.6cm} L{2.8cm} L{4.0cm}}
 \toprule
 Ref & Material & Infill / walls & Orientation and rationale \\
 \midrule
-W1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-W2 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+W1 & PET-CF, \qty{1290}{\kilo\gram\per\metre\cubed} & \textcolor{red}{TBD} & Layers normal to the spin axis, so the hoop load and the ballast pocket walls are not carried across a layer boundary \\
+W2 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Carries the brake impulse into the rotor; orientation set by that load path \\
 M1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-M2 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+M2 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Carries the brake reaction; the governing load case of Sec.~\ref{sec:background} \\
 F1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
 F2 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+The wheel ring density is not a free choice at print time: the inertia figures
+of Section~\ref{sec:rw_sizing} assume
+\qty{1290}{\kilo\gram\per\metre\cubed} throughout, so a ring printed at reduced
+infill supplies less inertia than designed and moves the nut count. Print
+settings for W1 are therefore part of the sizing, and a re-print at different
+settings requires the ballast count to be re-derived.
 
 \subsubsection{Assembly Sequence}
 
@@ -192,12 +241,23 @@ absorbed by ballast trim where the margin allows.}
 \small
 \begin{tabular}{L{4.6cm} c c c}
 \toprule
-Quantity & CAD value & Measured & Discrepancy \\
+Quantity & Design value & Measured & Discrepancy \\
 \midrule
-Total cube mass $M$          & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-Wheel mass $m_w$ (each)      & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-Wheel inertia $I_w$ (each)   & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-CoM offset from cube centre  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Total cube mass $M$          & \qty{1400}{\gram} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Wheel mass $m_w$ (each)      & \qty{156}{\gram}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Wheel inertia $I_w$ (each)   & $4.341\times10^{-4}$ & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Ballast nut mass (each)      & \qty{2.5}{\gram}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+CoM offset from cube centre  & 0 (by design)     & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+Two of these rows are gating rather than informational. The measured $M$ decides
+whether the mass budget of Section~\ref{sec:massbudget} closes at all, and it
+propagates through $h_w \propto M$ into the wheel; the measured nut mass
+propagates into $I_w$ directly. On the latter, the design uses a measured
+\qty{2.5}{\gram} against a geometric estimate of \qty{2.617}{\gram} for an M6
+nut to ISO 4032 --- a \qty{-4.5}{\percent} discrepancy consistent with ordinary
+manufacturing tolerance and plating variation, but worth re-confirming on a
+scale before the nut count is frozen, since the shape (and hence the radius of
+gyration) is taken from the nominal geometry even when the mass is measured.

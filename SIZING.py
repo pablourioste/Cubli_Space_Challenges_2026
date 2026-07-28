@@ -29,8 +29,8 @@ import math
 # FIXED INPUT VARIABLES  (edit here)
 # =================================================================
 # --- cube / jump-up ---
-M          = 1.40        # [kg]   total cube mass
-L          = 0.18         # [m]    cube edge length
+M          = 1.6        # [kg]   total cube mass
+L          = 0.20         # [m]    cube edge length
 g          = 9.81         # [m/s^2]
 eta        = 1.05         # [-]    energy margin (1.02-1.05 recommended)
 tau_b      = 5.0          # [N*m]  brake torque per wheel
@@ -44,7 +44,7 @@ ring_width_mm = 20.0      # [mm]  ring radial width (r_out - r_in), FIXED
                           #       the 2 mm minimum in BOTH nut orientations.
 spoke_w_mm    = 10.0      # [mm]  spoke width
 N_spokes      = 3         # [-]   number of spokes
-t_mm          = 12.0      # [mm]  UNIFORM thickness of ring + spokes
+t_mm          = 6.0      # [mm]  UNIFORM thickness of ring + spokes
                           #       12 mm: a 5.2 mm blind pocket leaves a 6.8 mm
                           #       plastic floor under each nut. At 10 mm the
                           #       ring needs so many nuts that the
@@ -88,7 +88,7 @@ rho_petcf  = 1290.0       # [kg/m^3]  ring + spokes
 rho_steel  = 7850.0       # [kg/m^3]  hex nuts
 
 # --- sweep ---
-OD_list_mm = [80, 90, 100, 110, 120, 130, 140, 150]   # ring OUTER diameter
+OD_list_mm = [80, 90, 100, 110, 120, 130, 140, 150, 160,170]   # ring OUTER diameter
 
 # =================================================================
 # STAGE 1 -- JUMP-UP -> TARGET WHEEL INERTIA

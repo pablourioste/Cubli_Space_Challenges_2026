@@ -181,26 +181,32 @@ a merely positive margin.
 
 \begin{table}[h]
 \centering
-\caption{Torque-limited wheel-inertia target (corner case). Inputs are fixed by
-the closure procedure of Section~\ref{sec:massbudget}; the table is populated on
-each iteration.}
+\caption{Torque-limited wheel-inertia target at the current design point.
+Inputs are fixed by the closure procedure of Section~\ref{sec:massbudget}; the
+table is recomputed on each iteration. $M$ is provisional
+(Section~\ref{sec:massbudget}) and $\tau_b$ is not yet substantiated
+(Section~\ref{sec:brake_torque}); both are flagged where they are used.}
 \label{tab:jumpup_budget}
 \begin{tabular}{llr}
 \toprule
 Symbol & Description & Value \\
 \midrule
-$M$                & Cube mass                    & \textcolor{red}{TBD} \\
-$L$                & Cube edge length             & \textcolor{red}{TBD} \\
-$\eta$             & Energy margin                & \textcolor{red}{TBD} \\
-$\tau_b$           & Brake torque per wheel       & \textcolor{red}{TBD} \\
-$\tau_g = MgL/2$   & Gravitational tip-over floor & \textcolor{red}{TBD} \\
-$\beta$            & Brake-amplification factor   & \textcolor{red}{TBD} \\
-$\omega_{\max}$    & Max wheel speed (design)     & \textcolor{red}{TBD} \\
-$h_w$              & Required angular momentum    & \textcolor{red}{TBD} \\
-$I_{w,\text{target}}$ & \textbf{Target wheel inertia} & \textcolor{red}{\textbf{TBD}} \\
+$M$                & Cube mass (provisional)      & \qty{1.40}{\kilo\gram} \\
+$L$                & Cube edge length             & \qty{180}{\milli\metre} \\
+$\eta$             & Energy margin                & \num{1.05} \\
+$\tau_b$           & Brake torque per wheel (unverified) & \qty{5.0}{\newton\metre} \\
+$\tau_g = MgL/2$   & Gravitational tip-over floor & \qty{1.236}{\newton\metre} \\
+$\beta$            & Brake-amplification factor   & \num{1.328} \\
+$\omega_{\max}$    & Max wheel speed (design)     & \qty{6000}{\rpm} (\qty{628}{\radian\per\second}) \\
+$h_w$              & Required angular momentum    & \qty{0.2640}{\kilo\gram\metre\squared\per\second} \\
+$I_{w,\text{target}}$ & \textbf{Target wheel inertia} & $\mathbf{4.202\times10^{-4}}$ \textbf{kg\,m$^2$} \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+Table~\ref{tab:inertia_cases} gives both contact cases at this design point.
+The corner case governs, as anticipated: it demands \qty{10.2}{\percent} more
+inertia than the edge case at the same wheel speed.
 
 \paragraph{Choice of $\omega_{\max}$.} The maximum wheel speed is a design
 choice rather than a datasheet figure, and it enters the sizing directly
@@ -218,8 +224,103 @@ design value is set below the ceiling those effects imply, leaving margin for
 motor tolerance, bearing and aerodynamic drag, and the residual uncertainty in
 $M$. The resulting back-EMF should remain a comfortable fraction of the usable
 bus voltage, and the electrical frequency $\omega_{\max}p/2\pi$ at $p$ pole
-pairs must sit inside the driver's commutation capability---both checks to be
-confirmed once the motor and pack are selected.
+pairs must sit inside the driver's commutation capability.
+
+Applying this to the selected motor and pack fixes the design speed at
+\textbf{\qty{6000}{\rpm}} (\qty{628}{\radian\per\second}). The derivation is
+Table~\ref{tab:speed_ceiling}. At \qty{380}{\rpm\per\volt} the MN4006 reaches
+\qty{8436}{\rpm} unloaded on a nominal \qty{22.2}{\volt} pack --- an upper
+bound with no load and no losses, not an operating point. Subtracting the
+winding drop across $2R_{\text{phase}} = \qty{0.388}{\ohm}$ at a representative
+spin-up current, then derating by a factor of \num{0.90} for sinusoidal
+modulation against a trapezoidally-rated $K_v$, and finally taking the pack at
+its end-of-charge voltage, leaves a realistic ceiling near
+\qty{6900}{\rpm}. The design value sits \qty{13}{\percent} below even that.
+
+\begin{table}[h]
+\centering
+\caption{Wheel-speed ceiling by pack state, after winding drop at a
+representative \qty{2}{\ampere} spin-up current and a \num{0.90} modulation
+derate. The design value is set below the sagged-pack figure.}
+\label{tab:speed_ceiling}
+\begin{tabular}{lccc}
+\toprule
+Pack state & Bus voltage & Ideal $K_vV$ & Achievable \\
+\midrule
+Charged   & \qty{25.2}{\volt} & \qty{9576}{\rpm} & \qty{8353}{\rpm} \\
+Nominal   & \qty{22.2}{\volt} & \qty{8436}{\rpm} & \qty{7327}{\rpm} \\
+Sagged    & \qty{21.0}{\volt} & \qty{7980}{\rpm} & \qty{6917}{\rpm} \\
+\midrule
+\textbf{Design value} & --- & --- & \textbf{\qty{6000}{\rpm}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The conservatism is deliberate and is bought rather than conceded. At
+\qty{6000}{\rpm} the back-EMF is \qty{15.79}{\volt}, only \qty{71}{\percent} of
+the nominal bus, so the wheel reaches its commanded speed across essentially the
+whole discharge curve rather than only on a freshly charged pack --- the
+relevant failure mode being a machine that works on the first attempt after
+charging and degrades through a demonstration session. Every derived quantity
+also becomes less demanding, since all scale with $\omega_{\max}^2$: stored
+energy is \qty{89}{\joule} per wheel rather than \qty{133}{\joule} at
+\qty{7327}{\rpm}, and the ballast retention load falls in the same proportion
+(Section~\ref{sec:rw_sizing}). The commutation check is not binding: at
+\num{12} pole pairs, \qty{6000}{\rpm} is an electrical frequency of
+\qty{1200}{\hertz}, well inside the driver's capability, so the constraint on
+top speed is the battery and not the driver.
+
+The cost is a larger wheel. Since $I_{w,\text{target}} \propto
+1/\omega_{\max}$, designing at \qty{6000}{\rpm} rather than at a
+top-of-range assumption demands roughly \qty{40}{\percent} more inertia. The
+selected wheel of Section~\ref{sec:rw_sizing} absorbs this, which is what makes
+the margin affordable.
+
+\subsubsection{Brake Torque and Its Provenance}
+\label{sec:brake_torque}
+
+The brake torque $\tau_b$ enters the sizing through $\beta$ alone, but it does
+so steeply, and the value used in Table~\ref{tab:jumpup_budget} is the least
+substantiated input in the chain. It is recorded here as an open item rather
+than presented as a result.
+
+The brake is a servo-driven barrier struck by a ballast bolt head, so $\tau_b$
+is \emph{not} the servo's output torque: the servo only holds the barrier in
+place while the wheel's own momentum does the work against it. The figure is
+therefore a structural and impulse quantity to be measured on the rig, and the
+supplied micro servo's rated output --- some seventeen times smaller --- is not
+the relevant comparison. What the servo must supply is enough holding torque
+and fast enough travel that the barrier is in position before the bolt arrives.
+
+The sensitivity is the reason this matters. Because $\beta = \tau_b/(\tau_b -
+\tau_g)$ diverges as $\tau_b \to \tau_g$, an overestimate of $\tau_b$ propagates
+directly into an undersized wheel (Table~\ref{tab:beta_sensitivity}). At the
+assumed \qty{5.0}{\newton\metre} the penalty is a modest \qty{33}{\percent}; at
+\qty{2.5}{\newton\metre} it is \qty{105}{\percent}, which would raise the
+inertia target above what the selected wheel can reach and force a redesign.
+Measuring $\tau_b$ on the 1-DoF rig is consequently a precondition for freezing
+the wheel, not a confirmation exercise afterwards.
+
+\begin{table}[h]
+\centering
+\caption{Sensitivity of the inertia target to the assumed brake torque, at
+$M = \qty{1.40}{\kilo\gram}$, $L = \qty{180}{\milli\metre}$
+($\tau_g = \qty{1.236}{\newton\metre}$) and $\omega_{\max} = \qty{6000}{\rpm}$.
+The assumed value is not yet measured.}
+\label{tab:beta_sensitivity}
+\begin{tabular}{ccc}
+\toprule
+$\tau_b$ (N\,m) & $\beta$ & $I_{w,\text{target}}$ ($10^{-4}$\,kg\,m$^2$) \\
+\midrule
+2.0  & 2.62 & 8.28 \\
+2.5  & 1.98 & 6.26 \\
+3.0  & 1.70 & 5.38 \\
+4.0  & 1.45 & 4.58 \\
+\textbf{5.0 (assumed)} & \textbf{1.33} & \textbf{4.20} \\
+7.0  & 1.21 & 3.83 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Control Design on the 2D Model}
 \label{sec:control2d}
