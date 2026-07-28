@@ -25,28 +25,12 @@ for the jump-up.
 
 Procurement is the single largest schedule risk. The long-lead items are not
 electronic but mechanical: the frame stock and the printed structure gate the
-entire build. Consumables and bench equipment not covered by the supplied set
---- wire, connectors, fasteners, PET-CF filament, the M6 ballast nuts, the bus
-bulk capacitor, XT30 pairs, the E-stop and fuse, the current-limited bench
-supply and the battery-safety kit --- are tracked separately in the build
-documentation. The ballast nuts are ordered with generous surplus, since the
-wheel trim of Section~\ref{sec:rw_sizing} depends on having spares to hand.
-
-\paragraph{No spare actuation set.} Three complete motor, driver and encoder
-sets are procured for a three-axis machine, so there is no spare and resupply
-lead time does not fit inside the build window. Two consequences follow and
-neither is hypothetical. First, the 1-DoF bench rig of
-Section~\ref{sec:cad_2d} draws on one of the three cube sets, so it cannot
-survive as a permanent development bench past cube integration --- either it is
-stripped at that point or the cube runs on two axes. Second, the loss of any
-motor, driver or encoder in service permanently costs an axis, which would force
-the reduced-actuation one-wheel variant \cite{hofer2023onewheelcubli}. This is
-an accepted risk rather than a mitigated one.
-
-\paragraph{Wheel procurement.} The reaction wheels are printed PET-CF rings
-with M6 steel hex-nut ballast (Section~\ref{sec:rw_sizing}). Any procurement
-line for cut steel rims belongs to a superseded wheel concept and is not part of
-this design.
+entire build, and with three actuation sets and no spare, the loss of a motor
+or driver in service would force the reduced-actuation one-wheel variant
+\cite{hofer2023onewheelcubli}. These items are ordered first. Consumables and
+bench equipment not covered by the supplied set --- wire, connectors,
+fasteners, filament, the current-limited bench supply and the battery-safety
+kit --- are tracked separately in the build documentation.
 
 % ------------------------------------------------------------------
 % TABLE 1 -- SUPPLIED BOM
@@ -70,9 +54,9 @@ Ref & Item & Qty\textsuperscript{a} & Key specifications & Function \\
 \endfoot
 \bottomrule
 \multicolumn{5}{@{}p{15.5cm}@{}}{\footnotesize\textsuperscript{a}\,Quantity per
-assembled cube; motors, drivers and encoders are 3 each, with \emph{no spare}.
-The 1-DoF bench rig therefore uses one of the three cube actuation sets and must
-be stripped at cube integration. See the procurement note below.}\\
+assembled cube; motors, drivers and encoders are 3 each. A fourth actuation set
+(motor + moteus-n1 + MA600) is retained on the 1-DoF bench rig (S1) throughout the
+build, so four of each are procured.}\\
 \endlastfoot
 % --- Actuation ---
 \multicolumn{5}{@{}l}{\textbf{Actuation}}\\

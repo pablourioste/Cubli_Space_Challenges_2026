@@ -2,17 +2,9 @@
 \section{Preliminary Hardware Design}
 \label{sec:hardware}
 
-This design is preliminary in a specific sense. The actuation, sensing and power
-components are selected (Appendix~\ref{app:bom}) and the principal dimensions
-follow from the closure of Section~\ref{sec:massbudget}: a
-\qty{180}{\milli\metre} cube with three \qty{130}{\milli\metre} ballasted
-reaction wheels at a \qty{6000}{\rpm} design speed. What remains open is the
-structure that carries them, and two inputs on which those dimensions depend ---
-the total mass $M$ and the brake torque $\tau_b$ --- are not yet measured. The
-architecture is therefore kept parametric so that the closure can be re-run
-against measured values rather than re-derived
-(Section~\ref{sec:cad_method}), and the two open inputs are flagged wherever
-they are used rather than presented as settled.
+This design is preliminary: final actuator and sensor specifications are not yet
+confirmed, so the mechanical and electrical architecture is kept modular and
+largely parametric (Section~\ref{sec:background}).
 
 \subsection{System Architecture}
 \label{sec:architecture}
@@ -43,10 +35,9 @@ Section~\ref{sec:modeling}.}
 The cube edge length $L$ and the reaction-wheel inertia $I_w$ are not
 independent design choices: they are the two ends of a single constraint chain
 that begins with what must physically be carried inside the cube. This section
-states that chain, the order in which it is closed, and the envelope it
-selects: $L = \qty{180}{\milli\metre}$, evaluated in
-Section~\ref{sec:envelope_selection}. The numbers follow from the procedure
-rather than preceding it, and the closure is re-run whenever an input moves.
+states that chain and the order in which it is closed. No dimensions are
+committed here---component selection is still open (Section~\ref{sec:hardware}),
+and the numbers follow from the procedure rather than preceding it.
 
 \paragraph{The battery and the internal structure drive the envelope.} The
 dominant volume claim inside the cube is not the reaction wheels but the power
@@ -126,91 +117,18 @@ Table~\ref{tab:inertia_cases} records both once the procedure closes.
 
 \begin{table}[h]
 \centering
-\caption{Required per-wheel inertia by contact case, at
-$M = \qty{1.40}{\kilo\gram}$, $L = \qty{180}{\milli\metre}$ and
-$\omega_{\max} = \qty{6000}{\rpm}$. The corner case governs by
-\qty{10.2}{\percent}.}
+\caption{Required per-wheel inertia by contact case, to be evaluated at the
+selected $\omega_{\max}$ once the envelope is fixed.}
 \label{tab:inertia_cases}
 \begin{tabular}{lcc}
 \toprule
-Contact case & $h_w$ (kg\,m$^2$/s) & $I_{w,\text{target}}$ ($10^{-4}$\,kg\,m$^2$) \\
+Contact case & $h_w$ (kg\,m$^2$/s) & $I_{w,\text{target}}$ (kg\,m$^2$) \\
 \midrule
-Edge                       & 0.2395 & 3.812 \\
-\textbf{Corner (critical)} & \textbf{0.2640} & \textbf{4.202} \\
+Edge                       & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\textbf{Corner (critical)} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-\subsubsection{Envelope Selection: Why \qty{180}{\milli\metre}}
-\label{sec:envelope_selection}
-
-Running the procedure over candidate edge lengths selects
-$L = \qty{180}{\milli\metre}$. Two independent arguments converge on it, and
-both are needed --- the dynamic one alone would not settle the question.
-
-\paragraph{The inertia budget.} Table~\ref{tab:envelope_trade} evaluates step~4
-against step~3 for each candidate. The requirement grows as $ML^{3/2}$ and is
-further penalised by $\beta$, which degrades with $L$; against this, the largest
-wheel the frame admits is roughly $L$ less a \qtyrange{30}{40}{\milli\metre}
-allowance for wall thickness, motor boss and contact features, and the inertia
-it supplies grows as the square of that diameter. At \qty{150}{\milli\metre} the
-largest wheel that fits is about \qty{120}{\milli\metre} in diameter and
-supplies $2.63\times10^{-4}$\,kg\,m$^2$ against a
-$3.03\times10^{-4}$\,kg\,m$^2$ requirement --- \qty{13}{\percent} short, and
-\emph{not} recoverable by ballast, since ballast necessarily sits inboard of the
-ring it displaces. At \qty{180}{\milli\metre} the requirement is
-$4.20\times10^{-4}$\,kg\,m$^2$ and a \qty{130}{\milli\metre} wheel supplies
-$3.49\times10^{-4}$\,kg\,m$^2$ from its printed structure alone, closing the
-remainder with ballast and retaining trim authority in both directions.
-
-\begin{table}[h]
-\centering
-\caption{Envelope trade at $\omega_{\max} = \qty{6000}{\rpm}$,
-$M = \qty{1.40}{\kilo\gram}$. The wheel cap assumes a
-\qty{30}{\milli\metre} frame allowance; bare-ring inertia is for the
-\qtyproduct{20 x 12}{\milli\metre} ring section of Section~\ref{sec:rw_sizing}.}
-\label{tab:envelope_trade}
-\small
-\begin{tabular}{ccccl}
-\toprule
-$L$ (mm) & $\beta$ & $I_{w,\text{target}}$ ($10^{-4}$) & Bare ring at cap ($10^{-4}$) & Verdict \\
-\midrule
-150 & 1.259 & 3.03 & 2.63 & Short by \qty{13}{\percent} \\
-160 & 1.282 & 3.40 & 3.49 & Closes with no trim margin \\
-\textbf{180} & \textbf{1.328} & \textbf{4.20} & \textbf{5.73} & \textbf{Clears; \qty{130}{\milli\metre} wheel selected} \\
-200 & 1.379 & 5.11 & 8.78 & Clears, but heavier and $\beta$ worse \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\paragraph{Packaging, which is independently decisive.} The dynamic argument
-alone would leave \qty{160}{\milli\metre} arguable. Packaging does not: the
-power and signal board is \qtyproduct{150 x 90}{\milli\metre}, so it does not
-fit inside a \qty{150}{\milli\metre} envelope at any wall thickness, and the
-interior must additionally carry three motors, three drivers, a 6S pack and the
-brake servos (Section~\ref{sec:layout}). This is the constraint that removes the
-smaller options outright, and it is why step~2 of
-Table~\ref{tab:sizing_procedure} precedes the wheel sizing rather than following
-it.
-
-\paragraph{What the decision costs.} A larger cube is not free, and the penalty
-should be stated rather than buried. Frame mass grows with $L$, and $M$ is
-already the least comfortable number in the budget
-(Table~\ref{tab:massbudget}); $\beta$ degrades from \num{1.259} at
-\qty{150}{\milli\metre} to \num{1.328} at \qty{180}{\milli\metre}, so the finite
-brake loses a larger fraction of its impulse to gravity; and both effects feed
-back into $I_{w,\text{target}}$. Note that $\beta$ depends entirely on the
-unverified brake torque of Section~\ref{sec:brake_torque}, so this column of the
-trade is the least secure part of it. The design is accepted at
-\qty{180}{\milli\metre} because the alternative does not close at all, not
-because the cost is negligible.
-
-This makes the cube larger than the \qty{150}{\milli\metre} ETH prototype
-referenced in Section~\ref{sec:background}, and the reason is material rather
-than dimensional: that design used a machined steel flywheel, where this one
-uses a printed ring with steel ballast at a substantially lower achievable
-density at radius. The lost density is compensated with radius, and radius is
-bought with envelope.
 
 \paragraph{Mass budget.} The allocation of Table~\ref{tab:massbudget} is the
 bookkeeping side of steps 5 and 6: it is populated as components are selected
@@ -219,68 +137,26 @@ $I_{w,\text{target}}$ and not merely an output of the design.
 
 \begin{table}[h]
 \centering
-\caption{Mass budget (per cube). Known figures are from the selected components;
-allowances are provisional. The total is an input to the inertia requirement,
-not only a result --- see the reconciliation below.}
+\caption{Mass budget (per cube), to be populated as components are selected.
+The total is an input to the inertia requirement, not only a result.}
 \label{tab:massbudget}
 \small
 \begin{tabular}{l c l}
 \toprule
-Subsystem & Mass (g) & Basis \\
+Subsystem & Allocated mass (g) & Status \\
 \midrule
-Battery pack                  & 600 & Selected 6S pack \\
-Reaction wheels ($3\times$)   & 468 & Sec.~\ref{sec:rw_sizing}, \qty{156}{\gram} each \\
-Motors ($3\times$)            & 204 & Datasheet, \qty{68}{\gram} each \\
-Drivers ($3\times$)           & 44  & Datasheet, \qty{14.6}{\gram} each \\
-\midrule
-\textit{Subtotal, known}      & \textit{1316} & \textit{Fixed by selection} \\
-\midrule
+Battery pack                  & \textcolor{red}{TBD} & Drives envelope (step 1) \\
+Reaction wheels ($3\times$)   & \textcolor{red}{TBD} & Pending Sec.~\ref{sec:rw_sizing} \\
+Motors ($3\times$)            & \textcolor{red}{TBD} & Pending motor selection \\
 Inner structure / motor subframe & \textcolor{red}{TBD} & Pending CAD \\
 Outer frame / contact features & \textcolor{red}{TBD} & Pending CAD \\
-Electronics (MCU, board, IMU, servos) & \textcolor{red}{TBD} & Allowance, pending weigh-in \\
+Electronics (MCU, drivers, IMU, servos) & \textcolor{red}{TBD} & Allowance \\
 Wiring / fasteners / margin   & \textcolor{red}{TBD} & Allowance \\
 \midrule
-\textbf{Design value $M$}     & \textbf{1400} & \textbf{Used in Sec.~\ref{sec:jumpup_target}} \\
+\textbf{Total $M$}            & \textcolor{red}{\textbf{TBD}} & \textbf{Closed by iteration} \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-\paragraph{The mass budget does not currently close, and this is the leading
-design risk.} The four selected components above total \qty{1316}{\gram},
-which is \qty{94}{\percent} of the \qty{1400}{\gram} figure that
-Section~\ref{sec:jumpup_target} uses as an input --- with no frame, no
-electronics board, no wiring, no fasteners and no brake hardware yet counted.
-The remaining allowance of \qty{84}{\gram} is not credible for those items.
-
-This is precisely the fixed-point failure that Section~\ref{sec:background}
-identifies as the characteristic way Cubli replications fail, and the honest
-statement is that the design is currently on the wrong side of it. The coupling
-makes it worse than a simple overrun: $h_w \propto M$, so a realistic $M$ raises
-$I_{w,\text{target}}$, which demands a heavier wheel, which raises $M$ again.
-Three responses are available, in order of preference:
-
-\begin{enumerate}
-  \item \textbf{Reduce structural mass.} The frame and subframe are the only
-        large uncommitted allocations, and they are the parts the CAD can still
-        influence. This is the first recourse and it is why the mass roll-up is
-        an output of the model (Section~\ref{sec:cad_method}) rather than an
-        annotation on it.
-  \item \textbf{Accept a higher $M$ and re-close.} The wheel retains upward trim
-        authority (Section~\ref{sec:rw_sizing}), so a moderate increase can be
-        absorbed by installing additional ballast rather than by re-designing.
-        The margin available for this is quantified there and it is not large.
-  \item \textbf{Raise $\omega_{\max}$.} Since $I_{w,\text{target}} \propto
-        1/\omega_{\max}$, recovering the deliberate conservatism of
-        Section~\ref{sec:jumpup_target} is the relief valve of last resort. It
-        is listed last because it trades away the discharge-curve robustness
-        that motivated the choice, and every load in the machine scales with
-        $\omega_{\max}^2$.
-\end{enumerate}
-
-The measured mass at first assembly is therefore a gating figure, not a
-reporting one: Appendix~\ref{app:cad_mass} records it against the model, and the
-closure of Table~\ref{tab:sizing_procedure} is re-run on that number before the
-wheels are considered frozen.
 
 \subsection{Mechanical Design and CAD Construction}
 \label{sec:mechanical}
@@ -410,35 +286,27 @@ Section~\ref{sec:massbudget} and are recorded there once fixed.
 
 \begin{table}[h]
 \centering
-\caption{Reaction-wheel design parameters at the selected geometry. Ballast is
-standard M6 hex nuts (ISO 4032) in blind hexagonal pockets; $m_b$ and
-$\Delta I_b$ are net of the plastic each pocket displaces.}
+\caption{Reaction-wheel design parameters, to be fixed once the envelope closes.}
 \label{tab:rw_params}
 \small
 \begin{tabular}{l l c}
 \toprule
 Symbol & Parameter & Value \\
 \midrule
-$D_w$      & Ring outer diameter (capped by envelope) & \qty{130}{\milli\metre} \\
-$w_r$      & Ring radial width                         & \qty{20}{\milli\metre} \\
-$t_r$      & Ring axial thickness                      & \qty{12}{\milli\metre} \\
-$n_s, w_s$ & Spoke count and width                     & 3, \qty{10}{\milli\metre} \\
-$\rho_p$   & Printed-material density (PET-CF)         & \qty{1290}{\kilo\gram\per\metre\cubed} \\
-$r_b$      & Ballast radius                            & \qty{55}{\milli\metre} \\
-$m_b$      & Net mass added per installed nut          & \qty{+1.87}{\gram} \\
-$\Delta I_b$ & Net inertia added per installed nut     & $5.70\times10^{-6}$\,kg\,m$^2$ \\
-$N$        & Nut count reaching $I_{w,\text{target}}$  & 15 \\
-$m_w$      & Resulting wheel mass                      & \qty{156}{\gram} \\
-$I_w$      & Resulting wheel inertia                   & $4.341\times10^{-4}$\,kg\,m$^2$ \\
---         & Achieved fraction of target               & \qty{103.3}{\percent} \\
+$D_w$      & Ring outer diameter (capped by envelope) & \textcolor{red}{TBD} \\
+$w_r$      & Ring radial width                         & \textcolor{red}{TBD} \\
+$t_r$      & Ring axial thickness                      & \textcolor{red}{TBD} \\
+$n_s, w_s$ & Spoke count and width                     & \textcolor{red}{TBD} \\
+$\rho_p$   & Printed-material density                  & \textcolor{red}{TBD} \\
+$r_b$      & Ballast radius                            & \textcolor{red}{TBD} \\
+$m_b$      & Net mass added per installed bolt         & \textcolor{red}{TBD} \\
+$\Delta I_b$ & Net inertia added per installed bolt    & \textcolor{red}{TBD} \\
+$N$        & Bolt count reaching $I_{w,\text{target}}$ & \textcolor{red}{TBD} \\
+$m_w$      & Resulting wheel mass                      & \textcolor{red}{TBD} \\
+$I_w$      & Resulting wheel inertia                   & \textcolor{red}{TBD} \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-The bare ring and spokes supply $3.486\times10^{-4}$\,kg\,m$^2$, or
-\qty{83}{\percent} of the target, so the ballast contributes the remaining
-\qty{17}{\percent} --- which is the intended proportion: enough that the trim is
-meaningful in both directions, not so much that the wheel depends on it.
 
 The ballast is characterised \emph{net} of the plastic each pocket displaces:
 $m_b$ and $\Delta I_b$ are the increments the installed bolt-and-nut adds over
@@ -474,106 +342,43 @@ count.
 
 \begin{table}[h]
 \centering
-\caption{Reaction-wheel outer-diameter trade study against
-$I_{w,\text{target}} = 4.202\times10^{-4}$\,kg\,m$^2$. $N$ is the nut count
-reaching the target, rounded up to a multiple of the spoke count for balance;
-the wall column is the plastic left circumferentially between adjacent pockets
-against a \qty{2}{\milli\metre} minimum.}
+\caption{Reaction-wheel outer-diameter trade study. To be populated once
+$I_{w,\text{target}}$ and the envelope cap are fixed; $N$ is the bolt count
+reaching the target, rounded up to a multiple of the spoke count for balance.}
 \label{tab:rw_sizing}
 \small
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{ccccccl}
 \toprule
-$D_w$ (mm) & $N$ & Mass (g) & $I_w$ ($10^{-4}$) & $I_w$/target (\%) & 3 wheels (g) & Circ.\ wall \\
+$D_w$ (mm) & $N$ & Mass (g) & $I_w$ (kg\,m$^2$) & $I_w$/target (\%) & 3 wheels (g) & Pocket fit \\
 \midrule
-80  & 210 & 461 & 4.21 & 100.1 & 1382 & \textcolor{red}{Overlap} \\
-90  & 141 & 344 & 4.21 & 100.2 & 1031 & \textcolor{red}{Overlap} \\
-100 & 96  & 271 & 4.27 & 101.7 & 814  & \textcolor{red}{Overlap} \\
-110 & 60  & 216 & 4.22 & 100.5 & 648  & \textcolor{red}{Overlap} \\
-120 & 36  & 183 & 4.33 & 103.0 & 550  & \textcolor{red}{Overlap} \\
-\textbf{130} & \textbf{15} & \textbf{156} & \textbf{4.34} & \textbf{103.3} & \textbf{468} & \textbf{\qty{11.0}{\milli\metre} OK} \\
-140 & \multicolumn{6}{l}{Bare ring exceeds target ($4.51\times10^{-4}$) --- no downward trim} \\
-150 & \multicolumn{6}{l}{Bare ring exceeds target ($5.73\times10^{-4}$) --- no downward trim} \\
+\textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The trade brackets tightly. Below \qty{130}{\milli\metre} every candidate fails
-criterion~3: reaching the target at a smaller radius needs so many nuts that the
-pockets overlap and no plastic wall survives between them --- at
-\qty{120}{\milli\metre}, 36 nuts on a \qty{50}{\milli\metre} ballast circle
-leaves a negative wall. At \qty{140}{\milli\metre} and above the bare ring
-already exceeds the target, failing criterion~4: the wheel costs mass for
-nothing and, more importantly, offers no downward trim authority if the measured
-inertia overshoots. \qty{130}{\milli\metre} is the only diameter in the sweep
-that passes all four criteria, and it does so with \qty{11.0}{\milli\metre} of
-circumferential wall --- comfortably clear of the minimum rather than marginal.
+\paragraph{Pocket placement.} The pockets cannot in general be spaced
+uniformly. A spoke occupies a finite angular width where it meets the ring, as
+does a pocket at the ballast radius, so a pocket centre must clear a spoke
+centre by the sum of the two half-widths. Whenever the uniform pitch
+$360^\circ/N$ divides the spoke pitch exactly, a uniform arrangement places a
+pocket on every spoke root and is inadmissible. The pockets are therefore
+distributed in equal groups within each inter-spoke sector, spread over the
+usable arc that remains after the spoke exclusion zones are removed. Grouping by
+sector preserves the $n_s$-fold symmetry and hence static and dynamic balance,
+and the count per sector is chosen to leave spare positions for later trim.
 
-\paragraph{Trim authority.} The selected wheel sits at \qty{103.3}{\percent} of
-target with 15 nuts, and the pocket-placement limit below caps the ring at 21.
-The wheel can therefore be trimmed \emph{upward} by up to six nuts
-($+3.4\times10^{-5}$\,kg\,m$^2$, about \qty{8}{\percent}) and downward by
-removing them. This is the margin the mass-budget risk of
-Section~\ref{sec:massbudget} draws on, and it is finite: it absorbs a moderate
-overrun in $M$, not an open-ended one.
-
-\paragraph{Radial and floor fit.} The radial checks pass in both nut
-orientations, which removes an assembly error mode --- the nut fits either way
-round. A \qty{12.01}{\milli\metre} pocket across corners in a
-\qty{20}{\milli\metre} ring leaves \qty{4.00}{\milli\metre} of wall each side at
-worst (\qty{4.80}{\milli\metre} across flats), against the
-\qty{2}{\milli\metre} minimum. The pockets are blind rather than
-through-holes: a \qty{5.2}{\milli\metre} pocket in the \qty{12}{\milli\metre}
-ring leaves a \qty{6.8}{\milli\metre} plastic floor beneath each nut, and that
-floor is a structural element rather than leftover material, since it is what
-reacts the centrifugal load.
-
-\paragraph{Pocket placement.} The pockets cannot be spaced uniformly, and this
-is a hard geometric result rather than a preference. A spoke occupies a finite
-angular width where it meets the ring, as does a pocket at the ballast radius,
-so a pocket centre must clear a spoke centre by the sum of the two half-widths.
-At the selected geometry the spoke half-angle at the ring inner diameter is
-\ang{6.38} and the pocket half-angle at $r_b$ is \ang{6.27}, requiring
-\ang{12.65} of separation. With $N = 15$ and three spokes the uniform pitch of
-\ang{24} divides the spoke pitch exactly, placing every fifth pocket directly on
-a spoke root; offsetting by half a pitch does not rescue it either. No uniform
-pitch clears the spokes at any usable nut count.
-
-The pockets are therefore distributed in equal groups within each inter-spoke
-sector, spread over the \ang{94.7} of usable arc that remains once the spoke
-exclusion zones are removed. Grouping by sector preserves the three-fold
-symmetry and hence static and dynamic balance, and it caps the ring at seven
-pockets per sector --- 21 in total, which is the source of the upward trim limit
-quoted above. This constraint is invisible to the sizing calculation, which
-models the ring as a bare annulus with no knowledge of where the spokes attach,
-so it is carried into the CAD as an explicit requirement
-(Appendix~\ref{app:cad_3d}) rather than left to be discovered when the wheel is
-drawn.
-
-\paragraph{Ballast retention.} Each nut carries a centrifugal load
-$F = m_b\,\omega_{\max}^2\,r_b = \qty{54.3}{\newton}$ (\qty{5.5}{\kilo\gram} equivalent)
-at the design speed, reacted by the \qty{6.8}{\milli\metre} pocket floor in
-bending. The floor will carry it, but the floor alone is not a retention plan:
-each nut is a loose steel mass in a plastic pocket on a wheel whose rim moves at
-\qty{40.8}{\metre\per\second}, and the load scales with $\omega_{\max}^2$, so
-any later decision to raise the design speed raises it quadratically.
-
-Positive retention is therefore required and is provided by a retaining cover
-plate over the pocket mouths. This is chosen over adhesive or threadlocker
-specifically because it preserves the removability that motivates the entire
-ballast scheme --- bonding the nuts in place would buy retention at the cost of
-the bidirectional trim that the mass-budget risk of
-Section~\ref{sec:massbudget} depends on. The retention method must be settled
-before the wheels are printed, since it affects the ring geometry.
-
-\paragraph{Balance as an assembly-control problem.} Fifteen discrete
-\qty{2.5}{\gram} masses at \qty{55}{\milli\metre} radius make wheel balance a
-matter of assembly verification, not just of design symmetry: a single missing
-or misplaced nut is a \qty{2.5}{\gram} imbalance at that radius.
-Section~\ref{sec:background} notes that a wheel half a gram out of balance at
-rim radius can render a correct estimator unusable, so nut-count and position
-verification per wheel is part of the balance and spin test rather than an
-inspection afterthought.
+\paragraph{Bolt retention.} Each bolt carries a centrifugal load
+$F = m_b\,\omega_{\max}^2\,r_b$ at the design speed, reacted by the pocket floor
+in bending. Positive retention is nonetheless required, and is provided by
+through-fastening each bolt with its nut against the pocket floor. This both
+retains the ballast and preserves the removability that motivates the scheme;
+the floor thickness and the pocket depth are set so that $F$ at the final
+$\omega_{\max}$ is carried with margin.
 
 \subsection{Electrical Design}
 \label{sec:electrical}
@@ -641,33 +446,17 @@ derates without a heatsink.}
 Load & Rail & Typical (mA) & Worst case (mA) & Basis \\
 \midrule
 Teensy 4.1                & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Datasheet / measured \\
-XIAO ESP32-C6 telemetry   & \qty{5}{\volt}  & \textcolor{red}{TBD} & 300 & TX burst governs \\
+XIAO ESP32-C6 telemetry   & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & TX burst governs \\
 BMI270 IMU                & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Datasheet \\
 MG92B brake servo         & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Stall current governs \\
 MA600 encoders ($3\times$)& \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Datasheet \\
 \midrule
-\textbf{Logic rail total} & \qty{5}{\volt}  & \textcolor{red}{\textbf{TBD}} & \textcolor{red}{\textbf{TBD}} & \textbf{vs.\ \qtyrange{2}{3}{\ampere} converter rating} \\
+\textbf{Logic rail total} & \qty{5}{\volt}  & \textcolor{red}{\textbf{TBD}} & \textcolor{red}{\textbf{TBD}} & \textbf{vs.\ converter rating} \\
 \midrule
 moteus-n1 drivers ($3\times$) & Pack & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Spin-up, not balance, governs \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-The logic-rail total is the figure to close first. The converter is rated
-\qtyrange{2}{3}{\ampere} and derates without a heatsink, while the coincident
-worst case --- telemetry transmit burst at \qty{300}{\milli\ampere}, servo
-stall, and the full sensor load simultaneously --- is not obviously inside that
-rating. Summing it from measurement is a bring-up task
-(Appendix~\ref{app:electrical_measured}), not a design assumption.
-
-The bulk capacitance on the pack bus is sized by the regenerative transient
-rather than by ripple: braking the wheels returns their stored energy
-(\qty{86}{\joule} per wheel at the design speed, Section~\ref{sec:rw_sizing})
-into the bus, so a \qtyrange{470}{1000}{\micro\farad} low-ESR part rated at
-\qty{50}{\volt} or above is required. This is a distinct component from the
-small electrolytics on the logic rail, which are low-voltage parts and must
-never be fitted to the pack bus --- a confusion the isolation check of
-Appendix~\ref{app:checklists} exists to catch.
 
 \subsubsection{Schematic and Interconnect Diagrams}
 \label{sec:schematics}
@@ -705,27 +494,20 @@ Sheet & Content & Governing constraint to verify \\
 
 The CAN-FD bus is the one electrical subsystem whose physical routing is a
 correctness requirement rather than a packaging preference, and it is therefore
-fixed before the board outline is drawn. At the \qty{5}{\mega\bit\per\second}
-design rate the bus must be a linear chain with stubs under
-\qty{10}{\centi\metre} and split termination
-($2\times\qty{60.4}{\ohm}$ with a \qty{4.7}{\nano\farad} capacitor to ground at
-the midpoint) at exactly the two physical ends; a star topology or a mid-chain
-termination will pass a bench continuity check and then fail intermittently
-under wheel vibration, which is the hardest class of fault to diagnose once the
-cube is closed. The design rules and their verification are listed in
-Table~\ref{tab:signal_rules}.
+fixed before the board outline is drawn. At the design data rate the bus must be
+a linear chain with short stubs and termination at exactly the two physical
+ends; a star topology or a mid-chain termination will pass a bench continuity
+check and then fail intermittently under wheel vibration, which is the hardest
+class of fault to diagnose once the cube is closed. The design rules and their
+verification are listed in Table~\ref{tab:signal_rules}.
 
-The encoder interfaces impose the complementary constraint, and it is the more
-restrictive of the two. Each MA600 requires an SPI run under
-\qty{20}{\centi\metre} to its own driver and an air gap to its ring magnet held
-below \qty{0.5}{\milli\metre}, with the sensor centred on the magnet thickness.
-The driver positions are therefore dictated by the encoder positions, and those
-in turn by the motor axes. The physical layout order is: motor axes fix the
-encoders, encoders fix the drivers, drivers fix the bus route, and only then is
-the board outline of Section~\ref{sec:layout} drawn around what remains. The
-shim value that sets the air gap is established on the bench and becomes an
-assembly specification carried into Appendix~\ref{app:cad_fab}, since the gap
-must be re-established every time the structure is bolted up.
+The encoder interfaces impose the complementary constraint. Each absolute
+encoder requires a short SPI run to its own driver and a tightly held air gap to
+its magnet, so the driver positions are dictated by the encoder positions, and
+those in turn by the motor axes. The physical layout order is therefore: motor
+axes fix the encoders, encoders fix the drivers, drivers fix the bus route, and
+only then is the board outline of Section~\ref{sec:layout} drawn around what
+remains.
 
 \begin{table}[h]
 \centering
@@ -737,8 +519,8 @@ checked before cube closure, since all are hard to access afterwards.}
 \toprule
 Interface & Rule & Verification \\
 \midrule
-CAN-FD bus       & Linear chain; stubs $<\qty{10}{\centi\metre}$; split termination ($2\times\qty{60.4}{\ohm}$, \qty{4.7}{\nano\farad}) at the two physical ends only & Differential-pair scope capture; sustained error-frame count at \qty{5}{\mega\bit\per\second} with all nodes addressed \\
-Encoder SPI      & Run $<\qty{20}{\centi\metre}$ to its own driver; air gap $\le\qty{0.5}{\milli\metre}$, sensor centred on the magnet & Read-back with no error flags; re-checked after mechanical assembly \\
+CAN-FD bus       & Linear chain; short stubs; split termination at the two physical ends only & Differential-pair scope capture; sustained error-frame count at full rate with all nodes addressed \\
+Encoder SPI      & Short run to its own driver; air gap and chip centring per the assembly spec & Read-back with no error flags; re-checked after mechanical assembly \\
 IMU              & Mounted at or near the pivot; orientation per the body frame of Sec.~\ref{sec:cad_method} & Static orientation check; noise floor with wheels spinning \\
 Rail separation  & Motor bus and logic rail separated downstream of the E-stop & Ripple measurement on the logic rail under motor load \\
 Grounding        & Single return topology; no motor return current through the sensing ground & Continuity and isolation check before first power-on \\
@@ -749,33 +531,22 @@ Grounding        & Single return topology; no motor return current through the s
 \subsubsection{Board Layout and Harness}
 \label{sec:layout}
 
-The electronics are built on a \qtyproduct{150 x 90}{\milli\metre} double-sided
-perfboard rather than a fabricated PCB. This is a schedule decision, not a
-technical preference: fabrication turnaround does not fit inside the build
-window, and a perfboard can be modified in place when bring-up reveals a change.
-Its consequence is that layout discipline --- rail separation, decoupling at
-each device, deliberate routing of the bus pair --- must be enforced by hand and
-checked explicitly, since no design-rule check will do it.
-
-The board dimension is also a driver of the cube envelope rather than a
-consequence of it: at \qty{150}{\milli\metre} across, the board does not fit
-inside a \qty{150}{\milli\metre} cube at any wall thickness, which is the
-packaging argument that independently forces the \qty{180}{\milli\metre}
-envelope of Section~\ref{sec:envelope_selection}. If the board can be split into
-two smaller boards that argument weakens considerably and the envelope decision
-rests more heavily on wheel trim authority; that question is settled during
-floorplanning and before the outline is delivered.
+The electronics are built on a double-sided perfboard rather than a fabricated
+PCB. This is a schedule decision, not a technical preference: fabrication
+turnaround does not fit inside the build window, and a perfboard can be
+modified in place when bring-up reveals a change. Its consequence is that
+layout discipline --- rail separation, decoupling at each device, deliberate
+routing of the bus pair --- must be enforced by hand and checked explicitly,
+since no design-rule check will do it.
 
 The board outline, mounting-hole pattern, keep-out heights and connector exit
 directions constitute the electronics-mount interface of
 Table~\ref{tab:mech_interfaces} and are frozen once delivered to the mechanical
 design: later electrical changes must fit inside that outline rather than move
-it. The populated board mass is a required input to the mass budget of
-Table~\ref{tab:massbudget} and is obtained by weighing the assembled prototype,
-not estimated. The harness --- battery lead, driver drops, bus chain and servo
-drive --- is fabricated to the drawings in Appendix~\ref{app:harness} and is
-labelled and strain-relieved before installation, because every connector in the
-machine sits on a structure that vibrates by design.
+it. The harness --- battery lead, driver drops, bus chain and servo drive ---
+is fabricated to the drawings in Appendix~\ref{app:harness} and is labelled and
+strain-relieved before installation, because every connector in the machine sits
+on a structure that vibrates by design.
 
 \subsubsection{Electrical Safety and Bring-Up Protocol}
 \label{sec:electrical_safety}
