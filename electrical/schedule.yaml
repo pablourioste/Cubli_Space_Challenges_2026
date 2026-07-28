@@ -26,8 +26,8 @@ hardware_baseline:
   consequence: >
     The 1-DoF rig is NOT permanent. It is built from one of the three cube
     sets and must be STRIPPED at EL-21 during Phase 2 to populate the third
-    cube axis. There is no independent bench after 7 Aug, so Phase 3 brake
-    work runs on the cube itself. Any motor, driver or encoder failure after
+    cube axis (3-4 Aug). There is no independent bench after 4 Aug, so Phase 3
+    brake work runs on the cube itself. Any motor, driver or encoder failure after
     integration loses an axis with no resupply before 20 Aug.
   supersedes:
     - "brief invariant: 4 complete sets, rig survives as permanent bench"
@@ -612,28 +612,34 @@ critical_path:
       runs in parallel off EL-14 and is not on this path, but carries a harder
       external date than G3 itself.
   to_G5:
-    chain: [EL-19, EL-21, EL-22, EL-26, EL-29]
+    chain: [EL-19, EL-21, EL-22, EL-26, EL-25, EL-29]
     path_start_day: 11
     path_end_day: 18
     gate_day: 18
     float_days: 0
     verdict: >
-      ZERO FLOAT. The binding chain runs through the bus and harness, not the
-      board: EL-21 (replicate sets) -> EL-22 (4-node bus) -> EL-26 (harness)
+      ZERO FLOAT. The binding chain runs through the bus, harness and battery
+      transient, not the board: EL-21 (replicate sets) -> EL-22 (4-node bus)
+      -> EL-26 (harness) -> EL-25 (48 A transient / first battery power-on)
       -> EL-29 (integrated power-on). EL-24 (perfboard) finishes day 13 and
-      feeds EL-22 with one day to spare, so the perfboard is NOT the pinch -
-      the harness is. Phase 2 inherits every day of Phase 1 slip directly,
-      because EL-21 cannot start until the rig is proven at EL-19.
+      feeds EL-22 with a day to spare, so the perfboard is NOT the pinch -
+      the harness and the battery bring-up are. Phase 2 inherits every day of
+      Phase 1 slip directly, because EL-21 cannot start until the rig is
+      proven at EL-19.
     parallel_chain_note: >
-      EL-25 (48 A transient, days 16-17) depends on EL-26 and EL-27 and ends
-      one day before G5, giving it 1 day of float. EL-28 (thermal) runs
-      days 17-18 off EL-25 with zero float. Both converge on EL-29.
+      EL-28 (thermal) shares the same predecessor EL-25 and also ends day 18
+      with zero float, so G5 has two independent zero-float finishers.
   to_G8:
     chain: [EL-29, EL-31, EL-32, EL-33, EL-34, EL-35]
     path_start_day: 18
     path_end_day: 27
     gate_day: 27
     float_days: 0
+    full_path_from_start: >
+      The unbroken longest path from 28 Jul to G8 is 16 tasks:
+      EL-11 -> EL-12 -> EL-13 -> EL-14 -> EL-17 -> EL-19 -> EL-21 -> EL-22 ->
+      EL-26 -> EL-25 -> EL-29 -> EL-31 -> EL-32 -> EL-33 -> EL-34 -> EL-35.
+      Every electrical gate sits on this one chain.
     verdict: >
       ZERO FLOAT along the chain, but the float is structured rather than
       continuous: EL-32 ends day 21 and EL-33 starts day 23, leaving days 22
@@ -652,7 +658,7 @@ issues:
       permanent bench" is not achievable - you confirmed three sets. The rig is
       built from a cube set and must be stripped at EL-21 on 3 Aug. Consequences
       carried into this schedule: TRIAGE FOUR becomes TRIAGE THREE; there is no
-      independent bench after 3 Aug, so all Phase 3 brake work runs on the
+      independent bench after 4 Aug, so all Phase 3 brake work runs on the
       flight article; and any post-integration failure of a motor, driver or
       encoder loses an axis permanently with no resupply before 20 Aug.
     action_required: >

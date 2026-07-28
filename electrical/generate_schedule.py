@@ -1,0 +1,446 @@
+#!/usr/bin/env python3
+"""
+Generate SCHEDULE.md and gantt_electrical.tex from schedule.yaml.
+
+schedule.yaml is the single source of truth. Run this after every edit to it:
+
+    python electrical/generate_schedule.py
+
+Requires PyYAML.
+"""
+import datetime
+import sys
+from pathlib import Path
+
+import yaml
+
+HERE = Path(__file__).resolve().parent
+YAML_PATH = HERE / "schedule.yaml"
+MD_PATH = HERE / "SCHEDULE.md"
+TEX_PATH = HERE / "gantt_electrical.tex"
+
+
+# --------------------------------------------------------------------------
+# helpers
+# --------------------------------------------------------------------------
+def as_date(v):
+    return v if isinstance(v, datetime.date) else datetime.date.fromisoformat(v)
+
+
+def flow(s):
+    """Collapse a YAML folded block into a single line."""
+    return " ".join(str(s).split()) if s else ""
+
+
+def dm(d):
+    """'28 Jul' style short date."""
+    return f"{d.day} {d.strftime('%b')}"
+
+
+def esc(s):
+    """Escape for LaTeX."""
+    out = str(s)
+    for a, b in (("\\", r"\textbackslash{}"), ("&", r"\&"), ("%", r"\%"),
+                 ("$", r"\$"), ("#", r"\#"), ("_", r"\_"), ("{", r"\{"),
+                 ("}", r"\}"), ("~", r"\textasciitilde{}"),
+                 ("^", r"\textasciicircum{}")):
+        out = out.replace(a, b)
+    return out
+
+
+def load():
+    with open(YAML_PATH, encoding="utf-8") as fh:
+        return yaml.safe_load(fh)
+
+
+# --------------------------------------------------------------------------
+# validation - refuse to generate from an inconsistent source
+# --------------------------------------------------------------------------
+def validate(d):
+    day1 = as_date(d["meta"]["day_one"])
+    tasks = {t["id"]: t for t in d["tasks"]}
+    errs = []
+
+    for t in d["tasks"]:
+        for lbl, dnum, dt in (("start", t["start_day"], t["start_date"]),
+                              ("end", t["end_day"], t["end_date"])):
+            exp = day1 + datetime.timedelta(days=dnum - 1)
+            if as_date(dt) != exp:
+                errs.append(f"{t['id']}: {lbl}_day {dnum} -> {exp}, "
+                            f"but {lbl}_date says {as_date(dt)}")
+        if t["end_day"] < t["start_day"]:
+            errs.append(f"{t['id']}: end_day before start_day")
+        for dep in t.get("depends_on", []):
+            if dep not in tasks:
+                errs.append(f"{t['id']}: unknown dependency {dep}")
+            elif tasks[dep]["end_day"] > t["start_day"]:
+                errs.append(f"{t['id']} starts day {t['start_day']} but "
+                            f"{dep} ends day {tasks[dep]['end_day']}")
+        g = t.get("gate")
+        if g and t["end_day"] > d["gates"][g]["day"]:
+            errs.append(f"{t['id']} ends day {t['end_day']}, past "
+                        f"{g} (day {d['gates'][g]['day']})")
+        if t["phase"] == 2 and not t.get("delta_class"):
+            errs.append(f"{t['id']}: phase 2 task missing delta_class")
+        if not flow(t.get("exit_criterion")):
+            errs.append(f"{t['id']}: missing exit_criterion")
+
+    for name, cp in d["critical_path"].items():
+        chain = cp["chain"]
+        for a, b in zip(chain, chain[1:]):
+            if a not in tasks or b not in tasks:
+                errs.append(f"critical_path {name}: unknown task")
+            elif a not in tasks[b].get("depends_on", []):
+                errs.append(f"critical_path {name}: {a} -> {b} is not a real "
+                            f"dependency edge")
+        if chain and chain[-1] in tasks:
+            end = tasks[chain[-1]]["end_day"]
+            if end != cp["path_end_day"]:
+                errs.append(f"critical_path {name}: chain ends day {end}, "
+                            f"stated {cp['path_end_day']}")
+            if cp["gate_day"] - cp["path_end_day"] != cp["float_days"]:
+                errs.append(f"critical_path {name}: float should be "
+                            f"{cp['gate_day'] - cp['path_end_day']}, "
+                            f"stated {cp['float_days']}")
+    return errs
+
+
+def longest_paths(d):
+    """Longest dependency chain ending at each task."""
+    tasks = {t["id"]: t for t in d["tasks"]}
+    memo = {}
+
+    def walk(tid):
+        if tid in memo:
+            return memo[tid]
+        best = [tid]
+        for dep in tasks[tid].get("depends_on", []):
+            cand = walk(dep) + [tid]
+            if len(cand) > len(best):
+                best = cand
+        memo[tid] = best
+        return best
+
+    return {tid: walk(tid) for tid in tasks}
+
+
+# --------------------------------------------------------------------------
+# SCHEDULE.md
+# --------------------------------------------------------------------------
+def gen_md(d):
+    tasks = {t["id"]: t for t in d["tasks"]}
+    gates = d["gates"]
+    paths = longest_paths(d)
+    L = []
+
+    L.append("# Cubli - Electrical/Electronics Technical Schedule")
+    L.append("")
+    L.append("**Generated from `schedule.yaml`. Do not edit this file by "
+             "hand** - edit the YAML and run `python electrical/"
+             "generate_schedule.py`.")
+    L.append("")
+    m = d["meta"]
+    L.append(f"Day 1 = {as_date(m['day_one'])} - day 29 = "
+             f"{as_date(m['day_last'])}. Electrical work starts "
+             f"{as_date(m['electrical_start_date'])} "
+             f"(day {m['electrical_start_day']}), three days behind the "
+             f"original plan.")
+    L.append("")
+
+    # hardware baseline
+    hb = d["hardware_baseline"]
+    L.append("## Hardware baseline")
+    L.append("")
+    L.append(f"**{hb['actuation_sets']} complete actuation sets, "
+             f"{hb['spare_sets']} spares. Strategy: {hb['strategy']}.**")
+    L.append("")
+    L.append(flow(hb["consequence"]))
+    L.append("")
+
+    # gates
+    L.append("## Gates")
+    L.append("")
+    L.append("| Gate | Day | Date | Name | Electrical scope |")
+    L.append("|---|---|---|---|---|")
+    for gid, g in gates.items():
+        L.append(f"| {gid} | {g['day']} | {dm(as_date(g['date']))} | "
+                 f"{g['name']} | {g['electrical_scope']} |")
+    L.append("")
+
+    # phases
+    for ph in d["phases"]:
+        pts = [t for t in d["tasks"] if t["phase"] == ph["id"]]
+        w0, w1 = ph["window_dates"]
+        L.append(f"## Phase {ph['id']} - {ph['name']} -> {ph['closes_at']}")
+        L.append("")
+        L.append(f"Days {ph['window_days'][0]}-{ph['window_days'][1]} "
+                 f"({dm(as_date(w0))} - {dm(as_date(w1))}), "
+                 f"{len(pts)} tasks.")
+        L.append("")
+        if ph.get("framing"):
+            L.append(flow(ph["framing"]))
+            L.append("")
+
+        hdr = "| ID | Task | Days | Dates | Depends on |"
+        sep = "|---|---|---|---|---|"
+        if ph["id"] == 2:
+            hdr = "| ID | Task | Delta | Days | Dates | Depends on |"
+            sep = "|---|---|---|---|---|---|"
+        L.append(hdr)
+        L.append(sep)
+        for t in sorted(pts, key=lambda x: (x["start_day"], x["id"])):
+            dep = ", ".join(t.get("depends_on") or []) or "-"
+            days = (f"{t['start_day']}" if t["start_day"] == t["end_day"]
+                    else f"{t['start_day']}-{t['end_day']}")
+            dates = (dm(as_date(t["start_date"]))
+                     if t["start_date"] == t["end_date"]
+                     else f"{dm(as_date(t['start_date']))} - "
+                          f"{dm(as_date(t['end_date']))}")
+            if ph["id"] == 2:
+                L.append(f"| {t['id']} | {t['name']} | "
+                         f"{t['delta_class'].upper()} | {days} | {dates} | "
+                         f"{dep} |")
+            else:
+                L.append(f"| {t['id']} | {t['name']} | {days} | {dates} | "
+                         f"{dep} |")
+        L.append("")
+
+        # scope + exit criteria
+        L.append(f"### Phase {ph['id']} scope and exit criteria")
+        L.append("")
+        for t in sorted(pts, key=lambda x: (x["start_day"], x["id"])):
+            tag = (f" *[{t['delta_class'].upper()}]*"
+                   if t.get("delta_class") else "")
+            L.append(f"**{t['id']} {t['name']}**{tag}")
+            L.append("")
+            L.append(flow(t["scope"]))
+            L.append("")
+            if t.get("scaling_note"):
+                L.append(f"- Scaling: {flow(t['scaling_note'])}")
+            if t.get("materials"):
+                L.append(f"- Materials: {flow(t['materials'])}")
+            if t.get("note"):
+                L.append(f"- Note: {flow(t['note'])}")
+            if t.get("scheduling_note"):
+                L.append(f"- Scheduling: {flow(t['scheduling_note'])}")
+            L.append(f"- **Exit:** {flow(t['exit_criterion'])}")
+            L.append("")
+
+    # dependency chain view
+    L.append("## Dependency chain - longest path to each gate")
+    L.append("")
+    L.append(f"Measured from {dm(as_date(m['electrical_start_date']))} "
+             f"(day {m['electrical_start_day']}).")
+    L.append("")
+    for gid in ("G3", "G5", "G8"):
+        cp = d["critical_path"].get(f"to_{gid}")
+        if not cp:
+            continue
+        gday = gates[gid]["day"]
+        gt = [t for t in d["tasks"] if t.get("gate") == gid]
+        end = max(x["end_day"] for x in gt)
+        finishers = [x["id"] for x in gt if x["end_day"] == end]
+        full = max((paths[f] for f in finishers), key=len)
+
+        L.append(f"### {gid} - {gates[gid]['name']} - day {gday} "
+                 f"({dm(as_date(gates[gid]['date']))})")
+        L.append("")
+        L.append("Longest path from the electrical start:")
+        L.append("")
+        L.append("```")
+        segs = []
+        for tid in full:
+            t = tasks[tid]
+            segs.append(f"{tid} (d{t['start_day']}-{t['end_day']})")
+        # wrap the arrow chain, keeping the arrow visible at a line break
+        line = ""
+        for i, s in enumerate(segs):
+            piece = s if i == 0 else f" -> {s}"
+            if line and len(line) + len(piece) > 72:
+                L.append(line + " ->")
+                line = "    " + s
+            else:
+                line += piece
+        if line:
+            L.append(line)
+        L.append("```")
+        L.append("")
+        fl = cp["float_days"]
+        word = ("ZERO FLOAT" if fl == 0
+                else f"NEGATIVE FLOAT ({fl} days)" if fl < 0
+                else f"{fl} day(s) float")
+        L.append(f"**Float on {gid}: {fl} day(s) - {word}.** "
+                 f"Path ends day {cp['path_end_day']}, gate is day {gday}.")
+        L.append("")
+        L.append(flow(cp["verdict"]))
+        L.append("")
+        if cp.get("parallel_chain_note"):
+            L.append(flow(cp["parallel_chain_note"]))
+            L.append("")
+        if cp.get("full_path_from_start"):
+            L.append(flow(cp["full_path_from_start"]))
+            L.append("")
+
+    # slack table
+    L.append("## Float on every task")
+    L.append("")
+    L.append("Slack = gate day - task end day. Zero means the task ends on "
+             "its gate.")
+    L.append("")
+    L.append("| ID | Days | Gate | Gate day | Slack |")
+    L.append("|---|---|---|---|---|")
+    for t in d["tasks"]:
+        g = t.get("gate")
+        if not g:
+            continue
+        gd = gates[g]["day"]
+        days = (f"{t['start_day']}" if t["start_day"] == t["end_day"]
+                else f"{t['start_day']}-{t['end_day']}")
+        L.append(f"| {t['id']} | {days} | {g} | {gd} | "
+                 f"{gd - t['end_day']} |")
+    L.append("")
+
+    # issues
+    L.append("## Issues found")
+    L.append("")
+    for i in d.get("issues", []):
+        L.append(f"### {i['id']} ({i['severity'].upper()}) - {i['title']}")
+        L.append("")
+        L.append(flow(i["detail"]))
+        L.append("")
+        if i.get("action_required"):
+            L.append(f"**Action required:** {flow(i['action_required'])}")
+            L.append("")
+
+    # open questions
+    L.append("## Open questions")
+    L.append("")
+    L.append("| # | Question | Blocks | State |")
+    L.append("|---|---|---|---|")
+    for q in d.get("open_questions", []):
+        L.append(f"| {q['id']} | {flow(q['question'])} | "
+                 f"{flow(q.get('blocks', '-'))} | {flow(q['state'])} |")
+    L.append("")
+
+    return "\n".join(L) + "\n"
+
+
+# --------------------------------------------------------------------------
+# gantt_electrical.tex
+# --------------------------------------------------------------------------
+def gen_tex(d):
+    gates = d["gates"]
+    m = d["meta"]
+    L = []
+
+    L.append("% !TEX root = ../main.tex")
+    L.append("% ---------------------------------------------------------")
+    L.append("% Cubli - ELECTRICAL/ELECTRONICS schedule, Gantt fragment.")
+    L.append("% GENERATED from electrical/schedule.yaml by")
+    L.append("% electrical/generate_schedule.py - do not edit by hand.")
+    L.append("%")
+    L.append("% Standalone fragment. Matches the \\ganttset options, day")
+    L.append("% numbering (day 1 = 23 Jul 2026) and colour macros of")
+    L.append("% sections/02_project_organization_gantt.tex, which is NOT")
+    L.append("% modified by this file.")
+    L.append("%")
+    L.append("% Requires in the preamble (already in main.tex): pgfgantt,")
+    L.append("% xcolor, and the colour macros mfcol / cdcol / ctcol / mscol.")
+    L.append("% mfcol (manufacturing & circuits) is defined in main.tex but")
+    L.append("% was previously unused - see AUDIT.md m-1. It is the")
+    L.append("% electrical stream colour here.")
+    L.append("% ---------------------------------------------------------")
+    L.append("")
+    L.append("\\ganttset{")
+    L.append("  hgrid, vgrid={*6{draw=none}, *1{draw=black!15}},")
+    L.append("  x unit=0.4cm, y unit title=0.5cm, y unit chart=0.42cm,")
+    L.append("  title height=1, bar height=0.6, bar top shift=0.2,")
+    L.append("  group top shift=0.1, group height=0.5, "
+             "milestone top shift=0.15,")
+    L.append("  bar label font=\\small, group label font=\\bfseries\\small,")
+    L.append("  milestone label font=\\small\\itshape, "
+             "title label font=\\small,")
+    L.append("  bar/.append style={draw=none},")
+    L.append("}")
+    L.append("")
+    L.append("\\begin{figure}[p]")
+    L.append("\\centering")
+    L.append("\\resizebox{\\textwidth}{!}{%")
+    L.append("\\begin{ganttchart}{1}{29}")
+    L.append("  \\gantttitle{Week 1 (23--29 Jul)}{7}")
+    L.append("  \\gantttitle{Week 2 (30 Jul--5 Aug)}{7}")
+    L.append("  \\gantttitle{Week 3 (6--12 Aug)}{7}")
+    L.append("  \\gantttitle{Week 4 (13--19 Aug)}{7}")
+    L.append("  \\gantttitle{20}{1} \\\\")
+    daynums = ([str(x) for x in range(23, 32)] +
+               [str(x) for x in range(1, 21)])
+    L.append("  " + " ".join(f"\\gantttitle{{{x}}}{{1}}"
+                             for x in daynums) + " \\\\")
+
+    for ph in d["phases"]:
+        pts = sorted([t for t in d["tasks"] if t["phase"] == ph["id"]],
+                     key=lambda x: (x["start_day"], x["id"]))
+        lo = min(t["start_day"] for t in pts)
+        hi = max(t["end_day"] for t in pts)
+        L.append(f"  % --- Phase {ph['id']}: {ph['name']} "
+                 f"(-> {ph['closes_at']}) ---")
+        L.append(f"  \\ganttgroup[group/.append style={{fill=mfcol!55}}]"
+                 f"{{Phase {ph['id']}: {esc(ph['name'])}}}{{{lo}}}{{{hi}}}"
+                 f" \\ganttnewline")
+        for t in pts:
+            label = f"{t['id']} {esc(t['name'])}"
+            if t.get("delta_class"):
+                label += f" [{t['delta_class'][0].upper()}]"
+            L.append(f"  \\ganttbar[bar/.append style={{fill=mfcol}}]"
+                     f"{{{label}}}{{{t['start_day']}}}{{{t['end_day']}}}"
+                     f" \\ganttnewline")
+
+    L.append("  \\ganttnewline")
+    L.append("  % --- Milestone gates ---")
+    gl = list(gates.items())
+    for idx, (gid, g) in enumerate(gl):
+        nl = "" if idx == len(gl) - 1 else " \\ganttnewline"
+        L.append(f"  \\ganttmilestone[milestone/.append style="
+                 f"{{fill=mscol}}]{{{gid} {esc(g['name'])}}}"
+                 f"{{{g['day']}}}{nl}")
+    L.append("\\end{ganttchart}%")
+    L.append("}")
+
+    hb = d["hardware_baseline"]
+    L.append("\\caption{Electrical and electronics workstream schedule, "
+             + f"{dm(as_date(m['electrical_start_date']))}--"
+             + f"{dm(as_date(m['day_last']))} 2026. Three phases, each "
+             "closing on a milestone gate: Phase~1 (1-DoF rig electrical) "
+             "at G3, Phase~2 (extension to the 3D cube) at G5, and Phase~3 "
+             "(brake actuation electrical) at G8. Phase~2 bars are annotated "
+             "with their delta class against Phase~1: [C]~carried, "
+             "[S]~scaled, [N]~new. The schedule is built on "
+             f"{hb['actuation_sets']}~complete actuation sets with no spare, "
+             "so the 1-DoF rig is stripped at EL-21 to populate the third "
+             "cube axis. All three gates close with zero float. Grey "
+             "diamonds: milestone gates.}")
+    L.append("\\label{fig:gantt_electrical}")
+    L.append("\\end{figure}")
+    return "\n".join(L) + "\n"
+
+
+def main():
+    d = load()
+    errs = validate(d)
+    if errs:
+        print("schedule.yaml is inconsistent - refusing to generate:",
+              file=sys.stderr)
+        for e in errs:
+            print(f"  - {e}", file=sys.stderr)
+        return 1
+    MD_PATH.write_text(gen_md(d), encoding="utf-8")
+    TEX_PATH.write_text(gen_tex(d), encoding="utf-8")
+    n = len(d["tasks"])
+    print(f"OK: {n} tasks validated.")
+    print(f"  wrote {MD_PATH.name}")
+    print(f"  wrote {TEX_PATH.name}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

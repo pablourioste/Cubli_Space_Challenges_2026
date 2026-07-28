@@ -62,6 +62,18 @@ C12 & Perfboard + harness & Power/signal board and the full power and CAN harnes
 C13 & Cube integration + power-on & Assemble the three axes, then bench and battery smoke test & Pablo \textit{(+Neisa)} & 7--9 Aug \\
 C14 & Brake mechanism build & Fabricate and fit the servo brake; bench-test the deceleration & Suvanna \textit{(+Pablo)} & 10--13 Aug \\
 \midrule
+\multicolumn{5}{@{}l}{\textbf{Electrical \& Electronics} (electronics design: Nicc; wiring, testing and bring-up: Pablo)} \\
+\midrule
+E1 & Bench power, e-stop \& triage & Current-limited bench supply, e-stop and inline fuse; incoming test of all three actuation sets against the \qty{194}{\milli\ohm} phase figure, with CAN IDs assigned & Pablo & 28--29 Jul \\
+E2 & Driver, phase wiring \& \qty{5}{\volt} rail & Motor phase wiring and FOC calibration of the first set; LM2596 rail trimmed to \qty{5.00}{\volt} and characterised under load to \qty{1.5}{\ampere} & Pablo \textit{(+Nicc)} & 29--30 Jul \\
+E3 & MA600 encoder + rig CAN bus & Magnet bonding, air gap ${\le}\,\qty{0.5}{\milli\metre}$ and bias trim; 2-node CAN-FD bus with split termination at both physical ends & Pablo & 30--31 Jul \\
+E4 & Rig parameters + board outline & Measurement setup for $K_t$, wheel inertia, friction and loop latency; driver placement, CAN routing and the perfboard floorplan issued as a frozen outline & Nicc \textit{(+Pablo)} & 31 Jul--1 Aug \\
+E5 & 1-DoF closed-loop bring-up & Teensy, IMU and CAN-FD closed loop on the rig; disarm path and watchdog verified before any balance attempt & Pablo \textit{(+Nicc)} & 1--2 Aug \\
+E6 & Perfboard + battery power chain & Populate the distribution perfboard (two ground domains, one star point, split \qty{5}{\volt} rail); XT90 chain with anti-spark, fuse and ${\ge}\,\qty{50}{\volt}$ bulk capacitance; replicate the remaining actuation sets & Nicc \textit{(+Pablo)} & 3--4 Aug \\
+E7 & 4-node bus + cube harness & Bus scaled to four nodes with stubs ${<}\,\qty{10}{\centi\metre}$ and an error soak at \qty{5}{\mega\bit\per\second}; full power and signal harness fabricated and routed; Wi-Fi telemetry for untethered operation & Pablo & 5--7 Aug \\
+E8 & Cube power-on, \qty{48}{\ampere} + thermal & First battery power-on and the three-axis \qty{48}{\ampere} transient; driver thermals in the enclosed volume; all axes addressable & Pablo \textit{(+Nicc)} & 7--9 Aug \\
+E9 & Brake servo rail + measurement & Servo on an isolated \qty{5}{\volt} rail with PWM drive and flyback; rail stability under stall, brake closure time and spin-down brake torque measured & Pablo \textit{(+Nicc)} & 10--18 Aug \\
+\midrule
 \multicolumn{5}{@{}l}{\textbf{Deliverables}} \\
 \midrule
 D1 & Results, demo \& final presentation & Slow-motion capture, results plots, deck, and the final presentation & All \textit{(+Suvanna edits)} & 17--20 Aug \\

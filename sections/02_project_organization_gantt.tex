@@ -2,7 +2,7 @@
 
 \ganttset{
   hgrid, vgrid={*6{draw=none}, *1{draw=black!15}},
-  x unit=0.4cm, y unit title=0.5cm, y unit chart=0.42cm,
+  x unit=0.4cm, y unit title=0.5cm, y unit chart=0.34cm,
   title height=1, bar height=0.6, bar top shift=0.2,
   group top shift=0.1, group height=0.5, milestone top shift=0.15,
   bar label font=\small, group label font=\bfseries\small,
@@ -65,6 +65,21 @@
   \ganttbar[bar/.append style={fill=cdcol}]{C12 Perfboard + harness}{12}{15} \ganttnewline
   \ganttbar[bar/.append style={fill=cdcol}]{C13 Cube integration + power-on}{16}{18} \ganttnewline
   \ganttbar[bar/.append style={fill=cdcol}]{C14 Brake mechanism build}{19}{22} \ganttnewline
+  % --- Electrical & Electronics ---
+  % Condensed from the 23-task electrical schedule in electrical/schedule.yaml
+  % (detailed chart: electrical/gantt_electrical.tex). Day numbers roll up the
+  % constituent EL- task ids noted after each bar. Regenerate those from the
+  % YAML; keep these summary spans in step with them.
+  \ganttgroup[group/.append style={fill=mfcol!55}]{Electrical \& Electronics}{6}{27} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{E1 Bench power, e-stop \& triage}{6}{7} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{E2 Driver, phase wiring \& 5\,V rail}{7}{8} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{E3 MA600 encoder + rig CAN bus}{8}{9} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{E4 Rig params + board outline}{9}{10} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{E5 1-DoF closed-loop bring-up}{10}{11} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{E6 Perfboard + battery power chain}{12}{13} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{E7 4-node bus + cube harness}{14}{16} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{E8 Cube power-on, 48\,A + thermal}{16}{18} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{E9 Brake servo rail + measurement}{19}{27} \ganttnewline
   % --- Deliverables ---
   \ganttgroup[group/.append style={fill=mscol!45}]{Deliverables}{26}{29} \ganttnewline
   \ganttbar[bar/.append style={fill=mscol!70}]{D1 Results, demo \& presentation}{26}{29} \ganttnewline
@@ -82,8 +97,12 @@
 \end{ganttchart}%
 }
 \caption{Detailed project schedule, 23 July--20 August 2026. The documentation
-stream (green) closes at the TDD deliverable on 3 August; control (blue) and
-hardware (gold) continue through the build and demonstrations to the final
-presentation on 20 August. Grey diamonds: milestone gates.}
+stream (green) closes at the TDD deliverable on 3 August; control (blue),
+hardware (gold) and electrical (orange) continue through the build and
+demonstrations to the final presentation on 20 August. The electrical stream
+covers the design, wiring and testing of the 1-DoF rig (E1--E5, to G3), its
+extension to the 3D cube (E6--E8, to G5) and the brake actuation electrical
+(E9, to G8); each bar summarises several tasks of the detailed electrical
+schedule. Grey diamonds: milestone gates.}
 \label{fig:gantt}
 \end{figure}

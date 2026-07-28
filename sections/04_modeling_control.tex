@@ -161,50 +161,65 @@ h_w = \beta\,h_{w,\text{ideal}},
 I_{w,\text{target}} = \frac{h_w}{\omega_{\max}},
 \label{eq:Iw_target}
 \end{equation}
-where $\omega_{\max}$ is the maximum practical wheel speed. Table
-\ref{tab:jumpup_budget} gives the resulting target for the baseline cube,
-which the reaction-wheel design in Section~\ref{sec:rw_sizing} must meet.
+where $\omega_{\max}$ is the maximum practical wheel speed.
+Equations~\eqref{eq:hw_ideal} and \eqref{eq:Iw_target} are the sizing relations
+used at step~4 of the closure procedure of Section~\ref{sec:massbudget}: given a
+candidate cube mass and edge length they return the inertia the wheel of
+Section~\ref{sec:rw_sizing} must meet. Their inputs are recorded in
+Table~\ref{tab:jumpup_budget} and are not fixed here---$M$ and $L$ are outputs
+of the packaging closure, not assumptions preceding it.
+
+Two features of these relations govern how the iteration behaves. First,
+$h_w \propto M L^{3/2}$, so growing the cube to accommodate a larger wheel also
+raises the requirement; convergence depends on the achievable inertia growing
+faster ($\sim D_w^2$) than the requirement does. Second, $\beta$ diverges as
+$\tau_b \to \tau_g$: a brake whose torque only marginally exceeds the
+gravitational tip-over torque cannot deliver the required impulse at any wheel
+speed. The brake torque must therefore be checked against $\tau_g = MgL/2$ on
+every iteration, and a comfortable ratio $\tau_b/\tau_g$ maintained rather than
+a merely positive margin.
 
 \begin{table}[h]
 \centering
-\caption{Torque-limited wheel-inertia target (corner case, baseline cube).}
+\caption{Torque-limited wheel-inertia target (corner case). Inputs are fixed by
+the closure procedure of Section~\ref{sec:massbudget}; the table is populated on
+each iteration.}
 \label{tab:jumpup_budget}
 \begin{tabular}{llr}
 \toprule
 Symbol & Description & Value \\
 \midrule
-$M$                & Cube mass                    & $1.40$ kg \\
-$L$                & Cube edge length             & $180$ mm \\
-$\eta$             & Energy margin                & $1.05$ \\
-$\tau_b$           & Brake torque per wheel       & $5.0$ N\,m \\
-$\tau_g$           & Gravitational tip-over floor & $1.24$ N\,m \\
-$\beta$            & Brake-amplification factor   & $1.33$ \\
-$\omega_{\max}$    & Max wheel speed (design)     & $6000$ rpm ($628$ rad/s) \\
-$h_w$              & Required angular momentum    & $0.264$ kg\,m$^2$/s \\
-$I_{w,\text{target}}$ & \textbf{Target wheel inertia} & $\mathbf{4.20\times10^{-4}}$ \textbf{kg\,m}$^\mathbf{2}$ \\
+$M$                & Cube mass                    & \textcolor{red}{TBD} \\
+$L$                & Cube edge length             & \textcolor{red}{TBD} \\
+$\eta$             & Energy margin                & \textcolor{red}{TBD} \\
+$\tau_b$           & Brake torque per wheel       & \textcolor{red}{TBD} \\
+$\tau_g = MgL/2$   & Gravitational tip-over floor & \textcolor{red}{TBD} \\
+$\beta$            & Brake-amplification factor   & \textcolor{red}{TBD} \\
+$\omega_{\max}$    & Max wheel speed (design)     & \textcolor{red}{TBD} \\
+$h_w$              & Required angular momentum    & \textcolor{red}{TBD} \\
+$I_{w,\text{target}}$ & \textbf{Target wheel inertia} & \textcolor{red}{\textbf{TBD}} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \paragraph{Choice of $\omega_{\max}$.} The maximum wheel speed is a design
 choice rather than a datasheet figure, and it enters the sizing directly
-through $I_{w,\text{target}} = h_w/\omega_{\max}$. At $K_v =
-\qty{380}{rpm\per\volt}$ on a nominal \qty{22.2}{\volt} pack the motor's
-no-load speed is \qty{8436}{rpm}, but this is unattainable in service: winding
-resistance ($2\times\qty{194}{\milli\ohm}$ line-to-line), the reduced phase
-voltage available under sinusoidal field-oriented modulation, and the fall of
-pack voltage through the discharge curve together place the realistic ceiling
-near \qty{6900}{rpm}. The design value is set to \textbf{\qty{6000}{rpm}
-(\qty{628}{\radian\per\second})}, below even that figure. At this speed the
-back-EMF is \qty{15.8}{\volt}, only \qty{71}{\percent} of the nominal bus, so
-the wheel reaches its commanded speed across the whole usable discharge range
-rather than only on a freshly charged pack, and margin remains for motor
-tolerance, bearing and aerodynamic drag, and the residual uncertainty in the
-mass budget. The cost is a \qty{40}{\percent} larger inertia requirement than
-a top-of-range assumption would give, which the wheel of
-Section~\ref{sec:rw_sizing} meets with \qty{3.3}{\percent} margin. The
-corresponding electrical frequency, \qty{1200}{\hertz} at 12 pole pairs, sits
-well inside the driver's capability.
+through $I_{w,\text{target}} = h_w/\omega_{\max}$: a higher assumed speed buys a
+proportionally smaller wheel. It is therefore the natural relief valve when the
+envelope caps the wheel below the requirement (step~5,
+Table~\ref{tab:sizing_procedure}), but it must be set from what the drive can
+sustain in service, not from the no-load figure $K_v V_{\text{bus}}$. Three
+effects separate the two: winding resistance, which costs speed under the torque
+required to spin the wheel up; the reduced phase voltage available under
+sinusoidal field-oriented modulation; and the fall of pack voltage through the
+discharge curve, which must be taken at its lower end if the maneuver is to
+remain available on a partly-depleted pack rather than only on a fresh one. The
+design value is set below the ceiling those effects imply, leaving margin for
+motor tolerance, bearing and aerodynamic drag, and the residual uncertainty in
+$M$. The resulting back-EMF should remain a comfortable fraction of the usable
+bus voltage, and the electrical frequency $\omega_{\max}p/2\pi$ at $p$ pole
+pairs must sit inside the driver's commutation capability---both checks to be
+confirmed once the motor and pack are selected.
 
 \subsection{Control Design on the 2D Model}
 \label{sec:control2d}

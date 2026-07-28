@@ -1,0 +1,82 @@
+% !TEX root = ../main.tex
+% ---------------------------------------------------------
+% Cubli - ELECTRICAL/ELECTRONICS schedule, Gantt fragment.
+% GENERATED from electrical/schedule.yaml by
+% electrical/generate_schedule.py - do not edit by hand.
+%
+% Standalone fragment. Matches the \ganttset options, day
+% numbering (day 1 = 23 Jul 2026) and colour macros of
+% sections/02_project_organization_gantt.tex, which is NOT
+% modified by this file.
+%
+% Requires in the preamble (already in main.tex): pgfgantt,
+% xcolor, and the colour macros mfcol / cdcol / ctcol / mscol.
+% mfcol (manufacturing & circuits) is defined in main.tex but
+% was previously unused - see AUDIT.md m-1. It is the
+% electrical stream colour here.
+% ---------------------------------------------------------
+
+\ganttset{
+  hgrid, vgrid={*6{draw=none}, *1{draw=black!15}},
+  x unit=0.4cm, y unit title=0.5cm, y unit chart=0.42cm,
+  title height=1, bar height=0.6, bar top shift=0.2,
+  group top shift=0.1, group height=0.5, milestone top shift=0.15,
+  bar label font=\small, group label font=\bfseries\small,
+  milestone label font=\small\itshape, title label font=\small,
+  bar/.append style={draw=none},
+}
+
+\begin{figure}[p]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{ganttchart}{1}{29}
+  \gantttitle{Week 1 (23--29 Jul)}{7}
+  \gantttitle{Week 2 (30 Jul--5 Aug)}{7}
+  \gantttitle{Week 3 (6--12 Aug)}{7}
+  \gantttitle{Week 4 (13--19 Aug)}{7}
+  \gantttitle{20}{1} \\
+  \gantttitle{23}{1} \gantttitle{24}{1} \gantttitle{25}{1} \gantttitle{26}{1} \gantttitle{27}{1} \gantttitle{28}{1} \gantttitle{29}{1} \gantttitle{30}{1} \gantttitle{31}{1} \gantttitle{1}{1} \gantttitle{2}{1} \gantttitle{3}{1} \gantttitle{4}{1} \gantttitle{5}{1} \gantttitle{6}{1} \gantttitle{7}{1} \gantttitle{8}{1} \gantttitle{9}{1} \gantttitle{10}{1} \gantttitle{11}{1} \gantttitle{12}{1} \gantttitle{13}{1} \gantttitle{14}{1} \gantttitle{15}{1} \gantttitle{16}{1} \gantttitle{17}{1} \gantttitle{18}{1} \gantttitle{19}{1} \gantttitle{20}{1} \\
+  % --- Phase 1: 1-DoF rig electrical (-> G3) ---
+  \ganttgroup[group/.append style={fill=mfcol!55}]{Phase 1: 1-DoF rig electrical}{6}{11} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-11 Bench supply, e-stop and fuse loop}{6}{6} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-12 Triage three - incoming inspection of all actuation sets}{6}{7} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-13 Commission one - driver, motor and phase wiring}{7}{8} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-15 5 V rail trim and load characterisation}{7}{8} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-14 MA600 off-axis encoder installation and calibration}{8}{9} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-16 Rig harness and 2-node CAN-FD bus}{8}{9} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-17 Parameter characterisation - Kt, J, friction, latency}{9}{10} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-18 Board outline and connector positions}{9}{10} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-19 Closed-loop rig bring-up}{10}{11} \ganttnewline
+  % --- Phase 2: Extension to the 3D cube (-> G5) ---
+  \ganttgroup[group/.append style={fill=mfcol!55}]{Phase 2: Extension to the 3D cube}{12}{18} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-21 Replicate actuation sets 2 and 3 [C]}{12}{13} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-23 Battery power chain [N]}{12}{13} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-24 Power/signal distribution perfboard [N]}{12}{13} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-22 4-node CAN-FD bus [S]}{14}{14} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-26 Harness fabrication and routing [S]}{14}{15} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-27 Telemetry link [N]}{15}{16} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-25 48 A transient handling and first battery power-on [S]}{16}{17} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-28 Thermal behaviour of three drivers in an enclosed volume [N]}{17}{18} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-29 Integrated power-on and axis addressability [C]}{17}{18} \ganttnewline
+  % --- Phase 3: Brake actuation electrical (-> G8) ---
+  \ganttgroup[group/.append style={fill=mfcol!55}]{Phase 3: Brake actuation electrical}{19}{27} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-31 Servo isolated 5 V rail and drive circuit}{19}{20} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-32 Rail stability under servo stall}{20}{21} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-33 Brake closure-time measurement}{23}{24} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-34 Spin-down brake-torque measurement}{24}{26} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{EL-35 Jump-up electrical support}{26}{27} \ganttnewline
+  \ganttnewline
+  % --- Milestone gates ---
+  \ganttmilestone[milestone/.append style={fill=mscol}]{G2 Modelling complete}{10} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{G3 1-DoF rig balances}{11} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{G4 TDD delivered}{12} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{G5 Cube integrated}{18} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{G6 Edge balance}{22} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{G7 Corner balance + slew}{25} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{G8 Jump-up}{27} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{G9 Final presentation}{29}
+\end{ganttchart}%
+}
+\caption{Electrical and electronics workstream schedule, 28 Jul--20 Aug 2026. Three phases, each closing on a milestone gate: Phase~1 (1-DoF rig electrical) at G3, Phase~2 (extension to the 3D cube) at G5, and Phase~3 (brake actuation electrical) at G8. Phase~2 bars are annotated with their delta class against Phase~1: [C]~carried, [S]~scaled, [N]~new. The schedule is built on 3~complete actuation sets with no spare, so the 1-DoF rig is stripped at EL-21 to populate the third cube axis. All three gates close with zero float. Grey diamonds: milestone gates.}
+\label{fig:gantt_electrical}
+\end{figure}

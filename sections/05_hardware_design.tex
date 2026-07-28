@@ -29,82 +29,131 @@ Section~\ref{sec:modeling}.}
 \label{fig:system_loop}
 \end{figure}
 
-\subsection{Mass and Inertia Budget}
+\subsection{Sizing Constraints and Closure Procedure}
 \label{sec:massbudget}
 
-Before committing to component geometry, the preliminary design is bounded by
-three coupled constraints that must be satisfied simultaneously. Sizing to the
-worst case of each fixes the envelope within which the mechanical and electrical
-design then iterate.
+The cube edge length $L$ and the reaction-wheel inertia $I_w$ are not
+independent design choices: they are the two ends of a single constraint chain
+that begins with what must physically be carried inside the cube. This section
+states that chain and the order in which it is closed. No dimensions are
+committed here---component selection is still open (Section~\ref{sec:hardware}),
+and the numbers follow from the procedure rather than preceding it.
 
-\paragraph{Volume constraint.} Every subsystem---the three orthogonal
-reaction-wheel/motor modules, the battery, and the electronics stack---must fit
-inside the $180$~mm cube envelope. This envelope is not arbitrary. Sizing the
-wheels to the conservative \qty{6000}{rpm} of Section~\ref{sec:jumpup_target}
-requires $4.20\times10^{-4}$ kg\,m$^2$ per wheel; within a $150$~mm envelope
-the largest wheel that clears the frame, motor and contact features is about
-$120$~mm in diameter, yielding $2.63\times10^{-4}$ kg\,m$^2$---$37\%$ short,
-and not recoverable by ballast, which necessarily sits inboard of the ring it
-displaces. The $180$~mm envelope admits the $130$~mm wheel of
-Section~\ref{sec:rw_sizing}. Packaging independently demands it: the
-$150\times90$~mm power and signal board does not fit within a $150$~mm cube at
-any wall thickness. The binding dimension remains the reaction wheel, whose
-outer diameter caps the radius at which ballast mass can be placed.
+\paragraph{The battery and the internal structure drive the envelope.} The
+dominant volume claim inside the cube is not the reaction wheels but the power
+and support hardware. A LiPo pack sized for the jump-up duty cycle is a
+monolithic, incompressible block: unlike the electronics it cannot be
+redistributed into the corners or thinned, and its dimensions follow from the
+required capacity and discharge rating rather than from any packaging
+preference. Around it must sit an \emph{inner structure}---a rigid subframe
+that locates the three orthogonal motors on mutually perpendicular axes through
+a common centre, carries the three motor drivers, the flight controller, the IMU
+and the brake servos, and reacts the motor mounting loads into the outer
+frame. The three wheel/motor modules must not intersect one another, the pack,
+or this subframe, and the pack should sit near the geometric centre so that it
+does not skew the cube's centre of mass away from the body diagonal.
 
-\paragraph{Mass constraint.} The cube is designed to a total mass target of
-$M = 1.40$~kg. This is not merely a logistics figure: it feeds back into the
-dynamics, since the gravitational tip-over torque $\tau_g = MgL/2$ and the
-required jump-up angular momentum both scale with $M$ (Section~\ref{sec:jumpup_target}).
-A heavier cube demands a more capable brake and a larger wheel inertia, so the
-mass target and the inertia target are coupled and must be closed together. The
-preliminary allocation is given in Table~\ref{tab:massbudget}, with the
-reaction-wheel set (the one firmly-sized item) committed and the remaining
-subsystems held as allowances to be refined as components are selected.
+The minimum internal clear volume is therefore set by the pack, the subframe and
+the electronics stack together, and $L$ is the smallest edge length that
+contains that volume plus the wall thickness and the corner and edge contact
+features. This is the first quantity to fix, and everything downstream depends
+on it.
+
+\paragraph{The envelope caps the wheel, and the wheel must meet the momentum
+requirement.} Once $L$ is set, the largest wheel outer diameter $D_w$ that
+clears the subframe, the motor body and the adjacent orthogonal modules is a
+geometric consequence, and it caps the achievable inertia---not only through
+$I_w \sim m_w D_w^2/4$, but because any ballast necessarily sits inboard of the
+ring it displaces, so a wheel that is short of target at its maximum diameter
+cannot be rescued by adding mass. Against this stands the requirement from the
+jump-up analysis (Section~\ref{sec:jumpup_target}),
+\[
+I_{w,\text{target}} = \frac{h_w(M, L)}{\omega_{\max}},
+\qquad
+h_w \propto M L^{3/2},
+\]
+which grows with both the cube mass and the edge length. Enlarging the cube to
+gain wheel diameter therefore also raises the requirement---but the achievable
+inertia grows faster than the requirement does ($D_w^2$ against $L^{3/2}$), so
+the loop does converge, and a wheel that is short at a given $L$ can be closed
+by a modest increase in $L$.
+
+\paragraph{Mass closes the loop.} The cube mass $M$ is not merely a logistics
+figure: it re-enters the dynamics through the gravitational tip-over torque
+$\tau_g = MgL/2$, which sets the floor the brake torque must exceed, and through
+$h_w \propto M$. Growing the envelope to fit a larger wheel adds frame and wheel
+mass, which raises $I_{w,\text{target}}$ again. Mass, volume and inertia are thus
+one coupled system, closed by the iteration of Table~\ref{tab:sizing_procedure}
+rather than by any of the three in isolation.
 
 \begin{table}[h]
 \centering
-\caption{Preliminary mass budget (per cube). Reaction wheels sized; others allocated.}
-\label{tab:massbudget}
+\caption{Sizing closure procedure. Steps are executed in order; a failure at
+step 4 returns to step 3 or step 1 as indicated.}
+\label{tab:sizing_procedure}
 \small
-\begin{tabular}{l S[table-format=4.0] l}
+\begin{tabular}{c L{4.6cm} L{6.4cm}}
 \toprule
-Subsystem & {Allocated mass (g)} & Status \\
+Step & Determines & Governing consideration \\
 \midrule
-Reaction wheels ($3\times$)   & 468   & Sized (Sec.~\ref{sec:rw_sizing}) \\
-Motors ($3\times$)            & {TBD} & Allowance --- pending motor selection \\
-Frame / structure             & {TBD} & Allowance --- pending CAD \\
-Battery                       & {TBD} & Allowance --- pending capacity sizing \\
-Electronics (MCU, drivers, IMU, servo) & {TBD} & Allowance \\
-Wiring / fasteners / margin   & {TBD} & Allowance \\
-\midrule
-\textbf{Total (target)}       & \bfseries 1400 & \textbf{Design target} \\
+1 & Battery pack geometry & Capacity and discharge rating for the jump-up duty cycle \\
+2 & Inner clear volume $V_{\min}$, hence minimum $L$ & Pack $+$ motor subframe $+$ driver/controller stack, non-intersecting; pack near centre \\
+3 & Maximum wheel diameter $D_w$, hence achievable $I_w$ & Clearance to subframe, motor body and the two orthogonal modules \\
+4 & Requirement $I_{w,\text{target}} = h_w(M,L)/\omega_{\max}$ & Corner jump-up, Eqs.~\eqref{eq:hw_ideal}--\eqref{eq:Iw_target} \\
+5 & Accept or iterate & If $I_w < I_{w,\text{target}}$: raise $L$ (step 2), raise $\omega_{\max}$, or trim $M$; re-enter at step 3 \\
+6 & Mass reconciliation & Updated $M$ feeds back into step 4; iterate to a fixed point \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\paragraph{Inertia constraint (corner-critical).} Each reaction wheel must store
-enough angular momentum at the motor's maximum speed to execute the jump-up
-maneuver. The two contact cases are not equally demanding: the corner
-equilibrium requires a larger rise of the center of mass and a less favorable
-momentum-transfer geometry than the edge equilibrium, so for a common maximum
-wheel speed $\omega_{\max}$ it demands the greater wheel inertia. Evaluating the
-torque-limited budget of Section~\ref{sec:jumpup_target} for both cases
-(Table~\ref{tab:inertia_cases}), the corner case requires
-$4.20\times10^{-4}$ kg\,m$^2$ against $3.81\times10^{-4}$ kg\,m$^2$ for the edge
----about $10\%$ more. The corner jump-up is therefore the critical condition,
-and the reaction wheel is sized to it; a wheel that satisfies the corner
-requirement satisfies the edge requirement with margin.
+\paragraph{Inertia requirement is corner-critical.} The two contact cases are
+not equally demanding. The corner equilibrium requires a larger rise of the
+centre of mass and a less favourable momentum-transfer geometry than the edge
+equilibrium, so for a common maximum wheel speed $\omega_{\max}$ it demands the
+greater wheel inertia (Table~\ref{tab:contact_factors}). Step~4 above is
+therefore always evaluated for the corner case; a wheel that satisfies the
+corner requirement satisfies the edge requirement with margin.
+Table~\ref{tab:inertia_cases} records both once the procedure closes.
 
 \begin{table}[h]
 \centering
-\caption{Required per-wheel inertia by contact case, at $\omega_{\max}=6000$~rpm.}
+\caption{Required per-wheel inertia by contact case, to be evaluated at the
+selected $\omega_{\max}$ once the envelope is fixed.}
 \label{tab:inertia_cases}
-\begin{tabular}{l S[table-format=1.3] S[table-format=1.2]}
+\begin{tabular}{lcc}
 \toprule
-Contact case & {$h_w$ (kg\,m$^2$/s)} & {$I_{w,\text{target}}$ ($10^{-4}$ kg\,m$^2$)} \\
+Contact case & $h_w$ (kg\,m$^2$/s) & $I_{w,\text{target}}$ (kg\,m$^2$) \\
 \midrule
-Edge                       & 0.240 & 3.81 \\
-\textbf{Corner (critical)} & \bfseries 0.264 & \bfseries 4.20 \\
+Edge                       & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\textbf{Corner (critical)} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Mass budget.} The allocation of Table~\ref{tab:massbudget} is the
+bookkeeping side of steps 5 and 6: it is populated as components are selected
+and re-totalled on each iteration, since the total is an input to
+$I_{w,\text{target}}$ and not merely an output of the design.
+
+\begin{table}[h]
+\centering
+\caption{Mass budget (per cube), to be populated as components are selected.
+The total is an input to the inertia requirement, not only a result.}
+\label{tab:massbudget}
+\small
+\begin{tabular}{l c l}
+\toprule
+Subsystem & Allocated mass (g) & Status \\
+\midrule
+Battery pack                  & \textcolor{red}{TBD} & Drives envelope (step 1) \\
+Reaction wheels ($3\times$)   & \textcolor{red}{TBD} & Pending Sec.~\ref{sec:rw_sizing} \\
+Motors ($3\times$)            & \textcolor{red}{TBD} & Pending motor selection \\
+Inner structure / motor subframe & \textcolor{red}{TBD} & Pending CAD \\
+Outer frame / contact features & \textcolor{red}{TBD} & Pending CAD \\
+Electronics (MCU, drivers, IMU, servos) & \textcolor{red}{TBD} & Allowance \\
+Wiring / fasteners / margin   & \textcolor{red}{TBD} & Allowance \\
+\midrule
+\textbf{Total $M$}            & \textcolor{red}{\textbf{TBD}} & \textbf{Closed by iteration} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -120,92 +169,143 @@ Edge                       & 0.240 & 3.81 \\
 
 \subsubsection{3D Cube Frame}
 
-% Structural concept for the full cube: three orthogonal wheel/motor modules,
-% frame, and corner/edge contact features.
+The frame is conceived in two parts, reflecting the constraint chain of
+Section~\ref{sec:massbudget}. An \emph{inner structure} locates the three motors
+on mutually perpendicular axes through a common centre and carries the battery
+pack, the three drivers, the flight controller and the brake servos; it is the
+element that fixes the minimum internal clear volume and therefore the edge
+length $L$. An \emph{outer frame} carries the edge and corner contact features,
+protects the wheels, and reacts the motor mounting loads from the inner
+structure into the ground contact. Detailed geometry is pending CAD and follows
+the envelope closure.
 
 \subsubsection{Reaction-Wheel Sizing}
 \label{sec:rw_sizing}
 
-The reaction wheel must supply the per-wheel inertia
-$I_{w,\text{target}} = 4.20\times10^{-4}$ kg\,m$^2$ derived from the jump-up
-budget of Section~\ref{sec:jumpup_target}, while remaining light enough not to
-dominate the cube mass. Rather than adjusting inertia by scaling a solid disc,
-the wheel is built as a printed \emph{ring plus spokes} whose inertia is then
-tuned by \emph{ballast}: standard M6 steel bolts seated in hexagonal pockets
-distributed around the ring. Each pocket both removes plastic and adds steel, so
-the net inertia gain per pocket is large and the design target is reached by
-choosing how many bolts to install---a discrete, easily-adjustable knob that also
-lets the physical wheel be re-tuned after fabrication to absorb parameter
-uncertainty.
+The wheel must supply the per-wheel inertia $I_{w,\text{target}}$ demanded by
+the corner jump-up (Section~\ref{sec:jumpup_target}), at an outer diameter no
+greater than the envelope permits (step~3 of
+Table~\ref{tab:sizing_procedure}), while remaining light enough not to dominate
+the cube mass---since its own mass feeds back into $I_{w,\text{target}}$
+through $M$. These three demands pull against each other, and the wheel
+architecture is chosen so that the design can be trimmed against them after
+fabrication rather than having to be right the first time.
 
-The structure is printed in PET-CF ($\rho = 1290$ kg/m$^3$): a
-$130$~mm outer-diameter ring of $20$~mm radial width and $12$~mm thickness,
-carried by three radial spokes $10$~mm wide of the same thickness. The hub and
-motor interface are neglected in the inertia budget. The ballast is standard
-M6 steel bolts and their nuts (ISO 4032 nut: $10$~mm across flats, $5.2$~mm
-thick, $\rho = 7850$ kg/m$^3$, measured mass $2.5$~g), seated in blind
-hexagonal pockets machined to $5.2$~mm depth at the mid-width of the ring,
-leaving a $6.8$~mm plastic floor beneath each. Accounting for the plastic each
-pocket displaces, the \emph{net} contribution per installed bolt is $+1.87$~g
-of mass and $+5.70\times10^{-6}$ kg\,m$^2$ of inertia at the ring radius.
+\paragraph{Architecture: ballasted ring.} Rather than adjusting inertia by
+scaling a solid disc, the wheel is built as a printed \emph{ring plus spokes}
+whose inertia is then tuned by \emph{ballast}: standard steel bolts and nuts
+seated in blind hexagonal pockets distributed around the ring. Each pocket both
+removes plastic and adds steel at the largest available radius, so the net
+inertia gain per pocket is large, and the target is reached by choosing how many
+bolts to install. This makes wheel inertia a discrete, reversible knob: the
+physical wheel can be re-tuned in either direction after fabrication to absorb
+the parameter uncertainty that the sizing procedure necessarily carries---most
+importantly the residual uncertainty in $M$, which is not known until the build
+is complete. A solid disc offers no such adjustment.
 
-Table~\ref{tab:rw_sizing} sweeps the outer diameter, solving for the number of
-bolts needed to reach $I_{w,\text{target}}$ and checking that the pockets
-physically fit. Small wheels need so many bolts that no plastic wall survives
-between adjacent pockets; the largest diameters reach the target from the bare
-ring alone, leaving no tuning margin and costing mass.
+The design intent is that the bare printed ring supplies most of the required
+inertia and the ballast acts only as a trim, so that the bolt count sits well
+inside its feasible range in both directions.
 
-The selected design is $\mathbf{OD = 130}$~\textbf{mm with 15 bolts}: it reaches
-$4.34\times10^{-4}$ kg\,m$^2$ against the $4.20\times10^{-4}$ kg\,m$^2$ target
-($103.3\%$), leaves $11.0$~mm of plastic between adjacent pockets and at least
-$4.0$~mm of radial wall in either bolt orientation, and keeps the three-wheel
-set to $\sim\!468$~g ($33\%$ of the $1.40$~kg cube). The printed ring supplies
-$74\%$ of the total inertia and the ballast $26\%$, so the bolts act as a trim
-about a structure that nearly meets the target unaided, and the wheel can be
-adjusted in either direction after fabrication.
+\paragraph{Parameters to be fixed.} The geometry is defined by the quantities
+of Table~\ref{tab:rw_params}, all of which follow from the envelope closure of
+Section~\ref{sec:massbudget} and are recorded there once fixed.
 
 \begin{table}[h]
 \centering
-\caption{Reaction-wheel outer-diameter trade study, at
-$I_{w,\text{target}}=4.20\times10^{-4}$~kg\,m$^2$ with M6 bolt ballast.
-$N$ is the bolt count reaching the target, rounded up to a multiple of three
-for balance. Selected design in bold.}
-\label{tab:rw_sizing}
+\caption{Reaction-wheel design parameters, to be fixed once the envelope closes.}
+\label{tab:rw_params}
 \small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{S[table-format=3.0] S[table-format=3.0] S[table-format=4.1] S[table-format=1.2] S[table-format=3.1] S[table-format=4.1] l}
+\begin{tabular}{l l c}
 \toprule
-{OD (mm)} & {$N$} & {Mass (g)} & {$I_w$ ($10^{-4}$\,kg\,m$^2$)} & {$I_w$/target (\%)} & {3 wheels (g)} & {Pocket fit} \\
+Symbol & Parameter & Value \\
 \midrule
-80  & 210 & 460.7 & 4.21 & 100.1 & 1382.1 & fails --- no wall \\
-90  & 141 & 343.6 & 4.21 & 100.2 & 1030.8 & fails --- no wall \\
-100 & 96  & 271.4 & 4.27 & 101.7 & 814.3  & fails --- no wall \\
-110 & 60  & 216.1 & 4.22 & 100.5 & 648.3  & fails --- no wall \\
-120 & 36  & 183.2 & 4.33 & 103.0 & 549.7  & fails --- no wall \\
-\bfseries 130 & \bfseries 15 & \bfseries 156.0 & \bfseries 4.34 & \bfseries 103.3 & \bfseries 467.9 & \textbf{OK ($11.0$\,mm)} \\
-140 & 0   & 179.9 & 4.51 & 107.4 & 539.7  & bare ring exceeds target \\
-150 & 0   & 194.0 & 5.73 & 136.3 & 582.1  & bare ring exceeds target \\
+$D_w$      & Ring outer diameter (capped by envelope) & \textcolor{red}{TBD} \\
+$w_r$      & Ring radial width                         & \textcolor{red}{TBD} \\
+$t_r$      & Ring axial thickness                      & \textcolor{red}{TBD} \\
+$n_s, w_s$ & Spoke count and width                     & \textcolor{red}{TBD} \\
+$\rho_p$   & Printed-material density                  & \textcolor{red}{TBD} \\
+$r_b$      & Ballast radius                            & \textcolor{red}{TBD} \\
+$m_b$      & Net mass added per installed bolt         & \textcolor{red}{TBD} \\
+$\Delta I_b$ & Net inertia added per installed bolt    & \textcolor{red}{TBD} \\
+$N$        & Bolt count reaching $I_{w,\text{target}}$ & \textcolor{red}{TBD} \\
+$m_w$      & Resulting wheel mass                      & \textcolor{red}{TBD} \\
+$I_w$      & Resulting wheel inertia                   & \textcolor{red}{TBD} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\paragraph{Pocket placement.} The pockets cannot be spaced uniformly. A spoke
-occupies $\pm6.4^\circ$ where it meets the ring and a pocket $\pm6.3^\circ$ at
-the ballast radius, so a pocket centre must clear a spoke centre by
-$12.7^\circ$. A uniform $15$-pocket ring would sit at a $24.0^\circ$ pitch,
-which divides $120^\circ$ exactly and therefore places one pocket on each of
-the three spoke roots. The fifteen pockets are instead distributed as five per
-$120^\circ$ sector between spokes, spread over the $94.7^\circ$ of usable arc
-at a $23.7^\circ$ pitch. Three-fold symmetry, and hence balance, is preserved,
-and the arrangement admits at most seven per sector should additional trim be
-required.
+The ballast is characterised \emph{net} of the plastic each pocket displaces:
+$m_b$ and $\Delta I_b$ are the increments the installed bolt-and-nut adds over
+the material it replaces, evaluated at the ballast radius. Sizing then reduces
+to solving
+\[
+I_{w}(D_w, N) \;=\; I_{w,\text{ring}}(D_w) + N\,\Delta I_b \;\geq\; I_{w,\text{target}}
+\]
+for the smallest admissible $N$ at each candidate $D_w$, subject to the fit and
+mass checks below.
 
-\paragraph{Bolt retention.} At \qty{6000}{rpm} each bolt experiences
-\qty{54}{\newton} of centrifugal load at the \qty{55}{\milli\metre} ballast
-radius. The blind-pocket floor carries this in bending, but positive retention
-is required: the bolts are through-fastened with their nuts against the pocket
-floor, which both retains the ballast and preserves the post-fabrication
-adjustability that motivates the scheme.
+\paragraph{Trade study.} Table~\ref{tab:rw_sizing} is the record sheet for the
+outer-diameter sweep, populated once $I_{w,\text{target}}$ and the envelope cap
+are known. Each candidate diameter is evaluated on four criteria, and the
+selected design is the one that passes all of them with the widest trim margin:
+\begin{enumerate}
+  \item \textbf{Envelope.} $D_w$ must clear the motor subframe, the motor body
+        and the two orthogonal wheel modules inside the selected $L$.
+  \item \textbf{Inertia.} $I_w \geq I_{w,\text{target}}$, with margin for the
+        uncertainty in $M$.
+  \item \textbf{Pocket fit.} Enough plastic wall must survive between adjacent
+        pockets and radially inboard and outboard of each. Small diameters fail
+        here: they need so many bolts to reach the target that no wall remains
+        between them.
+  \item \textbf{Mass and trim margin.} The three-wheel set must stay within its
+        allocation in Table~\ref{tab:massbudget}. Diameters large enough that
+        the bare ring already exceeds the target are rejected---they leave no
+        downward trim authority and cost mass for nothing.
+\end{enumerate}
+Criteria 3 and 4 bracket the feasible range from below and above respectively,
+so the selection is the largest diameter that still requires a non-trivial bolt
+count.
+
+\begin{table}[h]
+\centering
+\caption{Reaction-wheel outer-diameter trade study. To be populated once
+$I_{w,\text{target}}$ and the envelope cap are fixed; $N$ is the bolt count
+reaching the target, rounded up to a multiple of the spoke count for balance.}
+\label{tab:rw_sizing}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{ccccccl}
+\toprule
+$D_w$ (mm) & $N$ & Mass (g) & $I_w$ (kg\,m$^2$) & $I_w$/target (\%) & 3 wheels (g) & Pocket fit \\
+\midrule
+\textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Pocket placement.} The pockets cannot in general be spaced
+uniformly. A spoke occupies a finite angular width where it meets the ring, as
+does a pocket at the ballast radius, so a pocket centre must clear a spoke
+centre by the sum of the two half-widths. Whenever the uniform pitch
+$360^\circ/N$ divides the spoke pitch exactly, a uniform arrangement places a
+pocket on every spoke root and is inadmissible. The pockets are therefore
+distributed in equal groups within each inter-spoke sector, spread over the
+usable arc that remains after the spoke exclusion zones are removed. Grouping by
+sector preserves the $n_s$-fold symmetry and hence static and dynamic balance,
+and the count per sector is chosen to leave spare positions for later trim.
+
+\paragraph{Bolt retention.} Each bolt carries a centrifugal load
+$F = m_b\,\omega_{\max}^2\,r_b$ at the design speed, reacted by the pocket floor
+in bending. Positive retention is nonetheless required, and is provided by
+through-fastening each bolt with its nut against the pocket floor. This both
+retains the ballast and preserves the removability that motivates the scheme;
+the floor thickness and the pocket depth are set so that $F$ at the final
+$\omega_{\max}$ is carried with margin.
 
 \subsection{Electrical Design}
 \label{sec:electrical}
