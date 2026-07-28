@@ -1,11 +1,4 @@
-% !TEX root = main.tex
-% Cubli project Gantt - detailed schedule, 23 Jul - 20 Aug 2026.
-% Documentation stream ends at the 3 Aug TDD deliverable; control and hardware
-% continue to the 20 Aug final presentation.
-% Requires in preamble: \usepackage{pgfgantt}
-% Timeline: day 1 = 23 Jul 2026 ... day 29 = 20 Aug 2026.
-% Colours (pfcol, ctcol, cdcol, mscol) are defined once in main.tex preamble.
-% Filled to a page and scaled to \textwidth so it cannot overflow the margins.
+
 
 \ganttset{
   hgrid, vgrid={*6{draw=none}, *1{draw=black!15}},
@@ -28,7 +21,7 @@
   \gantttitle{20}{1} \\
   \gantttitle{23}{1} \gantttitle{24}{1} \gantttitle{25}{1} \gantttitle{26}{1} \gantttitle{27}{1} \gantttitle{28}{1} \gantttitle{29}{1} \gantttitle{30}{1} \gantttitle{31}{1} \gantttitle{1}{1} \gantttitle{2}{1} \gantttitle{3}{1} \gantttitle{4}{1} \gantttitle{5}{1} \gantttitle{6}{1} \gantttitle{7}{1} \gantttitle{8}{1} \gantttitle{9}{1} \gantttitle{10}{1} \gantttitle{11}{1} \gantttitle{12}{1} \gantttitle{13}{1} \gantttitle{14}{1} \gantttitle{15}{1} \gantttitle{16}{1} \gantttitle{17}{1} \gantttitle{18}{1} \gantttitle{19}{1} \gantttitle{20}{1} \\
   % --- Investigation, Requirements & Documentation (ends 3 Aug) ---
-  \ganttgroup[group/.append style={fill=pfcol!55}]{Investigation, Requirements \& Documentation}{1}{12} \ganttnewline
+  \ganttgroup[group/.append style={fill=pfcol!55}]{Documentation}{1}{12} \ganttnewline
   \ganttbar[bar/.append style={fill=pfcol}]{A1 Literature review}{1}{3} \ganttnewline
   \ganttbar[bar/.append style={fill=pfcol}]{A2 Problem statement}{1}{2} \ganttnewline
   \ganttbar[bar/.append style={fill=pfcol}]{A3 Scope \& requirements}{2}{3} \ganttnewline
