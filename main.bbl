@@ -1,0 +1,412 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global/global}
+    \entry{gajamohan2012cubli}{inproceedings}{}{}
+      \name{author}{4}{}{%
+        {{hash=620a91f0c5096e061a832537f4b51dc5}{%
+           family={Gajamohan},
+           familyi={G\bibinitperiod},
+           given={Mohanarajah},
+           giveni={M\bibinitperiod}}}%
+        {{hash=2a378d1bef2ab744e67b1961603119e7}{%
+           family={Merz},
+           familyi={M\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod}}}%
+        {{hash=550a17bda9b6d0bcf4eee54232df3399}{%
+           family={Thommen},
+           familyi={T\bibinitperiod},
+           given={Igor},
+           giveni={I\bibinitperiod}}}%
+        {{hash=ed6aac3f87d9f74d066c55f4124be7f4}{%
+           family={D'Andrea},
+           familyi={D\bibinitperiod},
+           given={Raffaello},
+           giveni={R\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Vilamoura-Algarve, Portugal}%
+      }
+      \strng{namehash}{202d79514b41962d8df525f42685abcb}
+      \strng{fullhash}{6c77e14adc00479ca087f8ec6c4a0981}
+      \strng{fullhashraw}{6c77e14adc00479ca087f8ec6c4a0981}
+      \strng{bibnamehash}{6c77e14adc00479ca087f8ec6c4a0981}
+      \strng{authorbibnamehash}{6c77e14adc00479ca087f8ec6c4a0981}
+      \strng{authornamehash}{202d79514b41962d8df525f42685abcb}
+      \strng{authorfullhash}{6c77e14adc00479ca087f8ec6c4a0981}
+      \strng{authorfullhashraw}{6c77e14adc00479ca087f8ec6c4a0981}
+      \field{extraname}{1}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{2012 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)}
+      \field{month}{10}
+      \field{title}{The {Cubli}: A Cube that can Jump Up and Balance}
+      \field{year}{2012}
+      \field{pages}{3722\bibrangedash 3727}
+      \range{pages}{6}
+      \verb{doi}
+      \verb 10.1109/IROS.2012.6385896
+      \endverb
+    \endentry
+    \entry{gajamohan2013cubli}{inproceedings}{}{}
+      \name{author}{4}{}{%
+        {{hash=620a91f0c5096e061a832537f4b51dc5}{%
+           family={Gajamohan},
+           familyi={G\bibinitperiod},
+           given={Mohanarajah},
+           giveni={M\bibinitperiod}}}%
+        {{hash=ac562effb8990faf9522242e215ac292}{%
+           family={Muehlebach},
+           familyi={M\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod}}}%
+        {{hash=ffa4971a135fc865f21e5b012fbbcc48}{%
+           family={Widmer},
+           familyi={W\bibinitperiod},
+           given={Thomas},
+           giveni={T\bibinitperiod}}}%
+        {{hash=ed6aac3f87d9f74d066c55f4124be7f4}{%
+           family={D'Andrea},
+           familyi={D\bibinitperiod},
+           given={Raffaello},
+           giveni={R\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Zurich, Switzerland}%
+      }
+      \strng{namehash}{202d79514b41962d8df525f42685abcb}
+      \strng{fullhash}{07ddae165175ab2593534b5b14dbc928}
+      \strng{fullhashraw}{07ddae165175ab2593534b5b14dbc928}
+      \strng{bibnamehash}{07ddae165175ab2593534b5b14dbc928}
+      \strng{authorbibnamehash}{07ddae165175ab2593534b5b14dbc928}
+      \strng{authornamehash}{202d79514b41962d8df525f42685abcb}
+      \strng{authorfullhash}{07ddae165175ab2593534b5b14dbc928}
+      \strng{authorfullhashraw}{07ddae165175ab2593534b5b14dbc928}
+      \field{extraname}{2}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{2013 European Control Conference (ECC)}
+      \field{month}{7}
+      \field{title}{The {Cubli}: A Reaction Wheel Based 3D Inverted Pendulum}
+      \field{year}{2013}
+      \field{pages}{268\bibrangedash 274}
+      \range{pages}{7}
+    \endentry
+    \entry{muehlebach2017cubli}{article}{}{}
+      \name{author}{2}{}{%
+        {{hash=ac562effb8990faf9522242e215ac292}{%
+           family={Muehlebach},
+           familyi={M\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod}}}%
+        {{hash=ed6aac3f87d9f74d066c55f4124be7f4}{%
+           family={D'Andrea},
+           familyi={D\bibinitperiod},
+           given={Raffaello},
+           giveni={R\bibinitperiod}}}%
+      }
+      \strng{namehash}{9923ff11230c2430837c53dfcce92c05}
+      \strng{fullhash}{9923ff11230c2430837c53dfcce92c05}
+      \strng{fullhashraw}{9923ff11230c2430837c53dfcce92c05}
+      \strng{bibnamehash}{9923ff11230c2430837c53dfcce92c05}
+      \strng{authorbibnamehash}{9923ff11230c2430837c53dfcce92c05}
+      \strng{authornamehash}{9923ff11230c2430837c53dfcce92c05}
+      \strng{authorfullhash}{9923ff11230c2430837c53dfcce92c05}
+      \strng{authorfullhashraw}{9923ff11230c2430837c53dfcce92c05}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Transactions on Control Systems Technology}
+      \field{month}{1}
+      \field{number}{1}
+      \field{title}{Nonlinear Analysis and Control of a Reaction-Wheel-Based 3-D Inverted Pendulum}
+      \field{volume}{25}
+      \field{year}{2017}
+      \field{pages}{235\bibrangedash 246}
+      \range{pages}{12}
+      \verb{doi}
+      \verb 10.1109/TCST.2016.2549544
+      \endverb
+    \endentry
+    \entry{votel2012cmgvsrw}{inproceedings}{}{}
+      \name{author}{2}{}{%
+        {{hash=f97e73079d8e18da3f28ed4b178f85d8}{%
+           family={Votel},
+           familyi={V\bibinitperiod},
+           given={Ronny},
+           giveni={R\bibinitperiod}}}%
+        {{hash=f6d91e32fe905fabf660aad57736b463}{%
+           family={Sinclair},
+           familyi={S\bibinitperiod},
+           given={Doug},
+           giveni={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{2a1e588a708ade8ce3a7f7fc840c39af}
+      \strng{fullhash}{2a1e588a708ade8ce3a7f7fc840c39af}
+      \strng{fullhashraw}{2a1e588a708ade8ce3a7f7fc840c39af}
+      \strng{bibnamehash}{2a1e588a708ade8ce3a7f7fc840c39af}
+      \strng{authorbibnamehash}{2a1e588a708ade8ce3a7f7fc840c39af}
+      \strng{authornamehash}{2a1e588a708ade8ce3a7f7fc840c39af}
+      \strng{authorfullhash}{2a1e588a708ade8ce3a7f7fc840c39af}
+      \strng{authorfullhashraw}{2a1e588a708ade8ce3a7f7fc840c39af}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{26th Annual AIAA/USU Conference on Small Satellites}
+      \field{title}{Comparison of Control Moment Gyros and Reaction Wheels for Small Earth-Observing Satellites}
+      \field{year}{2012}
+      \verb{urlraw}
+      \verb https://digitalcommons.usu.edu/smallsat/2012/all2012/74
+      \endverb
+      \verb{url}
+      \verb https://digitalcommons.usu.edu/smallsat/2012/all2012/74
+      \endverb
+    \endentry
+    \entry{yoshimitsu1999minerva}{inproceedings}{}{}
+      \name{author}{3}{}{%
+        {{hash=e143bc9120121e07abd80bd7884b7171}{%
+           family={Yoshimitsu},
+           familyi={Y\bibinitperiod},
+           given={Tetsuo},
+           giveni={T\bibinitperiod}}}%
+        {{hash=a48e5b52050d458b598571897dffa2d4}{%
+           family={Kubota},
+           familyi={K\bibinitperiod},
+           given={Takashi},
+           giveni={T\bibinitperiod}}}%
+        {{hash=25d7f8543c63f5d29907fca6d1e15edf}{%
+           family={Nakatani},
+           familyi={N\bibinitperiod},
+           given={Ichiro},
+           giveni={I\bibinitperiod}}}%
+      }
+      \strng{namehash}{630bb70dab64f0111542251d43846c78}
+      \strng{fullhash}{630bb70dab64f0111542251d43846c78}
+      \strng{fullhashraw}{630bb70dab64f0111542251d43846c78}
+      \strng{bibnamehash}{630bb70dab64f0111542251d43846c78}
+      \strng{authorbibnamehash}{630bb70dab64f0111542251d43846c78}
+      \strng{authornamehash}{630bb70dab64f0111542251d43846c78}
+      \strng{authorfullhash}{630bb70dab64f0111542251d43846c78}
+      \strng{authorfullhashraw}{630bb70dab64f0111542251d43846c78}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 1999 IEEE International Conference on Robotics and Automation (ICRA)}
+      \field{title}{New Mobility System for Small Planetary Body Exploration}
+      \field{year}{1999}
+      \field{pages}{1404\bibrangedash 1409}
+      \range{pages}{6}
+    \endentry
+    \entry{ho2017mascot}{article}{}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{4}{}{%
+        {{hash=7f0df799b04a810b4e720b2117a90835}{%
+           family={Ho},
+           familyi={H\bibinitperiod},
+           given={Tra-Mi},
+           giveni={T\bibinithyphendelim M\bibinitperiod}}}%
+        {{hash=a941765fabc5d697422da7d8cdcafb0d}{%
+           family={Baturkin},
+           familyi={B\bibinitperiod},
+           given={Vladimir},
+           giveni={V\bibinitperiod}}}%
+        {{hash=09743cb06e0d53082f123c21db681497}{%
+           family={Grimm},
+           familyi={G\bibinitperiod},
+           given={Christian},
+           giveni={C\bibinitperiod}}}%
+        {{hash=cba445fba0018f4f8dddc8c65b52bd7d}{%
+           family={Grundmann},
+           familyi={G\bibinitperiod},
+           given={Jan\bibnamedelima Thimo},
+           giveni={J\bibinitperiod\bibinitdelim T\bibinitperiod}}}%
+      }
+      \strng{namehash}{6b8f7256e062ff33ca8300f4e5251055}
+      \strng{fullhash}{b1570cc4bfd4491ba3fc1903e85c84de}
+      \strng{fullhashraw}{b1570cc4bfd4491ba3fc1903e85c84de}
+      \strng{bibnamehash}{b1570cc4bfd4491ba3fc1903e85c84de}
+      \strng{authorbibnamehash}{b1570cc4bfd4491ba3fc1903e85c84de}
+      \strng{authornamehash}{6b8f7256e062ff33ca8300f4e5251055}
+      \strng{authorfullhash}{b1570cc4bfd4491ba3fc1903e85c84de}
+      \strng{authorfullhashraw}{b1570cc4bfd4491ba3fc1903e85c84de}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Space Science Reviews}
+      \field{title}{{MASCOT}---The Mobile Asteroid Surface Scout Onboard the {Hayabusa2} Mission}
+      \field{volume}{208}
+      \field{year}{2017}
+      \field{pages}{339\bibrangedash 374}
+      \range{pages}{36}
+      \verb{doi}
+      \verb 10.1007/s11214-016-0251-6
+      \endverb
+    \endentry
+    \entry{spiridonov2024spacehopper}{inproceedings}{}{}
+      \name{author}{15}{}{%
+        {{hash=6452adc1249c2abc94741a4113987a47}{%
+           family={Spiridonov},
+           familyi={S\bibinitperiod},
+           given={Alexander},
+           giveni={A\bibinitperiod}}}%
+        {{hash=ffb68786a5b33d240936ad19369bab30}{%
+           family={Buehler},
+           familyi={B\bibinitperiod},
+           given={Fabio},
+           giveni={F\bibinitperiod}}}%
+        {{hash=cfcccd94fae67ee76f47a3d646871767}{%
+           family={Berclaz},
+           familyi={B\bibinitperiod},
+           given={Moriz},
+           giveni={M\bibinitperiod}}}%
+        {{hash=2ce80bf93702ccf98eb81db3807aab59}{%
+           family={Schelbert},
+           familyi={S\bibinitperiod},
+           given={Valerio},
+           giveni={V\bibinitperiod}}}%
+        {{hash=bc2c47bd99c8cb39189ef311000fda9c}{%
+           family={Geurts},
+           familyi={G\bibinitperiod},
+           given={Jorit},
+           giveni={J\bibinitperiod}}}%
+        {{hash=c88db9a9a83aec4f4fc6139c4ccaa726}{%
+           family={Krasnova},
+           familyi={K\bibinitperiod},
+           given={Elena},
+           giveni={E\bibinitperiod}}}%
+        {{hash=eb8d3449b95a3ed8c2c0434f5d550cbf}{%
+           family={Steinke},
+           familyi={S\bibinitperiod},
+           given={Emma},
+           giveni={E\bibinitperiod}}}%
+        {{hash=b7518b3a6882aa579d132957b8d55d4a}{%
+           family={Toma},
+           familyi={T\bibinitperiod},
+           given={Jonas},
+           giveni={J\bibinitperiod}}}%
+        {{hash=c5e5dc566be266da7609cf0978d019be}{%
+           family={Wuethrich},
+           familyi={W\bibinitperiod},
+           given={Joschua},
+           giveni={J\bibinitperiod}}}%
+        {{hash=0b81887aff9c918ecb550ec9f587a0fe}{%
+           family={Polat},
+           familyi={P\bibinitperiod},
+           given={Recep},
+           giveni={R\bibinitperiod}}}%
+        {{hash=a7017f9251dbd4bff744a9184b746853}{%
+           family={Zimmermann},
+           familyi={Z\bibinitperiod},
+           given={Wim},
+           giveni={W\bibinitperiod}}}%
+        {{hash=7616448ecab9efec7add9284714cdaf0}{%
+           family={Arm},
+           familyi={A\bibinitperiod},
+           given={Philip},
+           giveni={P\bibinitperiod}}}%
+        {{hash=5ac29b212261fe3d27e4d51cf14a990e}{%
+           family={Rudin},
+           familyi={R\bibinitperiod},
+           given={Nikita},
+           giveni={N\bibinitperiod}}}%
+        {{hash=eec07e61c129c1fd10beaa78d009a421}{%
+           family={Kolvenbach},
+           familyi={K\bibinitperiod},
+           given={Hendrik},
+           giveni={H\bibinitperiod}}}%
+        {{hash=164607f9daa616a03bed0e2bf6531a8d}{%
+           family={Hutter},
+           familyi={H\bibinitperiod},
+           given={Marco},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{e4bd470b11a947d42f2ec4aadf5a7870}
+      \strng{fullhash}{662cec2896e91fbeaee8b71ef797118f}
+      \strng{fullhashraw}{662cec2896e91fbeaee8b71ef797118f}
+      \strng{bibnamehash}{e4bd470b11a947d42f2ec4aadf5a7870}
+      \strng{authorbibnamehash}{e4bd470b11a947d42f2ec4aadf5a7870}
+      \strng{authornamehash}{e4bd470b11a947d42f2ec4aadf5a7870}
+      \strng{authorfullhash}{662cec2896e91fbeaee8b71ef797118f}
+      \strng{authorfullhashraw}{662cec2896e91fbeaee8b71ef797118f}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{2024 IEEE International Conference on Robotics and Automation (ICRA)}
+      \field{note}{arXiv:2403.02831}
+      \field{title}{{SpaceHopper}: A Small-Scale Legged Robot for Exploring Low-Gravity Celestial Bodies}
+      \field{year}{2024}
+      \field{pages}{3464\bibrangedash 3470}
+      \range{pages}{7}
+    \endentry
+    \entry{hofer2023onewheelcubli}{article}{}{}
+      \name{author}{3}{}{%
+        {{hash=3fa9f873c98eea0b21746edafddc8b42}{%
+           family={Hofer},
+           familyi={H\bibinitperiod},
+           given={Matthias},
+           giveni={M\bibinitperiod}}}%
+        {{hash=ac562effb8990faf9522242e215ac292}{%
+           family={Muehlebach},
+           familyi={M\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod}}}%
+        {{hash=ed6aac3f87d9f74d066c55f4124be7f4}{%
+           family={D'Andrea},
+           familyi={D\bibinitperiod},
+           given={Raffaello},
+           giveni={R\bibinitperiod}}}%
+      }
+      \strng{namehash}{d96149fbd9c44ae6f0db8b6759a014af}
+      \strng{fullhash}{d96149fbd9c44ae6f0db8b6759a014af}
+      \strng{fullhashraw}{d96149fbd9c44ae6f0db8b6759a014af}
+      \strng{bibnamehash}{d96149fbd9c44ae6f0db8b6759a014af}
+      \strng{authorbibnamehash}{d96149fbd9c44ae6f0db8b6759a014af}
+      \strng{authornamehash}{d96149fbd9c44ae6f0db8b6759a014af}
+      \strng{authorfullhash}{d96149fbd9c44ae6f0db8b6759a014af}
+      \strng{authorfullhashraw}{d96149fbd9c44ae6f0db8b6759a014af}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Mechatronics}
+      \field{title}{The One-Wheel {Cubli}: A 3D Inverted Pendulum That Can Balance with a Single Reaction Wheel}
+      \field{volume}{91}
+      \field{year}{2023}
+      \field{pages}{102965}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1016/j.mechatronics.2023.102965
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

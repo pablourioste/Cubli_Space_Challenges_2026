@@ -22,12 +22,17 @@ design then iterate.
 
 \paragraph{Volume constraint.} Every subsystem---the three orthogonal
 reaction-wheel/motor modules, the battery, and the electronics stack---must fit
-inside the $180$~mm cube envelope. The binding dimension is the reaction wheel:
-its outer diameter must clear the internal frame and corner/edge contact
-features while leaving room for the motor and the servo brake. This caps the
-usable wheel diameter and, with it, the radius at which ballast mass can be
-placed---directly limiting the inertia achievable at a given wheel mass
-(Section~\ref{sec:rw_sizing}).
+inside the $180$~mm cube envelope. This envelope is not arbitrary. Sizing the
+wheels to the conservative \qty{6000}{rpm} of Section~\ref{sec:jumpup_target}
+requires $4.40\times10^{-4}$ kg\,m$^2$ per wheel; within a $150$~mm envelope
+the largest wheel that clears the frame, motor and contact features is about
+$120$~mm in diameter, yielding $2.63\times10^{-4}$ kg\,m$^2$---$17\%$ short,
+and not recoverable by ballast, which necessarily sits inboard of the ring it
+displaces. The $180$~mm envelope admits the $130$~mm wheel of
+Section~\ref{sec:rw_sizing}. Packaging independently demands it: the
+$150\times90$~mm power and signal board does not fit within a $150$~mm cube at
+any wall thickness. The binding dimension remains the reaction wheel, whose
+outer diameter caps the radius at which ballast mass can be placed.
 
 \paragraph{Mass constraint.} The cube is designed to a total mass target of
 $M = 1.45$~kg. This is not merely a logistics figure: it feeds back into the
@@ -48,7 +53,7 @@ subsystems held as allowances to be refined as components are selected.
 \toprule
 Subsystem & {Allocated mass (g)} & Status \\
 \midrule
-Reaction wheels ($3\times$)   & 395   & Sized (Sec.~\ref{sec:rw_sizing}) \\
+Reaction wheels ($3\times$)   & 519   & Sized (Sec.~\ref{sec:rw_sizing}) \\
 Motors ($3\times$)            & {TBD} & Allowance --- pending motor selection \\
 Frame / structure             & {TBD} & Allowance --- pending CAD \\
 Battery                       & {TBD} & Allowance --- pending capacity sizing \\
@@ -68,21 +73,21 @@ momentum-transfer geometry than the edge equilibrium, so for a common maximum
 wheel speed $\omega_{\max}$ it demands the greater wheel inertia. Evaluating the
 torque-limited budget of Section~\ref{sec:jumpup_target} for both cases
 (Table~\ref{tab:inertia_cases}), the corner case requires
-$3.15\times10^{-4}$ kg\,m$^2$ against $2.85\times10^{-4}$ kg\,m$^2$ for the edge
+$4.40\times10^{-4}$ kg\,m$^2$ against $3.99\times10^{-4}$ kg\,m$^2$ for the edge
 ---about $10\%$ more. The corner jump-up is therefore the critical condition,
 and the reaction wheel is sized to it; a wheel that satisfies the corner
 requirement satisfies the edge requirement with margin.
 
 \begin{table}[h]
 \centering
-\caption{Required per-wheel inertia by contact case, at $\omega_{\max}=8400$~rpm.}
+\caption{Required per-wheel inertia by contact case, at $\omega_{\max}=6000$~rpm.}
 \label{tab:inertia_cases}
 \begin{tabular}{l S[table-format=1.3] S[table-format=1.2]}
 \toprule
 Contact case & {$h_w$ (kg\,m$^2$/s)} & {$I_{w,\text{target}}$ ($10^{-4}$ kg\,m$^2$)} \\
 \midrule
-Edge                       & 0.251 & 2.85 \\
-\textbf{Corner (critical)} & \bfseries 0.277 & \bfseries 3.15 \\
+Edge                       & 0.251 & 3.99 \\
+\textbf{Corner (critical)} & \bfseries 0.277 & \bfseries 4.40 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -105,7 +110,7 @@ Edge                       & 0.251 & 2.85 \\
 \label{sec:rw_sizing}
 
 The reaction wheel must supply the per-wheel inertia
-$I_{w,\text{target}} = 3.15\times10^{-4}$ kg\,m$^2$ derived from the jump-up
+$I_{w,\text{target}} = 4.40\times10^{-4}$ kg\,m$^2$ derived from the jump-up
 budget of Section~\ref{sec:jumpup_target}, while remaining light enough not to
 dominate the cube mass. Rather than adjusting inertia by scaling a solid disc,
 the wheel is built as a printed \emph{ring plus spokes} whose inertia is then
@@ -117,56 +122,72 @@ lets the physical wheel be re-tuned after fabrication to absorb parameter
 uncertainty.
 
 The structure is printed in PET-CF ($\rho = 1290$ kg/m$^3$): a
-$120$~mm outer-diameter ring of $15$~mm radial width and $10$~mm thickness,
+$130$~mm outer-diameter ring of $20$~mm radial width and $12$~mm thickness,
 carried by three radial spokes $10$~mm wide of the same thickness. The hub and
 motor interface are neglected in the inertia budget. The ballast is standard
-M5 steel hex nuts ($\rho = 7850$ kg/m$^3$, $11$~mm across flats,
-measured mass $3.12$~g), seated in blind hexagonal pockets machined at the
-mid-width of the ring. Accounting for the plastic each pocket displaces, the
-\emph{net} contribution per installed nut is $+2.39$~g of mass and
-$+1.55\times10^{-5}$ kg\,m$^2$ of inertia at the ring radius.
+M6 steel hex nuts (ISO 4032: $10$~mm across flats, $5.2$~mm thick,
+$\rho = 7850$ kg/m$^3$, measured mass $2.5$~g), seated in blind hexagonal
+pockets machined to $5.2$~mm depth at the mid-width of the ring, leaving a
+$6.8$~mm plastic floor beneath each nut. Accounting for the plastic each
+pocket displaces, the \emph{net} contribution per installed nut is $+1.87$~g
+of mass and $+5.70\times10^{-6}$ kg\,m$^2$ of inertia at the ring radius.
 
 Table~\ref{tab:rw_sizing} sweeps the outer diameter, solving for the number of
 nuts needed to reach $I_{w,\text{target}}$ and checking that the pockets
 physically fit. Small wheels need so many nuts that no plastic wall survives
-between adjacent pockets; wheels of $140$~mm and above reach the target from the
-bare ring alone (no tuning margin, and heavier). The selected design is
-$\mathbf{OD = 120}$~\textbf{mm with 21 nuts}: it meets the inertia target with a
-$\sim\!2.5$~mm circumferential wall between pockets, splits the inertia roughly
-evenly between structure ($45\%$) and ballast ($55\%$) so the wheel can be
-trimmed in either direction, and keeps the three-wheel set to $\sim\!395$~g
-($27\%$ of the $1.45$~kg cube).
+between adjacent pockets; the largest diameters reach the target from the bare
+ring alone, leaving no tuning margin and costing mass.
+
+The selected design is $\mathbf{OD = 130}$~\textbf{mm with 18 nuts}: it reaches
+$4.51\times10^{-4}$ kg\,m$^2$ against the $4.40\times10^{-4}$ kg\,m$^2$ target
+($102.4\%$), leaves $7.2$~mm of plastic between adjacent pockets and at least
+$4.0$~mm of radial wall in either nut orientation, and keeps the three-wheel
+set to $\sim\!485$~g. The printed ring supplies $74\%$ of the total inertia
+and the ballast $23\%$, so the nuts act as a trim about a structure that
+nearly meets the target unaided, and the wheel can be adjusted in either
+direction after fabrication.
 
 \begin{table}[h]
 \centering
-\caption{Reaction-wheel outer-diameter trade study. Selected design in bold.}
+\caption{Reaction-wheel outer-diameter trade study, at
+$I_{w,\text{target}}=4.40\times10^{-4}$~kg\,m$^2$ with M6 ballast. $N$ is the
+nut count reaching the target; the selected design carries 18 for trim margin.
+Selected design in bold.}
 \label{tab:rw_sizing}
 \small
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{S[table-format=3.0] S[table-format=3.0] S[table-format=3.1] S[table-format=1.2] S[table-format=3.1] S[table-format=3.1] l}
+\begin{tabular}{S[table-format=3.0] S[table-format=3.0] S[table-format=4.1] S[table-format=1.2] S[table-format=3.1] S[table-format=4.1] l}
 \toprule
 {OD (mm)} & {$N$} & {Mass (g)} & {$I_w$ ($10^{-4}$\,kg\,m$^2$)} & {$I_w$/target (\%)} & {3 wheels (g)} & {Pocket fit} \\
 \midrule
-80  & 105 & 300.6 & 3.17 & 100.7 & 901.7 & fails --- no wall \\
-90  & 72  & 229.6 & 3.16 & 100.5 & 688.7 & fails --- no wall \\
-100 & 51  & 187.3 & 3.25 & 103.3 & 561.9 & fails --- no wall \\
-110 & 33  & 152.2 & 3.22 & 102.3 & 456.7 & fails --- thin wall \\
-\bfseries 120 & \bfseries 21 & \bfseries 131.5 & \bfseries 3.31 & \bfseries 105.2 & \bfseries 394.6 & \textbf{OK ($\sim$2.5\,mm)} \\
-130 & 9   & 110.8 & 3.23 & 102.7 & 332.4 & OK (loose) \\
-140 & 0   & {---} & 3.23 & {---} & {---} & bare ring exceeds target \\
-150 & 0   & {---} & 4.07 & {---} & {---} & bare ring exceeds target \\
+80  & 221 & 620.1 & 4.41 & 100.3 & 1860.4 & fails --- no wall \\
+90  & 148 & 449.7 & 4.41 & 100.1 & 1349.1 & fails --- no wall \\
+100 & 99  & 339.2 & 4.40 & 100.1 & 1017.7 & fails --- no wall \\
+110 & 64  & 263.8 & 4.41 & 100.3 & 791.4  & fails --- no wall \\
+120 & 37  & 208.3 & 4.40 & 100.1 & 625.0  & fails --- no wall \\
+\bfseries 130 & \bfseries 18 & \bfseries 172.9 & \bfseries 4.51 & \bfseries 102.4 & \bfseries 518.6 & \textbf{OK ($7.2$\,mm)} \\
+140 & 0   & 139.9 & 4.51 & 102.5 & 419.8  & bare ring exceeds target \\
+150 & 0   & 152.0 & 5.73 & 130.1 & 456.0  & bare ring exceeds target \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\paragraph{Radial fit caveat.} The circumferential fit is satisfied at
-$120$~mm, but the \emph{radial} fit is marginal: an $11$~mm across-flats pocket
-in a $15$~mm-wide ring leaves only $1.8$~mm of wall on each side (dropping to
-$0.9$~mm if a nut is seated corner-out), below the $2$~mm minimum-wall target.
-The ring width should therefore be increased to $\gtrsim\!17$~mm, or the nut
-orientation constrained flats-radial, in the next design iteration. This does
-not change the inertia budget, only the ring's structural robustness around the
-pockets.
+\paragraph{Pocket placement.} The pockets cannot be spaced uniformly. A spoke
+occupies $\pm6.4^\circ$ where it meets the ring and a pocket $\pm6.3^\circ$ at
+the ballast radius, so a pocket centre must clear a spoke centre by
+$12.7^\circ$; with three spokes, no uniform pitch at any usable nut count
+satisfies this. The eighteen pockets are therefore distributed as six per
+$120^\circ$ sector between spokes, spread over the $94.7^\circ$ of usable arc
+at a $18.9^\circ$ pitch. Three-fold symmetry, and hence balance, is preserved,
+and the arrangement admits at most seven per sector should additional trim be
+required.
+
+\paragraph{Nut retention.} At \qty{6000}{rpm} each nut experiences
+\qty{54}{\newton} of centrifugal load at the \qty{55}{\milli\metre} ballast
+radius. The blind-pocket floor carries this in bending, but positive retention
+is required: a cover plate over the pocket mouths is preferred to adhesive,
+since it preserves the post-fabrication adjustability that motivates the
+ballast scheme.
 
 \subsection{Electrical Design}
 \label{sec:electrical}
