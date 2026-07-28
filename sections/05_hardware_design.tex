@@ -9,8 +9,25 @@ largely parametric (Section~\ref{sec:background}).
 \subsection{System Architecture}
 \label{sec:architecture}
 
-% High-level block diagram tying together actuation, sensing, processing, and
-% power for both the 2D prototype and the 3D cube.
+Figure~\ref{fig:system_loop} shows the closed control loop that ties the four
+subsystems together. The Teensy~4.1 runs estimation and control at
+\qty{1}{\kilo\hertz} and issues torque commands over CAN-FD to three moteus-n1
+drivers, each closing a \qty{30}{\kilo\hertz} field-oriented current loop on its
+MN4006 motor. The resulting reaction torque acts on the cube body; the body's
+attitude is sensed by the BMI270 IMU and the rotor angle by the MA600 absolute
+encoder, closing the loop back to the controller. The two loops run at different
+rates by design: the fast current loop is delegated entirely to the drivers, so
+the flight controller need only meet the \qty{1}{\milli\second} outer-loop
+deadline of Section~\ref{sec:control2d}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{images/cubli_full_system_loop.png}
+\caption{System architecture and control loop. Blue: processing; green: sensing;
+orange: actuation. Rates shown are the design targets of
+Section~\ref{sec:modeling}.}
+\label{fig:system_loop}
+\end{figure}
 
 \subsection{Mass and Inertia Budget}
 \label{sec:massbudget}
@@ -24,9 +41,9 @@ design then iterate.
 reaction-wheel/motor modules, the battery, and the electronics stack---must fit
 inside the $180$~mm cube envelope. This envelope is not arbitrary. Sizing the
 wheels to the conservative \qty{6000}{rpm} of Section~\ref{sec:jumpup_target}
-requires $4.40\times10^{-4}$ kg\,m$^2$ per wheel; within a $150$~mm envelope
+requires $4.20\times10^{-4}$ kg\,m$^2$ per wheel; within a $150$~mm envelope
 the largest wheel that clears the frame, motor and contact features is about
-$120$~mm in diameter, yielding $2.63\times10^{-4}$ kg\,m$^2$---$17\%$ short,
+$120$~mm in diameter, yielding $2.63\times10^{-4}$ kg\,m$^2$---$37\%$ short,
 and not recoverable by ballast, which necessarily sits inboard of the ring it
 displaces. The $180$~mm envelope admits the $130$~mm wheel of
 Section~\ref{sec:rw_sizing}. Packaging independently demands it: the
@@ -35,7 +52,7 @@ any wall thickness. The binding dimension remains the reaction wheel, whose
 outer diameter caps the radius at which ballast mass can be placed.
 
 \paragraph{Mass constraint.} The cube is designed to a total mass target of
-$M = 1.45$~kg. This is not merely a logistics figure: it feeds back into the
+$M = 1.40$~kg. This is not merely a logistics figure: it feeds back into the
 dynamics, since the gravitational tip-over torque $\tau_g = MgL/2$ and the
 required jump-up angular momentum both scale with $M$ (Section~\ref{sec:jumpup_target}).
 A heavier cube demands a more capable brake and a larger wheel inertia, so the
@@ -53,14 +70,14 @@ subsystems held as allowances to be refined as components are selected.
 \toprule
 Subsystem & {Allocated mass (g)} & Status \\
 \midrule
-Reaction wheels ($3\times$)   & 519   & Sized (Sec.~\ref{sec:rw_sizing}) \\
+Reaction wheels ($3\times$)   & 468   & Sized (Sec.~\ref{sec:rw_sizing}) \\
 Motors ($3\times$)            & {TBD} & Allowance --- pending motor selection \\
 Frame / structure             & {TBD} & Allowance --- pending CAD \\
 Battery                       & {TBD} & Allowance --- pending capacity sizing \\
 Electronics (MCU, drivers, IMU, servo) & {TBD} & Allowance \\
 Wiring / fasteners / margin   & {TBD} & Allowance \\
 \midrule
-\textbf{Total (target)}       & \bfseries 1450 & \textbf{Design target} \\
+\textbf{Total (target)}       & \bfseries 1400 & \textbf{Design target} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -73,7 +90,7 @@ momentum-transfer geometry than the edge equilibrium, so for a common maximum
 wheel speed $\omega_{\max}$ it demands the greater wheel inertia. Evaluating the
 torque-limited budget of Section~\ref{sec:jumpup_target} for both cases
 (Table~\ref{tab:inertia_cases}), the corner case requires
-$4.40\times10^{-4}$ kg\,m$^2$ against $3.99\times10^{-4}$ kg\,m$^2$ for the edge
+$4.20\times10^{-4}$ kg\,m$^2$ against $3.81\times10^{-4}$ kg\,m$^2$ for the edge
 ---about $10\%$ more. The corner jump-up is therefore the critical condition,
 and the reaction wheel is sized to it; a wheel that satisfies the corner
 requirement satisfies the edge requirement with margin.
@@ -86,8 +103,8 @@ requirement satisfies the edge requirement with margin.
 \toprule
 Contact case & {$h_w$ (kg\,m$^2$/s)} & {$I_{w,\text{target}}$ ($10^{-4}$ kg\,m$^2$)} \\
 \midrule
-Edge                       & 0.251 & 3.99 \\
-\textbf{Corner (critical)} & \bfseries 0.277 & \bfseries 4.40 \\
+Edge                       & 0.240 & 3.81 \\
+\textbf{Corner (critical)} & \bfseries 0.264 & \bfseries 4.20 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -110,14 +127,14 @@ Edge                       & 0.251 & 3.99 \\
 \label{sec:rw_sizing}
 
 The reaction wheel must supply the per-wheel inertia
-$I_{w,\text{target}} = 4.40\times10^{-4}$ kg\,m$^2$ derived from the jump-up
+$I_{w,\text{target}} = 4.20\times10^{-4}$ kg\,m$^2$ derived from the jump-up
 budget of Section~\ref{sec:jumpup_target}, while remaining light enough not to
 dominate the cube mass. Rather than adjusting inertia by scaling a solid disc,
 the wheel is built as a printed \emph{ring plus spokes} whose inertia is then
-tuned by \emph{ballast}: standard steel hex nuts dropped into hexagonal pockets
+tuned by \emph{ballast}: standard M6 steel bolts seated in hexagonal pockets
 distributed around the ring. Each pocket both removes plastic and adds steel, so
 the net inertia gain per pocket is large and the design target is reached by
-choosing how many nuts to install---a discrete, easily-adjustable knob that also
+choosing how many bolts to install---a discrete, easily-adjustable knob that also
 lets the physical wheel be re-tuned after fabrication to absorb parameter
 uncertainty.
 
@@ -125,34 +142,34 @@ The structure is printed in PET-CF ($\rho = 1290$ kg/m$^3$): a
 $130$~mm outer-diameter ring of $20$~mm radial width and $12$~mm thickness,
 carried by three radial spokes $10$~mm wide of the same thickness. The hub and
 motor interface are neglected in the inertia budget. The ballast is standard
-M6 steel hex nuts (ISO 4032: $10$~mm across flats, $5.2$~mm thick,
-$\rho = 7850$ kg/m$^3$, measured mass $2.5$~g), seated in blind hexagonal
-pockets machined to $5.2$~mm depth at the mid-width of the ring, leaving a
-$6.8$~mm plastic floor beneath each nut. Accounting for the plastic each
-pocket displaces, the \emph{net} contribution per installed nut is $+1.87$~g
+M6 steel bolts and their nuts (ISO 4032 nut: $10$~mm across flats, $5.2$~mm
+thick, $\rho = 7850$ kg/m$^3$, measured mass $2.5$~g), seated in blind
+hexagonal pockets machined to $5.2$~mm depth at the mid-width of the ring,
+leaving a $6.8$~mm plastic floor beneath each. Accounting for the plastic each
+pocket displaces, the \emph{net} contribution per installed bolt is $+1.87$~g
 of mass and $+5.70\times10^{-6}$ kg\,m$^2$ of inertia at the ring radius.
 
 Table~\ref{tab:rw_sizing} sweeps the outer diameter, solving for the number of
-nuts needed to reach $I_{w,\text{target}}$ and checking that the pockets
-physically fit. Small wheels need so many nuts that no plastic wall survives
+bolts needed to reach $I_{w,\text{target}}$ and checking that the pockets
+physically fit. Small wheels need so many bolts that no plastic wall survives
 between adjacent pockets; the largest diameters reach the target from the bare
 ring alone, leaving no tuning margin and costing mass.
 
-The selected design is $\mathbf{OD = 130}$~\textbf{mm with 18 nuts}: it reaches
-$4.51\times10^{-4}$ kg\,m$^2$ against the $4.40\times10^{-4}$ kg\,m$^2$ target
-($102.4\%$), leaves $7.2$~mm of plastic between adjacent pockets and at least
-$4.0$~mm of radial wall in either nut orientation, and keeps the three-wheel
-set to $\sim\!485$~g. The printed ring supplies $74\%$ of the total inertia
-and the ballast $23\%$, so the nuts act as a trim about a structure that
-nearly meets the target unaided, and the wheel can be adjusted in either
-direction after fabrication.
+The selected design is $\mathbf{OD = 130}$~\textbf{mm with 15 bolts}: it reaches
+$4.34\times10^{-4}$ kg\,m$^2$ against the $4.20\times10^{-4}$ kg\,m$^2$ target
+($103.3\%$), leaves $11.0$~mm of plastic between adjacent pockets and at least
+$4.0$~mm of radial wall in either bolt orientation, and keeps the three-wheel
+set to $\sim\!468$~g ($33\%$ of the $1.40$~kg cube). The printed ring supplies
+$74\%$ of the total inertia and the ballast $26\%$, so the bolts act as a trim
+about a structure that nearly meets the target unaided, and the wheel can be
+adjusted in either direction after fabrication.
 
 \begin{table}[h]
 \centering
 \caption{Reaction-wheel outer-diameter trade study, at
-$I_{w,\text{target}}=4.40\times10^{-4}$~kg\,m$^2$ with M6 ballast. $N$ is the
-nut count reaching the target; the selected design carries 18 for trim margin.
-Selected design in bold.}
+$I_{w,\text{target}}=4.20\times10^{-4}$~kg\,m$^2$ with M6 bolt ballast.
+$N$ is the bolt count reaching the target, rounded up to a multiple of three
+for balance. Selected design in bold.}
 \label{tab:rw_sizing}
 \small
 \setlength{\tabcolsep}{4pt}
@@ -160,14 +177,14 @@ Selected design in bold.}
 \toprule
 {OD (mm)} & {$N$} & {Mass (g)} & {$I_w$ ($10^{-4}$\,kg\,m$^2$)} & {$I_w$/target (\%)} & {3 wheels (g)} & {Pocket fit} \\
 \midrule
-80  & 221 & 620.1 & 4.41 & 100.3 & 1860.4 & fails --- no wall \\
-90  & 148 & 449.7 & 4.41 & 100.1 & 1349.1 & fails --- no wall \\
-100 & 99  & 339.2 & 4.40 & 100.1 & 1017.7 & fails --- no wall \\
-110 & 64  & 263.8 & 4.41 & 100.3 & 791.4  & fails --- no wall \\
-120 & 37  & 208.3 & 4.40 & 100.1 & 625.0  & fails --- no wall \\
-\bfseries 130 & \bfseries 18 & \bfseries 172.9 & \bfseries 4.51 & \bfseries 102.4 & \bfseries 518.6 & \textbf{OK ($7.2$\,mm)} \\
-140 & 0   & 139.9 & 4.51 & 102.5 & 419.8  & bare ring exceeds target \\
-150 & 0   & 152.0 & 5.73 & 130.1 & 456.0  & bare ring exceeds target \\
+80  & 210 & 460.7 & 4.21 & 100.1 & 1382.1 & fails --- no wall \\
+90  & 141 & 343.6 & 4.21 & 100.2 & 1030.8 & fails --- no wall \\
+100 & 96  & 271.4 & 4.27 & 101.7 & 814.3  & fails --- no wall \\
+110 & 60  & 216.1 & 4.22 & 100.5 & 648.3  & fails --- no wall \\
+120 & 36  & 183.2 & 4.33 & 103.0 & 549.7  & fails --- no wall \\
+\bfseries 130 & \bfseries 15 & \bfseries 156.0 & \bfseries 4.34 & \bfseries 103.3 & \bfseries 467.9 & \textbf{OK ($11.0$\,mm)} \\
+140 & 0   & 179.9 & 4.51 & 107.4 & 539.7  & bare ring exceeds target \\
+150 & 0   & 194.0 & 5.73 & 136.3 & 582.1  & bare ring exceeds target \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -175,19 +192,20 @@ Selected design in bold.}
 \paragraph{Pocket placement.} The pockets cannot be spaced uniformly. A spoke
 occupies $\pm6.4^\circ$ where it meets the ring and a pocket $\pm6.3^\circ$ at
 the ballast radius, so a pocket centre must clear a spoke centre by
-$12.7^\circ$; with three spokes, no uniform pitch at any usable nut count
-satisfies this. The eighteen pockets are therefore distributed as six per
+$12.7^\circ$. A uniform $15$-pocket ring would sit at a $24.0^\circ$ pitch,
+which divides $120^\circ$ exactly and therefore places one pocket on each of
+the three spoke roots. The fifteen pockets are instead distributed as five per
 $120^\circ$ sector between spokes, spread over the $94.7^\circ$ of usable arc
-at a $18.9^\circ$ pitch. Three-fold symmetry, and hence balance, is preserved,
+at a $23.7^\circ$ pitch. Three-fold symmetry, and hence balance, is preserved,
 and the arrangement admits at most seven per sector should additional trim be
 required.
 
-\paragraph{Nut retention.} At \qty{6000}{rpm} each nut experiences
+\paragraph{Bolt retention.} At \qty{6000}{rpm} each bolt experiences
 \qty{54}{\newton} of centrifugal load at the \qty{55}{\milli\metre} ballast
 radius. The blind-pocket floor carries this in bending, but positive retention
-is required: a cover plate over the pocket mouths is preferred to adhesive,
-since it preserves the post-fabrication adjustability that motivates the
-ballast scheme.
+is required: the bolts are through-fastened with their nuts against the pocket
+floor, which both retains the ballast and preserves the post-fabrication
+adjustability that motivates the scheme.
 
 \subsection{Electrical Design}
 \label{sec:electrical}
@@ -203,12 +221,61 @@ responsibility, and their fabrication is the leading schedule risk.
 
 \subsubsection{Electrical Diagram}
 
-% Wiring / power-distribution diagram: battery bus, DC-DC converter, motor
-% driver, microcontroller, encoder, IMU, servo, and telemetry link.
+The power architecture is shown in Figure~\ref{fig:power_tree}. A single 6S LiPo
+pack (\qty{22.2}{\volt} nominal, \qty{3600}{\milli\ampere\hour}) feeds everything
+through one XT90 connector, behind a combined E-stop and fuse using an XT90-S
+anti-spark connector to limit inrush into the driver bulk capacitance. The bus
+then splits into two rails. The \emph{motor bus} runs at pack voltage
+(\qtyrange{22}{25}{\volt} across the discharge curve) directly into the three
+moteus drivers, with bulk capacitance rated to at least \qty{50}{\volt} to absorb
+regenerative braking transients---which are not incidental here, since the
+jump-up maneuver of Section~\ref{sec:jumpup} dumps the full wheel kinetic energy
+back into the bus. The \emph{logic rail} is derived by an LM2596 buck converter
+stepping \qty{22}{\volt} down to \qty{5}{\volt} for the Teensy, the ESP32
+telemetry link, the brake servo and the IMU. Keeping the two rails separate
+downstream of the E-stop means motor-current ripple does not reach the sensing
+and processing electronics.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{images/cubli_power_tree.png}
+\caption{Power distribution tree. A single 6S pack feeds the motor bus directly
+and the \qty{5}{\volt} logic rail through a buck converter, both behind a common
+E-stop and fuse.}
+\label{fig:power_tree}
+\end{figure}
 
 \subsection{System Integration}
 \label{sec:integration}
 
-% How the actuation, sensing, processing, and power subsystems are assembled and
-% coordinated: mechanical mounting, interface management, and the software
-% coordination that runs the control loop derived in Sec.~\ref{sec:modeling}.
+% Mechanical mounting and interface management: TBD pending CAD.
+
+\subsubsection{Onboard Software Pipeline}
+\label{sec:software_pipeline}
+
+The subsystems of Figure~\ref{fig:system_loop} are coordinated by a single
+deterministic task on the Teensy, whose structure is given in
+Figure~\ref{fig:software_pipeline}. Each \qty{1}{\milli\second} cycle executes
+the same fixed sequence: sensor ingest reads the BMI270 over SPI and the moteus
+replies over CAN; the MEKF propagates attitude on the gyro and corrects it
+against the accelerometer while estimating gyro bias; the state vector
+$x = [g_B, \omega, h]$ is assembled from the estimator output and the wheel
+speeds; the LQR law of Section~\ref{sec:control2d} evaluates $u = -Kx$ with a
+penalty on stored momentum $h$ to bleed off wheel saturation; and the resulting
+commands leave as CAN torque requests to the drivers and a PWM signal to the
+brake servo. Telemetry is tapped off the assembled state to SD and Wi-Fi outside
+the control path, so logging cannot perturb loop timing.
+
+The fixed ordering matters: with no dynamic allocation and no blocking calls, the
+worst-case cycle time is bounded by construction rather than measured after the
+fact, which is what makes the \qty{1}{\kilo\hertz} sample period of the discrete
+LQR design a design guarantee rather than an average.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.78\textwidth]{images/teensy_software_pipeline.png}
+\caption{Teensy 4.1 control-loop software pipeline. The estimator and controller
+stages implement the design of Section~\ref{sec:control2d}; telemetry is a
+side-branch off the control path.}
+\label{fig:software_pipeline}
+\end{figure}

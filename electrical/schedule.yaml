@@ -1,0 +1,768 @@
+# ============================================================================
+# Cubli - Electrical/Electronics technical schedule
+# SINGLE SOURCE OF TRUTH. SCHEDULE.md and gantt_electrical.tex are generated
+# from this file. Edit here, then regenerate both.
+# ============================================================================
+meta:
+  workstream: electrical
+  day_one: 2026-07-23          # day 1 of the project WBS numbering
+  day_last: 2026-08-20         # day 29
+  electrical_start_day: 6      # 28 Jul 2026 - 3 days behind original plan
+  electrical_start_date: 2026-07-28
+  generated_from: this file
+  regenerate:
+    - SCHEDULE.md
+    - gantt_electrical.tex
+
+# ---------------------------------------------------------------------------
+# Hardware baseline. USER DECISION 28 Jul: THREE complete actuation sets.
+# This overrides the "4 sets / permanent bench" premise in the original brief
+# and matches AUDIT.md B-3 and PROCUREMENT.md.
+# ---------------------------------------------------------------------------
+hardware_baseline:
+  actuation_sets: 3
+  spare_sets: 0
+  strategy: TRIAGE THREE, COMMISSION ONE
+  consequence: >
+    The 1-DoF rig is NOT permanent. It is built from one of the three cube
+    sets and must be STRIPPED at EL-21 during Phase 2 to populate the third
+    cube axis. There is no independent bench after 7 Aug, so Phase 3 brake
+    work runs on the cube itself. Any motor, driver or encoder failure after
+    integration loses an axis with no resupply before 20 Aug.
+  supersedes:
+    - "brief invariant: 4 complete sets, rig survives as permanent bench"
+    - "RISKS.md RE11 as written (4-set shortfall) - now the baseline, not a risk"
+
+constants:
+  Kt_Nm_per_A: 0.02513          # 9.5493 / 380
+  peak_torque_Nm: 0.402         # at 16 A
+  peak_current_A: 16
+  bus_nominal_V: 22.2
+  bus_charged_V: 25.2
+  design_wheel_speed_rad_s: 733
+  motor_phase_resistance_mohm: 194
+  encoder_max_gap_mm: 0.5
+  encoder_magnet_thickness_mm: 4
+  encoder_max_spi_cable_cm: 20
+  can_bitrate_Mbps: 5
+  can_max_stub_cm: 10
+  can_termination: "2x 60.4 ohm + 4.7 nF split, at exactly the two physical bus ends"
+  can_unpowered_resistance_ohm: 60
+  bulk_cap_uF_min: 470
+  bulk_cap_uF_max: 1000
+  bulk_cap_min_voltage_V: 50
+  forbidden: "BOM 100 uF caps are 16 V. 5 V rail ONLY. Never on the 25 V bus."
+
+gates:
+  G2: {day: 10, date: 2026-08-01, name: Modelling complete, electrical_scope: none}
+  G3: {day: 11, date: 2026-08-02, name: 1-DoF rig balances, electrical_scope: ALL 1D ELECTRICAL DONE}
+  G4: {day: 12, date: 2026-08-03, name: TDD delivered, electrical_scope: none}
+  G5: {day: 18, date: 2026-08-09, name: Cube integrated, electrical_scope: ALL 3D ELECTRICAL DONE}
+  G6: {day: 22, date: 2026-08-13, name: Edge balance, electrical_scope: "HARD KILL DATE for jump-up goal"}
+  G7: {day: 25, date: 2026-08-16, name: Corner balance + slew, electrical_scope: none}
+  G8: {day: 27, date: 2026-08-18, name: Jump-up, electrical_scope: BRAKE ELECTRICAL DONE}
+  G9: {day: 29, date: 2026-08-20, name: Final presentation, electrical_scope: none}
+
+phases:
+  - id: 1
+    prefix: EL-1
+    name: 1-DoF rig electrical
+    closes_at: G3
+    window_days: [6, 11]
+    window_dates: [2026-07-28, 2026-08-02]
+  - id: 2
+    prefix: EL-2
+    name: Extension to the 3D cube
+    closes_at: G5
+    window_days: [12, 18]
+    window_dates: [2026-08-03, 2026-08-09]
+    framing: >
+      Every task is classified as a DELTA on Phase 1: CARRIED (identical
+      hardware/config replicated, no new engineering), SCALED (same function,
+      new constraints from 1 axis -> 3), or NEW (does not exist in the rig).
+  - id: 3
+    prefix: EL-3
+    name: Brake actuation electrical
+    closes_at: G8
+    window_days: [19, 27]
+    window_dates: [2026-08-10, 2026-08-18]
+
+# ===========================================================================
+# PHASE 1 - EL-1x - 1-DoF rig electrical -> G3 (2 Aug)
+# ===========================================================================
+tasks:
+
+  - id: EL-11
+    phase: 1
+    name: Bench supply, e-stop and fuse loop
+    scope: >
+      Bench PSU set up as the only energy source for all Phase 1 work. Verify
+      the current limit trips against a known resistive load before the inline
+      fuse blows. E-stop and fuse wired into the bench loop. LiPo safety kit
+      staged (charger, safe bag, cell alarm) but the battery stays out of the
+      loop until EL-25.
+    start_day: 6
+    end_day: 6
+    start_date: 2026-07-28
+    end_date: 2026-07-28
+    depends_on: []
+    gate: G3
+    exit_criterion: >
+      PSU current limit demonstrably trips at its set value before the inline
+      fuse opens, verified on a known load. E-stop opens the bus in one action.
+    materials: "bench PSU, e-stop/anti-spark switch, inline fuse - MUST BUY (PROCUREMENT.md)"
+
+  - id: EL-12
+    phase: 1
+    name: Triage three - incoming inspection of all actuation sets
+    scope: >
+      TRIAGE THREE, COMMISSION ONE. Smoke-test all three motor/driver/encoder
+      sets early so a dead unit surfaces now, not at integration: phase
+      continuity and resistance against the 194 mOhm datasheet figure, moteus-n1
+      boot and enumerate, MA600 SPI read-back, and assign a distinct CAN ID to
+      each of the three drivers. No commissioning beyond this - one set only
+      goes forward to EL-13.
+    start_day: 6
+    end_day: 7
+    start_date: 2026-07-28
+    end_date: 2026-07-29
+    depends_on: [EL-11]
+    gate: G3
+    exit_criterion: >
+      3 of 3 sets: phase-to-phase resistance within +/-20% of 194 mOhm on all
+      three pairs, driver enumerates on CAN-FD at its assigned unique ID, MA600
+      returns a changing 16-bit angle with no error flag. Any set failing is
+      logged as a dead unit - with zero spares this is escalated same day.
+    materials: scrap-sourceable (existing BOM hardware only)
+
+  - id: EL-13
+    phase: 1
+    name: Commission one - driver, motor and phase wiring
+    scope: >
+      Fully commission set #1 through to the rig. Phase wiring terminated
+      (bullet connectors, heat-shrink), moteus-n1 firmware current, FOC
+      calibration run against the MA600, CAN ID fixed and recorded. All on the
+      current-limited bench PSU.
+    start_day: 7
+    end_day: 8
+    start_date: 2026-07-29
+    end_date: 2026-07-30
+    depends_on: [EL-12]
+    gate: G3
+    exit_criterion: >
+      moteus-n1 completes FOC calibration with no fault, holds a commanded
+      current within 5% of setpoint, and commutates the motor smoothly through
+      a full mechanical revolution in both directions.
+    materials: "bullet connectors, heat-shrink, 14 AWG - MUST BUY"
+
+  - id: EL-14
+    phase: 1
+    name: MA600 off-axis encoder installation and calibration
+    scope: >
+      Bond the ring magnet to the wheel hub. Set the air gap with a shim stack
+      to <= 0.5 mm with the chip centred on the 4 mm magnet thickness - record
+      the shim value, it becomes the assembly spec for every axis at EL-21.
+      SPI cable run kept under 20 cm. Bias trim and encoder recalibration after
+      bonding.
+    start_day: 8
+    end_day: 9
+    start_date: 2026-07-30
+    end_date: 2026-07-31
+    depends_on: [EL-13]
+    gate: G3
+    exit_criterion: >
+      Measured air gap <= 0.5 mm recorded as a numeric shim value, SPI run
+      < 20 cm, and the encoder returns monotonic absolute angle over a full
+      revolution with zero error flags across a 10-minute spin.
+    materials: scrap-sourceable (shim stock); ring magnet from BOM
+
+  - id: EL-15
+    phase: 1
+    name: 5 V rail trim and load characterisation
+    scope: >
+      LM2596 buck trimmed to 5.00 V. Characterise the rail under load to 1.5 A:
+      output voltage vs load, ripple, and module thermals logged. 1N5819
+      back-feed diode fitted. 100 uF/16 V on the 5 V rail only. Establishes the
+      rail budget before the servo is added in Phase 3.
+    start_day: 7
+    end_day: 8
+    start_date: 2026-07-29
+    end_date: 2026-07-30
+    depends_on: [EL-11]
+    gate: G3
+    exit_criterion: >
+      Rail measures 5.00 V +/-0.05 V at no load and holds >= 4.75 V at 1.5 A.
+      Ripple recorded in mV pk-pk. LM2596 case temperature logged at 1.5 A
+      steady state and stated in degC.
+    materials: LM2596 + caps + diode from BOM; heatsink scrap-sourceable
+
+  - id: EL-16
+    phase: 1
+    name: Rig harness and 2-node CAN-FD bus
+    scope: >
+      Rig harness: bench PSU to driver via XT30 (each moteus ships a mating
+      XT30, so the connector side is covered), CAN-FD from driver to Teensy 4.1.
+      2-node bus, linear, split termination 2x 60.4 ohm + 4.7 nF at the two
+      physical ends. BMI270 on I2C to the Teensy, mounted on the rig body.
+      Tethered operation - no telemetry link in Phase 1.
+    start_day: 8
+    end_day: 9
+    start_date: 2026-07-30
+    end_date: 2026-07-31
+    depends_on: [EL-13, EL-15]
+    gate: G3
+    exit_criterion: >
+      Unpowered resistance across CANH-CANL reads 60 ohm +/-3 ohm. Driver and
+      Teensy both enumerate at 5 Mbps. BMI270 returns live accel and gyro on
+      I2C at the configured ODR.
+    materials: "60.4 ohm resistors, 4.7 nF caps from BOM; JST-PH3 cable gauge is a TODO"
+
+  - id: EL-17
+    phase: 1
+    name: Parameter characterisation - Kt, J, friction, latency
+    scope: >
+      Electrical measurement setup for the four parameters the control workstream
+      needs: Kt by current step against measured torque (expect 0.02513 N m/A),
+      wheel inertia J by spin-down, viscous and Coulomb friction by coast-down,
+      and closed-loop latency by command-to-encoder timestamp. Provide the
+      instrumentation; the numbers are consumed downstream.
+    start_day: 9
+    end_day: 10
+    start_date: 2026-07-31
+    end_date: 2026-08-01
+    depends_on: [EL-14, EL-16]
+    gate: G3
+    exit_criterion: >
+      Four numbers delivered with units and uncertainty: Kt in N m/A (compare
+      against 0.02513 nominal), J in kg m^2, viscous and Coulomb friction
+      coefficients, and loop latency in ms. Each measured, not assumed.
+
+  - id: EL-18
+    phase: 1
+    name: Board outline and connector positions
+    scope: >
+      HARD 1 AUG EXTERNAL DATE - gates the C5 mass freeze and the C11 frame
+      print. Fix the three driver positions from the MA600 SPI < 20 cm rule
+      (encoder position dictates driver position, not the reverse). Fix the CAN
+      routing as a linear chain across three drivers plus Teensy with stubs
+      < 10 cm and the two physical bus ends identified. Perfboard floorplan on
+      the 15 x 9 cm double-sided board: 25 V bus in, LM2596, 5 V rail, bulk cap
+      footprint, Teensy, XIAO ESP32-C6, BMI270, servo header, CAN termination.
+      Issue outline, mounting holes, keep-out heights, connector positions and
+      exit directions.
+    start_day: 9
+    end_day: 10
+    start_date: 2026-07-31
+    end_date: 2026-08-01
+    depends_on: [EL-14, EL-15]
+    gate: G3
+    exit_criterion: >
+      Outline issued as a dimensioned drawing with every connector position and
+      exit direction fixed, on 1 Aug. Board mass estimate stated in grams
+      (TODO - requires weighing the populated proto, see open questions).
+    note: >
+      Not on the G3 critical path but carries a harder external date than G3
+      itself. If EL-14 slips, issue from the layout study with conservative
+      keep-outs rather than delay - a late outline cascades to G5.
+
+  - id: EL-19
+    phase: 1
+    name: Closed-loop rig bring-up
+    scope: >
+      Teensy + BMI270 + CAN-FD closed loop on the 1-DoF rig. Bench PSU,
+      tethered. Verify the disarm path and watchdog trip before any balance
+      attempt. Support controller tuning to a sustained balance.
+    start_day: 10
+    end_day: 11
+    start_date: 2026-08-01
+    end_date: 2026-08-02
+    depends_on: [EL-17]
+    gate: G3
+    exit_criterion: >
+      Rig balances >= 60 s unassisted on the bench PSU. Watchdog trips the
+      driver to a safe state within its configured timeout, verified by
+      deliberately stalling the control loop. Zero CAN error frames during the
+      balance run.
+
+# ===========================================================================
+# PHASE 2 - EL-2x - 3D cube delta -> G5 (9 Aug)
+# Every task classified CARRIED / SCALED / NEW against Phase 1.
+# ===========================================================================
+
+  - id: EL-21
+    phase: 2
+    delta_class: carried
+    name: Replicate actuation sets 2 and 3
+    scope: >
+      Identical to EL-13 and EL-14, replicated on the remaining two sets: phase
+      wiring, FOC calibration, CAN ID, magnet bonding and gap to the EL-14 shim
+      spec. No new engineering - the procedure is fixed and the numbers are
+      known. INCLUDES STRIPPING THE 1-DoF RIG: with three sets and no spare,
+      the rig's set becomes the third cube axis. The bench rig ceases to exist
+      at this point.
+    start_day: 12
+    end_day: 13
+    start_date: 2026-08-03
+    end_date: 2026-08-04
+    depends_on: [EL-19]
+    gate: G5
+    exit_criterion: >
+      3 of 3 sets FOC-calibrated with unique CAN IDs, each encoder at
+      <= 0.5 mm gap matching the recorded EL-14 shim value, each returning
+      monotonic angle with no error flags.
+    materials: scrap-sourceable (BOM hardware, already triaged at EL-12)
+
+  - id: EL-22
+    phase: 2
+    delta_class: scaled
+    name: 4-node CAN-FD bus
+    scope: >
+      Same protocol and bit rate as the EL-16 rig bus, but 2 nodes -> 4 (three
+      drivers + Teensy). Linear topology across the cube geometry, every stub
+      < 10 cm, split termination moved to the two new physical bus ends. Error
+      soak at full rate with all four nodes addressed.
+    start_day: 14
+    end_day: 14
+    start_date: 2026-08-05
+    end_date: 2026-08-05
+    depends_on: [EL-21, EL-24]
+    gate: G5
+    exit_criterion: >
+      Unpowered CANH-CANL reads 60 ohm +/-3 ohm with termination at the two
+      ends only. All 4 nodes enumerate at 5 Mbps. Zero error frames over a
+      30-minute soak with all three drivers commanded.
+    scaling_note: "2 nodes -> 4 nodes; bus length grows from bench to cube geometry"
+
+  - id: EL-23
+    phase: 2
+    delta_class: new
+    name: Battery power chain
+    scope: >
+      Does not exist in the 1-DoF rig, which ran entirely on a bench PSU. XT90
+      battery lead, anti-spark switch, e-stop, inline fuse sized to the bus,
+      and bulk capacitance 470-1000 uF at >= 50 V for regen transients. The
+      BOM 100 uF parts are 16 V and must never appear on this rail.
+    start_day: 12
+    end_day: 13
+    start_date: 2026-08-03
+    end_date: 2026-08-04
+    depends_on: [EL-18]
+    gate: G5
+    exit_criterion: >
+      Bulk capacitance >= 470 uF at >= 50 V fitted and its working voltage
+      verified by part marking. Fuse rating stated in amps and justified
+      against the 48 A transient. Anti-spark switch limits inrush - measured
+      peak inrush current recorded in A.
+    materials: >
+      Bulk cap SCRAP-SOURCED per invariant (470-1000 uF, >= 50 V). XT90 pair
+      in BOM. E-stop/anti-spark switch and fuse MUST BUY. If no scrap cap
+      >= 50 V is found, this task has no defined transient path - see open
+      questions.
+
+  - id: EL-24
+    phase: 2
+    delta_class: new
+    name: Power/signal distribution perfboard
+    scope: >
+      DECIDED: perfboard, not a fabricated PCB. The rig had point-to-point
+      wiring and no distribution board at all. Two ground domains with exactly
+      one star point. 5 V rail split so the servo has a separate supply from
+      the logic. 25 V bus in, LM2596, bulk cap, Teensy, XIAO ESP32-C6, BMI270,
+      servo header, CAN split termination - all to the EL-18 floorplan.
+    start_day: 12
+    end_day: 13
+    start_date: 2026-08-03
+    end_date: 2026-08-04
+    depends_on: [EL-18]
+    gate: G5
+    exit_criterion: >
+      Continuity check confirms exactly one connection between the two ground
+      domains (the star point) - measured, not assumed. Logic 5 V and servo 5 V
+      are separately isolatable. Zero 16 V-rated part present on the 25 V bus,
+      verified by inspection against part markings before power.
+
+  - id: EL-25
+    phase: 2
+    delta_class: scaled
+    name: 48 A transient handling and first battery power-on
+    scope: >
+      The rig ran one motor at up to 16 A on a current-limited PSU. The cube
+      runs three at once: 48 A transient on a battery with no current limit.
+      Verify bus sag and bulk cap behaviour under a simultaneous three-axis
+      current step. FIRST BATTERY CONNECTION of the project - anti-spark,
+      fuse verified, cell alarm on, fire-safe area, second person present.
+    start_day: 16
+    end_day: 17
+    start_date: 2026-08-07
+    end_date: 2026-08-08
+    depends_on: [EL-26, EL-27]
+    gate: G5
+    exit_criterion: >
+      Bus holds >= 20 V at the 48 A three-axis transient (measured at the
+      board, not the battery terminals). Inrush on connection recorded in A.
+      No fuse opening, no driver undervoltage fault.
+    scaling_note: "16 A single-axis on a limited PSU -> 48 A three-axis on an unlimited battery"
+
+  - id: EL-26
+    phase: 2
+    delta_class: scaled
+    name: Harness fabrication and routing
+    scope: >
+      The rig had one short bench harness. The cube needs a full distribution
+      harness: XT90 battery lead to three XT30 driver drops at 14 AWG,
+      CAN chain, three SPI runs each under 20 cm, I2C to the IMU. Routed
+      clear of the wheels, strain-relieved and labelled. Each moteus ships a
+      mating XT30 so the connector side is covered.
+    start_day: 14
+    end_day: 15
+    start_date: 2026-08-05
+    end_date: 2026-08-06
+    depends_on: [EL-22, EL-24]
+    gate: G5
+    exit_criterion: >
+      Every SPI run measured < 20 cm and every CAN stub < 10 cm, recorded per
+      axis. All power joints pull-tested. No conductor within the wheel sweep
+      envelope, verified by rotating each wheel through a full revolution
+      by hand.
+    materials: "14 AWG and 24-26 AWG wire MUST BUY; XT30 mating halves ship with the moteus"
+
+  - id: EL-27
+    phase: 2
+    delta_class: new
+    name: Telemetry link
+    scope: >
+      Untethered operation is mandatory on a balancing cube - a tether applies
+      a disturbance torque and can catch. The rig was tethered throughout, so
+      this has no Phase 1 equivalent. XIAO ESP32-C6 on the logic 5 V rail,
+      UART to the Teensy, antenna clear of the frame. TX bursts draw ~300 mA
+      and must not disturb the logic rail.
+    start_day: 15
+    end_day: 16
+    start_date: 2026-08-06
+    end_date: 2026-08-07
+    depends_on: [EL-24]
+    gate: G5
+    exit_criterion: >
+      Live telemetry received with the cube fully untethered at >= 2 m range.
+      Logic 5 V rail sag during a 300 mA TX burst measured and < 100 mV.
+      Packet loss stated as a percentage over a 5-minute run.
+
+  - id: EL-28
+    phase: 2
+    delta_class: new
+    name: Thermal behaviour of three drivers in an enclosed volume
+    scope: >
+      The rig ran one driver in free air on a bench. The cube encloses three
+      drivers plus the LM2596 in a sealed printed volume with no forced
+      convection. Characterise the steady-state rise under a representative
+      balance load and confirm nothing is thermally throttling or drifting.
+    start_day: 17
+    end_day: 18
+    start_date: 2026-08-08
+    end_date: 2026-08-09
+    depends_on: [EL-25]
+    gate: G5
+    exit_criterion: >
+      Driver and LM2596 case temperatures logged over a 20-minute balance-
+      representative load; steady state reached with every device below its
+      rated limit, and the peak value stated in degC per device.
+    scaling_note: "1 driver in free air -> 3 drivers + buck in a sealed volume"
+    materials: scrap-sourceable (thermocouple or IR thermometer)
+
+  - id: EL-29
+    phase: 2
+    delta_class: carried
+    name: Integrated power-on and axis addressability
+    scope: >
+      Same bring-up sequence as EL-19, replicated across three axes on the
+      integrated cube. Continuity and isolation before power, PSU smoke test
+      with wheels removed, PSU test with wheels at a low current limit, then
+      battery. Every MA600 re-checked at the EL-14 gap spec after mechanical
+      assembly - the gap drifts during integration.
+    start_day: 17
+    end_day: 18
+    start_date: 2026-08-08
+    end_date: 2026-08-09
+    depends_on: [EL-25, EL-26, EL-27]
+    gate: G5
+    exit_criterion: >
+      All 3 axes addressable from the flight computer on battery power, all 3
+      encoders reading within the <= 0.5 mm gap spec after assembly, IMU live,
+      telemetry up. Zero CAN error frames during a full three-axis open-loop
+      spin.
+
+# ===========================================================================
+# PHASE 3 - EL-3x - Brake actuation electrical -> G8 (18 Aug)
+# NOTE: no bench rig exists after EL-21. This work runs on the cube and must
+# never displace the G6 edge-balance gate on 13 Aug.
+# ===========================================================================
+
+  - id: EL-31
+    phase: 3
+    name: Servo isolated 5 V rail and drive circuit
+    scope: >
+      TowerPro MG92B on the isolated servo 5 V rail established at EL-24,
+      separate from the logic supply. PWM signal only from the Teensy - no
+      servo current through the logic ground. Flyback protection on the servo
+      supply. Local decoupling at the servo header.
+    start_day: 19
+    end_day: 20
+    start_date: 2026-08-10
+    end_date: 2026-08-11
+    depends_on: [EL-29]
+    gate: G8
+    exit_criterion: >
+      Servo sweeps its full commanded range on 50 Hz PWM. Logic rail
+      disturbance during a servo step measured and < 100 mV. Flyback path
+      verified present by inspection and by scoping the servo supply at
+      switch-off.
+    materials: MG92B and diode from BOM; decoupling caps from BOM
+
+  - id: EL-32
+    phase: 3
+    name: Rail stability under servo stall
+    scope: >
+      The brake holds a barrier against a spinning wheel, so the servo stalls
+      by design rather than as a fault. Verify the isolated rail survives a
+      sustained stall without browning out the logic domain or the LM2596.
+    start_day: 20
+    end_day: 21
+    start_date: 2026-08-11
+    end_date: 2026-08-12
+    depends_on: [EL-31]
+    gate: G8
+    exit_criterion: >
+      Servo stall current measured in A. Servo rail holds >= 4.75 V and the
+      logic rail holds >= 4.9 V throughout a 5-second sustained stall. LM2596
+      case temperature during stall recorded in degC.
+
+  - id: EL-33
+    phase: 3
+    name: Brake closure-time measurement
+    scope: >
+      Instrument the brake actuation timing on the scope: PWM command edge to
+      mechanical barrier contact. The jump-up needs a near-impulsive momentum
+      transfer, so closure time is a control-loop input, not a comfort number.
+    start_day: 23
+    end_day: 24
+    start_date: 2026-08-14
+    end_date: 2026-08-15
+    depends_on: [EL-32]
+    gate: G8
+    exit_criterion: >
+      Closure time from command edge to barrier contact measured in ms,
+      averaged over >= 10 actuations with the spread stated.
+    scheduling_note: >
+      Deliberately placed AFTER the G6 edge-balance gate on 13 Aug. Brake work
+      is the sacrificial item by standing decision - it never competes with
+      edge balance for time on the cube.
+
+  - id: EL-34
+    phase: 3
+    name: Spin-down brake-torque measurement
+    scope: >
+      Measure the actual braking torque from wheel spin-down against the
+      barrier: log wheel speed through the braking event and differentiate.
+      The stated 5.0 N m in the sizing work has no measured provenance
+      (AUDIT.md M-5) and beta depends on it directly - this task is where that
+      number gets a source.
+    start_day: 24
+    end_day: 26
+    start_date: 2026-08-15
+    end_date: 2026-08-17
+    depends_on: [EL-33]
+    gate: G8
+    exit_criterion: >
+      Brake torque measured in N m from logged spin-down, stated with
+      uncertainty, and compared explicitly against the 5.0 N m assumed in the
+      sizing.
+
+  - id: EL-35
+    phase: 3
+    name: Jump-up electrical support
+    scope: >
+      Support the jump-up attempt: brake circuit live, spin-up to the design
+      wheel speed of 733 rad/s, bus and rail monitoring through the release
+      transient. This is the largest single energy event the electrical system
+      sees.
+    start_day: 26
+    end_day: 27
+    start_date: 2026-08-17
+    end_date: 2026-08-18
+    depends_on: [EL-34]
+    gate: G8
+    exit_criterion: >
+      Brake commands and releases on demand through a full jump-up attempt
+      with no bus overvoltage fault and no driver fault logged. Peak bus
+      voltage during the release transient recorded in V.
+
+# ===========================================================================
+# CRITICAL PATH - computed, not asserted
+# ===========================================================================
+critical_path:
+  to_G3:
+    chain: [EL-11, EL-12, EL-13, EL-14, EL-17, EL-19]
+    path_start_day: 6
+    path_end_day: 11
+    gate_day: 11
+    float_days: 0
+    verdict: >
+      ZERO FLOAT. The chain consumes days 6-11 exactly and G3 is day 11. Any
+      slip on any of these six tasks moves G3. EL-18 (board outline, 1 Aug)
+      runs in parallel off EL-14 and is not on this path, but carries a harder
+      external date than G3 itself.
+  to_G5:
+    chain: [EL-19, EL-21, EL-22, EL-26, EL-29]
+    path_start_day: 11
+    path_end_day: 18
+    gate_day: 18
+    float_days: 0
+    verdict: >
+      ZERO FLOAT. The binding chain runs through the bus and harness, not the
+      board: EL-21 (replicate sets) -> EL-22 (4-node bus) -> EL-26 (harness)
+      -> EL-29 (integrated power-on). EL-24 (perfboard) finishes day 13 and
+      feeds EL-22 with one day to spare, so the perfboard is NOT the pinch -
+      the harness is. Phase 2 inherits every day of Phase 1 slip directly,
+      because EL-21 cannot start until the rig is proven at EL-19.
+    parallel_chain_note: >
+      EL-25 (48 A transient, days 16-17) depends on EL-26 and EL-27 and ends
+      one day before G5, giving it 1 day of float. EL-28 (thermal) runs
+      days 17-18 off EL-25 with zero float. Both converge on EL-29.
+  to_G8:
+    chain: [EL-29, EL-31, EL-32, EL-33, EL-34, EL-35]
+    path_start_day: 18
+    path_end_day: 27
+    gate_day: 27
+    float_days: 0
+    verdict: >
+      ZERO FLOAT along the chain, but the float is structured rather than
+      continuous: EL-32 ends day 21 and EL-33 starts day 23, leaving days 22
+      (G6 edge balance) deliberately clear. That two-day gap is a reserved
+      window for edge-balance support, not slack available to the brake.
+
+# ===========================================================================
+# ISSUES FOUND - reported, not silently rescheduled
+# ===========================================================================
+issues:
+  - id: I-1
+    severity: blocker
+    title: Three actuation sets kills the permanent bench rig
+    detail: >
+      The brief's invariant "4 complete sets, so the 1-DoF rig survives as a
+      permanent bench" is not achievable - you confirmed three sets. The rig is
+      built from a cube set and must be stripped at EL-21 on 3 Aug. Consequences
+      carried into this schedule: TRIAGE FOUR becomes TRIAGE THREE; there is no
+      independent bench after 3 Aug, so all Phase 3 brake work runs on the
+      flight article; and any post-integration failure of a motor, driver or
+      encoder loses an axis permanently with no resupply before 20 Aug.
+    action_required: >
+      RISKS.md RE11 needs rewriting - "fewer than four sets" is no longer a
+      risk, it is the baseline. The replacement is a no-spare risk at higher
+      severity. AUDIT.md and PLAN.md still carry the 4-set premise in places.
+
+  - id: I-2
+    severity: blocker
+    title: Zero float on all three gates
+    detail: >
+      G3, G5 and G8 each close with exactly zero float. This is a direct
+      consequence of the electrical workstream starting on day 6 rather than
+      day 3 - three days were lost before any electrical work began, and there
+      is nowhere in a 22-day remaining span to recover them. No task has been
+      compressed to manufacture slack.
+    action_required: >
+      Accept the zero float explicitly, or cut scope. The candidates for cutting
+      are named in I-3.
+
+  - id: I-3
+    severity: major
+    title: EL-18 board outline has a harder date than the gate it sits under
+    detail: >
+      EL-18 must issue on 1 Aug because it gates the C5 mass freeze and the C11
+      frame print, both of which feed G5 on 9 Aug. It sits in Phase 1 but does
+      not serve G3. It depends on EL-14 (encoder installation, ends 31 Jul),
+      which is itself on the zero-float G3 critical path. A one-day slip on
+      EL-14 therefore threatens both G3 and the 1 Aug external commitment
+      simultaneously.
+    action_required: >
+      Standing fallback: if EL-14 slips, issue EL-18 from the layout study with
+      conservative keep-outs rather than delaying it. A late outline cascades
+      further than a slightly oversized one.
+
+  - id: I-4
+    severity: major
+    title: Phase 3 brake work has no bench and cannot start before G6
+    detail: >
+      With the rig stripped, EL-31 and EL-32 run on the integrated cube during
+      10-12 Aug - the same window as edge-balance work ahead of the G6 hard
+      kill date on 13 Aug. EL-33 onward is scheduled after G6 to protect it,
+      which is why days 22 is left clear. If edge balance consumes 10-13 Aug
+      entirely, EL-31 and EL-32 slip into the G6-to-G8 window and the Phase 3
+      chain loses its structured margin.
+    action_required: >
+      Confirm the standing decision holds: brake work is sacrificial and yields
+      to edge balance without discussion on the day.
+
+  - id: I-5
+    severity: major
+    title: Bulk capacitance is scrap-sourced with no fallback
+    detail: >
+      The invariant states the 470-1000 uF >= 50 V bulk cap comes from scrap.
+      PROCUREMENT.md carries it as a to-buy line. EL-23 and therefore EL-25
+      (48 A transient, first battery power-on) have no defined transient path
+      if no suitable scrap part is found. The BOM 100 uF parts are 16 V and
+      cannot substitute.
+    action_required: >
+      Confirm a >= 50 V part exists in scrap before 3 Aug, or convert this to a
+      purchase line with the lead time checked against the 3 Aug EL-23 start.
+
+  - id: I-6
+    severity: minor
+    title: Design wheel speed differs between the brief and the repository
+    detail: >
+      The brief states a design wheel speed of 733 rad/s (7000 rpm). The
+      repository closed this on 28 Jul at 6000 rpm = 628 rad/s
+      (MOTOR_SPEED.md, AUDIT.md M-4), describing 733 rad/s as the superseded
+      BOM figure. This schedule uses the brief's 733 rad/s in EL-35 because it
+      was given as an invariant, but the two documents now disagree.
+    action_required: >
+      Confirm which figure governs. It changes the spin-up target in EL-35 and
+      the stored energy the brake must absorb in EL-34.
+
+# ===========================================================================
+# OPEN QUESTIONS - values not available, not invented
+# ===========================================================================
+open_questions:
+  - id: Q-1
+    question: Populated perfboard mass in grams
+    blocks: EL-18 exit criterion (board mass estimate)
+    state: TODO - requires weighing the populated proto
+  - id: Q-2
+    question: Does a 470-1000 uF >= 50 V capacitor exist in scrap?
+    blocks: EL-23, EL-25
+    state: TODO - see I-5
+  - id: Q-3
+    question: Bench PSU actual current ceiling
+    blocks: EL-11, and any multi-driver bench test before EL-25
+    state: TODO - spec was >= 5 A; three drivers on the bench may exceed it
+  - id: Q-4
+    question: JST-PH3 CAN cable conductor gauge
+    blocks: EL-16, EL-22 - determines whether stock cables are usable
+    state: TODO - the BOM itself flags this as unknown
+  - id: Q-5
+    question: Total 5 V load, logic domain plus servo domain
+    blocks: EL-15, EL-24, EL-32
+    state: >
+      TODO - sum Teensy + XIAO (300 mA TX burst) + BMI270 + MG92B stall
+      against the LM2596 2-3 A rating, which derates without a heatsink
+  - id: Q-6
+    question: Fuse rating for the 48 A transient
+    blocks: EL-23 exit criterion
+    state: TODO - must be justified against the measured transient, not guessed
+  - id: Q-7
+    question: MG92B stall current
+    blocks: EL-32, and the Q-5 load budget
+    state: TODO - not in the BOM; measure at EL-31 or take from datasheet
+  - id: Q-8
+    question: Design wheel speed - 733 rad/s or 628 rad/s?
+    blocks: EL-34, EL-35
+    state: TODO - see I-6, the brief and the repository disagree

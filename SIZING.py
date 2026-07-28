@@ -1,12 +1,14 @@
 """
-Cubli reaction wheel -- ring + N spokes + hexagonal nut pockets.
+Cubli reaction wheel -- ring + N spokes + hexagonal bolt pockets.
 
 Wheel seen from its spin axis = a DONUT (ring) held by N_spokes SPOKES.
   - Ring + spokes are PET-CF, all at one uniform thickness `t`.
   - Hub / axis structure is OMITTED (negligible inertia contribution).
-  - Extra inertia comes from STEEL HEX NUTS dropped into hexagonal
+  - Extra inertia comes from M6 STEEL BOLTS seated in hexagonal
     through-pockets cut in the ring.  Each pocket therefore does TWO
     things: it ADDS steel and it REMOVES plastic.
+
+  Selected design: OD = 130 mm with 15 bolts (see the sweep below).
 
 Net effect per pocket (both mass and inertia):
     dm = m_nut - m_plastic_removed
@@ -27,7 +29,7 @@ import math
 # FIXED INPUT VARIABLES  (edit here)
 # =================================================================
 # --- cube / jump-up ---
-M          = 1.45        # [kg]   total cube mass
+M          = 1.40        # [kg]   total cube mass
 L          = 0.18         # [m]    cube edge length
 g          = 9.81         # [m/s^2]
 eta        = 1.05         # [-]    energy margin (1.02-1.05 recommended)
