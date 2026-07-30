@@ -23,7 +23,7 @@ deadline of Section~\ref{sec:control2d}.
 \begin{figure}[h]
 \centering
 \includegraphics[width=\textwidth]{images/cubli_full_system_loop.png}
-\caption{System architecture and control loop. Blue: processing; green: sensing;
+\caption[System architecture and control loop]{System architecture and control loop. Blue: processing; green: sensing;
 orange: actuation. Rates shown are the design targets of
 Section~\ref{sec:modeling}.}
 \label{fig:system_loop}
@@ -88,7 +88,7 @@ rather than by any of the three in isolation.
 
 \begin{table}[h]
 \centering
-\caption{Sizing closure procedure. Steps are executed in order; a failure at
+\caption[Sizing closure procedure]{Sizing closure procedure. Steps are executed in order; a failure at
 step 4 returns to step 3 or step 1 as indicated.}
 \label{tab:sizing_procedure}
 \small
@@ -117,7 +117,7 @@ Table~\ref{tab:inertia_cases} records both once the procedure closes.
 
 \begin{table}[h]
 \centering
-\caption{Required per-wheel inertia by contact case, to be evaluated at the
+\caption[Required per-wheel inertia by contact case]{Required per-wheel inertia by contact case, to be evaluated at the
 selected $\omega_{\max}$ once the envelope is fixed.}
 \label{tab:inertia_cases}
 \begin{tabular}{lcc}
@@ -137,7 +137,7 @@ $I_{w,\text{target}}$ and not merely an output of the design.
 
 \begin{table}[h]
 \centering
-\caption{Mass budget (per cube), to be populated as components are selected.
+\caption[Mass budget (per cube)]{Mass budget (per cube), to be populated as components are selected.
 The total is an input to the inertia requirement, not only a result.}
 \label{tab:massbudget}
 \small
@@ -233,7 +233,7 @@ drawings, are in Appendix~\ref{app:cad_3d}.
 
 \begin{table}[h]
 \centering
-\caption{Controlled mechanical interfaces. Each is frozen once agreed, so that
+\caption[Controlled mechanical interfaces]{Controlled mechanical interfaces. Each is frozen once agreed, so that
 the parts on either side can be revised independently.}
 \label{tab:mech_interfaces}
 \small
@@ -342,7 +342,7 @@ count.
 
 \begin{table}[h]
 \centering
-\caption{Reaction-wheel outer-diameter trade study. To be populated once
+\caption[Reaction-wheel outer-diameter trade study]{Reaction-wheel outer-diameter trade study. To be populated once
 $I_{w,\text{target}}$ and the envelope cap are fixed; $N$ is the bolt count
 reaching the target, rounded up to a multiple of the spoke count for balance.}
 \label{tab:rw_sizing}
@@ -441,7 +441,7 @@ and derating rather than by any inability of the motor to spin faster.
 \begin{figure}[tbp]
 \centering
 \includegraphics[width=\textwidth]{images/mn4006_torque_speed_vs_current.pdf}
-\caption{Measured MN4006 (a) shaft torque and (b) rotational speed against
+\caption[Measured MN4006 shaft torque and speed against phase current]{Measured MN4006 (a) shaft torque and (b) rotational speed against
 phase current, for one motor driving four different loads. Symbols are
 measured points at throttle settings of 50, 55, 60, 65, 75, 85 and
 \qty{100}{\percent}; lines join successive points and are not fits. The
@@ -475,7 +475,7 @@ and processing electronics.
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.9\textwidth]{images/cubli_power_tree.png}
-\caption{Power distribution tree. A single 6S pack feeds the motor bus directly
+\caption[Power distribution tree]{Power distribution tree. A single 6S pack feeds the motor bus directly
 and the \qty{5}{\volt} logic rail through a buck converter, both behind a common
 E-stop and fuse.}
 \label{fig:power_tree}
@@ -490,7 +490,7 @@ the sum of typical values.
 
 \begin{table}[h]
 \centering
-\caption{Rail current budget. Measured values replace estimates during bench
+\caption[Rail current budget]{Rail current budget. Measured values replace estimates during bench
 bring-up; the \qty{5}{\volt} total is checked against the LM2596 rating, which
 derates without a heatsink.}
 \label{tab:power_budget}
@@ -524,7 +524,7 @@ not.
 
 \begin{table}[h]
 \centering
-\caption{Schematic sheet index. Each sheet is checked against the governing
+\caption[Schematic sheet index]{Schematic sheet index. Each sheet is checked against the governing
 constraint stated in its row before release.}
 \label{tab:schematic_sheets}
 \small
@@ -565,7 +565,7 @@ remains.
 
 \begin{table}[h]
 \centering
-\caption{Signal-integrity design rules and how each is verified. These are
+\caption[Signal-integrity design rules and verification]{Signal-integrity design rules and how each is verified. These are
 checked before cube closure, since all are hard to access afterwards.}
 \label{tab:signal_rules}
 \small
@@ -650,7 +650,7 @@ LQR design a design guarantee rather than an average.
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.78\textwidth]{images/teensy_software_pipeline.png}
-\caption{Teensy 4.1 control-loop software pipeline. The estimator and controller
+\caption[Teensy 4.1 control-loop software pipeline]{Teensy 4.1 control-loop software pipeline. The estimator and controller
 stages implement the design of Section~\ref{sec:control2d}; telemetry is a
 side-branch off the control path.}
 \label{fig:software_pipeline}
@@ -675,7 +675,7 @@ same code that runs on the cube.
 
 \begin{table}[h]
 \centering
-\caption{Control software layers. Each is verified by a different method, which
+\caption[Control software layers]{Control software layers. Each is verified by a different method, which
 is why the boundaries are held.}
 \label{tab:sw_layers}
 \small
@@ -702,7 +702,7 @@ switch to a different gain.
 
 \begin{table}[h]
 \centering
-\caption{Operating modes and transitions. Every mode has a disarm exit; the
+\caption[Operating modes and transitions]{Operating modes and transitions. Every mode has a disarm exit; the
 detailed conditions and hysteresis bands are in
 Appendix~\ref{app:control_algorithms}.}
 \label{tab:sw_modes}

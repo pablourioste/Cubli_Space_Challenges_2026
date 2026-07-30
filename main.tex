@@ -17,6 +17,7 @@
 \usepackage{pgfgantt}   % Gantt chart for the project schedule (Sec. 2)
 \usepackage{hyperref}
 \usepackage{caption}    % consistent, compact table/figure caption styling
+\usepackage{tocloft}    % formatting of the List of Figures / List of Tables
 \usepackage{parskip}
 \usepackage[
     backend=biber,
@@ -51,6 +52,27 @@
 % ---------- Table & caption styling ----------
 \renewcommand{\arraystretch}{1.15}                 % consistent, slightly tighter rows
 \captionsetup{font=small, labelfont=bf, skip=6pt}  % compact bold "Table N" captions
+
+% Short captions (the [..] argument of \caption) are what reaches the lists; the
+% full caption stays under the float.
+\captionsetup{list=true}
+
+% ---------- List of Figures / List of Tables ----------
+% Entries are prefixed "Figure N" / "Table N" and use dotted leaders, so the two
+% lists read like an index rather than a bare numbered column.
+\renewcommand{\cftfigpresnum}{Figure~}
+\renewcommand{\cfttabpresnum}{Table~}
+\renewcommand{\cftfigaftersnum}{.}
+\renewcommand{\cfttabaftersnum}{.}
+\setlength{\cftfignumwidth}{5.2em}
+\setlength{\cfttabnumwidth}{4.6em}
+\renewcommand{\cftfigfont}{\normalsize}
+\renewcommand{\cfttabfont}{\normalsize}
+\renewcommand{\cftfigleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cfttableader}{\cftdotfill{\cftdotsep}}
+% Both lists appear in the table of contents and are PDF bookmarked.
+\setlength{\cftbeforefigskip}{2pt}
+\setlength{\cftbeforetabskip}{2pt}
 
 % ---------- Header / Footer ----------
 \pagestyle{fancy}
@@ -103,7 +125,20 @@
 \end{titlepage}
 
 \tableofcontents
-\newpage
+\clearpage
+
+% ---------- Index of figures and tables ----------
+% Generated automatically from the \caption commands in the section files; a
+% figure or table appears here as soon as it is captioned.
+\phantomsection
+\addcontentsline{toc}{section}{\listfigurename}
+\listoffigures
+\clearpage
+
+\phantomsection
+\addcontentsline{toc}{section}{\listtablename}
+\listoftables
+\clearpage
 
 \input{sections/01_introduction}
 \clearpage
