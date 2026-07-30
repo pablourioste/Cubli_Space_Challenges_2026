@@ -400,6 +400,55 @@ The full parts list is catalogued in Appendix~\ref{app:bom}
 the reaction wheels, the frame and all printed parts are the team's design
 responsibility, and their fabrication is the leading schedule risk.
 
+\paragraph{Motor characterisation and operating envelope.}
+Figure~\ref{fig:mn4006_curves} shows measured torque and speed against phase
+current for the MN4006, taken from manufacturer bench data. The measurements
+were made with the motor driving propellers rather than reaction wheels, so
+the \emph{load} is not representative of this application --- an aerodynamic
+load rises with the square of speed, whereas a reaction wheel is an inertia
+with only bearing friction opposing it at constant speed. What does transfer
+is the motor's own electromechanical behaviour, since torque per ampere and
+back-EMF per unit speed are properties of the machine and not of what it is
+attached to. The curves are used here only in that sense: to bound the torque
+and current the actuator can be expected to deliver.
+
+Three figures relevant to the design follow from the data. First, the
+torque--current relation in Figure~\ref{fig:mn4006_curves}(a) is close to
+linear ($r = 0.97$) with an incremental slope of
+\qty{0.023}{\newton\metre\per\ampere} and a positive torque-axis intercept of
+about \qty{0.08}{\newton\metre}. The intercept is the expected signature of
+losses that do not reach the shaft --- magnetising and iron losses plus
+bearing friction --- so the useful torque per ampere is the slope, and a
+constant inferred by simply dividing torque by current at a single point
+would overstate it (that ratio runs to \qty{0.031}{\newton\metre\per\ampere}
+through the origin). Either way the \qty{5}{\newton\metre} brake torque of
+Section~\ref{sec:massbudget} is two orders of magnitude beyond what one motor
+can produce, which is why braking is a separate servo-actuated mechanism
+rather than a motor function. Second, the highest measured point reaches
+\qty{0.45}{\newton\metre} at \qty{17.5}{\ampere}, above the
+\qty{16}{\ampere} peak rating in Table~\ref{tab:bom-supplied}, and that run
+terminated on the motor's thermal limit --- so the top of this envelope is a
+short-duration capability, not a continuous one. Third, speeds cross the
+\qty{6000}{\rpm} design ceiling of Section~\ref{sec:massbudget} only under the
+lighter loads, which is consistent with that ceiling being set by bus voltage
+and derating rather than by any inability of the motor to spin faster.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{images/mn4006_torque_speed_vs_current.pdf}
+\caption{Measured MN4006 (a) shaft torque and (b) rotational speed against
+phase current, for one motor driving four different loads. Symbols are
+measured points at throttle settings of 50, 55, 60, 65, 75, 85 and
+\qty{100}{\percent}; lines join successive points and are not fits. The
+dashed line in (b) is the \qty{6000}{\rpm} reaction-wheel design ceiling of
+Section~\ref{sec:massbudget}. Loads shown are propellers, not reaction wheels:
+the curves characterise the \emph{motor}, and the load-dependent spread
+between them does not carry over to this application. Manufacturer static
+bench data; the heaviest load reached the motor thermal limit at
+\qty{100}{\percent} throttle.}
+\label{fig:mn4006_curves}
+\end{figure}
+
 \subsubsection{Power Architecture}
 \label{sec:power_arch}
 

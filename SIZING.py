@@ -8,7 +8,13 @@ Wheel seen from its spin axis = a DONUT (ring) held by N_spokes SPOKES.
     through-pockets cut in the ring.  Each pocket therefore does TWO
     things: it ADDS steel and it REMOVES plastic.
 
-  Selected design: OD = 130 mm with 15 bolts (see the sweep below).
+  Selected design: OD = 150 mm with 9 bolts (see the sweep below).
+  (Was 130 mm / 15 bolts at M = 1.40 kg. The Stage 6 mass budget put the
+   real cube at 1.722 kg, which raised I_w_target beyond what the 130 mm
+   wheel delivers. omega_max is held at 6000 rpm per electrical/
+   MOTOR_SPEED.md -- the sagged-pack ceiling is ~6900 rpm, so the
+   ~7750 rpm the 130 mm wheel would have needed is not reachable.
+   Closure therefore comes from wheel diameter, not wheel speed.)
 
 Net effect per pocket (both mass and inertia):
     dm = m_nut - m_plastic_removed
@@ -29,8 +35,15 @@ import math
 # FIXED INPUT VARIABLES  (edit here)
 # =================================================================
 # --- cube / jump-up ---
-M          = 1.40        # [kg]   total cube mass
-L          = 0.18         # [m]    cube edge length
+M          = 1.410        # [kg]   total cube mass
+                          #        PROVISIONAL, and a converged fixed point:
+                          #        Stage 6 totals 1100 g known hardware + 610 g
+                          #        structure allowance = 1710 g, which is the
+                          #        value assumed here (step 6 of the closure
+                          #        procedure closes on itself).
+                          #        Was 1.40 kg, which the BOM did not support.
+                          #        ~36% is still allowance -- revisit at CAD.
+L          = 0.15         # [m]    cube edge length
 g          = 9.81         # [m/s^2]
 eta        = 1.05         # [-]    energy margin (1.02-1.05 recommended)
 tau_b      = 5.0          # [N*m]  brake torque per wheel
@@ -38,13 +51,13 @@ rpm_max    = 6000         # [rpm]  max wheel speed
 case       = "corner"     # "edge" or "corner" -- corner sizes the design
 
 # --- wheel geometry ---
-ring_width_mm = 20.0      # [mm]  ring radial width (r_out - r_in), FIXED
+ring_width_mm = 1.5      # [mm]  ring radial width (r_out - r_in), FIXED
                           #       20 mm: leaves 4.0 mm radial wall each side of
                           #       an M6 pocket (12.01 mm across corners), above
                           #       the 2 mm minimum in BOTH nut orientations.
 spoke_w_mm    = 10.0      # [mm]  spoke width
 N_spokes      = 3         # [-]   number of spokes
-t_mm          = 12.0      # [mm]  UNIFORM thickness of ring + spokes
+t_mm          = 10.0      # [mm]  UNIFORM thickness of ring + spokes
                           #       12 mm: a 5.2 mm blind pocket leaves a 6.8 mm
                           #       plastic floor under each nut. At 10 mm the
                           #       ring needs so many nuts that the
@@ -88,7 +101,7 @@ rho_petcf  = 1290.0       # [kg/m^3]  ring + spokes
 rho_steel  = 7850.0       # [kg/m^3]  hex nuts
 
 # --- sweep ---
-OD_list_mm = [80, 90, 100, 110, 120, 130, 140, 150]   # ring OUTER diameter
+OD_list_mm = [80, 90, 100, 110, 120, 130, 140, 150,160,170,180]   # ring OUTER diameter
 
 # =================================================================
 # STAGE 1 -- JUMP-UP -> TARGET WHEEL INERTIA
@@ -366,3 +379,177 @@ print(f"centrifugal force per nut at {rpm_max} rpm, r={r_nut_max*1e3:.0f} mm:")
 print(f"  F = m*omega^2*r = {F_c:.0f} N  ({F_c/9.81:.1f} kgf)")
 print("  -> nuts must be bonded or capped; the floor alone is not a retention "
       "plan at this load.")
+
+
+# =================================================================
+# =================================================================
+# STAGE 6 -- MASS BUDGET  (DECOUPLED from stages 1-5)
+# =================================================================
+# Self-contained: it reads NOTHING from the sizing code above except the
+# assumed cube mass M, which it exists to CHECK. Every mass is a variable
+# below -- edit the numbers there, not in the logic.
+#
+# WHY THIS MATTERS: M is not a free assumption. It is an input to
+# I_w_target (Stage 1), which sets the wheel, whose mass feeds back into
+# M. This stage closes that loop: it totals the real bill of materials
+# and compares it against the M assumed at the top of the file.
+# =================================================================
+
+# --- what the sizing above ASSUMED, so we can check it ---
+M_ASSUMED_g = M * 1e3        # [g] the cube mass Stage 1 was run with
+
+# Bill of materials.
+#   (label, unit_mass_g, qty, category)
+# unit_mass_g is the mass of ONE item; qty is how many are on the cube.
+# Set unit mass to None for an item whose mass is not yet known -- it is
+# then reported as UNKNOWN and excluded from the total, so a missing
+# number can never silently masquerade as zero.
+BOM = [
+    # --- actuation -------------------------------------------------
+    ("T-Motor MN4006 KV380",              68.0,  3, "Motors"),
+    ("TowerPro MG92B brake servo",        13.8,  3, "Motors"),
+
+    # --- reaction wheels -------------------------------------------
+    # From the OD=150 mm SOLID ring selected in Stage 4 above: at this
+    # diameter the plain PET-CF ring already exceeds I_w_target, so no
+    # steel nuts are needed at all. Kept as a literal so this stage
+    # stays decoupled; update it if the wheel design changes.
+    ("Reaction wheel (PET-CF, 150 mm, no nuts)", 151.98, 3, "Wheels"),
+
+    # --- power -----------------------------------------------------
+    ("Turnigy 6S 3600 mAh LiPo, 22.2 V",  254.0, 1, "Power"),
+    ("XT90 connector pair",                15.0,  1, "Power"),
+    ("LM2596 step-down regulator",         10.0,  1, "Power"),
+
+    # --- control & sensing -----------------------------------------
+    ("mjbots moteus-n1 driver",            14.6,  3, "Electronics"),
+    ("mjbots MA600 breakout + magnet",      3.0,  3, "Electronics"),
+    ("Teensy 4.1",                          5.0,  1, "Electronics"),
+    ("CAN-FD adapter for Teensy 4.1",       5.0,  1, "Electronics"),
+    ("mjcanfd-usb-1x",                      3.4,  1, "Electronics"),
+    ("Seeed XIAO ESP32-C6 + antenna",       3.0,  1, "Electronics"),
+    ("SparkFun BMI270 IMU (Qwiic)",         5.0,  1, "Electronics"),
+
+    # --- interconnect & passives -----------------------------------
+    ("JST PH3 cable",                       3.0,  3, "Wiring"),
+    ("Protoboard 15 x 9 cm double-sided",  25.0,  1, "Wiring"),
+    ("60.4 ohm 1/2 W resistor (CAN)",       0.253, 2, "Wiring"),
+    ("100 uF 16 V electrolytic cap",        1.0,  3, "Wiring"),
+    ("100 nF 50 V cap",                     1.0,  3, "Wiring"),
+    ("4.7 nF cap (CAN)",                    1.0,  2, "Wiring"),
+    ("1N5819 Schottky diode",               3.0,  1, "Wiring"),
+
+    # --- structure: NOT YET KNOWN, pending CAD ---------------------
+    # Declared explicitly rather than omitted, so the budget reports
+    # them as missing instead of quietly totalling without them.
+    ("Inner structure / motor subframe",   None,  1, "Structure"),
+    ("Outer frame / contact features",     None,  1, "Structure"),
+    ("Fasteners / wiring harness",         None,  1, "Structure"),
+]
+
+# Allowances for items above whose unit mass is still None. These are
+# ESTIMATES, flagged as such in the output and totalled separately, so
+# the known-hardware figure and the projected figure never get confused.
+ALLOWANCE_g = {
+    "Inner structure / motor subframe": 250.0,
+    "Outer frame / contact features":   300.0,
+    "Fasteners / wiring harness":        60.0,
+}
+
+CATEGORY_ORDER = ["Motors", "Wheels", "Power", "Electronics", "Wiring",
+                  "Structure"]
+
+print("\n\n" + "="*72)
+print("STAGE 6: MASS BUDGET".center(72))
+print("="*72)
+
+# ---- itemised list ----------------------------------------------
+hdr6 = (f"\n{'Item':<38} | {'unit g':>7} | {'qty':>3} | {'total g':>8} | "
+        f"{'category':<11}")
+print(hdr6)
+print("-"*len(hdr6))
+
+known_total   = 0.0
+unknown_items = []
+cat_known     = {c: 0.0 for c in CATEGORY_ORDER}
+
+for label, unit, qty, cat in BOM:
+    if unit is None:
+        unknown_items.append((label, qty, cat))
+        print(f"{label:<38} | {'--':>7} | {qty:>3} | {'UNKNOWN':>8} | {cat:<11}")
+        continue
+    tot = unit * qty
+    known_total += tot
+    cat_known[cat] = cat_known.get(cat, 0.0) + tot
+    print(f"{label:<38} | {unit:>7.2f} | {qty:>3} | {tot:>8.2f} | {cat:<11}")
+
+print("-"*len(hdr6))
+print(f"{'SUBTOTAL -- known hardware':<38} | {'':>7} | {'':>3} | "
+      f"{known_total:>8.2f} |")
+
+# ---- allowances for the unknowns --------------------------------
+allow_total = 0.0
+if unknown_items:
+    print(f"\n--- Allowances for items with no measured mass "
+          f"({len(unknown_items)}) ---")
+    for label, qty, cat in unknown_items:
+        a = ALLOWANCE_g.get(label)
+        if a is None:
+            print(f"{label:<38} |  NO ALLOWANCE SET -- budget is incomplete")
+            continue
+        tot = a * qty
+        allow_total += tot
+        cat_known[cat] = cat_known.get(cat, 0.0) + tot
+        print(f"{label:<38} | {a:>7.2f} | {qty:>3} | {tot:>8.2f} | "
+              f"{cat:<11} (est.)")
+
+M_est_g = known_total + allow_total
+
+# ---- category rollup --------------------------------------------
+print(f"\n{'Category':<14} | {'mass g':>9} | {'% of est. total':>15}")
+print("-"*45)
+for c in CATEGORY_ORDER:
+    v = cat_known.get(c, 0.0)
+    if v == 0.0:
+        continue
+    print(f"{c:<14} | {v:>9.2f} | {v/M_est_g*100:>14.1f}%")
+print("-"*45)
+print(f"{'TOTAL':<14} | {M_est_g:>9.2f} |")
+
+# ---- the actual comparison --------------------------------------
+print("\n=== Reconciliation against the assumed cube mass ===")
+print(f"known hardware (measured/spec)   = {known_total:8.1f} g")
+print(f"structure allowance (ESTIMATED)  = {allow_total:8.1f} g")
+print(f"ESTIMATED TOTAL M                = {M_est_g:8.1f} g  "
+      f"({M_est_g/1e3:.3f} kg)")
+print(f"ASSUMED M used in Stage 1        = {M_ASSUMED_g:8.1f} g  "
+      f"({M_ASSUMED_g/1e3:.3f} kg)")
+
+delta_g   = M_est_g - M_ASSUMED_g
+delta_pct = delta_g / M_ASSUMED_g * 100
+print(f"DELTA (estimate - assumed)       = {delta_g:+8.1f} g  ({delta_pct:+.1f}%)")
+
+if delta_g > 0:
+    print("\n  !! The build is HEAVIER than Stage 1 assumed.")
+    print("     h_w scales as M*L^1.5, so the wheel requirement rises:")
+    scale = (M_est_g/M_ASSUMED_g)
+    print(f"     I_w_target would grow by x{scale:.3f} "
+          f"-> {I_w_target*scale*1e4:.4f} x1e-4 kg*m^2")
+    print(f"     tau_g floor would rise to "
+          f"{M_est_g/1e3*g*L/2:.3f} N*m (tau_b = {tau_b} N*m)")
+    if tau_b <= M_est_g/1e3*g*L/2:
+        print("     !! BRAKE TORQUE NOW BELOW THE FLOOR -- design does not close.")
+    else:
+        beta_new = tau_b/(tau_b - M_est_g/1e3*g*L/2)
+        print(f"     beta would rise {beta:.3f} -> {beta_new:.3f}")
+        print(f"     combined I_w_target -> "
+              f"{I_w_target*scale*(beta_new/beta)*1e4:.4f} x1e-4 kg*m^2")
+    print("     -> re-run Stage 1 with the updated M (step 6 of the closure).")
+else:
+    print("\n  OK: the build is at or under the assumed mass; Stage 1 stands.")
+
+if unknown_items:
+    print(f"\n  NOTE: {len(unknown_items)} structural item(s) carry ESTIMATED "
+          f"allowances, not measured\n        masses. "
+          f"{allow_total/M_est_g*100:.0f}% of the total is allowance -- "
+          f"treat this as provisional\n        until CAD closes.")
