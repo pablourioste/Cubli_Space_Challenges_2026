@@ -35,7 +35,7 @@ import math
 # FIXED INPUT VARIABLES  (edit here)
 # =================================================================
 # --- cube / jump-up ---
-M          = 1.450        # [kg]   total cube mass
+M          = 1.580        # [kg]   total cube mass
                           #        PROVISIONAL, and a converged fixed point:
                           #        Stage 6 totals 1100 g known hardware + 610 g
                           #        structure allowance = 1710 g, which is the

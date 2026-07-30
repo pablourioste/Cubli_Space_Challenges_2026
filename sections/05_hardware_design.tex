@@ -1,4 +1,4 @@
-% ================= 5. PRELIMINARY HARDWARE DESIGN =================
+﻿% ================= 5. PRELIMINARY HARDWARE DESIGN =================
 \section{Preliminary Hardware Design}
 \label{sec:hardware}
 
@@ -421,10 +421,15 @@ losses that do not reach the shaft --- magnetising and iron losses plus
 bearing friction --- so the useful torque per ampere is the slope, and a
 constant inferred by simply dividing torque by current at a single point
 would overstate it (that ratio runs to \qty{0.031}{\newton\metre\per\ampere}
-through the origin). Either way the \qty{5}{\newton\metre} brake torque of
-Section~\ref{sec:massbudget} is two orders of magnitude beyond what one motor
-can produce, which is why braking is a separate servo-actuated mechanism
-rather than a motor function. Second, the highest measured point reaches
+through the origin). Either way the motor produces at most
+\qty{0.45}{\newton\metre}, an order of magnitude below the
+\qty{5}{\newton\metre} brake torque assumed in
+Section~\ref{sec:jumpup_target}. The two are not
+alternatives: the motor stores angular momentum in the wheel over about a
+second, and the brake destroys it in tens of milliseconds, so the impulsive
+torque comes from the collision and not from the drive. This is why braking is
+a separate mechanism rather than a motor function. Second, the highest
+measured point reaches
 \qty{0.45}{\newton\metre} at \qty{17.5}{\ampere}, above the
 \qty{16}{\ampere} peak rating in Table~\ref{tab:bom-supplied}, and that run
 terminated on the motor's thermal limit --- so the top of this envelope is a
@@ -433,7 +438,7 @@ short-duration capability, not a continuous one. Third, speeds cross the
 lighter loads, which is consistent with that ceiling being set by bus voltage
 and derating rather than by any inability of the motor to spin faster.
 
-\begin{figure}[h]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\textwidth]{images/mn4006_torque_speed_vs_current.pdf}
 \caption{Measured MN4006 (a) shaft torque and (b) rotational speed against

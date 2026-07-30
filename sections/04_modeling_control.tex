@@ -183,7 +183,8 @@ a merely positive margin.
 \centering
 \caption{Torque-limited wheel-inertia target (corner case). Inputs are fixed by
 the closure procedure of Section~\ref{sec:massbudget}; the table is populated on
-each iteration.}
+each iteration. $\tau_b$ is an assumed value pending measurement, justified
+below and equivalent to a \qty{38}{\milli\second} stop at the present $h_w$.}
 \label{tab:jumpup_budget}
 \begin{tabular}{llr}
 \toprule
@@ -192,7 +193,7 @@ Symbol & Description & Value \\
 $M$                & Cube mass                    & \textcolor{red}{TBD} \\
 $L$                & Cube edge length             & \textcolor{red}{TBD} \\
 $\eta$             & Energy margin                & \textcolor{red}{TBD} \\
-$\tau_b$           & Brake torque per wheel       & \textcolor{red}{TBD} \\
+$\tau_b$           & Brake torque per wheel       & \qty{5}{\newton\metre} (assumed; see below) \\
 $\tau_g = MgL/2$   & Gravitational tip-over floor & \textcolor{red}{TBD} \\
 $\beta$            & Brake-amplification factor   & \textcolor{red}{TBD} \\
 $\omega_{\max}$    & Max wheel speed (design)     & \textcolor{red}{TBD} \\
@@ -220,6 +221,60 @@ $M$. The resulting back-EMF should remain a comfortable fraction of the usable
 bus voltage, and the electrical frequency $\omega_{\max}p/2\pi$ at $p$ pole
 pairs must sit inside the driver's commutation capability---both checks to be
 confirmed once the motor and pack are selected.
+
+\paragraph{Choice of $\tau_b$, and what it is not.} The brake torque requires
+more care than the other inputs, because the mechanism does not generate it in
+the way the symbol suggests. The brake is a servo-driven barrier struck by a
+bolt head on the wheel: the servo only \emph{holds} the barrier in the wheel's
+path, and the wheel's own momentum does the work of the collision. The servo's
+stall torque is therefore \emph{not} $\tau_b$ and need not approach it---the
+TowerPro MG92B of Table~\ref{tab:bom-supplied} is rated near
+\qty{0.29}{\newton\metre}, roughly one seventeenth of the value used in sizing,
+and this is not an inconsistency. It must resist the barrier being deflected,
+not decelerate the wheel.
+
+Because the stop is a collision rather than a friction clutch, $\tau_b$ is not
+an independent property of any component and cannot be read from a datasheet.
+It is fixed entirely by how quickly the angular momentum is destroyed,
+\begin{equation}
+\tau_b = \frac{h_w}{\Delta t},
+\label{eq:tau_b_from_dt}
+\end{equation}
+so quoting a brake torque is equivalent to asserting a stopping time. At the
+present operating point ($h_w \approx \qty{0.19}{\kilo\gram\metre\squared\per
+\second}$) the design value $\tau_b = \qty{5}{\newton\metre}$ corresponds to
+$\Delta t \approx \qty{38}{\milli\second}$. Stated that way the assumption is
+open to inspection: \qty{38}{\milli\second} is characteristic of servo travel
+rather than of a rigid impact, and a bolt head striking a printed barrier
+should arrest the wheel in a few milliseconds, implying a substantially larger
+$\tau_b$. The design value is thus expected to be conservative for
+\emph{sizing} purposes.
+
+That conservatism is deliberate, and it is asymmetric. Since
+$\beta = \tau_b/(\tau_b-\tau_g)$ falls towards unity as $\tau_b$ grows,
+underestimating the brake torque inflates the inertia requirement---the safe
+direction---while overestimating it leaves the wheel undersized. With the
+present $\tau_g$, raising $\tau_b$ from \qtyrange{5}{10}{\newton\metre} relaxes
+$I_{w,\text{target}}$ by only about \qty{12}{\percent}, whereas lowering it to
+\qty{2}{\newton\metre} inflates the requirement by roughly \qty{65}{\percent}
+and to \qty{1.5}{\newton\metre} by over \qty{150}{\percent}. The penalty for
+being wrong is concentrated almost entirely on the low side, which is why a
+mid-range value is adopted in preference to the higher figure a short impact
+would justify.
+
+One consequence must be carried into the structural design rather than left
+implicit: $\tau_b$ is also a \emph{load}. The sizing value is chosen for the
+dynamics, and the same number should not be used to size the barrier, the bolt,
+the servo bracket or the wheel spokes, since a genuine few-millisecond stop
+would put an order of magnitude more torque through that load path. Until
+measurement settles the question, the structure is to be checked against a
+short-$\Delta t$ case and the dynamics against
+$\tau_b = \qty{5}{\newton\metre}$. The measurement that closes this is the
+spin-down test of Section~\ref{sec:test_jumpup}, which should report both the
+impulse-equivalent mean $\bar\tau_b = h_w/\Delta t$, which is the sizing
+quantity, and the peak torque, which is the structural one; the two may differ
+several-fold, and the logging rate must be fast enough to resolve an event of a
+few milliseconds without smoothing the peak away.
 
 \subsection{Control Design on the 2D Model}
 \label{sec:control2d}
