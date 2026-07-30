@@ -30,7 +30,9 @@
   // Build automatically when you save a .tex file
   "latex-workshop.latex.autoBuild.run": "onSave",
 
-  // Keep the project folder tidy: move aux files into a build/ subfolder
+  // Build in place, next to main.tex. Do NOT set this to a literal like
+  // "$out" -- an unexpanded variable here creates a stray directory of that
+  // name in the repo root. Aux files are cleaned by autoClean below instead.
   "latex-workshop.latex.outDir": "%DIR%",
 
   // Auto-clean intermediate files, but keep the PDF

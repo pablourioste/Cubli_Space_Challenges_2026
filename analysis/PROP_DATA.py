@@ -29,10 +29,20 @@ before the numbers are trusted for sizing. The script prints that check
 (IMPLIED EFFICIENCY table) rather than silently assuming the data is coherent.
 """
 import math
+from pathlib import Path
 
 import matplotlib
 matplotlib.use("Agg")           # file output only; no interactive backend needed
 import matplotlib.pyplot as plt
+
+# Output locations, resolved from this file rather than the working directory,
+# so the script produces the same files whether it is run from the repo root
+# or from inside analysis/.
+HERE     = Path(__file__).resolve().parent      # analysis/
+REPO     = HERE.parent                          # repo root
+FIG_DIR  = HERE / "figures"                     # standalone, code-only figures
+TDD_DIR  = REPO / "images"                       # figures the LaTeX \input's
+FIG_DIR.mkdir(exist_ok=True)
 
 # =================================================================
 # DATA  (edit here)
@@ -270,10 +280,12 @@ fig = build_figure(
         "reached the motor thermal limit at 100 % throttle."
     ),
 )
-fig.savefig("prop_torque_rpm_vs_current.png", dpi=300, bbox_inches="tight")
-fig.savefig("prop_torque_rpm_vs_current.pdf", bbox_inches="tight")  # vector
+fig.savefig(FIG_DIR / "prop_torque_rpm_vs_current.png", dpi=300,
+            bbox_inches="tight")
+fig.savefig(FIG_DIR / "prop_torque_rpm_vs_current.pdf",
+            bbox_inches="tight")  # vector
 plt.close(fig)
-print("wrote prop_torque_rpm_vs_current.png / .pdf")
+print(f"wrote {FIG_DIR.name}/prop_torque_rpm_vs_current.png / .pdf")
 
 # --- TDD figure: motor characterisation only ----------------------------
 # The thrust panel is DELIBERATELY OMITTED here. The Cubli drives reaction
@@ -284,11 +296,12 @@ print("wrote prop_torque_rpm_vs_current.png / .pdf")
 # document already asserts. LaTeX supplies the caption, so none is drawn.
 fig = build_figure(["torque", "speed"], figsize=(6.6, 3.2),
                    mark_omega_max=True)
-fig.savefig("images/mn4006_torque_speed_vs_current.pdf", bbox_inches="tight")
-fig.savefig("images/mn4006_torque_speed_vs_current.png", dpi=300,
+fig.savefig(TDD_DIR / "mn4006_torque_speed_vs_current.pdf",
+            bbox_inches="tight")
+fig.savefig(TDD_DIR / "mn4006_torque_speed_vs_current.png", dpi=300,
             bbox_inches="tight")
 plt.close(fig)
-print("wrote images/mn4006_torque_speed_vs_current.pdf / .png")
+print(f"wrote {TDD_DIR.name}/mn4006_torque_speed_vs_current.pdf / .png")
 
 
 # =================================================================

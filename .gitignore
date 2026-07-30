@@ -1,5 +1,6 @@
 # LaTeX build artifacts
 *.aux
+*.bbl
 *.bcf
 *.blg
 *.fdb_latexmk
@@ -11,3 +12,12 @@
 *.toc
 *.lof
 *.lot
+
+# Stray output dir created when latex-workshop's %DIR% failed to expand
+$out/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/

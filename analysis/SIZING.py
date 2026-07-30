@@ -35,7 +35,7 @@ import math
 # FIXED INPUT VARIABLES  (edit here)
 # =================================================================
 # --- cube / jump-up ---
-M          = 1.410        # [kg]   total cube mass
+M          = 1.450        # [kg]   total cube mass
                           #        PROVISIONAL, and a converged fixed point:
                           #        Stage 6 totals 1100 g known hardware + 610 g
                           #        structure allowance = 1710 g, which is the
@@ -414,7 +414,7 @@ BOM = [
     # diameter the plain PET-CF ring already exceeds I_w_target, so no
     # steel nuts are needed at all. Kept as a literal so this stage
     # stays decoupled; update it if the wheel design changes.
-    ("Reaction wheel (PET-CF, 150 mm, no nuts)", 151.98, 3, "Wheels"),
+    ("Reaction wheel (PET-CF, 150 mm, no nuts)", 110.98, 3, "Wheels"),
 
     # --- power -----------------------------------------------------
     ("Turnigy 6S 3600 mAh LiPo, 22.2 V",  254.0, 1, "Power"),
