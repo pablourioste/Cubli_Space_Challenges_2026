@@ -16,30 +16,30 @@
 \bottomrule\endfoot
 \multicolumn{5}{@{}l}{\textbf{Investigation, Requirements \& Documentation}} \\
 \midrule
-A1 & Literature \& state of the art & Review the ETH Cubli, the one-wheel Cubli, CubeSat ADCS practice and the hopping-mission precedents & Suvanna \textit{(+Dejan)} & 23--25 Jul \\
-A2 & Problem statement \& framing & Lock the ADCS application narrative that the rest of the document refers back to & Dejan & 23--24 Jul \\
-A3 & Scope \& requirements & Define scope and build the requirements table (functional, performance, design constraint) with verification methods & Dejan \textit{(+Pablo)} & 24--25 Jul \\
-A4 & Milestones \& roles & Prototype staging, binary gate criteria, and a one-page RACI of owners & Dejan & 23--25 Jul \\
+A1 & Literature \& state of the art & Review the ETH Cubli, the one-wheel Cubli, CubeSat ADCS practice and the hopping-mission precedents & Suvanna \textit{(+Deyan)} & 23--25 Jul \\
+A2 & Problem statement \& framing & Lock the ADCS application narrative that the rest of the document refers back to & Deyan & 23--24 Jul \\
+A3 & Scope \& requirements & Define scope and build the requirements table (functional, performance, design constraint) with verification methods & Deyan \textit{(+Pablo)} & 24--25 Jul \\
+A4 & Milestones \& roles & Prototype staging, binary gate criteria, and a one-page RACI of owners & Deyan & 23--25 Jul \\
 A5 & Risk register & Trigger, impact, owner and mitigation for the leading risks & All \textit{(+Pablo)} & 28--29 Jul \\
-A6 & 1-DoF equations of motion & Lagrangian derivation of the reaction-wheel pendulum with friction terms & Dejan \textit{(+Andrea)} & 24--25 Jul \\
-A7 & 3D equations of motion & Coupled three-wheel dynamics for the edge and corner pivots & Dejan \textit{(+Andrea)} & 27--28 Jul \\
-A8 & Linearisation \& controllability & Equilibria, linear models, controllability/observability checks & Dejan \textit{(+Andrea)} & 29 Jul \\
-A9 & Jump-up sizing \& budget & Energy-method wheel sizing and the parametric mass/inertia/CoM budget & Dejan \textit{(+Andrea)} & 30 Jul--1 Aug \\
+A6 & 1-DoF equations of motion & Lagrangian derivation of the reaction-wheel pendulum with friction terms & Deyan \textit{(+Andrea)} & 24--25 Jul \\
+A7 & 3D equations of motion & Coupled three-wheel dynamics for the edge and corner pivots & Deyan \textit{(+Andrea)} & 27--28 Jul \\
+A8 & Linearisation \& controllability & Equilibria, linear models, controllability/observability checks & Deyan \textit{(+Andrea)} & 29 Jul \\
+A9 & Jump-up sizing \& budget & Energy-method wheel sizing and the parametric mass/inertia/CoM budget & Deyan \textit{(+Andrea)} & 30 Jul--1 Aug \\
 A10 & TDD draft (all sections) & Every member drafts their section; placeholder figures acceptable & All & 25--26 Jul \\
 A11 & TDD deepen + S1 data & Full modelling and control sections; insert the rig evidence and measured parameters & All & 1--2 Aug \\
-A12 & TDD assemble \& submit & Consistency pass, figures, references, submission of the deliverable & All \textit{(Dejan integrates)} & 3 Aug \\
+A12 & TDD assemble \& submit & Consistency pass, figures, references, submission of the deliverable & All \textit{(Deyan integrates)} & 3 Aug \\
 \midrule
 \multicolumn{5}{@{}l}{\textbf{Control \& Software}} \\
 \midrule
 B1 & Sim environment + plant & Simulation setup and the 1-DoF plant, validated by energy conservation & Andrea & 23--24 Jul \\
-B2 & LQR design (1-DoF, sim) & Tune the regulator and sweep robustness to inertia error, delay and saturation & Andrea \textit{(+Dejan)} & 26--27 Jul \\
+B2 & LQR design (1-DoF, sim) & Tune the regulator and sweep robustness to inertia error, delay and saturation & Andrea \textit{(+Deyan)} & 26--27 Jul \\
 B3 & State estimator & Complementary tilt filter with injected noise and bias in simulation & Nicc & 27--28 Jul \\
 B4 & Firmware \& comms & Firmware architecture, loop rates, and the CAN-FD command/reply layer & Nicc \textit{(+Pablo)} & 24--28 Jul \\
 B5 & Sensor drivers + cal & IMU and encoder drivers, gyro/accel calibration and the lever-arm correction & Nicc \textit{(+Andrea)} & 28--30 Jul \\
 B6 & Safety \& mode logic & Watchdog, tilt-limit disarm, wheel-speed cap and the mode state machine & Nicc \textit{(+Andrea)} & 30--31 Jul \\
 B7 & S1 bring-up \& balance & Port estimator and LQR to the rig and tune to a stable balance & Nicc \textit{(+Andrea)} & 31 Jul--2 Aug \\
 B8 & System identification & Measure $K_t$, wheel inertia, friction and loop latency on the rig & Andrea \textit{(+Nicc)} & 1--2 Aug \\
-B9 & 3D model + LQR (sim) & 3D plant and the edge/corner regulators with the CAD inertia tensor & Andrea \textit{(+Dejan)} & 3--6 Aug \\
+B9 & 3D model + LQR (sim) & 3D plant and the edge/corner regulators with the CAD inertia tensor & Andrea \textit{(+Deyan)} & 3--6 Aug \\
 B10 & EKF / MEKF estimator & 3D estimator with gyro-bias states; characterise the yaw drift & Nicc \textit{(+Andrea)} & 6--8 Aug \\
 B11 & Edge balance (S2a) & Retune the edge controller on the assembled cube; log disturbance recovery & Andrea \textit{(+Nicc)} & 10--13 Aug \\
 B12 & Corner balance + slew (S2b/c) & Coupled three-axis corner balance and a commanded slew; report ADCS metrics & Andrea \textit{(+Nicc)} & 14--16 Aug \\
