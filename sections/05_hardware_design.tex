@@ -125,7 +125,7 @@ selected $\omega_{\max}$ once the envelope is fixed.}
 Contact case & $h_w$ (kg\,m$^2$/s) & $I_{w,\text{target}}$ (kg\,m$^2$) \\
 \midrule
 Edge                       & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\textbf{Corner (critical)} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\textbf{Corner (critical)} & $0.198$ & $3.15\times 10^{-4}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -145,15 +145,15 @@ The total is an input to the inertia requirement, not only a result.}
 \toprule
 Subsystem & Allocated mass (g) & Status \\
 \midrule
-Battery pack                  & \textcolor{red}{TBD} & Drives envelope (step 1) \\
-Reaction wheels ($3\times$)   & \textcolor{red}{TBD} & Pending Sec.~\ref{sec:rw_sizing} \\
-Motors ($3\times$)            & \textcolor{red}{TBD} & Pending motor selection \\
-Inner structure / motor subframe & \textcolor{red}{TBD} & Pending CAD \\
-Outer frame / contact features & \textcolor{red}{TBD} & Pending CAD \\
-Electronics (MCU, drivers, IMU, servos) & \textcolor{red}{TBD} & Allowance \\
-Wiring / fasteners / margin   & \textcolor{red}{TBD} & Allowance \\
+Battery pack                  & 254 & Drives envelope (step 1) \\
+Reaction wheels ($3\times$)   & 109 ($3\times$) & Sized (Sec.~\ref{sec:rw_sizing}) \\
+Motors ($3\times$)            & 68 ($3\times$) & Drives reaction wheels \\
+Inner structure / motor subframe & 120 & Transfers torque \\
+Outer frame / contact features & 350 & Sized \\
+Electronics (MCU, drivers, IMU, servos) & 150 & Allowance \\
+Wiring / fasteners / margin   & 100 & Allowance \\
 \midrule
-\textbf{Total $M$}            & \textcolor{red}{\textbf{TBD}} & \textbf{Closed by iteration} \\
+\textbf{Total $M$}            & 1505 & \textbf{Closed by iteration} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -208,8 +208,7 @@ paper cannot silently fail to close in the CAD.
 The single-face rig is the first article built and the bench on which the
 parameters of Table~\ref{tab:params} are measured. Its structure is a
 3D-printed plate sized to one cube face, a central motor and wheel mount, a
-corner bearing defining the single rotational degree of freedom, and the servo
-brake. Detailed geometry and the drawing set are in
+corner bearing defining the single rotational degree of freedom, and encoders and other hardware. Note that the servo (brake system) is not included in the 2D prototype as its purpose is validating the control loop on a more well-understood problem. Detailed geometry and the drawing set are in
 Appendix~\ref{app:cad_2d}.
 
 \subsubsection{3D Cube Frame}
@@ -217,7 +216,7 @@ Appendix~\ref{app:cad_2d}.
 The frame is conceived in two parts, reflecting the constraint chain of
 Section~\ref{sec:massbudget}. An \emph{inner structure} locates the three motors
 on mutually perpendicular axes through a common centre and carries the battery
-pack, the three drivers, the flight controller and the brake servos; it is the
+pack, the three drivers, the flight controller, inertial measurement unit, and the brake servos; it is the
 element that fixes the minimum internal clear volume and therefore the edge
 length $L$. An \emph{outer frame} carries the edge and corner contact features,
 protects the wheels, and reacts the motor mounting loads from the inner
@@ -293,17 +292,17 @@ Section~\ref{sec:massbudget} and are recorded there once fixed.
 \toprule
 Symbol & Parameter & Value \\
 \midrule
-$D_w$      & Ring outer diameter (capped by envelope) & \textcolor{red}{TBD} \\
-$w_r$      & Ring radial width                         & \textcolor{red}{TBD} \\
-$t_r$      & Ring axial thickness                      & \textcolor{red}{TBD} \\
-$n_s, w_s$ & Spoke count and width                     & \textcolor{red}{TBD} \\
-$\rho_p$   & Printed-material density                  & \textcolor{red}{TBD} \\
-$r_b$      & Ballast radius                            & \textcolor{red}{TBD} \\
-$m_b$      & Net mass added per installed bolt         & \textcolor{red}{TBD} \\
-$\Delta I_b$ & Net inertia added per installed bolt    & \textcolor{red}{TBD} \\
-$N$        & Bolt count reaching $I_{w,\text{target}}$ & \textcolor{red}{TBD} \\
-$m_w$      & Resulting wheel mass                      & \textcolor{red}{TBD} \\
-$I_w$      & Resulting wheel inertia                   & \textcolor{red}{TBD} \\
+$D_w$      & Ring outer diameter (capped by envelope) & $13$ cm \\
+$w_r$      & Ring radial width                         & $1.5$ cm \\
+$t_r$      & Ring axial thickness                      & $1$ cm \\
+$n_s, w_s$ & Spoke count and width                     & $3$, $1$ cm \\
+$\rho_p$   & Printed-material density                  & $1290$ $g/cm^3$ \\
+$r_b$      & Ballast radius                            & $5.75$ cm \\
+$m_b$      & Net mass added per installed bolt         & $2.5$ g \\
+$\Delta I_b$ & Net inertia added per installed bolt    & $8.27\times 10^{-6}$ $kg m^2$  \\
+$N$        & Bolt count reaching $I_{w,\text{target}}$ & $15$ \\
+$m_w$      & Resulting wheel mass                      & $109$ g \\
+$I_w$      & Resulting wheel inertia                   & $3.4\times 10^{-4}$ $kg m^2$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -317,11 +316,20 @@ I_{w}(D_w, N) \;=\; I_{w,\text{ring}}(D_w) + N\,\Delta I_b \;\geq\; I_{w,\text{t
 \]
 for the smallest admissible $N$ at each candidate $D_w$, subject to the fit and
 mass checks below.
+\paragraph{Sizing calculator.} Rather than sweep a single geometric variable
+over a fine grid, we built a parametric calculator relating all of the variables in Table~\ref{tab:rw_params} to the final mass and moment of inertia of a single reaction wheel. 
 
-\paragraph{Trade study.} Table~\ref{tab:rw_sizing} is the record sheet for the
-outer-diameter sweep, populated once $I_{w,\text{target}}$ and the envelope cap
-are known. Each candidate diameter is evaluated on four criteria, and the
-selected design is the one that passes all of them with the widest trim margin:
+outer diameter
+$D_w$, bolt count $N$, and pocket wall dimensions to the four governing
+outputs below. $I_w$, mass, and pocket wall thickness are coupled through
+$D_w$ and $N$ --- increasing $N$ raises $I_w$ but starves the walls between
+pockets, while increasing $D_w$ raises $I_w$ but also raises the bare-ring
+mass --- so no single variable can be optimized in isolation. We converged
+on the selected design by iterating the calculator: proposing a candidate
+$(D_w, N)$, checking it against the four criteria below, and adjusting until
+a combination cleared all four with margin. Each candidate is evaluated as
+follows, and the selected design is the one that passes all four with the
+widest trim margin:
 \begin{enumerate}
   \item \textbf{Envelope.} $D_w$ must clear the motor subframe, the motor body
         and the two orthogonal wheel modules inside the selected $L$.
@@ -336,31 +344,10 @@ selected design is the one that passes all of them with the widest trim margin:
         the bare ring already exceeds the target are rejected---they leave no
         downward trim authority and cost mass for nothing.
 \end{enumerate}
-Criteria 3 and 4 bracket the feasible range from below and above respectively,
-so the selection is the largest diameter that still requires a non-trivial bolt
-count.
-
-\begin{table}[h]
-\centering
-\caption[Reaction-wheel outer-diameter trade study]{Reaction-wheel outer-diameter trade study. To be populated once
-$I_{w,\text{target}}$ and the envelope cap are fixed; $N$ is the bolt count
-reaching the target, rounded up to a multiple of the spoke count for balance.}
-\label{tab:rw_sizing}
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{ccccccl}
-\toprule
-$D_w$ (mm) & $N$ & Mass (g) & $I_w$ (kg\,m$^2$) & $I_w$/target (\%) & 3 wheels (g) & Pocket fit \\
-\midrule
-\textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
+Criteria 3 and 4 still bracket the feasible range from below and above, so
+convergence was fast: a couple of trial points on each side of the bracket
+were enough to locate the largest diameter that still requires a non-trivial
+bolt count.
 \paragraph{Pocket placement.} The pockets cannot in general be spaced
 uniformly. A spoke occupies a finite angular width where it meets the ring, as
 does a pocket at the ballast radius, so a pocket centre must clear a spoke
