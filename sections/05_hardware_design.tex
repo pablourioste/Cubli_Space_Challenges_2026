@@ -208,8 +208,9 @@ paper cannot silently fail to close in the CAD.
 The single-face rig is the first article built and the bench on which the
 parameters of Table~\ref{tab:params} are measured. Its structure is a
 3D-printed plate sized to one cube face, a central motor and wheel mount, a
-corner bearing defining the single rotational degree of freedom, and encoders and other hardware. Note that the servo (brake system) is not included in the 2D prototype as its purpose is validating the control loop on a more well-understood problem. Detailed geometry and the drawing set are in
-Appendix~\ref{app:cad_2d}.
+corner bearing defining the single rotational degree of freedom, and encoders and other hardware. Note that the servo (brake system) is not included in the 2D prototype as its purpose is validating the control loop on a more well-understood problem. Detailed geometry and the drawing set are in Appendix~\ref{app:cad_2d}. 
+
+
 
 \subsubsection{3D Cube Frame}
 
@@ -457,7 +458,7 @@ derates without a heatsink.}
 \toprule
 Load & Rail & Typical (mA) & Worst case (mA) & Basis \\
 \midrule
-Teensy 4.1                & \qty{5}{\volt}  & \textcolor{red}{TBD} & 5 & Datasheet \\
+Teensy 4.1                & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Datasheet \\
 XIAO ESP32-C6 telemetry   & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & TX burst governs \\
 BMI270 IMU                & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Datasheet \\
 MG92B brake servo         & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Stall current governs \\

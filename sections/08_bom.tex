@@ -54,9 +54,7 @@ Ref & Item & Qty\textsuperscript{a} & Key specifications & Function \\
 \endfoot
 \bottomrule
 \multicolumn{5}{@{}p{15.5cm}@{}}{\footnotesize\textsuperscript{a}\,Quantity per
-assembled cube; motors, drivers and encoders are 3 each. A fourth actuation set
-(motor + moteus-n1 + MA600) is retained on the 1-DoF bench rig (S1) throughout the
-build, so four of each are procured.}\\
+assembled cube; motors, drivers and encoders are 3 each.}\\
 \endlastfoot
 % --- Actuation ---
 \multicolumn{5}{@{}l}{\textbf{Actuation}}\\
@@ -77,15 +75,15 @@ build, so four of each are procured.}\\
 4 & Teensy 4.1 & 1 & \qty{600}{\mega\hertz} Cortex-M7 + FPU; native CAN-FD (CAN3); \qty{5}{\volt} supply & Flight computer: estimator + control law \\
 5 & CAN-FD adapter (Teensy 4.1) & 1 & CAN-FD transceiver, logic-level $\rightarrow$ differential; \qty{5}{\mega\bit\per\second} & Bus transceiver for the MCU \\
 6 & mjbots mjcanfd-usb-1x & 1 & USB $\leftrightarrow$ CAN-FD, \qty{5}{\mega\bit\per\second} & Bench interface (calibration, tuning) \\
-7 & JST-PH3 CAN cables & ${\ge}4$ & \textcolor{red}{TODO: conductor gauge / current rating not in source}; 3-conductor daisy-chain & CAN bus interconnect \\
+7 & JST-PH3 CAN cables & ${\ge}4$ & \qty{2}{\ampere} AC/DC; 3-conductor daisy-chain & CAN bus interconnect \\
 8 & Seeed XIAO ESP32-C6 + antenna & 1 & Wi-Fi; \qty{3.3}{\volt} UART to MCU; TX burst ${\approx}\,\qty{300}{\milli\ampere}$ & Wi-Fi telemetry / command link \\
-9 & \qty{60.4}{\ohm} \qty{0.5}{\watt} resistor & 4 & split termination, $2\times\qty{60.4}{\ohm}\approx\qty{120}{\ohm}$ bus impedance & CAN bus termination \\
+9 & \qty{60.4}{\ohm} \qty{0.5}{\watt} resistor & 4 & Split termination, $2\times\qty{60.4}{\ohm}\approx\qty{120}{\ohm}$ bus impedance & CAN bus termination \\
 17 & \qty{4.7}{\nano\farad} capacitor & 2 & common-mode filter, bus midpoint to ground & CAN split-termination filter \\
 \midrule
 % --- Power ---
 \multicolumn{5}{@{}l}{\textbf{Power}}\\
 \midrule
-12 & Turnigy 6S LiPo (XT90) & 1 & \qty{22.2}{\volt} nom / \qty{25.2}{\volt} charged; \qty{3600}{\milli\ampere\hour}; \num{60}C; ${\approx}\,\qty{80}{\watt\hour}$; ${\approx}\,\qty{600}{\gram}$ & Primary energy store \\
+12 & Turnigy 6S LiPo (XT90) & 1 & \qty{22.2}{\volt}; \qty{1550}{\milli\ampere\hour}; \num{150}C; ${\approx}\,\qty{35}{\watt\hour}$; ${\approx}\,\qty{254}{\gram}$ & Primary energy store \\
 13 & LM2596 buck module & 1 & step-down to \qty{5.0}{\volt}; rated \qtyrange{2}{3}{\ampere} (derates without heatsink) & \qty{5}{\volt} logic rail \\
 14 & XT90 connector pair & 1--2 & rated ${\approx}\,\qty{90}{\ampere}$ & Battery power connector \\
 15 & \qty{100}{\micro\farad} \qty{16}{\volt} electrolytic & 2--4 & \qty{16}{\volt} part --- \qty{5}{\volt} rail only & \qty{5}{\volt}-rail bulk reservoir \\
