@@ -15,6 +15,61 @@ meta:
     - gantt_electrical.tex
 
 # ---------------------------------------------------------------------------
+# RE-BASELINE 31 Jul 2026 (day 9). Verified status, not assumed.
+#
+# The task dates below this block are the ORIGINAL plan and are retained as the
+# historical record. The consolidated re-baselined schedule now lives in
+# sections/02_project_organization_gantt.tex and _tasks.tex, which supersede
+# the EL-* dates here for planning purposes.
+#
+# Verified at the re-baseline review:
+#   - Wiring scheme and component placement designed and issued (was E1/EL-11
+#     scope). COMPLETE.
+#   - NO bench electrical testing has taken place. EL-11 through EL-16 are all
+#     unstarted as physical work.
+#   - First powered bring-up is targeted for Sunday 2 Aug (project day 11):
+#     5 V rail soldered and trimmed, driver mounted and commutating, MA600
+#     encoder mounted and reading. Open loop only, bench PSU, no control loop.
+#   - 3 Aug (day 12) is reserved as a recovery buffer for that bring-up.
+#   - Parameter measurement (EL-17) moves to the week of 3-9 Aug; it was
+#     confirmed blocked until further bench testing has been done.
+#   - Reaction-wheel rings are printed but NOT ballasted: the M6 fasteners that
+#     form the ballast stations have not arrived. Wheel completion and balancing
+#     are held pending that delivery.
+#   - A second procurement round follows the 3D frame freeze, to be ordered by
+#     5 Aug.
+#   - Cube edge length RESOLVED at 150 mm (closes open question on the
+#     150 vs 180 mm conflict).
+# ---------------------------------------------------------------------------
+rebaseline:
+  date: 2026-07-31
+  day: 9
+  supersedes_task_dates: true
+  consolidated_schedule_in:
+    - sections/02_project_organization_tasks.tex
+    - sections/02_project_organization_gantt.tex
+  verified_status:
+    design_issued: [wiring scheme, component placement]
+    bench_testing_done: none
+    first_powered_bringup: 2026-08-02
+    bringup_recovery_buffer: 2026-08-03
+    parameter_measurement_window: [2026-08-07, 2026-08-09]
+    wheels: rings printed, ballast blocked on M6 fastener delivery
+    procurement_round_2_due: 2026-08-05
+  decisions:
+    cube_edge_mm: 150
+    jump_up_scope: sacrificial - yields to G6 and G7 if the schedule is contested
+  revised_gates:
+    M1: {date: 2026-08-02, name: 1-DoF rig electrical bring-up (open loop)}
+    M4: {date: 2026-08-07, name: 1-DoF closed loop live, watchdog verified}
+    M6: {date: 2026-08-09, name: Plant parameters measured and validated}
+    G3: {date: 2026-08-12, name: 1-DoF rig balances (was 2 Aug)}
+    G5: {date: 2026-08-15, name: Cube integrated (was 9 Aug)}
+    G6: {date: 2026-08-17, name: Edge balance (was 13 Aug)}
+    G7: {date: 2026-08-19, name: Corner balance + slew (was 16 Aug)}
+    G8: {date: 2026-08-20, name: Jump-up, sacrificial (was 18 Aug)}
+
+# ---------------------------------------------------------------------------
 # Hardware baseline. USER DECISION 28 Jul: THREE complete actuation sets.
 # This overrides the "4 sets / permanent bench" premise in the original brief
 # and matches AUDIT.md B-3 and PROCUREMENT.md.
