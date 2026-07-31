@@ -9,7 +9,7 @@ working directory.
 
 | Script | What it does | Writes |
 | --- | --- | --- |
-| `SIZING.py` | Reaction-wheel sizing: jump-up dynamics → required inertia, PET-CF ring + spokes + M6 steel bolt pockets, fit checks, and a Stage 6 mass budget that closes the loop on the assumed cube mass. | stdout only |
+| `SIZING.py` | Reaction-wheel sizing: jump-up dynamics → required inertia, PET-CF ring + spokes + M6 bolt/nut sets in round through-holes, fit checks (radial wall + 2 mm edge-to-edge gap), and a Stage 6 mass budget that closes the loop on the assumed cube mass. | stdout only |
 | `PROP_DATA.py` | T-MOTOR MN4006 bench data: torque / speed / thrust vs. current for four CF propellers, plus an implied-efficiency coherence check and a torque-constant fit. | `figures/`, `../images/` |
 
 ## Figure outputs

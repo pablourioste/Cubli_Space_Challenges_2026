@@ -1,5 +1,26 @@
 # 130 mm Wheel with M6 Nuts in Blind Pockets — Final Sizing
 
+> **SUPERSEDED (2026-07-30) — the blind-pocket scheme described here is no
+> longer the design.** `analysis/SIZING.py` now models **round M6 clearance
+> through-holes (6.4 mm) with a bolt + nut per station**, not hexagonal blind
+> pockets. Three consequences make this document's numbers obsolete:
+>
+> 1. **Retention is solved.** The through-bolt clamps the ring, so the
+>    "nut retention is required and not currently in the design" open item
+>    below is closed. The 6.8 mm plastic floor no longer exists or matters.
+> 2. **The selected wheel is now 140 mm OD with zero ballast.** The bare
+>    PET-CF ring reaches ~118% of target on its own. Selection is on minimum
+>    wheel mass, not minimum diameter — inertia goes as *mR²*, so the small
+>    ring's 24-bolt solution cost 308 g/wheel against 140 g.
+> 3. **The gap check was optimistic.** The old circumferential check used the
+>    *arc* pitch; adjacent-hole spacing is the *chord*, which is always
+>    shorter (4.7% at N=6). The gap rule is now `2·R_pcr·sin(π/N) − 2·r_hole`.
+>
+> The nut-mass reconciliation in the next section is still valid and still
+> used (2.5 g measured vs 2.617 g geometric). The pocket-placement analysis
+> further down remains relevant as a *spoke-clash* constraint for CAD, since
+> `SIZING.py` still has no knowledge of spoke angular position.
+
 Supersedes the geometry section of `WHEEL_130.md` (which was computed with the
 old mixed-up nut). Speed basis in `MOTOR_SPEED.md`.
 

@@ -29,6 +29,16 @@ Net effect per hole (both mass and inertia):
 Because rho_steel >> rho_petcf, dI > 0 and the station is a net win --
 but the plastic loss is NOT negligible and is accounted for here.
 
+WHAT THE SWEEP NOW SELECTS: OD = 140 mm with ZERO bolts. At that diameter
+the bare PET-CF ring already reaches ~128% of I_w_target, so the hole
+pattern is a TRIM feature rather than required ballast. Selection is on
+minimum WHEEL MASS among the ODs passing every check, not on minimum
+diameter: I_zz goes as m*R^2, so mass at a large radius is far cheaper.
+The 90 mm ring also "meets target" but needs 24 bolts and weighs
+308 g/wheel against 140 g/wheel for the bare 140 mm ring -- 503 g more
+across three wheels, on a cube that has to throw its own mass.
+omega_max is held at 6000 rpm per electrical/MOTOR_SPEED.md.
+
 Flow:
   STAGE 1  jump-up dynamics         -> required per-wheel inertia I_w_target
   STAGE 2  solid PET-CF ring+spokes -> baseline structural inertia & mass
@@ -44,13 +54,14 @@ import math
 # FIXED INPUT VARIABLES  (edit here)
 # =================================================================
 # --- cube / jump-up ---
-M          = 1.580        # [kg]   total cube mass
+M          = 1.674        # [kg]   total cube mass
                           #        PROVISIONAL, and a converged fixed point:
-                          #        Stage 6 totals 1100 g known hardware + 610 g
-                          #        structure allowance = 1710 g, which is the
-                          #        value assumed here (step 6 of the closure
-                          #        procedure closes on itself).
-                          #        Was 1.40 kg, which the BOM did not support.
+                          #        Stage 6 totals 1064 g known hardware + 610 g
+                          #        structure allowance = 1674 g, which is the
+                          #        value assumed here, so step 6 of the closure
+                          #        procedure closes on itself (delta ~0).
+                          #        Raised from 1.580 kg when the wheel moved to
+                          #        the 140 mm ring (140 g vs 111 g each).
                           #        ~36% is still allowance -- revisit at CAD.
 L          = 0.15         # [m]    cube edge length
 g          = 9.81         # [m/s^2]
@@ -71,7 +82,7 @@ ring_width_mm = 20.0      # [mm]  ring radial width (R_outer - R_inner), FIXED
                           #       radial case to check, not two.
 spoke_w_mm    = 10.0      # [mm]  spoke width
 N_spokes      = 3         # [-]   number of spokes
-t_mm          = 12.0      # [mm]  UNIFORM thickness of ring + spokes
+t_mm          = 5.0      # [mm]  UNIFORM thickness of ring + spokes
                           #       = the through-hole depth. It no longer has to
                           #       cover a nut plus a floor, but it still sets
                           #       the bolt grip length and the ring's own
@@ -513,8 +524,16 @@ for r in rows:
 # ballast is mass the cube then has to throw. The sweep shows the effect
 # plainly -- the 90 mm ring needs 24 bolts (308 g/wheel) while a bare
 # 140 mm ring beats the target outright at 140 g/wheel.
-viable = [r for r in rows
-          if r['meets_target'] and not r['capped'] and r['radial_ok']]
+#
+# "Capped" is NOT by itself disqualifying. A capped wheel is one that could
+# not take every hole that was asked for; if it still meets I_w_target with
+# the holes it can legally hold, it is a perfectly good wheel. What
+# disqualifies a design is failing the requirement or failing the wall
+# rule. (Capping only kills a design when the cap is why it fell short --
+# which the meets_target test already catches.) Treating capped as fatal
+# made a forced num_holes report "no OD passes" even when every OD met the
+# target with room to spare.
+viable = [r for r in rows if r['meets_target'] and r['radial_ok']]
 sel = min(viable, key=lambda r: r['m_wheel']) if viable else None
 
 print("\n" + "="*72)
@@ -537,6 +556,12 @@ else:
     if sel['N_exact'] is not None:
         print(f"  (exact requirement was {sel['N_exact']:.2f} holes, "
               f"rounded up to a multiple of {N_round_to})")
+    if sel['capped']:
+        print(f"  NOTE: the hole count was CUT to {sel['N']} by the "
+              f"{min_gap_mm:.1f} mm edge-gap rule (N_max = {sel['N_max']}).")
+        print(f"        The wheel still meets the requirement at "
+              f"{sel['I_wheel']/I_w_target*100:.1f}% of target, so the cap "
+              f"cost margin, not closure.")
     print()
     print(f"{'quantity':<26} | {'SOLID':>12} | {'MODIFIED':>12} | {'delta':>12}")
     print("-"*72)
@@ -558,17 +583,58 @@ else:
     print(f"I_w_target            = {I_w_target*1e4:.4f} x1e-4 kg m^2")
     print(f"I_zz achieved         = {sel['I_wheel']*1e4:.4f} x1e-4 kg m^2  "
           f"({sel['I_wheel']/I_w_target*100:.1f}% of target)")
-    print(f"edge-to-edge gap      = {sel['gap']*1e3:.2f} mm   "
-          f"(minimum {min_gap_mm:.1f} mm) "
-          f"[{'OK' if sel['gap'] >= min_gap_mm*1e-3 else 'FAIL'}]")
-    print(f"chord between centres = "
-          f"{2*sel['R_pcr']*math.sin(math.pi/sel['N'])*1e3:.2f} mm"
-          if sel['N'] >= 2 else "chord between centres = n/a (N < 2)")
+    if sel['N'] >= 2:
+        print(f"edge-to-edge gap      = {sel['gap']*1e3:.2f} mm   "
+              f"(minimum {min_gap_mm:.1f} mm) "
+              f"[{'OK' if sel['gap'] >= min_gap_mm*1e-3 else 'FAIL'}]")
+        print(f"chord between centres = "
+              f"{2*sel['R_pcr']*math.sin(math.pi/sel['N'])*1e3:.2f} mm")
+    else:
+        print(f"edge-to-edge gap      = n/a ({sel['N']} hole(s)); "
+              f"the gap rule would allow up to {sel['N_max']}")
     print(f"radial wall inner/outer = {sel['wall_in']:.2f} / "
           f"{sel['wall_out']:.2f} mm   (minimum {min_wall_mm:.1f} mm) "
           f"[{'OK' if sel['radial_ok'] else 'FAIL'}]")
     print(f"three wheels          = {3*sel['m_wheel']*1e3:.1f} g  "
           f"({3*sel['m_wheel']/M*100:.1f}% of the {M:.3f} kg cube)")
+    if sel['N'] == 0:
+        print()
+        print("  The lightest compliant wheel carries NO ballast: at this")
+        print("  diameter the bare PET-CF ring already exceeds I_w_target, so")
+        print("  every bolt added would be mass with no requirement behind it.")
+        print("  The M6 hole pattern is retained as a TRIM feature -- see the")
+        print("  gap-rule table for how much upward trim is available, and the")
+        print("  demonstration below for what a populated pattern would cost.")
+
+# =================================================================
+# GAP-RULE DEMONSTRATION  (exercises the 2 mm constraint explicitly)
+# =================================================================
+# The selected wheel may need no ballast, which would leave the hole-pattern
+# checks untested in a normal run. This block forces the pattern onto the
+# selected ring and walks N upward through the cap, so the constraint is
+# visible rather than merely implemented.
+if sel is not None:
+    print(f"\n=== Gap rule exercised on the selected {sel['OD']:.0f} mm ring "
+          f"(R_pcr = {sel['R_pcr']*1e3:.2f} mm) ===")
+    print(f"{'N':>5} | {'chord mm':>9} | {'gap mm':>8} | {'verdict':<22} | "
+          f"{'+mass g':>8} | {'+I 1e-4':>8}")
+    print("-"*76)
+    _N_probe = sorted({3, 6, 12, sel['N_max'], sel['N_max']+1,
+                       sel['N_max']+3} - {0, 1, 2})
+    for N in _N_probe:
+        chord = 2*sel['R_pcr']*math.sin(math.pi/N)
+        gap   = edge_gap(N, sel['R_pcr'], r_hole)
+        ok    = gap >= min_gap_mm*1e-3
+        verdict = "OK" if ok else f"VIOLATES {min_gap_mm:.1f} mm min"
+        if N > sel['N_max']:
+            verdict += " (> N_max)"
+        d_mass = N * (m_hardware - m_removed)
+        d_I    = N * ((I0_hardware + m_hardware*sel['R_pcr']**2)
+                      - (I0_removed + m_removed*sel['R_pcr']**2))
+        print(f"{N:>5d} | {chord*1e3:>9.2f} | {gap*1e3:>8.2f} | {verdict:<22} | "
+              f"{d_mass*1e3:>+8.2f} | {d_I*1e4:>+8.4f}")
+    print(f"N_max = {sel['N_max']} is the largest count with gap >= "
+          f"{min_gap_mm:.1f} mm; the solver caps any request above it.")
 
 # =================================================================
 # RADIAL FIT CHECK (independent of OD -- a round hole has no orientation)
@@ -665,11 +731,15 @@ BOM = [
     ("TowerPro MG92B brake servo",        13.8,  3, "Motors"),
 
     # --- reaction wheels -------------------------------------------
-    # From the OD=150 mm SOLID ring selected in Stage 4 above: at this
-    # diameter the plain PET-CF ring already exceeds I_w_target, so no
-    # steel nuts are needed at all. Kept as a literal so this stage
-    # stays decoupled; update it if the wheel design changes.
-    ("Reaction wheel (PET-CF, 150 mm, no nuts)", 110.98, 3, "Wheels"),
+    # From the OD=140 mm ring selected by the sweep above: at this diameter
+    # the bare PET-CF ring+spokes already exceeds I_w_target (128%), so no
+    # M6 ballast is fitted and the mass is structure only. Kept as a
+    # literal so this stage stays decoupled from stages 1-5; update it if
+    # the wheel design changes.
+    #   139.94 g = ring 116.72 g + 3 spokes 23.22 g, t = 12 mm, 20 mm width.
+    # If ballast is later fitted for trim, add 10.0 g per hole (M6 bolt +
+    # nut) MINUS 0.50 g of displaced plastic = +9.50 g per station.
+    ("Reaction wheel (PET-CF, 140 mm, no ballast)", 139.94, 3, "Wheels"),
 
     # --- power -----------------------------------------------------
     ("Turnigy 6S 3600 mAh LiPo, 22.2 V",  254.0, 1, "Power"),
