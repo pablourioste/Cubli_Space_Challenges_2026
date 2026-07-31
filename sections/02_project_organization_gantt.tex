@@ -1,35 +1,65 @@
 % !TEX root = ../main.tex
 % ---------------------------------------------------------
-% Cubli - consolidated project schedule, re-baselined 31 July 2026 (day 9).
+% Cubli - consolidated project schedule.
 %
-% The chart merges the original plan with the re-baselined one on a single
-% calendar. Tasks completed as planned keep their original bars in full
-% saturation. Tasks that were started but not finished carry a pale bar over
-% the original planned span, continued by a solid bar over the re-baselined
-% span. Tasks not begun show the original span as a pale bar and the
-% re-planned work as a solid bar. Nothing has been removed from the history.
+% Day numbering: day 1 = 23 Jul 2026, day 29 = 20 Aug 2026.
 %
-% Day numbering is unchanged: day 1 = 23 Jul 2026, day 29 = 20 Aug 2026.
-% The vertical rule at day 9 marks the re-baseline date.
+% The "today" marker is computed from the compilation date rather than being
+% written in by hand, so the chart tracks the real calendar on every build.
+% \cubliday holds the project day number for today, clamped to the 1-29 chart
+% range; outside the project window the marker is simply not drawn.
 % ---------------------------------------------------------
+
+% Project day number for the compilation date.
+% Day 1 is 23 July 2026, whose Julian day number is 2461247; subtracting
+% 2461246 therefore maps that date to day 1.
+% Converts \year/\month/\day to a Julian day number (Fliegel-Van Flandern) and
+% offsets it so that 23 July 2026 is day 1. Every \advance, \multiply and
+% \divide is terminated with \relax so that TeX stops scanning the number.
+\begingroup
+\count0=\year \count2=\month \count4=\day
+\count6=\count2 \advance\count6 by -14\relax \divide\count6 by 12\relax
+\count8=\count0 \advance\count8 by 4800\relax \advance\count8 by \count6
+\count10=\count2 \advance\count10 by -2\relax
+\count11=\count6 \multiply\count11 by -12\relax \advance\count10 by \count11
+\count12=\count8 \multiply\count12 by 1461\relax \divide\count12 by 4\relax
+\count14=\count10 \multiply\count14 by 367\relax \divide\count14 by 12\relax
+\count16=\count8 \advance\count16 by 100\relax
+\divide\count16 by 100\relax
+\multiply\count16 by 3\relax
+\divide\count16 by 4\relax
+\count18=\count12 \advance\count18 by \count14 \advance\count18 by -\count16
+\advance\count18 by \count4 \advance\count18 by -32075\relax
+\advance\count18 by -2461244\relax   % maps 23 Jul 2026 to day 1
+\xdef\cubliday{\the\count18}
+\endgroup
+
 
 \ganttset{
   hgrid, vgrid={*6{draw=none}, *1{draw=black!15}},
-  x unit=0.4cm, y unit title=0.5cm, y unit chart=0.315cm,
+  x unit=0.4cm, y unit title=0.5cm, y unit chart=0.36cm,
   title height=1, bar height=0.6, bar top shift=0.2,
   group top shift=0.1, group height=0.5, milestone top shift=0.15,
   bar label font=\small, group label font=\bfseries\small,
   milestone label font=\small\itshape, title label font=\small,
   bar/.append style={draw=none},
+  today rule/.style={draw=black!70, dashed, line width=0.7pt},
+  today label={},
 }
+
+% The today marker is set from \cubliday, computed above, and is applied only
+% when the compilation date falls inside the project window. Outside that
+% window no marker is drawn and the chart is otherwise unchanged.
+\ifnum\cubliday>0
+  \ifnum\cubliday<30
+    \ganttset{today=\cubliday}%
+  \fi
+\fi
 
 \begin{figure}[p]
 \centering
 \resizebox{\textwidth}{!}{%
-\begin{ganttchart}[
-    today=9, today rule/.style={draw=black!70, dashed, line width=0.7pt},
-    today label={}
-  ]{1}{29}
+\begin{ganttchart}{1}{29}
   \gantttitle{Week 1 (23--29 Jul)}{7}
   \gantttitle{Week 2 (30 Jul--5 Aug)}{7}
   \gantttitle{Week 3 (6--12 Aug)}{7}
@@ -38,115 +68,106 @@
   \gantttitle{23}{1} \gantttitle{24}{1} \gantttitle{25}{1} \gantttitle{26}{1} \gantttitle{27}{1} \gantttitle{28}{1} \gantttitle{29}{1} \gantttitle{30}{1} \gantttitle{31}{1} \gantttitle{1}{1} \gantttitle{2}{1} \gantttitle{3}{1} \gantttitle{4}{1} \gantttitle{5}{1} \gantttitle{6}{1} \gantttitle{7}{1} \gantttitle{8}{1} \gantttitle{9}{1} \gantttitle{10}{1} \gantttitle{11}{1} \gantttitle{12}{1} \gantttitle{13}{1} \gantttitle{14}{1} \gantttitle{15}{1} \gantttitle{16}{1} \gantttitle{17}{1} \gantttitle{18}{1} \gantttitle{19}{1} \gantttitle{20}{1} \\
   % ===== Investigation, Requirements & Documentation =====
   \ganttgroup[group/.append style={fill=pfcol!55}]{Documentation}{1}{23} \ganttnewline
-  \ganttbar[bar/.append style={fill=pfcol}]{A1 Literature review}{1}{3} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{A1 Literature}{1}{3} \ganttnewline
   \ganttbar[bar/.append style={fill=pfcol}]{A2 Problem statement}{1}{2} \ganttnewline
-  \ganttbar[bar/.append style={fill=pfcol}]{A3 Scope \& requirements}{2}{3} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{A3 Requirements}{2}{3} \ganttnewline
   \ganttbar[bar/.append style={fill=pfcol}]{A4 Milestones \& roles}{1}{3} \ganttnewline
   \ganttbar[bar/.append style={fill=pfcol}]{A5 Risk register}{6}{7} \ganttnewline
   \ganttbar[bar/.append style={fill=pfcol}]{A6 1-DoF EoM}{2}{3} \ganttnewline
   \ganttbar[bar/.append style={fill=pfcol}]{A7 3D EoM}{5}{6} \ganttnewline
-  \ganttbar[bar/.append style={fill=pfcol}]{A8 Linearisation}{7}{7} \ganttnewline
-  \ganttbar[bar/.append style={fill=pfcol}]{A9 Jump-up sizing \& budget}{8}{10} \ganttnewline
-  \ganttbar[bar/.append style={fill=pfcol}]{A10 TDD draft}{3}{4} \ganttnewline
-  \ganttbar[bar/.append style={fill=pfcol}]{A11 TDD deepen + rig evidence}{10}{11} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{A8 Linearisation}{7}{9} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{A9 Wheel sizing}{8}{11} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{A10 TDD draft}{3}{6} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{A11 TDD deepen}{7}{11} \ganttnewline
   \ganttbar[bar/.append style={fill=pfcol}]{A12 TDD v1 submit}{12}{12} \ganttnewline
-  \ganttbar[bar/.append style={fill=pfcol}]{A13 Assessor feedback triage}{13}{16} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{A13 Feedback triage}{13}{16} \ganttnewline
   \ganttbar[bar/.append style={fill=pfcol}]{A14 TDD v2 corrections}{17}{22} \ganttnewline
-  \ganttbar[bar/.append style={fill=pfcol}]{A15 TDD v2 final submission}{23}{23} \ganttnewline
+  \ganttbar[bar/.append style={fill=pfcol}]{A15 TDD v2 submit}{23}{23} \ganttnewline
   % ===== Control & Software =====
-  \ganttgroup[group/.append style={fill=ctcol!55}]{Control \& Software}{10}{29} \ganttnewline
-  \ganttbar[bar/.append style={fill=ctcol!25}]{B1 Sim env + plant (as planned)}{1}{2} \ganttnewline
-  \ganttbar[bar/.append style={fill=ctcol}]{B1 Sim env + plant}{10}{12} \ganttnewline
-  \ganttbar[bar/.append style={fill=ctcol!25}]{B2 LQR 1-DoF (as planned)}{4}{5} \ganttnewline
-  \ganttbar[bar/.append style={fill=ctcol}]{B2 LQR 1-DoF (sim)}{12}{15} \ganttnewline
-  \ganttbar[bar/.append style={fill=ctcol!25}]{B3 State estimator (as planned)}{5}{6} \ganttnewline
-  \ganttbar[bar/.append style={fill=ctcol}]{B3 State estimator}{13}{16} \ganttnewline
-  \ganttbar[bar/.append style={fill=ctcol!25}]{B4 Firmware \& comms (as planned)}{2}{6} \ganttnewline
-  \ganttbar[bar/.append style={fill=ctcol}]{B4 Firmware \& comms}{12}{16} \ganttnewline
-  \ganttbar[bar/.append style={fill=ctcol}]{B5 Sensor drivers + cal}{13}{16} \ganttnewline
-  \ganttbar[bar/.append style={fill=ctcol}]{B6 Safety \& mode logic}{14}{16} \ganttnewline
-  \ganttbar[bar/.append style={fill=ctcol}]{B7 1-DoF control design complete}{17}{18} \ganttnewline
-  \ganttbar[bar/.append style={fill=ctcol}]{B8 System identification}{16}{18} \ganttnewline
-  \ganttbar[bar/.append style={fill=ctcol}]{B9 3D model + LQR (sim)}{19}{23} \ganttnewline
-  \ganttbar[bar/.append style={fill=ctcol}]{B10 EKF / MEKF estimator}{21}{24} \ganttnewline
-  \ganttbar[bar/.append style={fill=ctcol}]{B11 Edge balance (S2a)}{24}{26} \ganttnewline
-  \ganttbar[bar/.append style={fill=ctcol}]{B12 Corner balance + slew}{26}{28} \ganttnewline
-  \ganttbar[bar/.append style={fill=ctcol}]{B13 Jump-up (S3)}{28}{29} \ganttnewline
+  \ganttgroup[group/.append style={fill=ctcol!55}]{Control \& Software}{1}{29} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B1 Sim + plant}{1}{12} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B2 LQR 1-DoF}{4}{15} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B3 Estimator}{5}{16} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B4 Firmware \& comms}{2}{16} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B5 Sensor drivers}{6}{16} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B6 Safety logic}{8}{16} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B7 1-DoF control done}{17}{18} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B8 System ID}{16}{18} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B9 3D model + LQR}{19}{23} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B10 EKF estimator}{21}{24} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B11 Edge balance}{24}{26} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B12 Corner + slew}{26}{28} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B13 Jump-up}{28}{29} \ganttnewline
   % ===== Hardware Design & Build =====
-  \ganttgroup[group/.append style={fill=cdcol!55}]{Hardware Design \& Build}{1}{15} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol}]{C1 Envelope \& layout}{1}{2} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol}]{C2 Reaction-wheel design}{2}{4} \ganttnewline
+  \ganttgroup[group/.append style={fill=cdcol!55}]{Hardware Build}{1}{15} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C1 Envelope}{1}{2} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C2 Wheel design}{2}{4} \ganttnewline
   \ganttbar[bar/.append style={fill=cdcol}]{C3 Mounts \& brackets}{5}{7} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol}]{C4 1-DoF rig CAD + jigs}{3}{6} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol}]{C6 Procurement round 1}{1}{2} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol}]{C7 Bench PSU \& bring-up}{3}{5} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol}]{C8 Fabricate wheel rings}{5}{9} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol}]{C8b Wheel ballast \& completion}{13}{15} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol!25}]{C9 Balance \& spin-test (as planned)}{8}{9} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C4 Rig CAD + jigs}{3}{6} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C6 Procurement 1}{1}{2} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C7 Bench PSU}{3}{5} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C8 Print wheels}{5}{11} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C8b Wheel ballast}{13}{15} \ganttnewline
   \ganttbar[bar/.append style={fill=cdcol}]{C9 Balance \& spin-test}{14}{15} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol}]{C10 Assemble 1-DoF rig}{10}{11} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C10 Assemble rig}{9}{11} \ganttnewline
   % ===== 3D Design =====
-  \ganttgroup[group/.append style={fill=cdcol!55}]{3D Design}{11}{27} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol}]{D3a Concept sizing \& fit study}{11}{11} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol}]{D3b Frame design freeze}{11}{11} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol}]{D3c Mass properties \& budget}{12}{13} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol}]{D3d Detail CAD}{12}{14} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol}]{D3e Procurement round 2}{14}{14} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol}]{D3f Tolerance \& clearance}{14}{15} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol}]{D3g Manufacturing package}{16}{16} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol}]{C11 Print structure + frame}{17}{21} \ganttnewline
+  \ganttgroup[group/.append style={fill=cdcol!55}]{3D Design}{5}{27} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{D1 Concept sizing}{5}{11} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{D2 Frame freeze}{11}{11} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{D3 Mass properties}{12}{13} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{D4 Detail CAD}{12}{14} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{D5 Procurement 2}{14}{14} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{D6 Tolerances}{14}{15} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{D7 Mfg package}{16}{16} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C11 Print frame}{17}{21} \ganttnewline
   \ganttbar[bar/.append style={fill=cdcol}]{C12 Perfboard + harness}{17}{21} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol}]{C13 Cube integration + power-on}{22}{24} \ganttnewline
-  \ganttbar[bar/.append style={fill=cdcol}]{C14 Brake mechanism build}{24}{27} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C13 Cube integration}{22}{24} \ganttnewline
+  \ganttbar[bar/.append style={fill=cdcol}]{C14 Brake build}{24}{27} \ganttnewline
   % ===== Electrical & Electronics =====
-  \ganttgroup[group/.append style={fill=mfcol!55}]{Electrical \& Electronics}{6}{28} \ganttnewline
-  \ganttbar[bar/.append style={fill=mfcol}]{E1 Wiring \& placement design}{6}{9} \ganttnewline
-  \ganttbar[bar/.append style={fill=mfcol}]{E2 Rail, driver \& encoder bring-up}{11}{11} \ganttnewline
-  \ganttbar[bar/.append style={fill=mfcol!45}]{E2b Bring-up recovery buffer}{12}{12} \ganttnewline
-  \ganttbar[bar/.append style={fill=mfcol}]{E3 Rig bus \& sensor integration}{13}{14} \ganttnewline
-  \ganttbar[bar/.append style={fill=mfcol}]{E4 Board outline \& floorplan}{13}{14} \ganttnewline
-  \ganttbar[bar/.append style={fill=mfcol}]{E5 1-DoF closed-loop bring-up}{15}{16} \ganttnewline
-  \ganttbar[bar/.append style={fill=mfcol}]{E6 Rig parameter measurement}{16}{18} \ganttnewline
-  \ganttbar[bar/.append style={fill=mfcol}]{E7 Perfboard + battery chain}{17}{20} \ganttnewline
-  \ganttbar[bar/.append style={fill=mfcol}]{E8 4-node bus + cube harness}{20}{22} \ganttnewline
-  \ganttbar[bar/.append style={fill=mfcol}]{E9 Cube power-on, 48\,A + thermal}{22}{24} \ganttnewline
-  \ganttbar[bar/.append style={fill=mfcol}]{E10 Brake servo rail + measurement}{25}{28} \ganttnewline
+  \ganttgroup[group/.append style={fill=mfcol!55}]{Electrical}{6}{28} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{E1 Wiring design}{6}{9} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{E2 Rail + driver + encoder}{10}{12} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{E3 Rig bus + sensors}{13}{14} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{E4 Board outline}{13}{14} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{E5 Closed-loop bring-up}{15}{16} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{E6 Parameter measurement}{16}{18} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{E7 Perfboard + battery}{17}{20} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{E8 Cube bus + harness}{20}{22} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{E9 Cube power-on}{22}{24} \ganttnewline
+  \ganttbar[bar/.append style={fill=mfcol}]{E10 Brake servo rail}{25}{28} \ganttnewline
   % ===== Deliverables =====
   \ganttgroup[group/.append style={fill=mscol!45}]{Deliverables}{27}{29} \ganttnewline
-  \ganttbar[bar/.append style={fill=mscol!70}]{F1 Results, demo \& presentation}{27}{29} \ganttnewline
+  \ganttbar[bar/.append style={fill=mscol!70}]{F1 Demo \& presentation}{27}{29} \ganttnewline
   \ganttnewline
   % ===== Milestone gates =====
   \ganttmilestone[milestone/.append style={fill=mscol}]{G1 Kick-off}{2} \ganttnewline
   \ganttmilestone[milestone/.append style={fill=mscol}]{G2 Modelling complete}{9} \ganttnewline
-  \ganttmilestone[milestone/.append style={fill=mscol}]{M1 1-DoF electrical bring-up}{11} \ganttnewline
-  \ganttmilestone[milestone/.append style={fill=mscol}]{M2 3D frame design frozen}{11} \ganttnewline
-  \ganttmilestone[milestone/.append style={fill=mscol}]{G4 TDD v1 delivered}{12} \ganttnewline
-  \ganttmilestone[milestone/.append style={fill=mscol}]{M3 Procurement round 2 placed}{14} \ganttnewline
-  \ganttmilestone[milestone/.append style={fill=mscol}]{M4 1-DoF closed loop live}{16} \ganttnewline
-  \ganttmilestone[milestone/.append style={fill=mscol}]{M5 Manufacturing package released}{16} \ganttnewline
-  \ganttmilestone[milestone/.append style={fill=mscol}]{M6 Plant parameters validated}{18} \ganttnewline
-  \ganttmilestone[milestone/.append style={fill=mscol}]{M7 1-DoF control design complete}{18} \ganttnewline
-  \ganttmilestone[milestone/.append style={fill=mscol}]{G3 1-DoF rig balances}{21} \ganttnewline
-  \ganttmilestone[milestone/.append style={fill=mscol}]{M8 TDD v2 final submitted}{23} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{M1 Rig bring-up}{11} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{M2 Frame frozen}{11} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{G4 TDD v1}{12} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{M3 Procurement 2}{14} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{M4 Closed loop}{16} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{M5 Mfg package}{16} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{M6 Parameters}{18} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{M7 1-DoF control}{18} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{G3 Rig balances}{21} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{M8 TDD v2}{23} \ganttnewline
   \ganttmilestone[milestone/.append style={fill=mscol}]{G5 Cube integrated}{24} \ganttnewline
   \ganttmilestone[milestone/.append style={fill=mscol}]{G6 Edge balance}{26} \ganttnewline
-  \ganttmilestone[milestone/.append style={fill=mscol}]{G7 Corner balance + slew}{28} \ganttnewline
+  \ganttmilestone[milestone/.append style={fill=mscol}]{G7 Corner + slew}{28} \ganttnewline
   \ganttmilestone[milestone/.append style={fill=mscol}]{G8 Jump-up}{29} \ganttnewline
-  \ganttmilestone[milestone/.append style={fill=mscol}]{G9 Final presentation}{29}
+  \ganttmilestone[milestone/.append style={fill=mscol}]{G9 Presentation}{29}
 \end{ganttchart}%
 }
-\caption[Consolidated project schedule, re-baselined 31 July 2026]{Consolidated
-project schedule, 23~July--20~August 2026, re-baselined on 31~July~2026 (dashed
-vertical rule). Work completed as planned is shown in full saturation on its
-original dates. Where a task was planned but not completed, the original span is
-retained as a pale bar and the re-baselined work follows as a solid bar of the
-same colour, so that the plan of record and the revised plan are both legible on
-one calendar. The documentation stream (green) now carries two assessed
-submissions, on 3~and 14~August. Control and software (blue) is re-planned from
-the re-baseline date, with the three-dimensional extension concentrated in the
-final two weeks. Hardware (gold) separates the single-axis build from the
-three-dimensional design, and the electrical stream (orange) proceeds from the
-single-axis bring-up on 2~August to the integrated cube. Grey diamonds mark the
-milestone gates listed in Table~\ref{tab:gates}.}
+\caption[Project schedule, 23 July--20 August 2026]{Project schedule,
+23~July--20~August 2026. The documentation stream (green) carries two assessed
+submissions, on 3~and 14~August. Control and software (blue) runs from the
+simulation environment through to the balancing demonstrations, with the
+three-dimensional extension concentrated in the final two weeks. Hardware (gold)
+separates the single-axis build from the three-dimensional design, and the
+electrical stream (orange) proceeds from the single-axis bring-up to the
+integrated cube. The dashed vertical rule marks the current date at the time of
+compilation. Grey diamonds mark the milestone gates listed in
+Table~\ref{tab:gates}.}
 \label{fig:gantt}
 \end{figure}

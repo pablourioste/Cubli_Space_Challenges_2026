@@ -80,18 +80,12 @@ design; and electrical and electronics --- led by the owners assigned in
 Table~\ref{tab:team_roles}. The investigation is kept to the essentials needed to
 substantiate the design: a focused literature review, the dynamics derivation,
 and the wheel sizing that follows from it. Table~\ref{tab:wbs_tasks} breaks the
-streams into individual tasks, each with its scope, owner, dates and current
-status.
+streams into individual tasks, each with its scope, lead and dates.
 
-The schedule was re-baselined on 31~July~2026, at the end of the second week, and
-Table~\ref{tab:wbs_tasks} reflects that revision. The status column records the
-position of each task at the re-baseline date: \emph{Complete} for work delivered
-as planned, \emph{In progress} for work begun and continuing, \emph{Deferred} for
-work not started and re-planned from the re-baseline date, \emph{New} for tasks
-introduced by the revision, and \emph{Planned} for work whose start still lies
-ahead. Tasks completed as planned retain their original dates, so the record of
-what was undertaken in the first two weeks is preserved alongside the revised
-plan rather than replaced by it.
+Every task carries a single accountable lead. Where a task draws on more than one
+member of the team, the lead named in Table~\ref{tab:wbs_tasks} is the point of
+contact for that task and coordinates the supporting effort, so that
+accountability for each item rests with one person.
 
 \input{sections/02_project_organization_tasks}
 
@@ -102,84 +96,71 @@ The full-page schedule in Figure~\ref{fig:gantt} places every task of
 Section~\ref{sec:wbs} on the 23~July--20~August 2026 calendar, and
 Table~\ref{tab:gates} states the gate that closes each phase.
 
-\paragraph{Position at the re-baseline.}
-At the review of 31~July~2026 the investigation and documentation stream was
-complete through the linearisation and controllability study, and the
-single-axis mechanical and electrical designs were finished. Three areas were
-behind the original plan. The control and software stream had not begun
-implementation, the electrical work had produced the wiring and placement design
-but no bench testing, and the three-dimensional design had not passed the
-concept stage. The reaction-wheel rings were printed but could not be ballasted
-or balanced, since the M6 fasteners that form the ballast stations had not yet
-arrived. The revision below carries these items forward rather than compressing
-them, and the completed work retains its original dates.
-
-\paragraph{Structure of the revised plan.}
-Sunday 2~August is the pivot of the schedule and carries two independent
+\paragraph{Structure of the plan.}
+The first two weeks establish the analytical and design foundation: the dynamics
+derivation and wheel sizing on the documentation side, the single-axis rig and
+its wiring design on the hardware and electrical sides, and the simulation
+environment on the control side. These converge on 2~August, which carries two
 objectives: the first powered bring-up of the single-axis rig, taking the
 \qty{5}{\volt} rail, the driver and the encoder to verified open-loop operation
 (M1); and the freeze of the three-dimensional frame geometry, which closes the
-mass and inertia budget against the sizing analysis (M2). The following day is
-held as a recovery buffer for the bring-up, so that a first-attempt failure on
-the bench does not propagate into the dates that follow. The frame freeze
+mass and inertia budget against the sizing analysis (M2). The frame freeze
 releases the second procurement round on 5~August (M3), which is the last point
-at which parts can be ordered with useful delivery margin before assembly begins
-on 13~August.
+at which parts can be ordered with useful delivery margin before cube assembly
+begins on 13~August.
 
-The documentation stream now carries two assessed submissions. The first is
-delivered on 3~August (G4) with the evidence available at that date; the
-assessor's comments are triaged during the following week and the corrected
-second draft is submitted on 14~August (M8), by which point the rig results and
-the integrated cube can both be reported.
+The documentation stream carries two assessed submissions. The first is delivered
+on 3~August (G4) with the evidence available at that date; the assessor's
+comments are triaged during the following week and the corrected second draft is
+submitted on 14~August (M8), by which point the rig results and the integrated
+cube can both be reported.
 
 \paragraph{Critical path and contingency.}
 The critical path runs from the 2~August bring-up through the closed-loop rig
 (M4), the measured plant parameters (M6) and the single-axis control design
 (M7), into the three-dimensional controller and the balancing demonstrations.
-The single-axis rig remains the protected item, since its balance result is the
+The single-axis rig is the protected item, since its balance result is the
 experimental evidence in the document. The three-dimensional design proceeds in
 parallel on the mechanical side, so that fabrication is not held by the control
 work.
 
-The plan retains the full scope through to the jump-up demonstration. The
-schedule is nonetheless tightly constrained in the final week: edge balance
-begins two days after cube assembly completes, and the jump-up gate falls on the
-day of the final presentation. The jump-up (S3) is therefore designated
-sacrificial scope by standing decision. If the balancing demonstrations require
-the time, the jump-up yields first, and the demonstration presented on 20~August
-is the corner balance and commanded slew. The brake mechanism build and its
-associated electrical work are sequenced after the edge-balance gate for the
-same reason.
+The plan carries the full scope through to the jump-up demonstration. The final
+week is nonetheless tightly constrained: edge balance begins two days after cube
+assembly completes, and the jump-up gate falls on the day of the final
+presentation. The jump-up (S3) is therefore designated sacrificial scope by
+standing decision. If the balancing demonstrations require the time, the jump-up
+yields first, and the demonstration presented on 20~August is the corner balance
+and commanded slew. The brake mechanism build and its associated electrical work
+are sequenced after the edge-balance gate for the same reason.
 
 \begin{table}[h]
 \centering
-\caption[Milestone gates, re-baselined 31 July 2026]{Milestone gates, from
-kick-off to the final presentation, as revised at the re-baseline of
-31~July~2026. The original date is retained for comparison; a dash indicates a
-gate introduced by the revision.}
+\caption[Milestone gates, from kick-off to the final presentation]{Milestone
+gates, from kick-off to the final presentation, with the criterion that closes
+each one.}
 \label{tab:gates}
 \small
-\begin{tabular}{@{}l L{6.6cm} l l@{}}
+\begin{tabular}{@{}l L{7.6cm} l@{}}
 \toprule
-\textbf{Gate} & \textbf{Pass criterion} & \textbf{Original} & \textbf{Revised} \\
+\textbf{Gate} & \textbf{Pass criterion} & \textbf{Date} \\
 \midrule
-G1 & Long-lead order placed; requirements and plan locked & 24 Jul & 24 Jul \\
-G2 & Dynamics, linearisation and wheel sizing complete & 1 Aug & 31 Jul \\
-M1 & 1-DoF rig bring-up: \qty{5}{\volt} rail trimmed under load, driver commutating, encoder verified at ${\le}\,\qty{0.5}{\milli\metre}$ gap & --- & 2 Aug \\
-M2 & 3D frame geometry frozen at \qty{150}{\milli\metre}; mass, inertia and CoM budget closed against the sizing analysis & --- & 2 Aug \\
-G4 & TDD v1 delivered for assessment & 3 Aug & 3 Aug \\
-M3 & Procurement round 2 consolidated and ordered & --- & 5 Aug \\
-M4 & 1-DoF closed loop live; disarm path and watchdog verified & --- & 7 Aug \\
-M5 & Manufacturing package released for fabrication & --- & 7 Aug \\
-M6 & Plant parameters measured on the rig and validated against simulation & --- & 9 Aug \\
-M7 & 1-DoF control design complete: plant, regulator, estimator and safety logic & --- & 9 Aug \\
-G3 & 1-DoF rig balances $\geq$60 s unassisted & 2 Aug & 12 Aug \\
-M8 & TDD v2 corrected and finally submitted & --- & 14 Aug \\
-G5 & Cube integrated and powered; all axes addressable & 9 Aug & 15 Aug \\
-G6 & Edge balance (S2a) for $\geq$60 s with disturbance recovery & 13 Aug & 17 Aug \\
-G7 & Corner balance and commanded slew (S2b/c) & 16 Aug & 19 Aug \\
-G8 & Face-to-edge jump-up (S3) captured on video (sacrificial scope) & 18 Aug & 20 Aug \\
-G9 & Final presentation and demonstration & 20 Aug & 20 Aug \\
+G1 & Long-lead order placed; requirements and plan locked & 24 Jul \\
+G2 & Dynamics, linearisation and wheel sizing complete & 31 Jul \\
+M1 & 1-DoF rig bring-up: \qty{5}{\volt} rail trimmed under load, driver commutating, encoder verified at ${\le}\,\qty{0.5}{\milli\metre}$ gap & 2 Aug \\
+M2 & 3D frame geometry frozen at \qty{150}{\milli\metre}; mass, inertia and CoM budget closed against the sizing analysis & 2 Aug \\
+G4 & TDD v1 delivered for assessment & 3 Aug \\
+M3 & Procurement round 2 consolidated and ordered & 5 Aug \\
+M4 & 1-DoF closed loop live; disarm path and watchdog verified & 7 Aug \\
+M5 & Manufacturing package released for fabrication & 7 Aug \\
+M6 & Plant parameters measured on the rig and validated against simulation & 9 Aug \\
+M7 & 1-DoF control design complete: plant, regulator, estimator and safety logic & 9 Aug \\
+G3 & 1-DoF rig balances $\geq$60 s unassisted & 12 Aug \\
+M8 & TDD v2 corrected and finally submitted & 14 Aug \\
+G5 & Cube integrated and powered; all axes addressable & 15 Aug \\
+G6 & Edge balance (S2a) for $\geq$60 s with disturbance recovery & 17 Aug \\
+G7 & Corner balance and commanded slew (S2b/c) & 19 Aug \\
+G8 & Face-to-edge jump-up (S3) captured on video (sacrificial scope) & 20 Aug \\
+G9 & Final presentation and demonstration & 20 Aug \\
 \bottomrule
 \end{tabular}
 \end{table}
