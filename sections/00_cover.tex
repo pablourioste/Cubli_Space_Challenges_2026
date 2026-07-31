@@ -1,0 +1,111 @@
+% ============================================================================
+%  Cover page - Technical Design Document
+% ----------------------------------------------------------------------------
+%  Requires (already loaded in main.tex): graphicx, xcolor, geometry.
+%  Edit the four \cover... macros below to update title, subtitle, version and
+%  the author list; the layout adapts automatically.
+%
+%  Logos live in images/ alongside the other document graphics:
+%      images/SPACECHALLENGES.png  (program)
+%      images/CUBE_LOGO.png        (project)
+%  They are placed side by side at the top, program logo left, project logo
+%  right. Each is independently guarded: a missing file simply leaves its side
+%  blank, so the document never breaks on a missing graphic and the header
+%  keeps its height either way.
+% ============================================================================
+
+\definecolor{coverrule}{HTML}{2E75B6}  % divider rules (matches ctcol accent)
+\definecolor{covermeta}{HTML}{404040}  % metadata label grey
+
+% ---------- Editable cover fields ----------
+\newcommand{\coverTitle}{Technical Design Document}
+\newcommand{\coverAcronym}{TDD}
+\newcommand{\coverSubtitle}{Cubli --- A Three-Axis Reaction-Wheel Balancing Cube}
+\newcommand{\coverVersion}{v1.0}
+\newcommand{\coverOrganization}{Space Challenges Program 2026}
+\newcommand{\coverAuthors}{%
+    Athanasia Nikolova \quad\textbullet\quad Andrea Liang \quad\textbullet\quad Deyan Nikolaev Vlaev\\[0.35em]
+    Niccolo \quad\textbullet\quad Suvanna Viriyanti Wu \quad\textbullet\quad Pablo Urioste}
+
+% ---------- Helpers ----------
+% Full-width horizontal divider; argument = rule thickness.
+\newcommand{\coverrule}[1]{{\color{coverrule}\rule{\linewidth}{#1}}}
+
+% Height reserved for the logo row, so the title block starts at the same
+% vertical position whether or not the logo files are present.
+\newlength{\coverlogoheight}
+\setlength{\coverlogoheight}{2.6cm}
+
+% \coverlogo[<scale>]{<path>} - include the graphic scaled to fit
+% \coverlogoheight without exceeding its half-width column, keeping the aspect
+% ratio. The optional scale (default 1) trims the reserved height for logos
+% that carry their own whitespace padding, so the two marks read as equal
+% visual weight rather than equal bounding box. Falls back to blank space of
+% the full height if the file is missing, so a renamed or not-yet-committed
+% logo degrades gracefully instead of failing the build.
+\newcommand{\coverlogo}[2][1]{%
+    \IfFileExists{#2}
+        {\includegraphics[height=#1\coverlogoheight,width=\linewidth,keepaspectratio]{#2}}
+        {\rule{0pt}{\coverlogoheight}}}
+
+% Aligned key-value row of the metadata block; the label is flush right against
+% the value column so the two columns meet at a single vertical rule.
+\newcommand{\covermetarow}[2]{%
+    \hfill\textcolor{covermeta}{\textbf{#1}} & #2 \\[0.45em]}
+
+\begin{titlepage}
+    \centering
+    \sffamily
+
+    % ---------- Logo row: program logo left, project logo right ----------
+    % Both columns are vertically centred on a common baseline so logos of
+    % differing aspect ratio still sit level with each other.
+    \noindent
+    \begin{minipage}[c][1.2\coverlogoheight][c]{0.42\textwidth}
+        \centering
+        \coverlogo[1.15]{images/SPACECHALLENGES.png}
+    \end{minipage}\hfill
+    \begin{minipage}[c][1.2\coverlogoheight][c]{0.42\textwidth}
+        \centering
+        \coverlogo{images/CUBE_LOGO.png}
+    \end{minipage}
+
+    \vspace{1.6cm}
+
+    % ---------- Title block ----------
+    \coverrule{1.2pt}
+    \vspace{0.9cm}
+
+    {\fontsize{30}{36}\selectfont\bfseries \coverTitle\par}
+    \vspace{0.45cm}
+    {\Large\bfseries\color{coverrule} (\coverAcronym)\par}
+
+    \vspace{0.9cm}
+    \coverrule{0.5pt}
+
+    \vspace{1.0cm}
+    {\LARGE \coverSubtitle\par}
+
+    \vfill
+
+    % ---------- Metadata block ----------
+    % The label column is fixed-width so the four rows share one baseline grid;
+    % the whole block is centred as a unit rather than per-row.
+    \begin{minipage}{0.95\textwidth}
+        \centering
+        \renewcommand{\arraystretch}{1.0}
+        \begin{tabular}{@{}p{0.18\linewidth}@{\hspace{1.2em}}l@{}}
+            \covermetarow{Authors}{\begin{tabular}[t]{@{}l@{}}\coverAuthors\end{tabular}}
+            \covermetarow{Organization}{\coverOrganization}
+            \covermetarow{Version}{\coverVersion}
+            \covermetarow{Date}{\today}
+        \end{tabular}
+    \end{minipage}
+
+    \vspace{1.4cm}
+    \coverrule{1.2pt}
+
+    \vspace{0.6cm}
+    {\small\color{covermeta} Space Challenges 2026 --- Cubli Team\par}
+
+\end{titlepage}
