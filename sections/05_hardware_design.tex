@@ -244,7 +244,7 @@ Motor mount        & Motor $\leftrightarrow$ inner structure & Bolt circle, shaf
 Wheel hub          & Wheel $\leftrightarrow$ motor rotor     & Bore, bolt pattern, axial location, balance datum \\
 Frame joint        & Inner structure $\leftrightarrow$ outer frame & Bolt pattern, keep-out envelope, load path to the contact features \\
 Electronics mount  & Board $\leftrightarrow$ inner structure & Board outline, mounting-hole pattern, keep-out heights, connector exit directions (Sec.~\ref{sec:layout}) \\
-Brake mount        & Servo $\leftrightarrow$ inner structure & Servo location, barrier throw, clearance to the ballast bolt heads \\
+Brake mount        & Servo $\leftrightarrow$ inner structure & Servo location, barrier throw \\
 Battery retention  & Pack $\leftrightarrow$ inner structure & Pack envelope, retention method, centring tolerance to the cube centre \\
 Contact features   & Outer frame $\leftrightarrow$ ground    & Corner and edge geometry, material, replaceability \\
 \bottomrule
@@ -265,7 +265,7 @@ fabrication rather than having to be right the first time.
 
 \paragraph{Architecture: ballasted ring.} Rather than adjusting inertia by
 scaling a solid disc, the wheel is built as a printed \emph{ring plus spokes}
-whose inertia is then tuned by \emph{ballast}: standard steel bolts and nuts
+whose inertia is then tuned by \emph{ballast}: standard steel nuts
 seated in blind hexagonal pockets distributed around the ring. Each pocket both
 removes plastic and adds steel at the largest available radius, so the net
 inertia gain per pocket is large, and the target is reached by choosing how many
@@ -276,7 +276,7 @@ importantly the residual uncertainty in $M$, which is not known until the build
 is complete. A solid disc offers no such adjustment.
 
 The design intent is that the bare printed ring supplies most of the required
-inertia and the ballast acts only as a trim, so that the bolt count sits well
+inertia and the ballast acts only as a trim, so that the count sits well
 inside its feasible range in both directions.
 
 \paragraph{Parameters to be fixed.} The geometry is defined by the quantities
@@ -285,24 +285,24 @@ Section~\ref{sec:massbudget} and are recorded there once fixed.
 
 \begin{table}[h]
 \centering
-\caption[Reaction-wheel design parameters]{Reaction-wheel design parameters, to be fixed once the envelope closes.}
+
 \label{tab:rw_params}
 \small
 \begin{tabular}{l l c}
 \toprule
 Symbol & Parameter & Value \\
 \midrule
-$D_w$      & Ring outer diameter (capped by envelope) & $13$ cm \\
-$w_r$      & Ring radial width                         & $1.5$ cm \\
-$t_r$      & Ring axial thickness                      & $1$ cm \\
-$n_s, w_s$ & Spoke count and width                     & $3$, $1$ cm \\
-$\rho_p$   & Printed-material density                  & $1290$ $g/cm^3$ \\
-$r_b$      & Ballast radius                            & $5.75$ cm \\
-$m_b$      & Net mass added per installed bolt         & $2.5$ g \\
-$\Delta I_b$ & Net inertia added per installed bolt    & $8.27\times 10^{-6}$ $kg m^2$  \\
-$N$        & Bolt count reaching $I_{w,\text{target}}$ & $15$ \\
-$m_w$      & Resulting wheel mass                      & $109$ g \\
-$I_w$      & Resulting wheel inertia                   & $3.4\times 10^{-4}$ $kg m^2$ \\
+$D_w$      & Ring outer diameter (capped by envelope) & \qty{13}{\centi\metre} \\
+$w_r$      & Ring radial width                         & \qty{1.5}{\centi\metre} \\
+$t_r$      & Ring axial thickness                      & \qty{1}{\centi\metre} \\
+$n_s, w_s$ & Spoke count and width                     & $3$, \qty{1}{\centi\metre} \\
+$\rho_p$   & Printed-material density                  & \qty{1290}{\kilo\gram\per\metre\cubed} \\
+$r_b$      & Ballast radius                            & \qty{5.75}{\centi\metre} \\
+$m_b$      & Net mass added per installed bolt         & \qty{2.5}{\gram} \\
+$\Delta I_b$ & Net inertia added per installed bolt    & \qty{8.27e-6}{\kilogram\metre\squared} \\
+$N$        & Bolt count reaching $I_{w,\text{target}}$ & \num{15} \\
+$m_w$      & Resulting wheel mass                      & \qty{109}{\gram} \\
+$I_w$      & Resulting wheel inertia                   & \qty{3.4e-4}{\kilogram\metre\squared} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -317,55 +317,26 @@ I_{w}(D_w, N) \;=\; I_{w,\text{ring}}(D_w) + N\,\Delta I_b \;\geq\; I_{w,\text{t
 for the smallest admissible $N$ at each candidate $D_w$, subject to the fit and
 mass checks below.
 \paragraph{Sizing calculator.} Rather than sweep a single geometric variable
-over a fine grid, we built a parametric calculator relating all of the variables in Table~\ref{tab:rw_params} to the final mass and moment of inertia of a single reaction wheel. 
+over a fine grid, we built a parametric calculator relating all of the variables in Table~\ref{tab:rw_params} to the final mass and moment of inertia of a single reaction wheel. There are limits on each variable, such as that the outer diameter of the reaction wheel $D_w$ is within the body dimension $L$ of the outer frame. 
 
-outer diameter
-$D_w$, bolt count $N$, and pocket wall dimensions to the four governing
-outputs below. $I_w$, mass, and pocket wall thickness are coupled through
-$D_w$ and $N$ --- increasing $N$ raises $I_w$ but starves the walls between
-pockets, while increasing $D_w$ raises $I_w$ but also raises the bare-ring
-mass --- so no single variable can be optimized in isolation. We converged
-on the selected design by iterating the calculator: proposing a candidate
-$(D_w, N)$, checking it against the four criteria below, and adjusting until
-a combination cleared all four with margin. Each candidate is evaluated as
-follows, and the selected design is the one that passes all four with the
-widest trim margin:
-\begin{enumerate}
-  \item \textbf{Envelope.} $D_w$ must clear the motor subframe, the motor body
-        and the two orthogonal wheel modules inside the selected $L$.
-  \item \textbf{Inertia.} $I_w \geq I_{w,\text{target}}$, with margin for the
-        uncertainty in $M$.
-  \item \textbf{Pocket fit.} Enough plastic wall must survive between adjacent
-        pockets and radially inboard and outboard of each. Small diameters fail
-        here: they need so many bolts to reach the target that no wall remains
-        between them.
-  \item \textbf{Mass and trim margin.} The three-wheel set must stay within its
-        allocation in Table~\ref{tab:massbudget}. Diameters large enough that
-        the bare ring already exceeds the target are rejected---they leave no
-        downward trim authority and cost mass for nothing.
-\end{enumerate}
-Criteria 3 and 4 still bracket the feasible range from below and above, so
-convergence was fast: a couple of trial points on each side of the bracket
-were enough to locate the largest diameter that still requires a non-trivial
-bolt count.
-\paragraph{Pocket placement.} The pockets cannot in general be spaced
-uniformly. A spoke occupies a finite angular width where it meets the ring, as
-does a pocket at the ballast radius, so a pocket centre must clear a spoke
-centre by the sum of the two half-widths. Whenever the uniform pitch
-$360^\circ/N$ divides the spoke pitch exactly, a uniform arrangement places a
-pocket on every spoke root and is inadmissible. The pockets are therefore
-distributed in equal groups within each inter-spoke sector, spread over the
-usable arc that remains after the spoke exclusion zones are removed. Grouping by
-sector preserves the $n_s$-fold symmetry and hence static and dynamic balance,
-and the count per sector is chosen to leave spare positions for later trim.
+% \paragraph{Pocket placement.} The pockets cannot in general be spaced
+% uniformly. A spoke occupies a finite angular width where it meets the ring, as
+% does a pocket at the ballast radius, so a pocket centre must clear a spoke
+% centre by the sum of the two half-widths. Whenever the uniform pitch
+% $360^\circ/N$ divides the spoke pitch exactly, a uniform arrangement places a
+% pocket on every spoke root and is inadmissible. The pockets are therefore
+% distributed in equal groups within each inter-spoke sector, spread over the
+% usable arc that remains after the spoke exclusion zones are removed. Grouping by
+% sector preserves the $n_s$-fold symmetry and hence static and dynamic balance,
+% and the count per sector is chosen to leave spare positions for later trim.
 
-\paragraph{Bolt retention.} Each bolt carries a centrifugal load
-$F = m_b\,\omega_{\max}^2\,r_b$ at the design speed, reacted by the pocket floor
-in bending. Positive retention is nonetheless required, and is provided by
-through-fastening each bolt with its nut against the pocket floor. This both
-retains the ballast and preserves the removability that motivates the scheme;
-the floor thickness and the pocket depth are set so that $F$ at the final
-$\omega_{\max}$ is carried with margin.
+% \paragraph{Bolt retention.} Each bolt carries a centrifugal load
+% $F = m_b\,\omega_{\max}^2\,r_b$ at the design speed, reacted by the pocket floor
+% in bending. Positive retention is nonetheless required, and is provided by
+% through-fastening each bolt with its nut against the pocket floor. This both
+% retains the ballast and preserves the removability that motivates the scheme;
+% the floor thickness and the pocket depth are set so that $F$ at the final
+% $\omega_{\max}$ is carried with margin.
 
 \subsection{Electrical Design}
 \label{sec:electrical}
@@ -486,7 +457,7 @@ derates without a heatsink.}
 \toprule
 Load & Rail & Typical (mA) & Worst case (mA) & Basis \\
 \midrule
-Teensy 4.1                & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Datasheet / measured \\
+Teensy 4.1                & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Datasheet \\
 XIAO ESP32-C6 telemetry   & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & TX burst governs \\
 BMI270 IMU                & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Datasheet \\
 MG92B brake servo         & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Stall current governs \\
