@@ -73,7 +73,7 @@
 % ----- Right logo: Armonia -----
 \newlength{\armlogowidth}  \setlength{\armlogowidth}{3.05cm}
 \newlength{\armlogoraise}  \setlength{\armlogoraise}{0cm}
-\newlength{\armlogoshift}  \setlength{\armlogoshift}{0cm}
+\newlength{\armlogoshift}  \setlength{\armlogoshift}{-1cm}
 
 % Gap between the two logos.
 \newlength{\coverlogogap}  \setlength{\coverlogogap}{2.2cm}
@@ -89,7 +89,7 @@
 % of the logo row or anything below it.
 \newcommand{\coverlogo}[4]{%
     \IfFileExists{#4}
-        {\hspace*{#3}\raisebox{#2}[0pt][0pt]{%
+        {\hspace*{#3}\raisebox{#2}[20pt][-20pt]{%
             \includegraphics[width=#1]{#4}}}
         {}}
 % ===========================================================================
