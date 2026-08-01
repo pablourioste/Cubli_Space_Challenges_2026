@@ -2,16 +2,24 @@
 %  Cover page - Technical Design Document
 % ----------------------------------------------------------------------------
 %  Requires (already loaded in main.tex): graphicx, xcolor, geometry.
-%  Edit the four \cover... macros below to update title, subtitle, version and
-%  the author list; the layout adapts automatically.
+%  Edit the \cover... fields below to update title, subtitle, version and the
+%  team list; the layout reflows automatically.
+%
+%  Typography: the page stays in the document's roman (serif) face rather than
+%  switching to sans, so the cover reads as part of a formal engineering report
+%  instead of a slide. Hierarchy comes from size and letterspacing, not weight
+%  alone.
 %
 %  Logos live in images/ alongside the other document graphics:
 %      images/SPACECHALLENGES.png  (program)
-%      images/CUBE_LOGO.png        (project)
-%  They are placed side by side at the top, program logo left, project logo
-%  right. Each is independently guarded: a missing file simply leaves its side
-%  blank, so the document never breaks on a missing graphic and the header
-%  keeps its height either way.
+%      images/armonia_logo.png     (team)
+%  Both source files are square (4500x4500 and 1024x1024), so they are drawn
+%  into identical square boxes of side \coverlogosize and therefore match
+%  exactly. To resize both, change \coverlogosize alone. To trim one logo's
+%  own internal whitespace, give it the optional scale argument, e.g.
+%  \coverlogo[1.1]{...} - the box stays the same size, only the artwork inside
+%  it grows. Each logo is guarded: a missing file leaves blank space of the
+%  same size rather than failing the build.
 % ============================================================================
 
 \definecolor{coverrule}{HTML}{2E75B6}  % divider rules (matches ctcol accent)
@@ -19,93 +27,124 @@
 
 % ---------- Editable cover fields ----------
 \newcommand{\coverTitle}{Technical Design Document}
-\newcommand{\coverAcronym}{TDD}
-\newcommand{\coverSubtitle}{Cubli --- A Three-Axis Reaction-Wheel Balancing Cube}
+\newcommand{\coverSubtitle}{Cubli}
+\newcommand{\coverTagline}{A Three-Axis Reaction-Wheel Balancing Cube}
 \newcommand{\coverVersion}{v1.0}
 \newcommand{\coverOrganization}{Space Challenges Program 2026}
-\newcommand{\coverAuthors}{%
-    Athanasia Nikolova \quad\textbullet\quad Andrea Liang \quad\textbullet\quad Deyan Nikolaev Vlaev\\[0.35em]
-    Niccolo \quad\textbullet\quad Suvanna Viriyanti Wu \quad\textbullet\quad Pablo Urioste}
+
+% Team list, laid out as an explicit three-column grid: names separated by & and
+% rows by \\. Keeping it explicit means the columns line up exactly; to add a
+% member, extend a row or start a new one.
+\newcommand{\coverTeam}{%
+    Athanasia Nikolova & Andrea Liang & Deyan Nikolaev Vlaev \\[0.85em]
+    Niccolo & Suvanna Viriyanti Wu & Pablo Urioste \\}
 
 % ---------- Helpers ----------
 % Full-width horizontal divider; argument = rule thickness.
 \newcommand{\coverrule}[1]{{\color{coverrule}\rule{\linewidth}{#1}}}
 
-% Height reserved for the logo row, so the title block starts at the same
-% vertical position whether or not the logo files are present.
-\newlength{\coverlogoheight}
-\setlength{\coverlogoheight}{2.6cm}
+% Letterspaced small-caps run, used for the label above the title and for the
+% metadata keys. Gives the cover a formal, engraved feel without extra packages.
+\newcommand{\coverspaced}[1]{%
+    {\scshape\fontsize{10}{12}\selectfont
+     \makebox[\linewidth][c]{\color{covermeta}#1}}}
 
-% \coverlogo[<scale>]{<path>} - include the graphic scaled to fit
-% \coverlogoheight without exceeding its half-width column, keeping the aspect
-% ratio. The optional scale (default 1) trims the reserved height for logos
-% that carry their own whitespace padding, so the two marks read as equal
-% visual weight rather than equal bounding box. Falls back to blank space of
-% the full height if the file is missing, so a renamed or not-yet-committed
-% logo degrades gracefully instead of failing the build.
+% ---------- Logo sizing ----------
+% Side length of the square box each logo is drawn into. Both logos share it,
+% so they always come out the same size. Change this one length to rescale.
+\newlength{\coverlogosize}
+\setlength{\coverlogosize}{3.1cm}
+
+% \coverlogo[<scale>]{<path>} - draw the graphic centred in a square box of
+% side \coverlogosize. The optional scale (default 1) magnifies the artwork
+% inside that fixed box, to compensate for differing amounts of built-in
+% padding between logo files; it does not change the box, so the two logos stay
+% aligned and equally sized whatever you set it to.
 \newcommand{\coverlogo}[2][1]{%
-    \IfFileExists{#2}
-        {\includegraphics[height=#1\coverlogoheight,width=\linewidth,keepaspectratio]{#2}}
-        {\rule{0pt}{\coverlogoheight}}}
+    \begin{minipage}[c][\coverlogosize][c]{\coverlogosize}%
+        \centering
+        \IfFileExists{#2}
+            {\includegraphics[width=#1\coverlogosize,
+                              height=#1\coverlogosize,
+                              keepaspectratio]{#2}}
+            {}%
+    \end{minipage}}
 
-% Aligned key-value row of the metadata block; the label is flush right against
-% the value column so the two columns meet at a single vertical rule.
+% Aligned key-value row of the metadata block.
 \newcommand{\covermetarow}[2]{%
-    \hfill\textcolor{covermeta}{\textbf{#1}} & #2 \\[0.45em]}
+    \hfill\coverspacedlabel{#1} & #2 \\[0.5em]}
+\newcommand{\coverspacedlabel}[1]{{\scshape\color{covermeta}#1}}
 
 \begin{titlepage}
     \centering
-    \sffamily
+    % titlepage appends its own \vfill, which would push the trailing metadata
+    % and rule onto a discarded overflow page. Zeroing \parskip and holding the
+    % whole cover in one top-anchored block keeps every element on this sheet.
+    \setlength{\parskip}{0pt}
 
-    % ---------- Logo row: program logo left, project logo right ----------
-    % Both columns are vertically centred on a common baseline so logos of
-    % differing aspect ratio still sit level with each other.
-    \noindent
-    \begin{minipage}[c][1.2\coverlogoheight][c]{0.42\textwidth}
-        \centering
-        \coverlogo[1.15]{images/SPACECHALLENGES.png}
-    \end{minipage}\hfill
-    \begin{minipage}[c][1.2\coverlogoheight][c]{0.42\textwidth}
-        \centering
-        \coverlogo{images/armonia_logo.png}
-    \end{minipage}
+    % ---------- Logo row: program logo left, team logo right ----------
+    % The pair is set as one centred box with a fixed gap between the two
+    % square cells, so the marks stay symmetric about the page centre and
+    % equally sized regardless of their internal padding.
+    \vspace*{0.2cm}
+    \coverlogo{images/SPACECHALLENGES.png}%
+    \hspace{2.2cm}%
+    \coverlogo{images/armonia_logo.png}
 
-    \vspace{1.6cm}
+    \vspace{1.5cm}
 
     % ---------- Title block ----------
-    \coverrule{1.2pt}
+    \coverspaced{Space Challenges Program 2026}
+
+    \vspace{0.4cm}
+    \coverrule{1.1pt}
     \vspace{0.9cm}
 
-    {\fontsize{30}{36}\selectfont\bfseries \coverTitle\par}
-    \vspace{0.45cm}
-    {\Large\bfseries\color{coverrule} (\coverAcronym)\par}
+    {\fontsize{28}{34}\selectfont\scshape \coverTitle\par}
 
     \vspace{0.9cm}
-    \coverrule{0.5pt}
+    \coverrule{0.8pt}
 
-    \vspace{1.0cm}
-    {\LARGE \coverSubtitle\par}
+    \vspace{1.2cm}
 
-    \vfill
+    % ---------- Project identity ----------
+    {\fontsize{44}{50}\selectfont\bfseries \coverSubtitle\par}
+    \vspace{0.55cm}
+    {\large\itshape \coverTagline\par}
 
-    % ---------- Metadata block ----------
-    % The label column is fixed-width so the four rows share one baseline grid;
-    % the whole block is centred as a unit rather than per-row.
-    \begin{minipage}{0.95\textwidth}
+    % Explicit gaps rather than \vfill: inside titlepage the surrounding glue
+    % absorbs the stretch, so fixed spacing is what actually holds the project
+    % name high on the page and keeps the lower block from bunching.
+    \vspace{2.4cm}
+
+    % ---------- Team block ----------
+    % Names sit on a three-column grid under a small-caps heading, so the list
+    % reads as a deliberate block rather than a run of comma-separated text.
+    \coverspaced{Project Team}
+    \vspace{0.6cm}
+
+    \begin{minipage}{0.92\textwidth}
         \centering
-        \renewcommand{\arraystretch}{1.0}
-        \begin{tabular}{@{}p{0.18\linewidth}@{\hspace{1.2em}}l@{}}
-            \covermetarow{Authors}{\begin{tabular}[t]{@{}l@{}}\coverAuthors\end{tabular}}
-            \covermetarow{Organization}{\coverOrganization}
-            \covermetarow{Version}{\coverVersion}
-            \covermetarow{Date}{\today}
+        \large
+        \begin{tabular}{@{}*{3}{>{\centering\arraybackslash}p{0.32\linewidth}}@{}}
+            \coverTeam
         \end{tabular}
     \end{minipage}
 
-    \vspace{1.4cm}
-    \coverrule{1.2pt}
+    \vspace{1.5cm}
 
-    \vspace{0.6cm}
-    {\small\color{covermeta} Space Challenges 2026 --- Cubli Team\par}
+    % ---------- Document metadata ----------
+    \begin{minipage}{0.62\textwidth}
+        \renewcommand{\arraystretch}{1.0}
+        \begin{tabular}{@{}p{0.42\linewidth}@{\hspace{1.4em}}l@{}}
+            \covermetarow{Organization}{\coverOrganization}
+            \covermetarow{Document version}{\coverVersion}
+            \covermetarow{Date of issue}{\today}
+        \end{tabular}
+    \end{minipage}
+
+    \vspace{0.9cm}
+    \coverrule{1.1pt}
+    \vspace*{0.2cm}
 
 \end{titlepage}

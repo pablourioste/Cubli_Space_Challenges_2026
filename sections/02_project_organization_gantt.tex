@@ -35,9 +35,17 @@
 \endgroup
 
 
+% The chart is drawn on two landscape pages at natural size rather than being
+% squeezed onto one portrait page with \resizebox. Scaling to fit the text
+% width shrank the day numbers below legibility and still overflowed the page
+% bottom, so the rows are split across two sheets instead:
+%   Sheet 1 - documentation and control/software streams
+%   Sheet 2 - hardware, 3D design, electrical, deliverables and milestone gates
+% Landscape gives each of the 29 days ~0.62cm instead of ~0.4cm, which is what
+% makes the day and week headers readable.
 \ganttset{
   hgrid, vgrid={*6{draw=none}, *1{draw=black!15}},
-  x unit=0.4cm, y unit title=0.5cm, y unit chart=0.36cm,
+  x unit=0.62cm, y unit title=0.58cm, y unit chart=0.44cm,
   title height=1, bar height=0.6, bar top shift=0.2,
   group top shift=0.1, group height=0.5, milestone top shift=0.15,
   bar label font=\small, group label font=\bfseries\small,
@@ -46,6 +54,23 @@
   today rule/.style={draw=black!70, dashed, line width=0.7pt},
   today label={},
 }
+
+% Shared chart header: week bands over individual day numbers. Defined once so
+% both sheets carry an identical time axis and stay visually comparable.
+\newcommand{\cubliganttheader}{%
+  \gantttitle{Week 1 (23--29 Jul)}{7}
+  \gantttitle{Week 2 (30 Jul--5 Aug)}{7}
+  \gantttitle{Week 3 (6--12 Aug)}{7}
+  \gantttitle{Week 4 (13--19 Aug)}{7}
+  \gantttitle{20}{1} \\
+  \gantttitle{23}{1} \gantttitle{24}{1} \gantttitle{25}{1} \gantttitle{26}{1}
+  \gantttitle{27}{1} \gantttitle{28}{1} \gantttitle{29}{1} \gantttitle{30}{1}
+  \gantttitle{31}{1} \gantttitle{1}{1} \gantttitle{2}{1} \gantttitle{3}{1}
+  \gantttitle{4}{1} \gantttitle{5}{1} \gantttitle{6}{1} \gantttitle{7}{1}
+  \gantttitle{8}{1} \gantttitle{9}{1} \gantttitle{10}{1} \gantttitle{11}{1}
+  \gantttitle{12}{1} \gantttitle{13}{1} \gantttitle{14}{1} \gantttitle{15}{1}
+  \gantttitle{16}{1} \gantttitle{17}{1} \gantttitle{18}{1} \gantttitle{19}{1}
+  \gantttitle{20}{1} \\}
 
 % The today marker is set from \cubliday, computed above, and is applied only
 % when the compilation date falls inside the project window. Outside that
@@ -56,16 +81,14 @@
   \fi
 \fi
 
+% ---------------------------------------------------------------------------
+% Sheet 1 of 2: documentation and control/software streams.
+% ---------------------------------------------------------------------------
+\begin{landscape}
 \begin{figure}[p]
 \centering
-\resizebox{\textwidth}{!}{%
 \begin{ganttchart}{1}{29}
-  \gantttitle{Week 1 (23--29 Jul)}{7}
-  \gantttitle{Week 2 (30 Jul--5 Aug)}{7}
-  \gantttitle{Week 3 (6--12 Aug)}{7}
-  \gantttitle{Week 4 (13--19 Aug)}{7}
-  \gantttitle{20}{1} \\
-  \gantttitle{23}{1} \gantttitle{24}{1} \gantttitle{25}{1} \gantttitle{26}{1} \gantttitle{27}{1} \gantttitle{28}{1} \gantttitle{29}{1} \gantttitle{30}{1} \gantttitle{31}{1} \gantttitle{1}{1} \gantttitle{2}{1} \gantttitle{3}{1} \gantttitle{4}{1} \gantttitle{5}{1} \gantttitle{6}{1} \gantttitle{7}{1} \gantttitle{8}{1} \gantttitle{9}{1} \gantttitle{10}{1} \gantttitle{11}{1} \gantttitle{12}{1} \gantttitle{13}{1} \gantttitle{14}{1} \gantttitle{15}{1} \gantttitle{16}{1} \gantttitle{17}{1} \gantttitle{18}{1} \gantttitle{19}{1} \gantttitle{20}{1} \\
+  \cubliganttheader
   % ===== Investigation, Requirements & Documentation =====
   \ganttgroup[group/.append style={fill=pfcol!55}]{Documentation}{1}{23} \ganttnewline
   \ganttbar[bar/.append style={fill=pfcol}]{A1 Literature}{1}{3} \ganttnewline
@@ -97,7 +120,29 @@
   \ganttbar[bar/.append style={fill=ctcol}]{B10 EKF estimator}{21}{24} \ganttnewline
   \ganttbar[bar/.append style={fill=ctcol}]{B11 Edge balance}{24}{26} \ganttnewline
   \ganttbar[bar/.append style={fill=ctcol}]{B12 Corner + slew}{26}{28} \ganttnewline
-  \ganttbar[bar/.append style={fill=ctcol}]{B13 Jump-up}{28}{29} \ganttnewline
+  \ganttbar[bar/.append style={fill=ctcol}]{B13 Jump-up}{28}{29}
+\end{ganttchart}
+\caption[Project schedule (1 of 3): documentation, control and software]{Project
+schedule, 23~July--20~August 2026 (sheet 1 of 3): documentation and
+control/software streams. The documentation stream (green) carries two assessed
+submissions, on 3~and 14~August. Control and software (blue) runs from the
+simulation environment through to the balancing demonstrations, with the
+three-dimensional extension concentrated in the final two weeks. The dashed
+vertical rule marks the current date at the time of compilation. The build
+streams continue in Figure~\ref{fig:gantt-build} and the milestone gates in
+Figure~\ref{fig:gantt-gates}.}
+\label{fig:gantt}
+\end{figure}
+\end{landscape}
+
+% ---------------------------------------------------------------------------
+% Sheet 2 of 2: hardware, 3D design, electrical, deliverables, milestone gates.
+% ---------------------------------------------------------------------------
+\begin{landscape}
+\begin{figure}[p]
+\centering
+\begin{ganttchart}{1}{29}
+  \cubliganttheader
   % ===== Hardware Design & Build =====
   \ganttgroup[group/.append style={fill=cdcol!55}]{Hardware Build}{1}{15} \ganttnewline
   \ganttbar[bar/.append style={fill=cdcol}]{C1 Envelope}{1}{2} \ganttnewline
@@ -137,8 +182,34 @@
   \ganttbar[bar/.append style={fill=mfcol}]{E10 Brake servo rail}{25}{28} \ganttnewline
   % ===== Deliverables =====
   \ganttgroup[group/.append style={fill=mscol!45}]{Deliverables}{27}{29} \ganttnewline
-  \ganttbar[bar/.append style={fill=mscol!70}]{F1 Demo \& presentation}{27}{29} \ganttnewline
-  \ganttnewline
+  \ganttbar[bar/.append style={fill=mscol!70}]{F1 Demo \& presentation}{27}{29}
+\end{ganttchart}
+\caption[Project schedule (2 of 3): hardware, electrical and deliverables]{Project
+schedule, 23~July--20~August 2026 (sheet 2 of 3): hardware, three-dimensional
+design, electrical and deliverable streams, continued from
+Figure~\ref{fig:gantt}. Hardware (gold) separates the single-axis build from the
+three-dimensional design, and the electrical stream (orange) proceeds from the
+single-axis bring-up to the integrated cube. The dashed vertical rule marks the
+current date at the time of compilation. The milestone gates that close each
+phase are shown in Figure~\ref{fig:gantt-gates}.}
+\label{fig:gantt-build}
+\end{figure}
+\end{landscape}
+
+% ---------------------------------------------------------------------------
+% Sheet 3 of 3: milestone gates. Kept on their own sheet because the seventeen
+% gates do not fit under the build streams without overflowing the page.
+% ---------------------------------------------------------------------------
+\begin{landscape}
+\begin{figure}[p]
+\centering
+% The gates sheet carries far fewer rows than the stream sheets, so it is given
+% a taller row pitch; the time axis is unchanged, keeping columns aligned. The
+% setting is scoped to this figure so later charts keep the default pitch.
+\begingroup
+\ganttset{y unit chart=0.62cm}
+\begin{ganttchart}{1}{29}
+  \cubliganttheader
   % ===== Milestone gates =====
   \ganttmilestone[milestone/.append style={fill=mscol}]{G1 Kick-off}{2} \ganttnewline
   \ganttmilestone[milestone/.append style={fill=mscol}]{G2 Modelling complete}{9} \ganttnewline
@@ -157,17 +228,15 @@
   \ganttmilestone[milestone/.append style={fill=mscol}]{G7 Corner + slew}{28} \ganttnewline
   \ganttmilestone[milestone/.append style={fill=mscol}]{G8 Jump-up}{29} \ganttnewline
   \ganttmilestone[milestone/.append style={fill=mscol}]{G9 Presentation}{29}
-\end{ganttchart}%
-}
-\caption[Project schedule, 23 July--20 August 2026]{Project schedule,
-23~July--20~August 2026. The documentation stream (green) carries two assessed
-submissions, on 3~and 14~August. Control and software (blue) runs from the
-simulation environment through to the balancing demonstrations, with the
-three-dimensional extension concentrated in the final two weeks. Hardware (gold)
-separates the single-axis build from the three-dimensional design, and the
-electrical stream (orange) proceeds from the single-axis bring-up to the
-integrated cube. The dashed vertical rule marks the current date at the time of
-compilation. Grey diamonds mark the milestone gates listed in
-Table~\ref{tab:gates}.}
-\label{fig:gantt}
+\end{ganttchart}
+\endgroup
+\caption[Project schedule (3 of 3): milestone gates]{Project schedule,
+23~July--20~August 2026 (sheet 3 of 3): the milestone gates that close each
+phase, continued from Figures~\ref{fig:gantt} and~\ref{fig:gantt-build}. Grey
+diamonds mark the gates listed in Table~\ref{tab:gates}, placed on the day each
+gate falls due. The dashed vertical rule marks the current date at the time of
+compilation. All three sheets share the same time axis, so columns align
+between them.}
+\label{fig:gantt-gates}
 \end{figure}
+\end{landscape}
