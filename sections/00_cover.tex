@@ -49,50 +49,54 @@
     {\scshape\fontsize{10}{12}\selectfont
      \makebox[\linewidth][c]{\color{covermeta}#1}}}
 
-% ============================ LOGO TUNING ==================================
-% The two logo files carry different amounts of built-in white space around the
-% artwork, so drawing them at the same nominal size does NOT make them look the
-% same size or sit on the same line. The six knobs below exist to correct that
-% by eye. Each logo has its own scale and its own horizontal/vertical offset,
-% and they are completely independent - changing one never moves the other.
-%
-%   ...width  : how wide the artwork is drawn. Bigger value = bigger logo.
-%               Use this to make the two marks look optically equal.
-%   ...raise  : vertical nudge. POSITIVE moves the logo UP, negative moves DOWN.
-%   ...shift  : horizontal nudge. POSITIVE moves the logo RIGHT, negative LEFT.
-%
-% Tune in small steps (0.05cm-0.1cm); recompile and look. Nothing else on the
-% cover depends on these values.
-% ---------------------------------------------------------------------------
+% #########################################################################
+% #                          LOGO CONTROLS                                #
+% #  Everything you need to align the two logos is in the two blocks      #
+% #  below. Edit the numbers, recompile, look. Nothing else is affected.  #
+% #########################################################################
 
-% ----- Left logo: Space Challenges -----
-\newlength{\sclogowidth}   \setlength{\sclogowidth}{3.30cm}
-\newlength{\sclogoraise}   \setlength{\sclogoraise}{0cm}
-\newlength{\sclogoshift}   \setlength{\sclogoshift}{0cm}
 
-% ----- Right logo: Armonia -----
-\newlength{\armlogowidth}  \setlength{\armlogowidth}{3.05cm}
-\newlength{\armlogoraise}  \setlength{\armlogoraise}{0cm}
-\newlength{\armlogoshift}  \setlength{\armlogoshift}{0cm}
+% =========================== 1. SIZE =====================================
+%  Bigger number = bigger logo. Adjust until the two marks look equal.
+% =========================================================================
 
-% Gap between the two logos.
+\newlength{\sclogosize}    \setlength{\sclogosize}{3.30cm}   % LEFT  (Space Challenges)
+\newlength{\armlogosize}   \setlength{\armlogosize}{3.05cm}  % RIGHT (Armonia)
+
+
+% ========================= 2. POSITION ===================================
+%  UP    : positive = move up,    negative = move down
+%  RIGHT : positive = move right, negative = move left
+%  Tune in small steps, e.g. 0.05cm or 0.1cm.
+% =========================================================================
+
+% ----- LEFT logo (Space Challenges) -----
+\newlength{\sclogoup}      \setlength{\sclogoup}{0cm}
+\newlength{\sclogoright}   \setlength{\sclogoright}{0cm}
+
+% ----- RIGHT logo (Armonia) -----
+\newlength{\armlogoup}     \setlength{\armlogoup}{0cm}
+\newlength{\armlogoright}  \setlength{\armlogoright}{0cm}
+
+% ----- Space between the two logos -----
 \newlength{\coverlogogap}  \setlength{\coverlogogap}{2.2cm}
 
-% Height reserved for the logo row. It is fixed and independent of the logos,
-% so raising or lowering either mark never shifts the title block underneath.
-% Increase it if you enlarge a logo enough to overflow the row.
+% #########################################################################
+% #  End of logo controls. No need to edit below this line.               #
+% #########################################################################
+
+% Height reserved for the logo row. Fixed and independent of the logos, so
+% moving a logo up or down never shifts the title block underneath. Increase
+% it only if you make a logo big enough to overflow the row.
 \newlength{\coverlogorow}  \setlength{\coverlogorow}{3.4cm}
 
-% \coverlogo{<width>}{<raise>}{<shift>}{<path>} - place one logo at the given
-% width, nudged by raise (up) and shift (right). The box carries no height of
-% its own, so a vertical nudge moves the artwork without disturbing the height
-% of the logo row or anything below it.
+% \coverlogo{<size>}{<up>}{<right>}{<path>} - place one logo. The box carries
+% no height of its own, so a vertical nudge moves only the artwork.
 \newcommand{\coverlogo}[4]{%
     \IfFileExists{#4}
         {\hspace*{#3}\raisebox{#2}[0pt][0pt]{%
             \includegraphics[width=#1]{#4}}}
         {}}
-% ===========================================================================
 
 % Aligned key-value row of the metadata block.
 \newcommand{\covermetarow}[2]{%
@@ -106,17 +110,15 @@
     % whole cover in one top-anchored block keeps every element on this sheet.
     \setlength{\parskip}{0pt}
 
-    % ---------- Logo row: program logo left, team logo right ----------
-    % Each logo is positioned by its own width/raise/shift knobs defined in the
-    % LOGO TUNING block above. \coverlogorow reserves a fixed height for the
-    % row, so nudging a logo up or down never moves the title block below it.
+    % ---------- Logo row ----------
+    % Sizes and positions come from the LOGO CONTROLS block at the top.
     \vspace*{0.2cm}
     \makebox[\linewidth][c]{%
         \rule{0pt}{\coverlogorow}%
-        \coverlogo{\sclogowidth}{\sclogoraise}{\sclogoshift}%
+        \coverlogo{\sclogosize}{\sclogoup}{\sclogoright}%
                   {images/SPACECHALLENGES.png}%
         \hspace{\coverlogogap}%
-        \coverlogo{\armlogowidth}{\armlogoraise}{\armlogoshift}%
+        \coverlogo{\armlogosize}{\armlogoup}{\armlogoright}%
                   {images/armonia_logo.png}%
     }
 
