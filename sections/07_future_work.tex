@@ -5,6 +5,260 @@
 
 \subsection{Autonomous Stand-up \& Disturbance Rejection}
 
+\subsection{AI-Driven Control \& Dynamic Coefficient Tuning}
+\label{sec:ai_control}
+
+\subsubsection{Motivation: Why a Fixed Gain Is a Fixed Assumption}
+
+The balancing controller of Section~\ref{sec:control2d} computes a single
+gain $K_d$ offline, from an $(A,B)$ pair built from the parameters of
+Tables~\ref{tab:2d_vars} and \ref{tab:3d_vars}. That gain is optimal for
+exactly one plant: the one those numbers describe. It is retained here as the
+baseline precisely because it is simple and verifiable, but its optimality is
+conditional in three ways that the hardware of this project is expected to
+violate.
+
+\begin{itemize}
+    \item \textbf{Parametric drift.} $C_b$ and $C_w$ are not obtained from
+    CAD and are carried as estimates until the identification tests of
+    Section~\ref{sec:test_paramid} (Table~\ref{tab:params}). Bearing friction,
+    wiring drag and motor cogging also change with temperature, wear and
+    reassembly, so the identified values are a snapshot rather than a
+    constant. The inertia tensor $I$ and the center-of-mass offset $r_{cm}$
+    are subject to the same objection at the few-percent level, and $r_{cm}$
+    in particular shifts whenever the pack or harness is disturbed.
+    \item \textbf{Payload and configuration changes.} Any added mass changes
+    $m$, $r_{cm}$ and $I$ simultaneously, and therefore changes $A$. A gain
+    tuned for one configuration is not merely suboptimal for another; near a
+    fully unstable equilibrium it may be destabilizing.
+    \item \textbf{Contact and surface variation.} The pivot is modeled as an
+    ideal frictionless point or line. A real corner resting on a real surface
+    slips, deforms and dissipates energy in a way that is neither in the model
+    nor constant across surfaces, and this is the dominant unmodeled effect
+    for the walking objective of Section~\ref{sec:objectives}.
+\end{itemize}
+
+The standard remedy within the existing design is gain scheduling on
+$\hat\theta_b$ (Section~\ref{sec:control2d}), but scheduling interpolates
+between gains that were themselves computed from the same assumed parameters.
+It addresses the weakening of the small-angle linearization; it does not
+address a plant that differs from the model. The proposal here is to keep the
+verified feedback law and adapt its coefficients online.
+
+\subsubsection{Proposed Hybrid Architecture}
+
+The intended structure is deliberately conservative: a classical inner loop
+whose stability properties are understood, wrapped by a slow outer loop that
+adjusts the inner loop's coefficients. Writing $\phi$ for the tunable
+coefficient vector,
+\begin{equation}
+u[k] = -K_d(\phi[k])\,\hat x[k],
+\qquad
+\phi[k+1] = \phi[k] + \Delta\phi\big(\hat x[k],\, \hat x[k-1], \dots\big),
+\label{eq:hybrid_arch}
+\end{equation}
+where $\hat x$ is the estimated state of Section~\ref{sec:control2d} and
+$\Delta\phi$ is produced by the tuner. Two properties of
+\eqref{eq:hybrid_arch} matter more than the choice of learning algorithm.
+First, the inner loop remains a linear state feedback at every instant, so
+the controller that runs on the hardware is the one already implemented and
+tested. Second, $\phi$ is updated on a timescale far slower than the control
+period $\Delta t$, which keeps the frozen-gain analysis approximately valid
+and prevents the tuner from acting as an unmodeled fast feedback path. Three
+candidate tuners are of interest, and they are not equivalent in cost:
+
+\begin{itemize}
+    \item \textbf{Bayesian optimization} over a low-dimensional
+    parameterization of $Q$ and $R$, minimizing a measured cost from short
+    balancing trials \cite{shahriari2016bayesopt}. This is the cheapest option
+    and the one with a direct precedent on this class of hardware: automatic
+    LQR tuning has been demonstrated on an inverted pendulum with on the order
+    of tens of experiments \cite{marco2016automaticlqr}, and a self-tuning LQR
+    has been run on the Cubli's own ancestor platform at ETH
+    \cite{trimpe2014learningcubli}. It tunes between trials, not within them.
+    \item \textbf{Adaptive dynamic programming}, which solves the LQR problem
+    online from measured data rather than from $(A,B)$, converging toward the
+    optimal gain for the true plant without an explicit model
+    \cite{lewis2012adp}. This is the option with the strongest theoretical
+    guarantees and the strictest excitation requirements.
+    \item \textbf{Reinforcement learning}, in which a policy trained in
+    simulation outputs $\Delta\phi$ continuously from the state-error history.
+    This is the most capable and the least verifiable, and is treated below as
+    the exploratory branch rather than the default.
+\end{itemize}
+
+\paragraph{A stated reservation.} The literature supporting learned control
+is overwhelmingly validated in simulation or on well-instrumented hardware,
+and the failure mode of an online tuner on an open-loop-unstable plant is a
+fall, not a degraded score. Any deployment on this cube should therefore be
+gated behind: a projection of $\phi$ onto a set for which the frozen-gain
+closed loop is verified stable across the parameter uncertainty; a fallback to
+the fixed $K_d$ of Section~\ref{sec:control2d} on any estimator fault or
+divergence; and bench trials with the cube tethered. This is future work in
+the literal sense --- none of it is a committed deliverable of the present
+design, and the baseline controller is not contingent on any of it.
+
+\subsubsection{Module 1: Dynamic Gain Tuning}
+
+The tuner does not emit motor currents. It emits the coefficients from which
+$K_d$ is computed, which bounds what a bad update can do. Two
+parameterizations are worth comparing:
+
+\begin{itemize}
+    \item \textbf{Weight-space tuning.} The policy outputs the diagonal
+    entries of the cost matrices,
+    $\phi = (\log q_1,\dots,\log q_9,\ \log r_1, \log r_2, \log r_3)$ with
+    $Q = \mathrm{diag}(q_i) \succ 0$ and $R = \mathrm{diag}(r_i) \succ 0$, and
+    $K_d$ follows from the discrete algebraic Riccati equation. The
+    logarithmic parameterization enforces positive definiteness by
+    construction, so every $\phi$ the policy can emit corresponds to a
+    well-posed LQR problem and, for a stabilizable $(A_d,B_d)$, to a
+    stabilizing gain for the \emph{modeled} plant. The cost is that a Riccati
+    solve must run onboard whenever $\phi$ changes, which is what confines
+    updates to a slow outer loop.
+    \item \textbf{Gain-space tuning.} The policy perturbs the entries of $K_d$
+    directly, or equivalently the $K_p, K_d$ pair of a PD form, avoiding the
+    Riccati solve at the price of losing the structural guarantee above. This
+    is the practical choice if the outer loop must run fast, and it makes the
+    projection step of the previous paragraph mandatory rather than merely
+    prudent.
+\end{itemize}
+
+For the 3D corner-balancing case the state is
+$x = (\theta, \omega_b, \omega_w) \in \mathbb{R}^9$ and $K_d$ is $3\times 9$
+(Section~\ref{sec:3dmodel}), so tuning the $54$ free entries directly is not
+sensible on the available data. Weight-space tuning reduces the problem to
+$12$ coefficients, and symmetry of the three wheel axes reduces it further if
+the wheels are treated as identical. A reward or cost of the form
+\begin{equation}
+c[k] = \hat x^{\mathrm T}[k]\,W_x\,\hat x[k] + \rho\,\|u[k]\|^2 + \sigma\,\|\omega_w[k]\|^2
+\label{eq:tuner_cost}
+\end{equation}
+adds an explicit penalty on stored wheel momentum, which the nominal LQR cost
+$J(u)$ of Section~\ref{sec:control2d} does not distinguish from any other
+state deviation. This term is the one directly relevant to the saturation
+problem raised in Section~\ref{sec:application}: it expresses a preference for
+holding attitude with the wheels near zero speed, leaving momentum headroom
+for disturbance rejection.
+
+\subsubsection{Module 2: Sim-to-Real Transfer via Domain Randomization}
+
+A policy trained against a single nominal parameter set learns to exploit that
+parameter set. Domain randomization instead samples the plant parameters from
+a distribution at the start of each training episode
+\cite{tobin2017domainrand}, so that the policy is optimized against a family
+of plants rather than one, and the transfer method has a substantial record on
+physical legged hardware \cite{hwangbo2019anymal}. For this cube the
+randomized quantities follow directly from the identification gaps already
+documented:
+
+\begin{itemize}
+    \item \textbf{Damping:} $C_b, C_w$ over a wide interval, since these are
+    estimated rather than measured until Section~\ref{sec:test_paramid}
+    closes.
+    \item \textbf{Inertia and mass distribution:} $I$, $m$ and $r_{cm}$
+    perturbed by a few percent, covering print-density variation, fastener
+    placement and harness routing.
+    \item \textbf{Actuation:} $K_m$ within motor tolerance, plus a current
+    saturation limit and a commanded-torque delay, so the policy cannot assume
+    an ideal actuator.
+    \item \textbf{Contact:} pivot friction and restitution, and a small random
+    ground slope --- the term standing in for the surface variation that
+    motivates this module.
+    \item \textbf{Sensing:} gyro bias walk, accelerometer noise and an
+    injected vibration component, matching the estimator degradation
+    identified in Section~\ref{sec:background} as the practical limit on
+    balancing.
+\end{itemize}
+
+The last item deserves emphasis, because it is the one most often omitted. The
+accelerometer corruption on this platform is generated by the controller's own
+wheel activity, so it is correlated with the policy's actions rather than
+independent of them. A randomization scheme that injects only white sensor
+noise will understate the difficulty, and a policy that transfers under it
+should not be assumed to transfer on hardware. Whether the randomized
+distribution actually covers the real cube is an empirical question, settled
+by the same bench tests as everything else --- the honest failure mode of this
+module is a distribution the designer chose to be convenient rather than
+representative.
+
+\subsubsection{Module 3: Jump-Up Energy Optimization}
+
+The jump-up analysis of Section~\ref{sec:jumpup_target} treats the maneuver as
+a spin-up to $\omega_{\max}$ followed by an abrupt stop, with all deviation
+from the ideal absorbed into a single brake-amplification factor
+$\beta = \tau_b/(\tau_b-\tau_g)$. That model is adequate for sizing and is
+deliberately conservative, but it is a poor description of what the mechanism
+does: the servo-driven barrier has finite travel, the collision is not
+instantaneous, and the resulting torque profile is neither a step nor known in
+advance.
+
+The proposal is to treat the torque command over the maneuver window as a
+profile to be optimized rather than a constant. Parameterizing the
+pre-brake and post-impact torque commands by a small vector $\psi$ --- for
+instance the timing of brake release relative to the wheel-speed trajectory,
+and the shape of the recovery torque applied by the remaining wheels
+immediately after impact --- the objective is
+\begin{equation}
+\min_{\psi}\ \ \mathbb{E}\Big[\, \|\theta(t_f) - \theta^\star\|^2 + \mu\,\|\omega_b(t_f)\|^2 \,\Big]
+\quad \text{subject to} \quad
+\omega_w \le \omega_{\max},\ \ |u_i| \le u_{\max},
+\label{eq:jump_opt}
+\end{equation}
+where $t_f$ is the instant the controller hands over to the balancing law at
+$|\hat\theta_b| < \theta_{\text{th}}$. Minimizing residual body rate at
+handover is the quantity of interest, because a jump that reaches the
+equilibrium with excess rate demands recovery authority the balancing
+controller may not have. Because each evaluation of \eqref{eq:jump_opt} is a
+physical jump, the sample budget is small and the appropriate method is
+Bayesian optimization rather than a policy-gradient method, with the initial
+design taken from the analytical $h_w$ of Equation~\eqref{eq:hw_ideal}.
+
+Two constraints on this module must be stated. First, it presupposes the
+measurement described in Section~\ref{sec:jumpup_target}: until the spin-down
+test of Section~\ref{sec:test_jumpup} reports both the impulse-equivalent mean
+$\bar\tau_b = h_w/\Delta t$ and the peak torque, there is no validated model to
+optimize against and no way to distinguish an improved profile from a
+mis-measured one. Second, the structural caveat carries over unchanged ---
+optimization must not be permitted to search toward shorter stopping times,
+since $\tau_b$ is simultaneously a load on the barrier, bolt, bracket and
+spokes, and the sizing value was chosen for the dynamics and not for that load
+path. The search space must be bounded by the structural case, not by the
+dynamic one.
+
+\subsubsection{Relevance Beyond the Bench}
+
+Two application claims follow, and both are narrower than the general
+enthusiasm for learned control would suggest.
+
+For \textbf{CubeSat attitude control}, the relevant fact is that a
+spacecraft's inertia tensor is known imprecisely at integration and changes in
+flight --- propellant depletion, deployable appendages, thermal distortion ---
+while reaction-wheel friction rises with bearing age. These are the orbital
+analogues of the parametric drift of Section~\ref{sec:control2d}, and they are
+conventionally handled by conservative fixed gains with margin, at a cost in
+pointing performance. A tuner that adapts $Q$ and $R$ against measured
+performance addresses exactly this gap. The qualification barrier for flying
+learned control is high and unaddressed here; the architecture of
+\eqref{eq:hybrid_arch} is chosen partly because a bounded outer loop over a
+classical inner loop is the form most likely to survive that scrutiny.
+
+For \textbf{low-gravity surface mobility}, the case is stronger, because the
+plant is genuinely unknown before arrival. Regolith mechanical properties on a
+small body are not characterized to the precision a hopping controller would
+want, and the flight-proven hoppers cited in Section~\ref{sec:application}
+\cite{yoshimitsu1999minerva, ho2017mascot} move ballistically rather than
+under closed-loop control for this reason. The contact randomization of
+Module~2 and the profile optimization of Module~3 map onto that problem
+directly: a hop whose landing attitude is controlled, on a surface whose
+properties were sampled from a distribution rather than assumed, is the
+capability that separates directional walking from a ballistic tumble
+\cite{spiridonov2024spacehopper}. The cube tests this under $1$~g, where the
+destabilizing torque is larger and never relents --- a harder case in that one
+respect, as argued in Section~\ref{sec:application}, though it does not
+reproduce the low-gravity contact dynamics that would decide the real
+maneuver.
+
 \subsection{Single-Wheel Variant / Extensions}
 
 % A reduced-actuation variant balancing the 3D cube with a single reaction wheel,

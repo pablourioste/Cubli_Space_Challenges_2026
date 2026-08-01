@@ -49,26 +49,50 @@
     {\scshape\fontsize{10}{12}\selectfont
      \makebox[\linewidth][c]{\color{covermeta}#1}}}
 
-% ---------- Logo sizing ----------
-% Side length of the square box each logo is drawn into. Both logos share it,
-% so they always come out the same size. Change this one length to rescale.
-\newlength{\coverlogosize}
-\setlength{\coverlogosize}{3.1cm}
+% ============================ LOGO TUNING ==================================
+% The two logo files carry different amounts of built-in white space around the
+% artwork, so drawing them at the same nominal size does NOT make them look the
+% same size or sit on the same line. The six knobs below exist to correct that
+% by eye. Each logo has its own scale and its own horizontal/vertical offset,
+% and they are completely independent - changing one never moves the other.
+%
+%   ...width  : how wide the artwork is drawn. Bigger value = bigger logo.
+%               Use this to make the two marks look optically equal.
+%   ...raise  : vertical nudge. POSITIVE moves the logo UP, negative moves DOWN.
+%   ...shift  : horizontal nudge. POSITIVE moves the logo RIGHT, negative LEFT.
+%
+% Tune in small steps (0.05cm-0.1cm); recompile and look. Nothing else on the
+% cover depends on these values.
+% ---------------------------------------------------------------------------
 
-% \coverlogo[<scale>]{<path>} - draw the graphic centred in a square box of
-% side \coverlogosize. The optional scale (default 1) magnifies the artwork
-% inside that fixed box, to compensate for differing amounts of built-in
-% padding between logo files; it does not change the box, so the two logos stay
-% aligned and equally sized whatever you set it to.
-\newcommand{\coverlogo}[2][1]{%
-    \begin{minipage}[c][\coverlogosize][c]{\coverlogosize}%
-        \centering
-        \IfFileExists{#2}
-            {\includegraphics[width=#1\coverlogosize,
-                              height=#1\coverlogosize,
-                              keepaspectratio]{#2}}
-            {}%
-    \end{minipage}}
+% ----- Left logo: Space Challenges -----
+\newlength{\sclogowidth}   \setlength{\sclogowidth}{3.30cm}
+\newlength{\sclogoraise}   \setlength{\sclogoraise}{0cm}
+\newlength{\sclogoshift}   \setlength{\sclogoshift}{0cm}
+
+% ----- Right logo: Armonia -----
+\newlength{\armlogowidth}  \setlength{\armlogowidth}{3.05cm}
+\newlength{\armlogoraise}  \setlength{\armlogoraise}{0cm}
+\newlength{\armlogoshift}  \setlength{\armlogoshift}{0cm}
+
+% Gap between the two logos.
+\newlength{\coverlogogap}  \setlength{\coverlogogap}{2.2cm}
+
+% Height reserved for the logo row. It is fixed and independent of the logos,
+% so raising or lowering either mark never shifts the title block underneath.
+% Increase it if you enlarge a logo enough to overflow the row.
+\newlength{\coverlogorow}  \setlength{\coverlogorow}{3.4cm}
+
+% \coverlogo{<width>}{<raise>}{<shift>}{<path>} - place one logo at the given
+% width, nudged by raise (up) and shift (right). The box carries no height of
+% its own, so a vertical nudge moves the artwork without disturbing the height
+% of the logo row or anything below it.
+\newcommand{\coverlogo}[4]{%
+    \IfFileExists{#4}
+        {\hspace*{#3}\raisebox{#2}[0pt][0pt]{%
+            \includegraphics[width=#1]{#4}}}
+        {}}
+% ===========================================================================
 
 % Aligned key-value row of the metadata block.
 \newcommand{\covermetarow}[2]{%
@@ -83,13 +107,18 @@
     \setlength{\parskip}{0pt}
 
     % ---------- Logo row: program logo left, team logo right ----------
-    % The pair is set as one centred box with a fixed gap between the two
-    % square cells, so the marks stay symmetric about the page centre and
-    % equally sized regardless of their internal padding.
+    % Each logo is positioned by its own width/raise/shift knobs defined in the
+    % LOGO TUNING block above. \coverlogorow reserves a fixed height for the
+    % row, so nudging a logo up or down never moves the title block below it.
     \vspace*{0.2cm}
-    \coverlogo{images/SPACECHALLENGES.png}%
-    \hspace{2.2cm}%
-    \coverlogo{images/armonia_logo.png}
+    \makebox[\linewidth][c]{%
+        \rule{0pt}{\coverlogorow}%
+        \coverlogo{\sclogowidth}{\sclogoraise}{\sclogoshift}%
+                  {images/SPACECHALLENGES.png}%
+        \hspace{\coverlogogap}%
+        \coverlogo{\armlogowidth}{\armlogoraise}{\armlogoshift}%
+                  {images/armonia_logo.png}%
+    }
 
     \vspace{1.5cm}
 
