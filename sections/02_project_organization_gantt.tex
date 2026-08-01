@@ -35,6 +35,18 @@
 \endgroup
 
 
+% The schedule sheets are float pages ([p]), which LaTeX typesets with the
+% "plain" style; since main.tex redefines "plain" to carry the running header
+% and footer, those decorations would appear rotated on the landscape sheets.
+% "cubligantt" is an empty style used for these pages only. \pagestyle inside a
+% landscape block applies to every page it produces, and \thispagestyle
+% overrides the float page's own \plain, so both are set below.
+\fancypagestyle{cubligantt}{%
+  \fancyhf{}%
+  \renewcommand{\headrulewidth}{0pt}%
+  \renewcommand{\footrulewidth}{0pt}%
+}
+
 % The chart is drawn on two landscape pages at natural size rather than being
 % squeezed onto one portrait page with \resizebox. Scaling to fit the text
 % width shrank the day numbers below legibility and still overflowed the page
@@ -85,7 +97,9 @@
 % Sheet 1 of 2: documentation and control/software streams.
 % ---------------------------------------------------------------------------
 \begin{landscape}
+\pagestyle{cubligantt}
 \begin{figure}[p]
+\thispagestyle{cubligantt}
 \centering
 \begin{ganttchart}{1}{29}
   \cubliganttheader
@@ -134,12 +148,15 @@ Figure~\ref{fig:gantt-gates}.}
 \label{fig:gantt}
 \end{figure}
 \end{landscape}
+\pagestyle{fancy}
 
 % ---------------------------------------------------------------------------
 % Sheet 2 of 2: hardware, 3D design, electrical, deliverables, milestone gates.
 % ---------------------------------------------------------------------------
 \begin{landscape}
+\pagestyle{cubligantt}
 \begin{figure}[p]
+\thispagestyle{cubligantt}
 \centering
 \begin{ganttchart}{1}{29}
   \cubliganttheader
@@ -195,13 +212,16 @@ phase are shown in Figure~\ref{fig:gantt-gates}.}
 \label{fig:gantt-build}
 \end{figure}
 \end{landscape}
+\pagestyle{fancy}
 
 % ---------------------------------------------------------------------------
 % Sheet 3 of 3: milestone gates. Kept on their own sheet because the seventeen
 % gates do not fit under the build streams without overflowing the page.
 % ---------------------------------------------------------------------------
 \begin{landscape}
+\pagestyle{cubligantt}
 \begin{figure}[p]
+\thispagestyle{cubligantt}
 \centering
 % The gates sheet carries far fewer rows than the stream sheets, so it is given
 % a taller row pitch; the time axis is unchanged, keeping columns aligned. The
@@ -240,3 +260,4 @@ between them.}
 \label{fig:gantt-gates}
 \end{figure}
 \end{landscape}
+\pagestyle{fancy}
