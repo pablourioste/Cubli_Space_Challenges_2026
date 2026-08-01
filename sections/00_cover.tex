@@ -27,7 +27,7 @@
 
 % ---------- Editable cover fields ----------
 \newcommand{\coverTitle}{Technical Design Document}
-\newcommand{\coverSubtitle}{Cubli}
+\newcommand{\coverSubtitle}{Armonia}
 \newcommand{\coverTagline}{A Three-Axis Reaction-Wheel Balancing Cube}
 \newcommand{\coverVersion}{v1.0}
 \newcommand{\coverOrganization}{Space Challenges Program 2026}
@@ -37,7 +37,7 @@
 % member, extend a row or start a new one.
 \newcommand{\coverTeam}{%
     Athanasia Nikolova & Andrea Liang & Deyan Nikolaev Vlaev \\[0.85em]
-    Niccolo & Suvanna Viriyanti Wu & Pablo Urioste \\}
+    Niccolo Tonetto & Suvanna Viriyanti Wu & Pablo Urioste \\}
 
 % ---------- Helpers ----------
 % Full-width horizontal divider; argument = rule thickness.
@@ -61,7 +61,7 @@
 % =========================================================================
 
 \newlength{\sclogosize}    \setlength{\sclogosize}{3.30cm}   % LEFT  (Space Challenges)
-\newlength{\armlogosize}   \setlength{\armlogosize}{3.05cm}  % RIGHT (Armonia)
+\newlength{\armlogosize}   \setlength{\armlogosize}{3.8cm}  % RIGHT (Armonia)
 
 
 % ========================= 2. POSITION ===================================
@@ -75,7 +75,7 @@
 \newlength{\sclogoright}   \setlength{\sclogoright}{0cm}
 
 % ----- RIGHT logo (Armonia) -----
-\newlength{\armlogoup}     \setlength{\armlogoup}{0cm}
+\newlength{\armlogoup}     \setlength{\armlogoup}{-0.46cm}
 \newlength{\armlogoright}  \setlength{\armlogoright}{0cm}
 
 % ----- Space between the two logos -----
@@ -168,7 +168,6 @@
     \begin{minipage}{0.62\textwidth}
         \renewcommand{\arraystretch}{1.0}
         \begin{tabular}{@{}p{0.42\linewidth}@{\hspace{1.4em}}l@{}}
-            \covermetarow{Organization}{\coverOrganization}
             \covermetarow{Document version}{\coverVersion}
             \covermetarow{Date of issue}{\today}
         \end{tabular}
