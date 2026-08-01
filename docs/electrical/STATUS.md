@@ -69,7 +69,7 @@ the 3 Aug buffer is for.
 | [ ] | **Gate M1** rail trimmed, driver commutates, encoder reads | Pablo | **2 Aug** | all E1 | todo | buffer: 3 Aug |
 | [ ] | **E1.B Recovery buffer** — finish anything E1 that did not close | Pablo | **3 Aug** | — | todo | protects all downstream dates |
 
-## E2 — Board outline to Neisa — RE-BASELINED to 4-5 Aug (days 13-14)
+## E2 — Board outline to Nasia — RE-BASELINED to 4-5 Aug (days 13-14)
 
 Original window was 29-31 Jul with a hard 1 Aug hand-off. That date was not met.
 It is re-planned against the new 3D design sequence: the frame is sized and
@@ -81,7 +81,7 @@ frozen on 2 Aug, so the board outline now lands inside the detail-CAD window
 | [ ] | E2.1 Driver positions from SPI < 20 cm rule | Pablo | 4 Aug | E1.5 | todo | encoder cable dictates driver location |
 | [ ] | E2.2 CAN routing, stubs < 10 cm, bus ends identified | Pablo | 4 Aug | E2.1 | todo | linear topology only |
 | [ ] | E2.3 Perfboard floorplan, 15 x 9 cm | Pablo | 5 Aug | E2.1, E2.2 | todo | |
-| [ ] | E2.4 **Board outline + connectors -> Neisa** | Pablo | **5 Aug** | E2.3 | todo | feeds detail CAD (D3d) |
+| [ ] | E2.4 **Board outline + connectors -> Nasia** | Pablo | **5 Aug** | E2.3 | todo | feeds detail CAD (D3d) |
 | [ ] | E2.5 Electronics mass line -> Dejan | Pablo | 5 Aug | E2.4 | todo | TODO: weigh populated proto |
 | [ ] | **Gate E2** outline frozen | Pablo | 5 Aug | E2.4 | todo | |
 
@@ -93,7 +93,7 @@ week of 3-9 Aug. **G3 (rig balances) moves from 2 Aug to 12 Aug.**
 
 | # | Task | Owner | Due | Blocked by | State | Notes |
 |---|---|---|---|---|---|---|
-| [ ] | E3.1 Rig electrical assembly completed | Pablo+Neisa | 4 Aug | M1, C8b | todo | rig part-mounted; reinforced supports to print |
+| [ ] | E3.1 Rig electrical assembly completed | Pablo+Nasia | 4 Aug | M1, C8b | todo | rig part-mounted; reinforced supports to print |
 | [ ] | E3.2 Rig harness, 2-node CAN terminated both ends | Pablo | 5 Aug | E3.1, E2.2 | todo | |
 | [ ] | E3.3 Powered rig checkout, closed loop | Pablo+Nicc | 6-7 Aug | E3.2, B6 | todo | disarm + watchdog verified = **M4** |
 | [ ] | E3.4 Measurement setup for Kt / J / friction / latency | Pablo+Andrea | 7-9 Aug | E3.3 | todo | Andrea owns the numbers |
@@ -130,7 +130,7 @@ week of 3-9 Aug. **G3 (rig balances) moves from 2 Aug to 12 Aug.**
 
 | # | Task | Owner | Due | Blocked by | State | Notes |
 |---|---|---|---|---|---|---|
-| [ ] | E5.1 Install board + harness, re-check all MA600 gaps | Pablo+Neisa | 7 Aug | C11, E4.7 | todo | gap drifts on assembly |
+| [ ] | E5.1 Install board + harness, re-check all MA600 gaps | Pablo+Nasia | 7 Aug | C11, E4.7 | todo | gap drifts on assembly |
 | [ ] | E5.2 Continuity + isolation before power | Pablo | 7 Aug | E5.1 | todo | confirm no 16 V cap on 25 V bus |
 | [ ] | E5.3 PSU smoke test, wheels off | Pablo | 8 Aug | E5.2 | todo | all 3 drivers enumerate |
 | [ ] | E5.4 PSU test, wheels on, open-loop per axis | Pablo | 8 Aug | E5.3 | todo | |

@@ -89,7 +89,7 @@ resolving before either number is published — the mass distribution
 inertia even when the mass is overridden.
 
 **Nobody should publish Table `tab:rw_sizing` until the script and the table
-are reconciled.** Owner: Suvanna/Neisa with Dejan.
+are reconciled.** Owner: Suvanna/Nasia with Dejan.
 
 ### M-2. Radial fit fails at every orientation, and the document understates it
 Section 5.3's "Radial fit caveat" says 1.8 mm wall, "dropping to 0.9 mm if a
@@ -166,7 +166,7 @@ brake**. The target is very likely unachievable, and if M rises the required
 inertia rises with it (h_w scales with M), which feeds straight back into the
 wheel that is already failing its fit checks.
 This is the mass-inertia fixed point the introduction warns about, and the
-document is currently on the wrong side of it. Owner: Neisa + Dejan, urgent.
+document is currently on the wrong side of it. Owner: Nasia + Dejan, urgent.
 
 ### M-7. Motor count in BOM Table 1 versus the footnote versus reality
 Table 1 lists qty **3** for motors, drivers and encoders; the footnote says
@@ -221,9 +221,13 @@ system loop). Flagging so they are not forgotten.
 `tab:team_roles` describes Pablo as "System integration and lead: digital
 actuator and sensor coding, embedded software" — but in the WBS, firmware is
 Nicc's (B4) and I own circuits, perfboard, harness and electrical
-manufacturing (C6, C7, C10, C12, C13). Also "Athanasia Nikolova" in §2.1 is
-"Neisa" everywhere in the WBS — the same person under two names, never
-reconciled. Nicc/"Niccolo" has no contact details and no surname.
+manufacturing (C6, C7, C10, C12, C13). Nicc/"Niccolo" has no contact details
+and no surname.
+
+The related naming defect is **resolved**: the WBS previously called
+Athanasia Nikolova "Neisa", a misspelling, so §2.1 and the WBS read as two
+different people. All WBS and planning references now use the correct short
+form "Nasia".
 
 ### m-4. Objectives are referenced but never defined
 `sec:objectives` is referenced from §1.1, §3.3, §4 intro and §5.2 — the label
@@ -266,13 +270,13 @@ Ranked by how much else depends on them:
 | # | Open number | Blocks | Owner | State |
 |---|---|---|---|---|
 | 1 | ~~omega_max~~ | inertia target, wheel design | Pablo | **CLOSED: 6000 rpm** |
-| 2 | Real total mass M | h_w, tau_g, beta, the whole jump-up budget | Neisa + Dejan | open, urgent |
+| 2 | Real total mass M | h_w, tau_g, beta, the whole jump-up budget | Nasia + Dejan | open, urgent |
 | 3 | tau_b provenance (5.0 N m) | beta, inertia target | Dejan + Suvanna | open |
 | 4 | ~~Nut identity~~ | wheel inertia, ballast count | Suvanna | **CLOSED: M6, -4.5%** |
-| 5 | Max wheel OD inside 180 mm frame | ring OD selection | Neisa | open |
+| 5 | Max wheel OD inside 180 mm frame | ring OD selection | Nasia | open |
 | 6 | 3-motor architecture consequences | bench rig survival, spares, risk register | Pablo + you | open |
-| 7 | Nut retention method | wheel safety at 54 N/nut | Suvanna/Neisa | open, new |
-| 8 | Pocket placement vs spokes | wheel CAD | Neisa | open, new |
+| 7 | Nut retention method | wheel safety at 54 N/nut | Suvanna/Nasia | open, new |
+| 8 | Pocket placement vs spokes | wheel CAD | Nasia | open, new |
 
 With omega_max and the nut geometry closed, **the mass budget (row 2) is now
 the single most consequential open number** — it feeds h_w linearly, and the

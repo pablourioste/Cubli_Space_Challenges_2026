@@ -212,7 +212,7 @@ wheel packaging — and it depends entirely on the unverified tau_b = 5.0 N m
 ## Open input
 
 TODO: the frame wall thickness and internal clearance that set the "L minus
-30 mm" allowance are my estimate, not a CAD number. Neisa should confirm the
+30 mm" allowance are my estimate, not a CAD number. Nasia should confirm the
 actual maximum wheel OD that fits the 180 mm frame before the ring OD is
 frozen. The argument above holds for any allowance in the 20-40 mm band, but
 the selected OD depends on it.

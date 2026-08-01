@@ -18,7 +18,7 @@ Tasks owned: C6, C7, C10, C12, C13. Supported: A3, A5, B4, C14.
 
 | Date | Invariant | Gates |
 |---|---|---|
-| 1 Aug | Board outline + connector positions to Neisa | C5 mass freeze |
+| 1 Aug | Board outline + connector positions to Nasia | C5 mass freeze |
 | 2 Aug | G3: 1-DoF rig balances AND Kt / wheel J / friction / loop latency to Andrea | B8 -> B9 |
 | 3 Aug | G4: TDD deliverable | A12 |
 | 9 Aug | G5: cube integrated | B10 -> B11 |
@@ -52,10 +52,10 @@ If any is not, it is a blocker and belongs in STATUS.md as such.
 
 | Ref | Item | Owner | Was due |
 |---|---|---|---|
-| C6 | Procurement order placed (long-lead) | Pablo (+Neisa) | 24 Jul |
-| C1 | Envelope and layout study | Neisa (+Suvanna) | 24 Jul |
+| C6 | Procurement order placed (long-lead) | Pablo (+Nasia) | 24 Jul |
+| C1 | Envelope and layout study | Nasia (+Suvanna) | 24 Jul |
 | A3 | Scope and requirements table | Dejan (+Pablo) | 25 Jul |
-| C2 | Reaction-wheel design | Suvanna (+Neisa) | 26 Jul |
+| C2 | Reaction-wheel design | Suvanna (+Nasia) | 26 Jul |
 | B1 | Sim environment + 1-DoF plant | Andrea | 24 Jul |
 
 ---
@@ -84,10 +84,10 @@ before the fuse. Nothing has been connected to the battery.
 | E2.1 | Fix driver positions from the MA600 SPI < 20 cm rule: each moteus-n1 sits within 20 cm cable of its own encoder. Three positions, one per axis | E1.5, C1 | 29-30 Jul |
 | E2.2 | Fix CAN bus routing: linear chain across the three drivers + Teensy, stubs < 10 cm, and identify the two physical bus ends where termination goes | E2.1 | 30 Jul |
 | E2.3 | Perfboard floorplan on the 15 x 9 cm double-sided board: 25 V bus in, LM2596, 5 V rail, bulk cap footprint, Teensy, XIAO ESP32-C6, BMI270 breakout, servo header, CAN termination network | E2.1, E2.2 | 30-31 Jul |
-| E2.4 | **Deliver to Neisa:** board outline DXF/PDF, mounting hole pattern, keep-out heights, connector positions and exit directions, board mass estimate (TODO: weigh the populated proto) | E2.3 | **1 Aug** |
+| E2.4 | **Deliver to Nasia:** board outline DXF/PDF, mounting hole pattern, keep-out heights, connector positions and exit directions, board mass estimate (TODO: weigh the populated proto) | E2.3 | **1 Aug** |
 | E2.5 | Supply the same numbers to Dejan for the TDD mass budget electronics line | E2.4 | 1 Aug |
 
-**Exit gate E2:** Neisa has an outline she can cut structure to; C5 mass freeze
+**Exit gate E2:** Nasia has an outline she can cut structure to; C5 mass freeze
 is unblocked. Deliverable is frozen — later electrical changes must fit inside
 this outline, not move it.
 
@@ -171,7 +171,7 @@ intervention.
 
 | Date | Deliverable | To | Blocks |
 |---|---|---|---|
-| 1 Aug | Board outline, connector positions, mass estimate | Neisa | C5 mass freeze |
+| 1 Aug | Board outline, connector positions, mass estimate | Nasia | C5 mass freeze |
 | 1 Aug | Electronics mass line for the budget | Dejan | A11/A12 |
 | 2 Aug | Measured Kt, wheel J, friction, loop latency | Andrea | B9 -> B11 -> B12 |
 | 2 Aug | Rig electrical evidence + photos | Dejan | A11 TDD deepen |
@@ -183,7 +183,7 @@ intervention.
 
 ## Open questions (numbers I do not have — not invented)
 
-1. Populated perfboard mass. TODO: weigh the proto before E2.4 or Neisa's
+1. Populated perfboard mass. TODO: weigh the proto before E2.4 or Nasia's
    budget carries an unknown.
 2. Bulk cap 470-1000 uF >= 50 V: ordered under C6, or still open? Lead time
    unknown. E4.2 depends on it.
