@@ -275,7 +275,9 @@ threads onto it and clamps the ring, so nothing depends on a plastic pocket
 floor. Each station carries the centrifugal load
 $F = m_{\text{hw}}\,\omega_{\max}^2\,r_b$ of its own hardware, reacted by the
 bolt in tension and by bearing of the head and nut faces on the printed
-material; both are checked in Section~\ref{sec:test_feasibility}, and a nyloc
+material
+% ; both are checked in Section~\ref{sec:test_feasibility}
+, and a nyloc
 or threadlocked nut is specified so that vibration cannot back it off.
 
 The geometry is defined by the quantities of Table~\ref{tab:rw_params}, all of
@@ -306,8 +308,6 @@ $m_{\text{hw}}$ & Hardware mass per station (bolt $+$ nut) & \qty{9.0}{\gram} \\
 $m_b$      & \emph{Net} mass added per station          & \qty{8.79}{\gram} \\
 $\Delta I_b$ & \emph{Net} inertia added per station     & \qty{2.428e-5}{\kilogram\metre\squared} \\
 $N$        & Station count reaching $I_{w,\text{target}}$ & \num{15} \\
-$N_{\max}$ & Station count admitted by the gap rule    & \num{39} \\
-$s_{\min}$ & Radial wall, hole edge to ring boundary   & \qty{4.30}{\milli\metre} \\
 $m_w$      & Resulting wheel mass                      & \qty{172.5}{\gram} \\
 $I_w$      & Resulting wheel inertia                   & \qty{4.599e-4}{\kilogram\metre\squared} \\
            & \quad as a fraction of $I_{w,\text{target}}$ & \qty{111.7}{\percent} \\
@@ -501,6 +501,9 @@ E-stop and fuse.}
 \label{fig:power_tree}
 \end{figure}
 
+
+\begin{comment}
+
 The rail-by-rail current budget that sizes the buck converter and the harness
 conductors is Table~\ref{tab:power_budget}. It is populated from measurement
 during bench bring-up rather than from datasheet maxima alone, because the
@@ -531,6 +534,7 @@ moteus-n1 drivers ($3\times$) & Pack & \textcolor{red}{TBD} & \textcolor{red}{TB
 \bottomrule
 \end{tabular}
 \end{table}
+\end{comment}
 
 \subsubsection{Schematic and Interconnect Diagrams}
 \label{sec:schematics}
@@ -633,8 +637,9 @@ the anti-spark path intact, since the driver bulk capacitance draws an inrush
 that will weld a bare connector.
 
 The staged sequence --- rails, then buses, then sensors, then open-loop motion,
-then closed-loop --- is part of the validation plan and is given in
-Section~\ref{sec:testing}. The isolation checks that precede first power-on
+then closed-loop --- is part of the validation plan
+% and is given in Section~\ref{sec:testing}
+. The isolation checks that precede first power-on
 (rail-to-rail separation, bus-to-chassis, and confirmation that no low-voltage
 capacitor sits on the pack bus) are recorded in Appendix~\ref{app:electrical}
 as a checklist, because they are performed on every re-assembly and not only
@@ -682,8 +687,10 @@ Section~\ref{sec:modelling} derives the control law; this subsection states how
 that law is realised as software, which is a separate set of decisions. The
 implementation detail --- the mode state machine, the estimator and controller
 in executable pseudocode, the fixed gains and tuning parameters, the timing
-budget and the fault responses --- is collected in
-Appendix~\ref{app:control_algorithms}, so that a re-tuned gain does not require
+budget and the fault responses --- will be collected, 
+% is collected in
+% Appendix~\ref{app:control_algorithms}
+so that a re-tuned gain does not require
 an edit to the design sections.
 
 The software is organised in the four layers of
@@ -720,9 +727,11 @@ different gain.
 
 \begin{table}[htbp]
 \centering
-\caption[Operating modes and transitions]{Operating modes and transitions. Every mode has a disarm exit; the
-detailed conditions and hysteresis bands are in
-Appendix~\ref{app:control_algorithms}.}
+\caption[Operating modes and transitions]{Operating modes and transitions. Every mode has a disarm exit. 
+% ; the
+% detailed conditions and hysteresis bands are in
+% Appendix~\ref{app:control_algorithms}
+}
 \label{tab:sw_modes}
 \small
 \begin{tabular}{L{2.6cm} L{5.2cm} L{6.0cm}}
@@ -745,8 +754,7 @@ Section~\ref{sec:control2d} is a design guarantee only if the worst-case cycle
 is bounded by construction, which is why the pipeline of
 Figure~\ref{fig:software_pipeline} uses a fixed stage ordering with no dynamic
 allocation and no blocking calls, and why telemetry is a side-branch rather than
-a stage. The per-stage timing budget and its measured margin are recorded in
-Appendix~\ref{app:control_algorithms} and re-measured whenever a stage changes.
+a stage. %The per-stage timing budget and its measured margin are recorded in Appendix~\ref{app:control_algorithms} and re-measured whenever a stage changes.
 
 \paragraph{Fault handling.} The failure cases the software must survive are
 sensor dropout, bus error, wheel saturation and loss of the balancing
