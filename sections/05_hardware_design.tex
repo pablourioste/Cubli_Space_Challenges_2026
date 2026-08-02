@@ -266,78 +266,132 @@ fabrication rather than having to be right the first time.
 
 \paragraph{Architecture: ballasted ring.} Rather than adjusting inertia by
 scaling a solid disc, the wheel is built as a printed \emph{ring plus spokes}
-whose inertia is then tuned by \emph{ballast}: standard steel nuts
-seated in blind hexagonal pockets distributed around the ring. Each pocket both
-removes plastic and adds steel at the largest available radius, so the net
-inertia gain per pocket is large, and the target is reached by choosing how many
-bolts to install. This makes wheel inertia a discrete, reversible knob: the
+whose inertia is then tuned by \emph{ballast}: standard M6 steel bolt-and-nut
+sets fitted through round clearance holes drilled through the full ring
+thickness, distributed around the ring at a common pitch circle. Each station
+both removes plastic and adds steel at the largest available radius, so the net
+inertia gain per station is large, and the target is reached by choosing how
+many to install. This makes wheel inertia a discrete, reversible knob: the
 physical wheel can be re-tuned in either direction after fabrication to absorb
 the parameter uncertainty that the sizing procedure necessarily carries---most
 importantly the residual uncertainty in $M$, which is not known until the build
 is complete. A solid disc offers no such adjustment.
 
-The design intent is that the bare printed ring supplies most of the required
-inertia and the ballast acts only as a trim, so that the count sits well
-inside its feasible range in both directions.
+The bolt passing through the ring is also the retention feature: the nut
+threads onto it and clamps the ring, so nothing depends on a plastic pocket
+floor. Each station carries the centrifugal load
+$F = m_{\text{hw}}\,\omega_{\max}^2\,r_b$ of its own hardware, reacted by the
+bolt in tension and by bearing of the head and nut faces on the printed
+material; both are checked in Section~\ref{sec:test_feasibility}, and a nyloc
+or threadlocked nut is specified so that vibration cannot back it off.
 
 \paragraph{Parameters to be fixed.} The geometry is defined by the quantities
 of Table~\ref{tab:rw_params}, all of which follow from the envelope closure of
 Section~\ref{sec:massbudget} and are recorded there once fixed.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
-
+\caption[Reaction-wheel geometry and ballast parameters]{Reaction-wheel
+geometry and ballast parameters. Values are the current design point of the
+iteration described below; they are provisional while the structural mass of
+Table~\ref{tab:massbudget} remains an allowance.}
 \label{tab:rw_params}
 \small
-\begin{tabular}{l l c}
+\begin{tabular}{l L{6.4cm} c}
 \toprule
 Symbol & Parameter & Value \\
 \midrule
-$D_w$      & Ring outer diameter (capped by envelope) & \qty{13}{\centi\metre} \\
-$w_r$      & Ring radial width                         & \qty{1.5}{\centi\metre} \\
-$t_r$      & Ring axial thickness                      & \qty{1}{\centi\metre} \\
-$n_s, w_s$ & Spoke count and width                     & $3$, \qty{1}{\centi\metre} \\
-$\rho_p$   & Printed-material density                  & \qty{1290}{\kilo\gram\per\metre\cubed} \\
-$r_b$      & Ballast radius                            & \qty{5.75}{\centi\metre} \\
-$m_b$      & Net mass added per installed bolt         & \qty{2.5}{\gram} \\
-$\Delta I_b$ & Net inertia added per installed bolt    & \qty{8.27e-6}{\kilogram\metre\squared} \\
-$N$        & Bolt count reaching $I_{w,\text{target}}$ & \num{15} \\
-$m_w$      & Resulting wheel mass                      & \qty{109}{\gram} \\
-$I_w$      & Resulting wheel inertia                   & \qty{3.4e-4}{\kilogram\metre\squared} \\
+$D_w$      & Ring outer diameter (capped by envelope) & \qty{120}{\milli\metre} \\
+$w_r$      & Ring radial width                         & \qty{12}{\milli\metre} \\
+$t_r$      & Ring axial thickness (= hole depth)       & \qty{5}{\milli\metre} \\
+$n_s, w_s$ & Spoke count and width                     & $3$, \qty{10}{\milli\metre} \\
+$\rho_p$   & Printed-material density (PET-CF)         & \qty{1290}{\kilo\gram\per\metre\cubed} \\
+$d_h$      & Ballast hole diameter (M6 clearance)      & \qty{6.4}{\milli\metre} \\
+$r_b$      & Ballast pitch circle radius               & \qty{54}{\milli\metre} \\
+$m_{\text{hw}}$ & Hardware mass per station (bolt $+$ nut) & \qty{9.0}{\gram} \\
+$m_b$      & \emph{Net} mass added per station          & \qty{8.79}{\gram} \\
+$\Delta I_b$ & \emph{Net} inertia added per station     & \qty{2.55e-5}{\kilogram\metre\squared} \\
+$N$        & Station count reaching $I_{w,\text{target}}$ & \num{15} \\
+$N_{\max}$ & Station count admitted by the gap rule    & \num{40} \\
+$m_w$      & Resulting wheel mass                      & \qty{167}{\gram} \\
+$I_w$      & Resulting wheel inertia                   & \qty{5.47e-4}{\kilogram\metre\squared} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The ballast is characterised \emph{net} of the plastic each pocket displaces:
+The ballast is characterised \emph{net} of the plastic each hole displaces:
 $m_b$ and $\Delta I_b$ are the increments the installed bolt-and-nut adds over
-the material it replaces, evaluated at the ballast radius. Sizing then reduces
-to solving
+the full-depth cylinder of material it replaces, evaluated at the pitch circle
+radius. Both corrections are taken about the spin axis by the parallel-axis
+theorem, retaining each feature's own-axis term rather than treating it as a
+point mass. Sizing then reduces to solving
 \[
 I_{w}(D_w, N) \;=\; I_{w,\text{ring}}(D_w) + N\,\Delta I_b \;\geq\; I_{w,\text{target}}
 \]
 for the smallest admissible $N$ at each candidate $D_w$, subject to the fit and
 mass checks below.
-\paragraph{Sizing calculator.} Rather than sweep a single geometric variable
-over a fine grid, we built a parametric calculator relating all of the variables in Table~\ref{tab:rw_params} to the final mass and moment of inertia of a single reaction wheel. There are limits on each variable, such as that the outer diameter of the reaction wheel $D_w$ is within the body dimension $L$ of the outer frame. 
 
-% \paragraph{Pocket placement.} The pockets cannot in general be spaced
-% uniformly. A spoke occupies a finite angular width where it meets the ring, as
-% does a pocket at the ballast radius, so a pocket centre must clear a spoke
-% centre by the sum of the two half-widths. Whenever the uniform pitch
-% $360^\circ/N$ divides the spoke pitch exactly, a uniform arrangement places a
-% pocket on every spoke root and is inadmissible. The pockets are therefore
-% distributed in equal groups within each inter-spoke sector, spread over the
-% usable arc that remains after the spoke exclusion zones are removed. Grouping by
-% sector preserves the $n_s$-fold symmetry and hence static and dynamic balance,
-% and the count per sector is chosen to leave spare positions for later trim.
+\paragraph{Two geometric constraints bound $N$.} A station must leave sound
+material around it, which caps how many the ring can hold. Radially, the hole
+plus a minimum wall on each side must fit inside $w_r$, which is why the pitch
+circle is centred in the ring width---the choice that maximises the wall on
+both sides simultaneously. Circumferentially, $N$ holes equally spaced on the
+pitch circle are separated edge-to-edge by
+\[
+\text{gap}(N) \;=\; 2 r_b \sin(\pi/N) - d_h ,
+\]
+measured on the \emph{chord} between adjacent centres rather than the arc,
+since the arc overstates the true separation. Requiring a minimum gap inverts
+to a hard cap $N_{\max} = \lfloor \pi / \arcsin((d_h/2 + \text{gap}_{\min})/r_b) \rfloor$.
+The count is rounded to a multiple of the spoke number so that the pattern
+retains $n_s$-fold symmetry and the wheel stays balanced.
 
-% \paragraph{Bolt retention.} Each bolt carries a centrifugal load
-% $F = m_b\,\omega_{\max}^2\,r_b$ at the design speed, reacted by the pocket floor
-% in bending. Positive retention is nonetheless required, and is provided by
-% through-fastening each bolt with its nut against the pocket floor. This both
-% retains the ballast and preserves the removability that motivates the scheme;
-% the floor thickness and the pocket depth are set so that $F$ at the final
-% $\omega_{\max}$ is carried with margin.
+\paragraph{Sizing calculator and the iteration it supports.} The relations
+above are implemented as a parametric calculator that maps the geometry of
+Table~\ref{tab:rw_params} onto the mass and inertia of one wheel, sweeping
+candidate outer diameters and returning, for each, the station count required,
+the count the gap rule admits, the resulting mass and inertia, and the
+pass\slash fail state of every constraint. It is not an optimiser, and the
+design point it reports was not found by one.
+
+The procedure actually followed is the fixed-point iteration of
+Table~\ref{tab:sizing_procedure}, executed by hand. A cube mass is estimated
+and a mass budget assembled from it; the jump-up analysis converts that mass
+into an inertia requirement; the wheel is sized against the requirement subject
+to the internal-volume and hole-pattern constraints; and the resulting wheel
+mass is returned to the budget, which changes the mass that started the loop.
+The cycle repeats until it lands on a geometry that simultaneously fits the
+internal volume, admits a station count satisfying the inertia requirement, and
+reproduces the cube mass it assumed. Convergence is what closes the design:
+the reported point is one at which the assumed and the totalled mass agree, so
+step~6 of Table~\ref{tab:sizing_procedure} returns approximately zero.
+
+This is a heuristic, non-deterministic search. The order in which candidates
+are tried, and the choice of which variable to relax when an iteration fails,
+rest on engineering judgement rather than on a rule, so a different sequence of
+decisions could terminate at a different admissible design. The same problem
+admits a deterministic formulation---minimise the cube mass $M$, or equivalently
+the three-wheel mass that dominates its variable part, subject to the inertia
+requirement, the envelope, the radial-wall and edge-gap rules, and the brake
+torque floor $\tau_b > \tau_g$---and solving it would return the mass-optimal
+design together with a proof that nothing lighter closes. That formulation is
+deferred: it is only meaningful once the structural masses are measured rather
+than allowed for, since roughly a third of the present budget is allowance and
+an optimum computed against it would be an optimum for the wrong problem. For a
+preliminary design whose purpose is to establish feasibility and fix the
+envelope, a converged feasible point is the appropriate result, and the
+calculator's constraint reporting is what makes that point auditable.
+
+One consequence of the objective is worth recording, because it runs against
+intuition. Selection among admissible diameters is on minimum \emph{wheel
+mass}, not minimum diameter: since $I \sim m r^2$, mass placed at a large
+radius buys inertia far more cheaply than mass at a small one, so the smallest
+wheel that ``works'' is the expensive one---it must make up its shortfall with
+a large number of dense ballast stations, and that mass is mass the cube then
+has to throw. The sweep shows the effect directly, with the smaller candidate
+diameters requiring several times the ballast of the larger ones to reach the
+same inertia.
+
 
 \subsection{Electrical Design}
 \label{sec:electrical}
