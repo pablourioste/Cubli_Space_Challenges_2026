@@ -137,7 +137,7 @@ Subsystem & Mass (g) & Share & Basis \\
 \midrule
 Reaction wheels ($3\times\qty{172.5}{\gram}$) & 517.5 & \qty{29.2}{\percent} & Sized (Sec.~\ref{sec:rw_sizing}) \\
 Motors and brake servos ($3\times$ each)      & 245.4 & \qty{13.9}{\percent} & Datasheet \\
-Power (battery, XT90, regulator)              & 279.0 & \qty{15.7}{\percent} & Drives envelope (step 1) \\
+Power (battery, XT60, regulator)              & 279.0 & \qty{15.7}{\percent} & Drives envelope (step 1) \\
 Electronics (drivers, MCU, encoders, IMU)     &  74.2 & \qty{4.2}{\percent}  & Datasheet \\
 Wiring, perfboard and passives                &  45.5 & \qty{2.6}{\percent}  & Estimated \\
 \midrule
@@ -207,7 +207,29 @@ cannot fail to close in the CAD without the discrepancy being detected.
 The single-face rig is the first article built and the bench on which the
 parameters of Table~\ref{tab:params} are measured. Its structure is a
 3D-printed plate sized to one cube face, a central motor and wheel mount, a
-corner bearing defining the single rotational degree of freedom, and encoders and other hardware. Note that the servo (brake system) is not included in the 2D prototype as its purpose is validating the control loop on a more well-understood problem. Detailed geometry and the drawing set are in Appendix~\ref{app:cad_2d}. 
+corner bearing defining the single rotational degree of freedom, and encoders and other hardware. Note that the servo (brake system) is not included in the 2D prototype as its purpose is validating the control loop on a more well-understood problem. Detailed geometry and the drawing set are in Appendix~\ref{app:cad_2d}.
+
+The rig as built is shown in Figure~\ref{fig:rig_2d}. The plate is mounted
+diagonally, so that the pivot bearing sits at the lowest corner and the wheel
+axis passes through the plate centre: this places the centre of mass directly
+above the contact point at the upright equilibrium, which is the configuration
+linearised in Section~\ref{sec:control2d}. The two printed uprights either side
+of the frame are hard stops, limiting travel to a few degrees past the point of
+no return so that a failed balancing attempt ends against a stop rather than on
+the bench.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.62\textwidth,angle=270]{images/cube_2D.jpeg}
+\caption[Single-face (1-DoF) prototype rig as built]{The single-face prototype
+rig as built: one reaction wheel driven by a brushless motor on a
+diagonally-mounted printed plate, pivoting on a corner bearing against a printed
+base with hard stops. This is the article on which the plant parameters of
+Table~\ref{tab:params} are measured and the single-axis controller of
+Section~\ref{sec:control2d} is validated before the three-axis build. The
+drawing set is given in Appendix~\ref{app:cad_2d}.}
+\label{fig:rig_2d}
+\end{figure}
 
 
 
@@ -220,8 +242,19 @@ pack, the three drivers, the flight controller, inertial measurement unit, and t
 element that fixes the minimum internal clear volume and therefore the edge
 length $L$. An \emph{outer frame} carries the edge and corner contact features,
 protects the wheels, and reacts the motor mounting loads from the inner
-structure into the ground contact. Detailed geometry is pending CAD and follows
-the envelope closure.
+structure into the ground contact.
+
+A first physical prototype of this frame has been printed and is shown in
+Figure~\ref{fig:cube_3d}. It is explicitly a \emph{concept prototype}, not the
+flight article: it demonstrates the two-part architecture, the X-braced face
+pattern and the packaging of three orthogonal wheel modules within the cube
+envelope, and it serves as a physical check on clearances that are awkward to
+judge on screen. The final design is not frozen. Detailed geometry follows the
+envelope closure of Section~\ref{sec:massbudget}, and the wheel dimensions in
+particular remain open pending the sizing iteration of
+Section~\ref{sec:rw_sizing} and confirmation of the final motor; the mass
+properties of the printed prototype are therefore not the mass properties
+assumed in the budget.
 
 The split is also the main mechanical interface in the machine, and it is
 managed as one: the inner structure is designed against a fixed bolt pattern and
@@ -250,6 +283,21 @@ Contact features   & Outer frame $\leftrightarrow$ ground    & Corner and edge g
 \bottomrule
 \end{tabular}
 \end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.55\textwidth,angle=270]{images/cube_3D.jpeg}
+\caption[Printed concept prototype of the three-axis cube frame]{Printed concept
+prototype of the three-axis cube frame, showing the X-braced outer faces and the
+three orthogonal reaction-wheel modules carried by the inner structure. This
+article validates the two-part architecture and the internal packaging only: it
+is \emph{not} the final design. Wheel geometry and the frame edge length $L$
+remain subject to the sizing closure of Sections~\ref{sec:massbudget}
+and~\ref{sec:rw_sizing}, so its mass properties do not represent the budgeted
+values. Drawings of the frozen design will be issued in
+Appendix~\ref{app:cad_3d}.}
+\label{fig:cube_3d}
+\end{figure}
 
 \subsubsection{Reaction-Wheel Sizing}
 \label{sec:rw_sizing}
@@ -479,8 +527,13 @@ bench data; the heaviest load reached the motor thermal limit at
 
 The power architecture is shown in Figure~\ref{fig:power_tree}. A single 6S LiPo
 pack (\qty{22.2}{\volt} nominal, \qty{1550}{\milli\ampere\hour}) feeds everything
-through one XT90 connector, behind a combined E-stop and fuse using an XT90-S
-anti-spark connector to limit inrush into the driver bulk capacitance. The bus
+through one XT60 connector, behind a combined E-stop and fuse, with an
+anti-spark path to limit inrush into the driver bulk capacitance. The XT60 is
+fixed by the pack rather than chosen: it is rated at
+${\approx}\,\qty{60}{\ampere}$, which covers the \qty{48}{\ampere} three-axis
+spin-up transient of Section~\ref{sec:power_arch} but with a smaller margin
+than a \qty{90}{\ampere} housing would give, so the transient is a measured
+acceptance item at first power-on rather than an assumed one. The bus
 then splits into two rails. The \emph{motor bus} runs at pack voltage
 (\qtyrange{22}{25}{\volt} across the discharge curve) directly into the three
 moteus drivers, with bulk capacitance rated to at least \qty{50}{\volt} to absorb

@@ -842,8 +842,8 @@ BOM = [
     ("Reaction wheel (PET-CF, 120 mm, 15x M6)", 172.51, 3, "Wheels"),
 
     # --- power -----------------------------------------------------
-    ("Turnigy 6S 3600 mAh LiPo, 22.2 V",  254.0, 1, "Power"),
-    ("XT90 connector pair",                15.0,  1, "Power"),
+    ("Tattu R-Line V5.0 6S 1550 mAh LiPo, 22.2 V", 254.0, 1, "Power"),
+    ("XT60 connector pair",                15.0,  1, "Power"),
     ("LM2596 step-down regulator",         10.0,  1, "Power"),
 
     # --- control & sensing -----------------------------------------

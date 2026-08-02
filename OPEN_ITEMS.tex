@@ -405,7 +405,7 @@ lines 78--88. \textbf{11 TBD}: housing and keying for J1--J11.
 
 The governing rule is already stated in the TDD: no two connectors carrying
 different voltages may share a housing type, so a mis-mate is impossible by
-construction. J1 is fixed by the BOM (XT90). The remaining ten are open choices
+construction. J1 is fixed by the BOM (XT60). The remaining ten are open choices
 and can be decided today.
 
 \subsection{A12 --- Wire schedule \quad \ready}
@@ -542,7 +542,7 @@ is already written, and each is a short fix.
 \toprule
 \# & Location & Defect \\
 \midrule
-1 & \texttt{05\_hardware\_design} :420 vs \texttt{08\_bom}:86 & Battery capacity contradiction: \qty{3600}{\milli\ampere\hour} in the power architecture, \qty{1550}{\milli\ampere\hour} in the BOM, same 6S pack. The sizing script uses 3600. \\
+1 & \texttt{05\_hardware\_design} :420 vs \texttt{08\_bom}:86 & \closed{} Battery capacity contradiction (\qty{3600}{} vs \qty{1550}{\milli\ampere\hour}) resolved against the procured pack: Tattu R-Line V5.0, \qty{22.2}{\volt}, \qty{1550}{\milli\ampere\hour}, \num{150}C, XT60. The BOM, the power architecture and \texttt{analysis/SIZING.py} now agree. Note the connector is XT60, not XT90 as previously written. \\
 2 & \texttt{05\_hardware\_design} & \closed{} \texttt{tab:rw\_params} was missing its \texttt{\textbackslash caption} and would not have appeared in the List of Tables. A caption is now present. \\
 3 & \texttt{06\_testing}:65--66 vs \texttt{tab:gates} & G6 hard-kill date stated as 13~August; Table~\texttt{tab:gates} puts G6 at 17~August. A kill date cannot precede the gate it kills. \\
 4 & \texttt{02\_project\_organization} \texttt{\_tasks}:46 & Task B4 says ``Raspberry Pi software architecture''; Sec.~5 and the BOM specify Teensy~4.1 throughout. \\
