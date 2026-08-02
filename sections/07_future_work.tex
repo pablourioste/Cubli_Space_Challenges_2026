@@ -1,9 +1,9 @@
 % ================= 7. FUTURE WORK =================
 \section{Future Work}
 
-\subsection{NMPC \& Warm-Start Control (Future Implementation)}
+% \subsection{NMPC \& Warm-Start Control (Future Implementation)}
 
-\subsection{Autonomous Stand-up \& Disturbance Rejection}
+% \subsection{Autonomous Stand-up \& Disturbance Rejection}
 
 \subsection{AI-Driven Control \& Dynamic Coefficient Tuning}
 \label{sec:ai_control}
@@ -21,7 +21,10 @@ violate.
 \begin{itemize}
     \item \textbf{Parametric drift.} $C_b$ and $C_w$ are not obtained from
     CAD and are carried as estimates until the identification tests of
-    Section~\ref{sec:test_paramid} (Table~\ref{tab:params}). Bearing friction,
+    % Section~\ref{sec:test_paramid} (
+    Table~\ref{tab:params}. 
+    % )
+    Bearing friction,
     wiring drag and motor cogging also change with temperature, wear and
     reassembly, so the identified values are a snapshot rather than a
     constant. The inertia tensor $I$ and the centre-of-mass offset $r_{cm}$
@@ -154,8 +157,7 @@ documented:
 
 \begin{itemize}
     \item \textbf{Damping:} $C_b, C_w$ over a wide interval, since these are
-    estimated rather than measured until Section~\ref{sec:test_paramid}
-    closes.
+    estimated rather than measured until the test pyramid closes. % Section~\ref{sec:test_paramid} closes.
     \item \textbf{Inertia and mass distribution:} $I$, $m$ and $r_{cm}$
     perturbed by a few percent, covering print-density variation, fastener
     placement and harness routing.
@@ -214,8 +216,9 @@ Bayesian optimisation rather than a policy-gradient method, with the initial
 design taken from the analytical $h_w$ of Equation~\eqref{eq:hw_ideal}.
 
 Two constraints on this module must be stated. First, it presupposes the
-measurement described in Section~\ref{sec:jumpup_target}: until the spin-down
-test of Section~\ref{sec:test_jumpup} reports both the impulse-equivalent mean
+measurement described in Section~\ref{sec:jumpup_target}: until the spin-down test
+% of Section~\ref{sec:test_jumpup} 
+reports both the impulse-equivalent mean
 $\bar\tau_b = h_w/\Delta t$ and the peak torque, there is no validated model to
 optimise against and no way to distinguish an improved profile from a
 mis-measured one. Second, the structural caveat carries over unchanged ---
@@ -258,7 +261,7 @@ respect, as argued in Section~\ref{sec:application}, though it does not
 reproduce the low-gravity contact dynamics that would decide the real
 manoeuvre.
 
-\subsection{Single-Wheel Variant / Extensions}
+% \subsection{Single-Wheel Variant / Extensions}
 
 % A reduced-actuation variant balancing the 3D cube with a single reaction wheel,
 % following the ETH one-wheel Cubli \cite{hofer2023onewheelcubli}.
