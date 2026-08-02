@@ -54,7 +54,7 @@ import math
 # FIXED INPUT VARIABLES  (edit here)
 # =================================================================
 # --- cube / jump-up ---
-M          = 1.674        # [kg]   total cube mass
+M          = 1.80       # [kg]   total cube mass
                           #        PROVISIONAL, and a converged fixed point:
                           #        Stage 6 totals 1064 g known hardware + 610 g
                           #        structure allowance = 1674 g, which is the
@@ -67,13 +67,13 @@ L          = 0.15         # [m]    cube edge length
 g          = 9.81         # [m/s^2]
 eta        = 1.05         # [-]    energy margin (1.02-1.05 recommended)
 tau_b      = 5.0          # [N*m]  brake torque per wheel
-rpm_max    = 6000         # [rpm]  max wheel speed
+rpm_max    = 5000         # [rpm]  max wheel speed
 case       = "corner"     # "edge" or "corner" -- corner sizes the design
 
 # --- wheel geometry ---
 # Named R_outer / R_inner / thickness below as well, after unit conversion,
 # so the geometry functions read the way the drawing does.
-ring_width_mm = 20.0      # [mm]  ring radial width (R_outer - R_inner), FIXED
+ring_width_mm = 12.0      # [mm]  ring radial width (R_outer - R_inner), FIXED
                           #       20 mm: a 6.4 mm M6 clearance hole centred in
                           #       the width leaves 6.8 mm of radial wall on
                           #       each side, well over the 2 mm minimum.
@@ -121,7 +121,7 @@ N_round_to    = 3         # [-]   round the solved hole count up to a multiple
 # --- M6 hardware seated in each hole (bolt + nut) ---
 # Both masses are per-item and are the things to put on a scale. They enter
 # as POSITIVE mass; nothing about the hardware is modelled as a negative.
-mass_m6_bolt_g = 7.5      # [g]   ONE M6 bolt, head + shank, of the length
+mass_m6_bolt_g = 6.5      # [g]   ONE M6 bolt, head + shank, of the length
                           #       actually used. Strongly length-dependent:
                           #       ISO 4762 M6x20 hex-socket cap is ~6.0 g,
                           #       M6x25 ~7.0 g, M6x30 ~8.0 g. 7.5 g stands in
@@ -731,15 +731,20 @@ BOM = [
     ("TowerPro MG92B brake servo",        13.8,  3, "Motors"),
 
     # --- reaction wheels -------------------------------------------
-    # From the OD=140 mm ring selected by the sweep above: at this diameter
-    # the bare PET-CF ring+spokes already exceeds I_w_target (128%), so no
-    # M6 ballast is fitted and the mass is structure only. Kept as a
-    # literal so this stage stays decoupled from stages 1-5; update it if
-    # the wheel design changes.
-    #   139.94 g = ring 116.72 g + 3 spokes 23.22 g, t = 12 mm, 20 mm width.
-    # If ballast is later fitted for trim, add 10.0 g per hole (M6 bolt +
-    # nut) MINUS 0.50 g of displaced plastic = +9.50 g per station.
-    ("Reaction wheel (PET-CF, 140 mm, no ballast)", 139.94, 3, "Wheels"),
+    # OD = 120 mm is a FIXED CONSTRAINT, not a sweep result: the wheel has
+    # to fit the 150 mm cube, so the diameter is imposed and the sweep is
+    # only consulted for what that diameter costs. At 120 mm the bare
+    # PET-CF ring falls well short of I_w_target (0.847 vs 4.209 x1e-4),
+    # so unlike the old 140 mm entry this wheel IS ballasted: 15 M6
+    # bolt+nut stations on R_pcr = 54.0 mm bring it to 111.7% of target.
+    #   167.44 g = 32.44 g PET-CF (ring + 3 spokes, t = 5 mm, 12 mm width,
+    #              already net of the 15 drilled holes)
+    #            + 135.00 g steel (15 x 9.00 g bolt + nut)
+    # Net per station is +8.79 g (9.00 g hardware - 0.21 g displaced
+    # plastic), so trimming the count by 3 holes moves this by ~26.4 g.
+    # Kept as a literal so this stage stays decoupled from stages 1-5;
+    # update it if the wheel design changes.
+    ("Reaction wheel (PET-CF, 120 mm, 15x M6)", 167.44, 3, "Wheels"),
 
     # --- power -----------------------------------------------------
     ("Turnigy 6S 3600 mAh LiPo, 22.2 V",  254.0, 1, "Power"),

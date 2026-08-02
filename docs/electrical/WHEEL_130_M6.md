@@ -97,7 +97,7 @@ order of preference:
 3. Bolt through each nut into the floor (adds mass at the worst radius, and
    the bolt head then needs its own pocket).
 
-Option 1 preserves what the ballast scheme is for. This is Suvanna/Neisa's
+Option 1 preserves what the ballast scheme is for. This is Suvanna/Nasia's
 call, but it must be decided before the wheels are printed.
 
 ## Sensitivity to the speed decision
@@ -145,7 +145,7 @@ clears the spokes at any usable nut count — 15, 18, 21 and 24 all clash.
 | Maximum per sector | 7 (21 total) |
 
 This keeps 3-fold symmetry so balance is unaffected, and it caps the upward
-trim range at 21 nuts. **This is a CAD constraint for Neisa/Suvanna** — the
+trim range at 21 nuts. **This is a CAD constraint for Nasia/Suvanna** — the
 script will keep reporting OK regardless, because placement is outside its
 model.
 
