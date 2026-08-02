@@ -1,4 +1,4 @@
-# Electrical Status Tracker
+﻿# Electrical Status Tracker
 
 Update daily. Tick the box, set State, add a date in Notes when it matters.
 State: `todo` / `wip` / `done` / `blocked` / `cut`.
@@ -36,40 +36,40 @@ G6 17 Aug (edge) - G7 19 Aug (corner) - G8/G9 20 Aug.
 
 | # | Task | Owner | Was due | Blocked by | State | Notes |
 |---|---|---|---|---|---|---|
-| [x] | C6 procurement order placed | Pablo | 24 Jul | — | done | arrived; further material also purchased |
-| [x] | C6 motor/driver/encoder sets received | Pablo | 24 Jul | — | done | baseline is 3 complete sets |
-| [ ] | **M6 nuts for wheel ballast** | Pablo | — | supplier | **blocked** | **NOT ARRIVED. Blocks wheel ballast, balancing and spin-test.** |
-| [ ] | C6 bulk cap 470-1000 uF >= 50 V | Pablo | 24 Jul | — | todo | still to confirm; separate line, not the 16 V caps |
-| [ ] | C6 XT30 pairs >= 4 | Pablo | 24 Jul | — | todo | drivers are XT30, battery is XT90 |
-| [x] | C6 bench PSU available | Pablo | 24 Jul | — | done | current-limited |
-| [x] | A3 requirements table support | Dejan+Pablo | 25 Jul | — | done | |
-| [x] | **Wiring scheme + component placement designed** | Pablo | 31 Jul | — | **done** | design issued; the build reference for 2 Aug |
+| [x] | C6 procurement order placed | Pablo | 24 Jul | â€” | done | arrived; further material also purchased |
+| [x] | C6 motor/driver/encoder sets received | Pablo | 24 Jul | â€” | done | baseline is 3 complete sets |
+| [ ] | **M6 nuts for wheel ballast** | Pablo | â€” | supplier | **blocked** | **NOT ARRIVED. Blocks wheel ballast, balancing and spin-test.** |
+| [ ] | C6 bulk cap 470-1000 uF >= 50 V | Pablo | 24 Jul | â€” | todo | still to confirm; separate line, not the 16 V caps |
+| [ ] | C6 XT30 pairs >= 4 | Pablo | 24 Jul | â€” | todo | drivers are XT30, battery is XT60 |
+| [x] | C6 bench PSU available | Pablo | 24 Jul | â€” | done | current-limited |
+| [x] | A3 requirements table support | Dejan+Pablo | 25 Jul | â€” | done | |
+| [x] | **Wiring scheme + component placement designed** | Pablo | 31 Jul | â€” | **done** | design issued; the build reference for 2 Aug |
 | [ ] | **Procurement round 2 (post 3D freeze)** | Pablo | **5 Aug** | 3D frame freeze | todo | new BOM once 3D design is sized |
 
-## E1 — Bench power, safety, single-axis bring-up — RE-BASELINED to 2 Aug (day 11)
+## E1 â€” Bench power, safety, single-axis bring-up â€” RE-BASELINED to 2 Aug (day 11)
 
 Original window was 27-29 Jul (days 5-7). No bench work took place in that
 window; the effort went into the wiring and placement design instead. This is
 now the **Sunday 2 Aug** session, with **3 Aug as the recovery buffer**.
 
 Sunday target, in the owner's words: the 5 V rail calibrated and soldered, and
-the driver and encoder mounted and fully functioning. Open loop only — driver
+the driver and encoder mounted and fully functioning. Open loop only â€” driver
 and DC bench supply, no control loop. Allow for partial failure; that is what
 the 3 Aug buffer is for.
 
 | # | Task | Owner | Due | Blocked by | State | Notes |
 |---|---|---|---|---|---|---|
-| [ ] | E1.1 Bench PSU + E-stop + fuse in bench loop | Pablo | 2 Aug | — | todo | |
-| [ ] | E1.2 LiPo safety kit staged | Pablo | 2 Aug | — | todo | battery stays out until cube power-on |
-| [ ] | E1.3 Incoming inspection, 3 motor sets | Pablo | 2 Aug | — | todo | phase R vs 194 mOhm |
+| [ ] | E1.1 Bench PSU + E-stop + fuse in bench loop | Pablo | 2 Aug | â€” | todo | |
+| [ ] | E1.2 LiPo safety kit staged | Pablo | 2 Aug | â€” | todo | battery stays out until cube power-on |
+| [ ] | E1.3 Incoming inspection, 3 motor sets | Pablo | 2 Aug | â€” | todo | phase R vs 194 mOhm |
 | [ ] | **E1.7 5 V rail soldered + trimmed to 5.00 V** | Pablo | **2 Aug** | E1.1 | todo | **primary Sunday target**; characterise under load |
 | [ ] | E1.4 moteus-n1 #1 bring-up, CAN ID, FOC cal | Pablo+Nicc | 2 Aug | E1.1, E1.3 | todo | on PSU only |
 | [ ] | E1.5 MA600 mounted, gap fixture, record shim | Pablo | 2 Aug | E1.3 | todo | <= 0.5 mm, centred on 4 mm magnet |
 | [ ] | E1.6 Open-loop spin, log no-load current + max RPM | Pablo | 2 Aug | E1.4, E1.5 | todo | containment required |
 | [ ] | **Gate M1** rail trimmed, driver commutates, encoder reads | Pablo | **2 Aug** | all E1 | todo | buffer: 3 Aug |
-| [ ] | **E1.B Recovery buffer** — finish anything E1 that did not close | Pablo | **3 Aug** | — | todo | protects all downstream dates |
+| [ ] | **E1.B Recovery buffer** â€” finish anything E1 that did not close | Pablo | **3 Aug** | â€” | todo | protects all downstream dates |
 
-## E2 — Board outline to Nasia — RE-BASELINED to 4-5 Aug (days 13-14)
+## E2 â€” Board outline to Nasia â€” RE-BASELINED to 4-5 Aug (days 13-14)
 
 Original window was 29-31 Jul with a hard 1 Aug hand-off. That date was not met.
 It is re-planned against the new 3D design sequence: the frame is sized and
@@ -85,7 +85,7 @@ frozen on 2 Aug, so the board outline now lands inside the detail-CAD window
 | [ ] | E2.5 Electronics mass line -> Dejan | Pablo | 5 Aug | E2.4 | todo | TODO: weigh populated proto |
 | [ ] | **Gate E2** outline frozen | Pablo | 5 Aug | E2.4 | todo | |
 
-## E3 — 1-DoF rig + parameter measurement — RE-BASELINED to 4-9 Aug (days 13-18)
+## E3 â€” 1-DoF rig + parameter measurement â€” RE-BASELINED to 4-9 Aug (days 13-18)
 
 Original window was 31 Jul - 2 Aug. Confirmed blocked at the review: parameter
 measurement waits until further bench testing has been done, so it moves to the
@@ -107,17 +107,17 @@ week of 3-9 Aug. **G3 (rig balances) moves from 2 Aug to 12 Aug.**
 > balance 19 Aug** (was 16 Aug), **G8 jump-up 20 Aug** (was 18 Aug, and
 > sacrificial). Add roughly six days to each E4-E7 due date below.
 
-## A5 support — risk register (due with TDD 3 Aug)
+## A5 support â€” risk register (due with TDD 3 Aug)
 
 | # | Task | Owner | Due | Blocked by | State | Notes |
 |---|---|---|---|---|---|---|
 | [ ] | Electrical risk rows -> Dejan | Pablo | 3 Aug | RISKS.md | todo | see electrical/RISKS.md |
 
-## E4 — Perfboard + harness, C12 (3-6 Aug, days 12-15)
+## E4 â€” Perfboard + harness, C12 (3-6 Aug, days 12-15)
 
 | # | Task | Owner | Due | Blocked by | State | Notes |
 |---|---|---|---|---|---|---|
-| [ ] | E4.1 XT90 -> 3x XT30 distribution harness | Pablo | 3 Aug | C6 | todo | no WBS task owns this |
+| [ ] | E4.1 XT60 -> 3x XT30 distribution harness | Pablo | 3 Aug | C6 | todo | no WBS task owns this |
 | [ ] | E4.2 Populate perfboard, rails + bulk cap | Pablo | 4 Aug | E2.3, bulk cap | todo | 16 V caps on 5 V rail ONLY |
 | [ ] | E4.3 Rail bring-up, ripple, LM2596 thermal | Pablo | 4 Aug | E4.2 | todo | derates without heatsink |
 | [ ] | E4.4 CAN harness, split termination at 2 ends | Pablo | 5 Aug | E4.2, E2.2 | todo | 2x 60.4 ohm + 4.7 nF |
@@ -126,7 +126,7 @@ week of 3-9 Aug. **G3 (rig balances) moves from 2 Aug to 12 Aug.**
 | [ ] | E4.7 Label, strain-relieve, photograph | Pablo | 6 Aug | E4.4, E4.6 | todo | |
 | [ ] | **Gate E4** full bench power-on, 3 drivers, on PSU | Pablo | 6 Aug | all E4 | todo | |
 
-## E5 — Cube integration + power-on, C13 (7-9 Aug, days 16-18) — G5 9 Aug
+## E5 â€” Cube integration + power-on, C13 (7-9 Aug, days 16-18) â€” G5 9 Aug
 
 | # | Task | Owner | Due | Blocked by | State | Notes |
 |---|---|---|---|---|---|---|
@@ -138,7 +138,7 @@ week of 3-9 Aug. **G3 (rig balances) moves from 2 Aug to 12 Aug.**
 | [ ] | E5.6 Handover: all axes addressable, telemetry up | Pablo | 9 Aug | E5.5 | todo | to Nicc + Andrea |
 | [ ] | **Gate E5 = G5** cube integrated and powered | Pablo | 9 Aug | all E5 | todo | |
 
-## E6 — Edge-balance support (10-13 Aug, days 19-22) — HARD KILL 13 Aug
+## E6 â€” Edge-balance support (10-13 Aug, days 19-22) â€” HARD KILL 13 Aug
 
 | # | Task | Owner | Due | Blocked by | State | Notes |
 |---|---|---|---|---|---|---|
@@ -148,13 +148,13 @@ week of 3-9 Aug. **G3 (rig balances) moves from 2 Aug to 12 Aug.**
 | [ ] | E6.4 Battery endurance under balance load | Pablo | 13 Aug | E6.1 | todo | for demo-day planning |
 | [ ] | **Gate E6 = G6** edge balance, no open electrical defect | Pablo | 13 Aug | E6.1 | todo | S3 cut if missed |
 
-## E7 — Corner, jump-up, presentation (14-20 Aug, days 23-29)
+## E7 â€” Corner, jump-up, presentation (14-20 Aug, days 23-29)
 
 | # | Task | Owner | Due | Blocked by | State | Notes |
 |---|---|---|---|---|---|---|
 | [ ] | E7.1 Support B12 corner balance + slew | Pablo | 16 Aug | E6 gate | todo | |
 | [ ] | E7.2 Brake circuit support for B13 jump-up | Pablo | 18 Aug | E6.3, G6 pass | todo | only if G6 passed 13 Aug |
-| [ ] | E7.3 Demo-day spares + field-repair kit | Pablo | 17 Aug | — | todo | spare harness/driver/encoder |
+| [ ] | E7.3 Demo-day spares + field-repair kit | Pablo | 17 Aug | â€” | todo | spare harness/driver/encoder |
 | [ ] | E7.4 Electrical figures for TDD final + deck | Pablo | 19 Aug | E4.7, E6.4 | todo | block diagram, power tree |
 | [ ] | E7.5 Final presentation support | Pablo | 20 Aug | all | todo | |
 | [ ] | **Gate E7 = G9** demo runs on battery, no intervention | Pablo | 20 Aug | all | todo | |
@@ -171,5 +171,5 @@ week of 3-9 Aug. **G3 (rig balances) moves from 2 Aug to 12 Aug.**
 | [ ] | Total 5 V load vs LM2596 rating | todo |
 | [ ] | 4th complete motor set actually ordered | todo |
 | [x] | Cube edge 150 mm or 180 mm | **RESOLVED 31 Jul: 150 mm** |
-| [ ] | M6 nut delivery date (blocks wheel ballast + balancing) | **blocked — chase supplier** |
-| [ ] | Procurement round 2 scope, post 3D freeze | todo — order by 5 Aug |
+| [ ] | M6 nut delivery date (blocks wheel ballast + balancing) | **blocked â€” chase supplier** |
+| [ ] | Procurement round 2 scope, post 3D freeze | todo â€” order by 5 Aug |

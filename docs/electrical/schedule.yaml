@@ -1,4 +1,4 @@
-# ============================================================================
+﻿# ============================================================================
 # Cubli - Electrical/Electronics technical schedule
 # SINGLE SOURCE OF TRUTH. SCHEDULE.md and gantt_electrical.tex are generated
 # from this file. Edit here, then regenerate both.
@@ -393,7 +393,7 @@ tasks:
     delta_class: new
     name: Battery power chain
     scope: >
-      Does not exist in the 1-DoF rig, which ran entirely on a bench PSU. XT90
+      Does not exist in the 1-DoF rig, which ran entirely on a bench PSU. XT60
       battery lead, anti-spark switch, e-stop, inline fuse sized to the bus,
       and bulk capacitance 470-1000 uF at >= 50 V for regen transients. The
       BOM 100 uF parts are 16 V and must never appear on this rail.
@@ -409,7 +409,7 @@ tasks:
       against the 48 A transient. Anti-spark switch limits inrush - measured
       peak inrush current recorded in A.
     materials: >
-      Bulk cap SCRAP-SOURCED per invariant (470-1000 uF, >= 50 V). XT90 pair
+      Bulk cap SCRAP-SOURCED per invariant (470-1000 uF, >= 50 V). XT60 pair
       in BOM. E-stop/anti-spark switch and fuse MUST BUY. If no scrap cap
       >= 50 V is found, this task has no defined transient path - see open
       questions.
@@ -464,7 +464,7 @@ tasks:
     name: Harness fabrication and routing
     scope: >
       The rig had one short bench harness. The cube needs a full distribution
-      harness: XT90 battery lead to three XT30 driver drops at 14 AWG,
+      harness: XT60 battery lead to three XT30 driver drops at 14 AWG,
       CAN chain, three SPI runs each under 20 cm, I2C to the IMU. Routed
       clear of the wheels, strain-relieved and labelled. Each moteus ships a
       mating XT30 so the connector side is covered.

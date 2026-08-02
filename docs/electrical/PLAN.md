@@ -1,4 +1,4 @@
-# Cubli — Electrical/Electronics Workstream Plan
+﻿# Cubli â€” Electrical/Electronics Workstream Plan
 
 Owner: Pablo. Scope: circuits, perfboard layout, harnessing, electrical
 manufacturing; support to system integration and documentation.
@@ -39,7 +39,7 @@ Brake work (C14) must never cannibalise the 13 Aug edge-balance gate.
   (2x 60.4 ohm + 4.7 nF) at exactly the two physical bus ends.
 - The BOM 100 uF caps are 16 V, 5 V rail only. They never touch the 25 V bus.
   Bulk cap 470-1000 uF at >= 50 V is a separate procurement line.
-- Battery XT90, drivers XT30: a distribution harness must be fabricated.
+- Battery XT60, drivers XT30: a distribution harness must be fabricated.
 - Perfboard, not fabricated PCB. DECIDED. Fab turnaround does not fit C12.
 - All firmware bring-up on a current-limited bench PSU, never on the battery.
 
@@ -60,7 +60,7 @@ If any is not, it is a blocker and belongs in STATUS.md as such.
 
 ---
 
-## Block E1 — Bench power, safety, single-axis bring-up
+## Block E1 â€” Bench power, safety, single-axis bring-up
 **27-29 Jul (days 5-7).** Extends C7; adds the electrical items C7 does not name.
 
 | ID | Task | Depends on | Days |
@@ -76,7 +76,7 @@ If any is not, it is a blocker and belongs in STATUS.md as such.
 reads absolute angle without error flags, PSU current limit demonstrably trips
 before the fuse. Nothing has been connected to the battery.
 
-## Block E2 — Board outline + connector positions (1 Aug hard date)
+## Block E2 â€” Board outline + connector positions (1 Aug hard date)
 **29-31 Jul (days 7-9).** No existing WBS task owns this. It gates C5.
 
 | ID | Task | Depends on | Days |
@@ -88,12 +88,12 @@ before the fuse. Nothing has been connected to the battery.
 | E2.5 | Supply the same numbers to Dejan for the TDD mass budget electronics line | E2.4 | 1 Aug |
 
 **Exit gate E2:** Nasia has an outline she can cut structure to; C5 mass freeze
-is unblocked. Deliverable is frozen — later electrical changes must fit inside
+is unblocked. Deliverable is frozen â€” later electrical changes must fit inside
 this outline, not move it.
 
-## Block E3 — 1-DoF rig assembly and parameter measurement
+## Block E3 â€” 1-DoF rig assembly and parameter measurement
 **31 Jul - 2 Aug (days 9-11).** C10, plus the electrical half of B8.
-Feeds G3 on 2 Aug. Zero float — see the dependency check.
+Feeds G3 on 2 Aug. Zero float â€” see the dependency check.
 
 | ID | Task | Depends on | Days |
 |---|---|---|---|
@@ -106,12 +106,12 @@ Feeds G3 on 2 Aug. Zero float — see the dependency check.
 **Exit gate E3 (= G3):** rig balances >= 60 s and Andrea has four measured
 numbers. B9 starts 3 Aug on measured, not assumed, parameters.
 
-## Block E4 — Perfboard build + harness (C12)
+## Block E4 â€” Perfboard build + harness (C12)
 **3-6 Aug (days 12-15).** Four days, as decided. Perfboard, not PCB.
 
 | ID | Task | Depends on | Days |
 |---|---|---|---|
-| E4.1 | Fabricate the distribution harness: XT90 battery lead to 3x XT30 driver drops, 14 AWG, anti-spark switch and inline fuse inline. This item is in no existing WBS task | C6 (XT30 pairs, wire) | 3 Aug |
+| E4.1 | Fabricate the distribution harness: XT60 battery lead to 3x XT30 driver drops, 14 AWG, anti-spark switch and inline fuse inline. This item is in no existing WBS task | C6 (XT30 pairs, wire) | 3 Aug |
 | E4.2 | Populate the perfboard: LM2596 5 V rail, 1N5819 back-feed diode, 100 uF/16 V on the 5 V rail only, 100 nF local decoupling, bulk 470-1000 uF >= 50 V on the 25 V bus | E2.3, bulk cap received | 3-4 Aug |
 | E4.3 | Rail bring-up on bench PSU: 5 V under load, ripple check, thermal check on the LM2596 (it derates without a heatsink) | E4.2 | 4 Aug |
 | E4.4 | CAN harness for the cube: linear chain, stubs < 10 cm, split termination 2x 60.4 ohm + 4.7 nF at the two ends only | E4.2, E2.2 | 4-5 Aug |
@@ -122,7 +122,7 @@ numbers. B9 starts 3 Aug on measured, not assumed, parameters.
 **Exit gate E4:** board and harness pass a full bench power-on with all three
 drivers on the bus, still on the PSU. Battery has not been connected.
 
-## Block E5 — Cube integration and power-on (C13)
+## Block E5 â€” Cube integration and power-on (C13)
 **7-9 Aug (days 16-18).** Gated by G5 on 9 Aug.
 
 | ID | Task | Depends on | Days |
@@ -137,7 +137,7 @@ drivers on the bus, still on the PSU. Battery has not been connected.
 **Exit gate E5 (= G5):** cube integrated and powered, all axes addressable
 from the flight computer, on battery. B10/B11 unblocked.
 
-## Block E6 — Edge-balance electrical support
+## Block E6 â€” Edge-balance electrical support
 **10-13 Aug (days 19-22).** Protect the 13 Aug hard kill date.
 
 | ID | Task | Depends on | Days |
@@ -148,17 +148,17 @@ from the flight computer, on battery. B10/B11 unblocked.
 | E6.4 | Battery endurance measurement: runtime per charge under balance load; report to the team for demo-day planning | E6.1 | 12-13 Aug |
 
 **Exit gate E6 (= G6):** edge balance achieved 13 Aug with no open electrical
-defect. If G6 slips, E6.3 stops first — the brake is the sacrificial item,
+defect. If G6 slips, E6.3 stops first â€” the brake is the sacrificial item,
 never the balance.
 
-## Block E7 — Corner balance, jump-up, presentation
+## Block E7 â€” Corner balance, jump-up, presentation
 **14-20 Aug (days 23-29).**
 
 | ID | Task | Depends on | Days |
 |---|---|---|---|
 | E7.1 | Electrical support to B12 corner balance and slew | E6 gate | 14-16 Aug |
 | E7.2 | Brake circuit support for B13 jump-up (only if G6 passed by 13 Aug) | E6.3, G6 pass | 17-18 Aug |
-| E7.3 | Spares and field-repair kit for demo day: spare harness, spare driver, spare encoder, tools, charged batteries | — | 17 Aug |
+| E7.3 | Spares and field-repair kit for demo day: spare harness, spare driver, spare encoder, tools, charged batteries | â€” | 17 Aug |
 | E7.4 | Electrical content for the TDD final revision and the deck: block diagram, power tree, harness photos, measured numbers | E4.7, E6.4 | 18-19 Aug |
 | E7.5 | Final presentation support, 20 Aug | all | 20 Aug |
 
@@ -167,7 +167,7 @@ intervention.
 
 ---
 
-## Deliverable summary — what leaves my desk
+## Deliverable summary â€” what leaves my desk
 
 | Date | Deliverable | To | Blocks |
 |---|---|---|---|
@@ -181,7 +181,7 @@ intervention.
 | 13 Aug | Brake circuit verified | Nicc | B13 |
 | 19 Aug | Electrical figures and numbers | Suvanna, Dejan | D1 deck |
 
-## Open questions (numbers I do not have — not invented)
+## Open questions (numbers I do not have â€” not invented)
 
 1. Populated perfboard mass. TODO: weigh the proto before E2.4 or Nasia's
    budget carries an unknown.
@@ -190,7 +190,7 @@ intervention.
 3. XT30 pairs quantity received. Need >= 4 (3 drivers + rig).
 4. Bench PSU actual current ceiling. The gap table says >= 5 A; a 3-driver
    bench test may exceed that.
-5. JST-PH3 CAN cable conductor gauge — the BOM itself flags this as TODO.
+5. JST-PH3 CAN cable conductor gauge â€” the BOM itself flags this as TODO.
    Affects whether stock cables are usable or the harness is hand-made.
 6. LM2596 total 5 V load: Teensy + XIAO (300 mA TX burst) + BMI270 + MG92B
    stall. TODO: sum it. The module is rated 2-3 A and derates without a

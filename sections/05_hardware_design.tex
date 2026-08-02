@@ -530,10 +530,10 @@ pack (\qty{22.2}{\volt} nominal, \qty{1550}{\milli\ampere\hour}) feeds everythin
 through one XT60 connector, behind a combined E-stop and fuse, with an
 anti-spark path to limit inrush into the driver bulk capacitance. The XT60 is
 fixed by the pack rather than chosen: it is rated at
-${\approx}\,\qty{60}{\ampere}$, which covers the \qty{48}{\ampere} three-axis
-spin-up transient of Section~\ref{sec:power_arch} but with a smaller margin
-than a \qty{90}{\ampere} housing would give, so the transient is a measured
-acceptance item at first power-on rather than an assumed one. The bus
+${\approx}\,\qty{60}{\ampere}$, which covers the three-axis spin-up transient
+but with a smaller margin than a \qty{90}{\ampere} housing would give, so the
+transient is a measured acceptance item at first power-on rather than an
+assumed one. The bus
 then splits into two rails. The \emph{motor bus} runs at pack voltage
 (\qtyrange{22}{25}{\volt} across the discharge curve) directly into the three
 moteus drivers, with bulk capacitance rated to at least \qty{50}{\volt} to absorb

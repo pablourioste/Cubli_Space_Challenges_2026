@@ -7,7 +7,7 @@ Resolves AUDIT.md M-4 (BOM said 7000 rpm, sizing said 8400 rpm). Neither was
 correct as an unqualified "max speed", and both were optimistic.
 
 Inputs: T-Motor MN4006 KV380 (Kv = 380 rpm/V, R_phase = 194 mOhm, 18N24P ->
-12 pole pairs), mjbots moteus-n1, Turnigy 6S LiPo.
+12 pole pairs), mjbots moteus-n1, Tattu R-Line V5.0 6S LiPo (1550 mAh, XT60).
 Kt = 9.5493/380 = **0.02513 N m/A**.
 
 ## What the motor can theoretically reach
