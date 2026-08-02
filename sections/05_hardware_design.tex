@@ -267,13 +267,7 @@ scaling a solid disc, the wheel is built as a printed \emph{ring plus spokes}
 whose inertia is then tuned by \emph{ballast}: standard M6 steel bolt-and-nut
 sets fitted through round clearance holes drilled through the full ring
 thickness, distributed around the ring at a common pitch circle. Each station
-both removes plastic and adds steel at the largest available radius, so the net
-inertia gain per station is large, and the target is reached by choosing how
-many to install. This makes wheel inertia a discrete, reversible knob: the
-physical wheel can be re-tuned in either direction after fabrication to absorb
-the parameter uncertainty that the sizing procedure necessarily carries---most
-importantly the residual uncertainty in $M$, which is not known until the build
-is complete. A solid disc offers no such adjustment.
+both removes plastic and adds steel at the largest available radius, so the net inertia gain per station is large, and the target is reached by choosing how many to install. 
 
 The bolt passing through the ring is also the retention feature: the nut
 threads onto it and clamps the ring, so nothing depends on a plastic pocket
@@ -303,7 +297,7 @@ $D_w$      & Ring outer diameter (capped by envelope) & \qty{120}{\milli\metre} 
 $w_r$      & Ring radial width                         & \qty{12}{\milli\metre} \\
 $t_r$      & Ring axial thickness (= hole depth)       & \qty{5}{\milli\metre} \\
 $n_s, w_s$ & Spoke count and width                     & $3$, \qty{10}{\milli\metre} \\
-$\rho_p$   & Printed-material density (PET-CF)         & \qty{1290}{\kilo\gram\per\metre\cubed} \\
+$\rho_p$   & Printed-material density (PETG-CF)         & \qty{1290}{\kilo\gram\per\metre\cubed} \\
 $d_h$      & Ballast hole diameter (M6 clearance)      & \qty{6.4}{\milli\metre} \\
 $r_b$      & Ballast pitch circle radius               & \qty{54}{\milli\metre} \\
 $m_{\text{hw}}$ & Hardware mass per station (bolt $+$ nut) & \qty{9.0}{\gram} \\
@@ -329,20 +323,20 @@ I_{w}(D_w, N) \;=\; I_{w,\text{ring}}(D_w) + N\,\Delta I_b \;\geq\; I_{w,\text{t
 for the smallest admissible $N$ at each candidate $D_w$, subject to the fit and
 mass checks below.
 
-\paragraph{Geometric constraints on the station count.} A station must leave sound
-material around it, which caps how many the ring can hold. Radially, the hole
-plus a minimum wall on each side must fit inside $w_r$, which is why the pitch
-circle is centred in the ring width---the choice that maximises the wall on
-both sides simultaneously. Circumferentially, $N$ holes equally spaced on the
-pitch circle are separated edge-to-edge by
-\[
-\text{gap}(N) \;=\; 2 r_b \sin(\pi/N) - d_h ,
-\]
-measured on the \emph{chord} between adjacent centres rather than the arc,
-since the arc overstates the true separation. Requiring a minimum gap inverts
-to a hard cap $N_{\max} = \lfloor \pi / \arcsin((d_h/2 + \text{gap}_{\min})/r_b) \rfloor$.
-The count is rounded to a multiple of the spoke number so that the pattern
-retains $n_s$-fold symmetry and the wheel stays balanced.
+% \paragraph{Geometric constraints on the station count.} A station must leave sound
+% material around it, which caps how many the ring can hold. Radially, the hole
+% plus a minimum wall on each side must fit inside $w_r$, which is why the pitch
+% circle is centred in the ring width---the choice that maximises the wall on
+% both sides simultaneously. Circumferentially, $N$ holes equally spaced on the
+% pitch circle are separated edge-to-edge by
+% \[
+% \text{gap}(N) \;=\; 2 r_b \sin(\pi/N) - d_h ,
+% \]
+% measured on the \emph{chord} between adjacent centres rather than the arc,
+% since the arc overstates the true separation. Requiring a minimum gap inverts
+% to a hard cap $N_{\max} = \lfloor \pi / \arcsin((d_h/2 + \text{gap}_{\min})/r_b) \rfloor$.
+% The count is rounded to a multiple of the spoke number so that the pattern
+% retains $n_s$-fold symmetry and the wheel stays balanced.
 
 \paragraph{Sizing calculator and iteration procedure.} The relations
 above are implemented as a parametric calculator that maps the geometry of
@@ -364,30 +358,32 @@ reproduces the cube mass it assumed. Convergence is what closes the design:
 the reported point is one at which the assumed and the totalled mass agree, so
 step~6 of Table~\ref{tab:sizing_procedure} returns approximately zero.
 
-This is a heuristic, non-deterministic search. The order in which candidates
-are tried, and the choice of which variable to relax when an iteration fails,
-rest on engineering judgement rather than on a rule, so a different sequence of
-decisions could terminate at a different admissible design. The same problem
-admits a deterministic formulation---minimise the cube mass $M$, or equivalently
-the three-wheel mass that dominates its variable part, subject to the inertia
-requirement, the envelope, the radial-wall and edge-gap rules, and the brake
-torque floor $\tau_b > \tau_g$---and solving it would return the mass-optimal
-design together with a proof that nothing lighter closes. That formulation is
-deferred: it is only meaningful once the structural masses are measured rather
-than allowed for, since roughly a third of the present budget is allowance and
-an optimum computed against it would be an optimum for the wrong problem. For a
-preliminary design whose purpose is to establish feasibility and fix the
-envelope, a converged feasible point is the appropriate result, and the
-calculator's constraint reporting is what makes that point auditable.
-
 Selection among admissible diameters is made on minimum \emph{wheel mass}
-rather than minimum diameter. Since $I \sim m r^2$, mass placed at a large
-radius contributes inertia more efficiently than mass at a small one, so the
-smallest admissible wheel is the most expensive in mass terms: it must make up
-its inertia shortfall with a large number of ballast stations, and that mass
-enters $M$ and raises the requirement in turn. The sweep quantifies the effect,
-with the smaller candidate diameters requiring several times the ballast of the
-larger ones to reach the same inertia.
+rather than minimum diameter. 
+
+% This is a heuristic, non-deterministic search. The order in which candidates
+% are tried, and the choice of which variable to relax when an iteration fails,
+% rest on engineering judgement rather than on a rule, so a different sequence of
+% decisions could terminate at a different admissible design. The same problem
+% admits a deterministic formulation---minimise the cube mass $M$, or equivalently
+% the three-wheel mass that dominates its variable part, subject to the inertia
+% requirement, the envelope, the radial-wall and edge-gap rules, and the brake
+% torque floor $\tau_b > \tau_g$---and solving it would return the mass-optimal
+% design together with a proof that nothing lighter closes. That formulation is
+% deferred: it is only meaningful once the structural masses are measured rather
+% than allowed for, since roughly a third of the present budget is allowance and
+% an optimum computed against it would be an optimum for the wrong problem. For a
+% preliminary design whose purpose is to establish feasibility and fix the
+% envelope, a converged feasible point is the appropriate result, and the
+% calculator's constraint reporting is what makes that point auditable.
+
+% Since $I \sim m r^2$, mass placed at a large
+% radius contributes inertia more efficiently than mass at a small one, so the
+% smallest admissible wheel is the most expensive in mass terms: it must make up
+% its inertia shortfall with a large number of ballast stations, and that mass
+% enters $M$ and raises the requirement in turn. The sweep quantifies the effect,
+% with the smaller candidate diameters requiring several times the ballast of the
+% larger ones to reach the same inertia.
 
 
 \subsection{Electrical Design}
@@ -529,8 +525,7 @@ The signal-level design is documented as a set of sheets rather than a single
 drawing, so that each can be checked against the constraint that governs it.
 Table~\ref{tab:schematic_sheets} is the index; the sheets themselves are in
 Appendix~\ref{app:schematics}, together with the connector and pin-assignment
-tables that a person holding the harness needs and a reader of this section does
-not.
+tables. 
 
 \begin{table}[htbp]
 \centering
@@ -557,7 +552,7 @@ Sheet & Content & Governing constraint to verify \\
 \label{sec:bus_topology}
 
 The CAN-FD bus is the one electrical subsystem whose physical routing is a
-correctness requirement rather than a packaging preference, and it is therefore
+correctness requirement, and it is therefore
 fixed before the board outline is drawn. At the design data rate the bus must be
 a linear chain with short stubs and termination at exactly the two physical
 ends; a star topology or a mid-chain termination will pass a bench continuity
