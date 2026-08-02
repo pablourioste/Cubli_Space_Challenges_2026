@@ -12,127 +12,119 @@ specifications are in Appendix~\ref{app:bom} and are not repeated.
 
 \subsection{Schematic Sheets}
 \label{app:schematics}
-
-The seven sheets below are placeholders: each is numbered, captioned and listed
-so that the document structure, the cross-references and the sheet index of
-Table~\ref{tab:schematic_sheets} are already in place. Each caption states what
-the sheet will show and the constraint it is checked against, so that a drawing
-can be substituted without any other edit to this appendix. The complete
-schematic set is reproduced at full page size in
-Figure~\ref{fig:schematic_full}.
-
-\subsubsection{Sheet 1 --- Power Entry and Protection}
-
-% Pack connector, anti-spark inrush path, combined E-stop and fuse, split to
-% motor bus and logic rail.
-\begin{figure}[htbp]
-\centering
-\phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 1 --- power entry and protection:
-pack connector, anti-spark inrush path, combined E-stop and fuse, and the split
-to the motor bus and the logic rail.}
-\caption[Schematic sheet 1: power entry and protection]{Schematic sheet 1 --- power entry and protection. To be verified
-against the fuse rating vs.\ worst-case bus current
-(Table~\ref{tab:power_budget}) and the inrush into the driver bulk
-capacitance.}
-\label{fig:sch_power_entry}
-\end{figure}
-
-\subsubsection{Sheet 2 --- Logic Rail}
-
-% Buck converter, back-feed protection diode, rail bulk capacitance, per-device
-% decoupling.
-\begin{figure}[htbp]
-\centering
-\phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 2 --- \qty{5}{\volt} logic rail:
-buck converter, back-feed protection diode, rail bulk capacitance and
-per-device decoupling.}
-\caption[Schematic sheet 2: logic rail]{Schematic sheet 2 --- \qty{5}{\volt} logic rail. To be verified against
-the converter rating vs.\ the worst-case rail total, and against capacitor
-voltage ratings by position: low-voltage parts on the logic rail only, never on
-the pack bus.}
-\label{fig:sch_logic_rail}
-\end{figure}
-
-\subsubsection{Sheet 3 --- CAN-FD Bus}
-
-% Linear bus chain across the three drivers and the flight computer, with split
-% termination at the two physical ends.
-\begin{figure}[htbp]
-\centering
-\phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 3 --- CAN-FD bus:
-linear chain across the three drivers and the flight computer, with split
-termination at the two physical ends.}
-\caption[Schematic sheet 3: CAN-FD bus]{Schematic sheet 3 --- CAN-FD bus. To be verified against the topology
-rules of Table~\ref{tab:signal_rules}: linear chain, bounded stubs, termination
-at the two physical ends only.}
-\label{fig:sch_can_bus}
-\end{figure}
-
-\subsubsection{Sheet 4 --- Encoder Interfaces}
-Note: for the provided N35 $1/4" x 1/8"$ diametric disk magnet, the optimal distance in order to achieve the \qty{20}{\milli\tesla} -- \qty{80}{\milli\tesla} nominal magnetic field for the MA600 encoder is \qty{3.3}{\milli\metre}.
-
-% SPI interface, one per axis, driver to encoder.
-\begin{figure}[htbp]
-\centering
-\phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 4 --- encoder interfaces:
-the SPI interface from driver to encoder, one instance per axis, with the
-air-gap dimension called out.}
-\caption[Schematic sheet 4: encoder interfaces]{Schematic sheet 4 --- encoder interfaces ($3\times$). To be verified
-against the SPI cable length limit and the \qty{3.3}{\milli\metre} air gap; these
-fix the driver positions rather than the reverse
-(Sec.~\ref{sec:bus_topology}).}
-\label{fig:sch_encoders}
-\end{figure}
-
-\subsubsection{Sheet 5 --- Flight Computer and IMU}
-
-% MCU, IMU interface, orientation relative to the body frame.
-\begin{figure}[htbp]
-\centering
-\phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 5 --- flight computer and IMU:
-MCU, IMU interface, and the sensor orientation relative to the body frame.}
-\caption[Schematic sheet 5: flight computer and IMU]{Schematic sheet 5 --- flight computer and IMU. To be verified against
-the sensor orientation relative to the body frame of
-Sec.~\ref{sec:cad_method} and the mounting location relative to the pivot
-required by Sec.~\ref{sec:control2d}.}
-\label{fig:sch_fc_imu}
-\end{figure}
-
-\subsubsection{Sheet 6 --- Telemetry Link}
-
-% Telemetry module, serial interface to the MCU, supply decoupling.
-\begin{figure}[htbp]
-\centering
-\phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 6 --- telemetry link:
-telemetry module, serial interface to the MCU, and the supply decoupling sized
-for the transmit burst.}
-\caption[Schematic sheet 6: telemetry link]{Schematic sheet 6 --- telemetry link. To be verified against the
-transmit-burst current and its return path off the logic rail.}
-\label{fig:sch_telemetry}
-\end{figure}
-
-\subsubsection{Sheet 7 --- Brake Servo Drive}
-
-% Servo supply, decoupling and PWM routing.
-\begin{figure}[htbp]
-\centering
-\phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 7 --- brake servo drive:
-servo supply, decoupling and PWM routing, one instance per axis.}
-\caption[Schematic sheet 7: brake servo drive]{Schematic sheet 7 --- brake servo drive. To be verified against
-stall-current headroom on the logic rail, with the PWM routed clear of the
-encoder SPI.}
-\label{fig:sch_servo}
-\end{figure}
-
-\subsubsection{Full Schematic Sheet}
 \label{app:schematic_full}
 
-Figure~\ref{fig:schematic_full} is the schematic as currently captured: one flat
-KiCad sheet carrying the whole system, reproduced on the landscape page that
-follows at the largest size the format allows. It is the working drawing the
-build is wired from, and it is the source the seven sheets above are split out
-of --- the split is a release step, not a redraw, so the two must agree net for
-net whenever a sheet is issued.
+The system is captured on one flat KiCad sheet, reproduced at page size in
+Figure~\ref{fig:schematic_full} and listed by functional block in
+Table~\ref{tab:schematic_sheets}. That capture is the working drawing the build
+is wired from. The blocks it carries are: power entry and protection (pack
+connector, anti-spark inrush path, combined E-stop and fuse, split to the motor
+bus and the logic rail); the \qty{5}{\volt} logic rail off an LM2596 converter
+with back-feed protection and per-device decoupling; the CAN-FD bus as a linear
+chain across the three moteus drivers and the flight computer, terminated at
+the two physical ends only; the per-axis encoder SPI interfaces; the Teensy 4.1
+flight computer with the BMI270 IMU; the ESP32 telemetry link; and the three
+brake servo drives.
+
+Note: for the provided N35 $1/4" \times 1/8"$ diametric disk magnet, the optimal
+distance in order to achieve the \qty{20}{\milli\tesla} --
+\qty{80}{\milli\tesla} nominal magnetic field for the MA600 encoder is
+\qty{3.3}{\milli\metre}.
+
+The per-block schematic sheets, split out of this capture as a release step
+rather than a redraw, are to be added in the final draft.
+
+% ---------------------------------------------------------------------------
+% Per-sheet placeholder figures, held for the final draft. Each is to be split
+% out of images/schematic_full.pdf (a release step, not a redraw: the sheets
+% must agree with the capture net for net). Cross-references to these labels
+% must stay commented out with them.
+%
+% \subsubsection{Sheet 1 --- Power Entry and Protection}
+% \begin{figure}[htbp]
+% \centering
+% \phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 1 --- power entry and protection:
+% pack connector, anti-spark inrush path, combined E-stop and fuse, and the split
+% to the motor bus and the logic rail.}
+% \caption[Schematic sheet 1: power entry and protection]{Schematic sheet 1 --- power entry and protection. To be verified
+% against the fuse rating vs.\ worst-case bus current
+% (Table~\ref{tab:power_budget}) and the inrush into the driver bulk
+% capacitance.}
+% \label{fig:sch_power_entry}
+% \end{figure}
+%
+% \subsubsection{Sheet 2 --- Logic Rail}
+% \begin{figure}[htbp]
+% \centering
+% \phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 2 --- \qty{5}{\volt} logic rail:
+% buck converter, back-feed protection diode, rail bulk capacitance and
+% per-device decoupling.}
+% \caption[Schematic sheet 2: logic rail]{Schematic sheet 2 --- \qty{5}{\volt} logic rail. To be verified against
+% the converter rating vs.\ the worst-case rail total, and against capacitor
+% voltage ratings by position: low-voltage parts on the logic rail only, never on
+% the pack bus.}
+% \label{fig:sch_logic_rail}
+% \end{figure}
+%
+% \subsubsection{Sheet 3 --- CAN-FD Bus}
+% \begin{figure}[htbp]
+% \centering
+% \phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 3 --- CAN-FD bus:
+% linear chain across the three drivers and the flight computer, with split
+% termination at the two physical ends.}
+% \caption[Schematic sheet 3: CAN-FD bus]{Schematic sheet 3 --- CAN-FD bus. To be verified against the topology
+% rules of Table~\ref{tab:signal_rules}: linear chain, bounded stubs, termination
+% at the two physical ends only.}
+% \label{fig:sch_can_bus}
+% \end{figure}
+%
+% \subsubsection{Sheet 4 --- Encoder Interfaces}
+% \begin{figure}[htbp]
+% \centering
+% \phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 4 --- encoder interfaces:
+% the SPI interface from driver to encoder, one instance per axis, with the
+% air-gap dimension called out.}
+% \caption[Schematic sheet 4: encoder interfaces]{Schematic sheet 4 --- encoder interfaces ($3\times$). To be verified
+% against the SPI cable length limit and the \qty{3.3}{\milli\metre} air gap; these
+% fix the driver positions rather than the reverse
+% (Sec.~\ref{sec:bus_topology}).}
+% \label{fig:sch_encoders}
+% \end{figure}
+%
+% \subsubsection{Sheet 5 --- Flight Computer and IMU}
+% \begin{figure}[htbp]
+% \centering
+% \phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 5 --- flight computer and IMU:
+% MCU, IMU interface, and the sensor orientation relative to the body frame.}
+% \caption[Schematic sheet 5: flight computer and IMU]{Schematic sheet 5 --- flight computer and IMU. To be verified against
+% the sensor orientation relative to the body frame of
+% Sec.~\ref{sec:cad_method} and the mounting location relative to the pivot
+% required by Sec.~\ref{sec:control2d}.}
+% \label{fig:sch_fc_imu}
+% \end{figure}
+%
+% \subsubsection{Sheet 6 --- Telemetry Link}
+% \begin{figure}[htbp]
+% \centering
+% \phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 6 --- telemetry link:
+% telemetry module, serial interface to the MCU, and the supply decoupling sized
+% for the transmit burst.}
+% \caption[Schematic sheet 6: telemetry link]{Schematic sheet 6 --- telemetry link. To be verified against the
+% transmit-burst current and its return path off the logic rail.}
+% \label{fig:sch_telemetry}
+% \end{figure}
+%
+% \subsubsection{Sheet 7 --- Brake Servo Drive}
+% \begin{figure}[htbp]
+% \centering
+% \phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 7 --- brake servo drive:
+% servo supply, decoupling and PWM routing, one instance per axis.}
+% \caption[Schematic sheet 7: brake servo drive]{Schematic sheet 7 --- brake servo drive. To be verified against
+% stall-current headroom on the logic rail, with the PWM routed clear of the
+% encoder SPI.}
+% \label{fig:sch_servo}
+% \end{figure}
+% ---------------------------------------------------------------------------
 
 % The full schematic is drawn on its own landscape page rather than scaled into
 % the text block: reduced to \textwidth in portrait the reference designators
@@ -164,9 +156,8 @@ net whenever a sheet is issued.
 Covers the flight computer (Teensy 4.1) and its ESP32 telemetry module, the
 BMI270 IMU, the three moteus driver and motor connectors, the CAN-FD
 transceiver and termination, the LM2596 \qty{5}{\volt} converter from the pack,
-and the three brake servos. The per-sheet views of
-Figures~\ref{fig:sch_power_entry}--\ref{fig:sch_servo} are drawn from this
-capture as it is split for release.}
+and the three brake servos. The per-block sheets are drawn from this capture as
+it is split for release.}
 \label{fig:schematic_full}
 \end{figure}
 \end{landscape}
