@@ -54,14 +54,15 @@ Ref & Item & Qty\textsuperscript{a} & Key specifications & Function \\
 \endfoot
 \bottomrule
 \multicolumn{5}{@{}p{15.5cm}@{}}{\footnotesize\textsuperscript{a}\,Quantity per
-assembled cube; motors, drivers and encoders are 3 each.}\\
+assembled cube; motors, drivers, encoders and brake servos are 3 each ---
+one per wheel axis.}\\
 \endlastfoot
 % --- Actuation ---
 \multicolumn{5}{@{}l}{\textbf{Actuation}}\\
 \midrule
 1 & T-Motor MN4006 KV380 & 3 & 18N24P outrunner; \qty{380}{\rpm\per\volt}; \qty{68}{\gram}; $\varnothing$\qtyproduct{44.35 x 21}{\milli\metre}; \qty{194}{\milli\ohm}; peak \qty{16}{\ampere}, \qty{380}{\watt} & Reaction-wheel torque source \\
 2 & mjbots moteus-n1 & 3 & \qtyrange{10}{54}{\volt}; \qty{100}{\ampere} peak / \qty{9}{\ampere} cont.; \qtyrange{15}{30}{\kilo\hertz} FOC; \qty{5}{\mega\bit\per\second} CAN-FD; \qty{14.6}{\gram} & FOC current/torque driver (inner loop) \\
-11 & TowerPro MG92B servo & 1--3 & metal-gear micro servo; $\approx$\qty{0.29}{\newton\metre} ($\approx$\qty{3}{\kilo\gram\centi\metre}) at \qty{6}{\volt}; \qty{50}{\hertz} PWM & Wheel brake actuator (jump-up) \\
+11 & TowerPro MG92B servo & 3 & metal-gear micro servo; $\approx$\qty{0.29}{\newton\metre} ($\approx$\qty{3}{\kilo\gram\centi\metre}) at \qty{6}{\volt}; \qty{50}{\hertz} PWM & Wheel brake actuator (jump-up) \\
 \midrule
 % --- Sensing ---
 \multicolumn{5}{@{}l}{\textbf{Sensing}}\\

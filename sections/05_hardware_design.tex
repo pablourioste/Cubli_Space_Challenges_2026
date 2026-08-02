@@ -1,4 +1,4 @@
-﻿% ================= 5. PRELIMINARY HARDWARE DESIGN =================
+% ================= 5. PRELIMINARY HARDWARE DESIGN =================
 \section{Preliminary Hardware Design}
 \label{sec:hardware}
 
@@ -20,7 +20,7 @@ rates by design: the fast current loop is delegated entirely to the drivers, so
 the flight controller need only meet the \qty{1}{\milli\second} outer-loop
 deadline of Section~\ref{sec:control2d}.
 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{images/cubli_full_system_loop.png}
 \caption[System architecture and control loop]{System architecture and control loop. Blue: processing; green: sensing;
@@ -39,7 +39,7 @@ states that chain and the order in which it is closed. No dimensions are
 committed here---component selection is still open (Section~\ref{sec:hardware}),
 and the numbers follow from the procedure rather than preceding it.
 
-\paragraph{The battery and the internal structure drive the envelope.} The
+\paragraph{Envelope drivers.} The
 dominant volume claim inside the cube is not the reaction wheels but the power
 and support hardware. A LiPo pack sized for the jump-up duty cycle is a
 monolithic, incompressible block: unlike the electronics it cannot be
@@ -59,8 +59,7 @@ contains that volume plus the wall thickness and the corner and edge contact
 features. This is the first quantity to fix, and everything downstream depends
 on it.
 
-\paragraph{The envelope caps the wheel, and the wheel must meet the momentum
-requirement.} Once $L$ is set, the largest wheel outer diameter $D_w$ that
+\paragraph{Envelope cap on wheel inertia.} Once $L$ is set, the largest wheel outer diameter $D_w$ that
 clears the subframe, the motor body and the adjacent orthogonal modules is a
 geometric consequence, and it caps the achievable inertia---not only through
 $I_w \sim m_w D_w^2/4$, but because any ballast necessarily sits inboard of the
@@ -78,15 +77,15 @@ inertia grows faster than the requirement does ($D_w^2$ against $L^{3/2}$), so
 the loop does converge, and a wheel that is short at a given $L$ can be closed
 by a modest increase in $L$.
 
-\paragraph{Mass closes the loop.} The cube mass $M$ is not merely a logistics
-figure: it re-enters the dynamics through the gravitational tip-over torque
-$\tau_g = MgL/2$, which sets the floor the brake torque must exceed, and through
-$h_w \propto M$. Growing the envelope to fit a larger wheel adds frame and wheel
-mass, which raises $I_{w,\text{target}}$ again. Mass, volume and inertia are thus
-one coupled system, closed by the iteration of Table~\ref{tab:sizing_procedure}
-rather than by any of the three in isolation.
+\paragraph{Mass coupling.} The cube mass $M$ re-enters the dynamics through the
+gravitational tip-over torque $\tau_g = MgL/2$, which sets the floor the brake
+torque must exceed, and through $h_w \propto M$. Growing the envelope to fit a
+larger wheel adds frame and wheel mass, which raises $I_{w,\text{target}}$
+again. Mass, volume and inertia are thus one coupled system, closed by the
+iteration of Table~\ref{tab:sizing_procedure} rather than by any of the three in
+isolation.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Sizing closure procedure]{Sizing closure procedure. Steps are executed in order; a failure at
 step 4 returns to step 3 or step 1 as indicated.}
@@ -106,8 +105,7 @@ Step & Determines & Governing consideration \\
 \end{tabular}
 \end{table}
 
-\paragraph{Inertia requirement is corner-critical.} The two contact cases are
-not equally demanding. The corner equilibrium requires a larger rise of the
+The two contact cases are not equally demanding. The corner equilibrium requires a larger rise of the
 centre of mass and a less favourable momentum-transfer geometry than the edge
 equilibrium, so for a common maximum wheel speed $\omega_{\max}$ it demands the
 greater wheel inertia (Table~\ref{tab:contact_factors}). Step~4 above is
@@ -115,7 +113,7 @@ therefore always evaluated for the corner case; a wheel that satisfies the
 corner requirement satisfies the edge requirement with margin.
 Table~\ref{tab:inertia_cases} records both once the procedure closes.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Required per-wheel inertia by contact case]{Required per-wheel inertia by contact case, to be evaluated at the
 selected $\omega_{\max}$ once the envelope is fixed.}
@@ -130,12 +128,12 @@ Edge                       & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
 \end{tabular}
 \end{table}
 
-\paragraph{Mass budget.} The allocation of Table~\ref{tab:massbudget} is the
-bookkeeping side of steps 5 and 6: it is populated as components are selected
-and re-totalled on each iteration, since the total is an input to
-$I_{w,\text{target}}$ and not merely an output of the design.
+The allocation of Table~\ref{tab:massbudget} is the bookkeeping side of steps 5
+and 6: it is populated as components are selected and re-totalled on each
+iteration, since the total is an input to $I_{w,\text{target}}$ as well as an
+output of the design.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Mass budget (per cube)]{Mass budget (per cube), to be populated as components are selected.
 The total is an input to the inertia requirement, not only a result.}
@@ -194,9 +192,9 @@ part in Appendix~\ref{app:cad} is modelled:
         Table~\ref{tab:sizing_procedure}.
 \end{enumerate}
 
-Convention 3 is what makes the iteration auditable: the mass budget and the
-inertia requirement are read from the same model, so a design that closes on
-paper cannot silently fail to close in the CAD.
+Convention 3 makes the iteration auditable: the mass budget and the inertia
+requirement are read from the same model, so a design that closes analytically
+cannot fail to close in the CAD without the discrepancy being detected.
 
 \subsubsection{2D Prototype Build}
 \label{sec:cad_2d}
@@ -231,7 +229,7 @@ independently as long as that interface holds. The controlled interfaces are
 listed in Table~\ref{tab:mech_interfaces}; the parts realising them, with their
 drawings, are in Appendix~\ref{app:cad_3d}.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Controlled mechanical interfaces]{Controlled mechanical interfaces. Each is frozen once agreed, so that
 the parts on either side can be revised independently.}
@@ -285,9 +283,9 @@ bolt in tension and by bearing of the head and nut faces on the printed
 material; both are checked in Section~\ref{sec:test_feasibility}, and a nyloc
 or threadlocked nut is specified so that vibration cannot back it off.
 
-\paragraph{Parameters to be fixed.} The geometry is defined by the quantities
-of Table~\ref{tab:rw_params}, all of which follow from the envelope closure of
-Section~\ref{sec:massbudget} and are recorded there once fixed.
+The geometry is defined by the quantities of Table~\ref{tab:rw_params}, all of
+which follow from the envelope closure of Section~\ref{sec:massbudget} and are
+recorded there once fixed.
 
 \begin{table}[htbp]
 \centering
@@ -331,7 +329,7 @@ I_{w}(D_w, N) \;=\; I_{w,\text{ring}}(D_w) + N\,\Delta I_b \;\geq\; I_{w,\text{t
 for the smallest admissible $N$ at each candidate $D_w$, subject to the fit and
 mass checks below.
 
-\paragraph{Two geometric constraints bound $N$.} A station must leave sound
+\paragraph{Geometric constraints on the station count.} A station must leave sound
 material around it, which caps how many the ring can hold. Radially, the hole
 plus a minimum wall on each side must fit inside $w_r$, which is why the pitch
 circle is centred in the ring width---the choice that maximises the wall on
@@ -346,7 +344,7 @@ to a hard cap $N_{\max} = \lfloor \pi / \arcsin((d_h/2 + \text{gap}_{\min})/r_b)
 The count is rounded to a multiple of the spoke number so that the pattern
 retains $n_s$-fold symmetry and the wheel stays balanced.
 
-\paragraph{Sizing calculator and the iteration it supports.} The relations
+\paragraph{Sizing calculator and iteration procedure.} The relations
 above are implemented as a parametric calculator that maps the geometry of
 Table~\ref{tab:rw_params} onto the mass and inertia of one wheel, sweeping
 candidate outer diameters and returning, for each, the station count required,
@@ -382,15 +380,14 @@ preliminary design whose purpose is to establish feasibility and fix the
 envelope, a converged feasible point is the appropriate result, and the
 calculator's constraint reporting is what makes that point auditable.
 
-One consequence of the objective is worth recording, because it runs against
-intuition. Selection among admissible diameters is on minimum \emph{wheel
-mass}, not minimum diameter: since $I \sim m r^2$, mass placed at a large
-radius buys inertia far more cheaply than mass at a small one, so the smallest
-wheel that ``works'' is the expensive one---it must make up its shortfall with
-a large number of dense ballast stations, and that mass is mass the cube then
-has to throw. The sweep shows the effect directly, with the smaller candidate
-diameters requiring several times the ballast of the larger ones to reach the
-same inertia.
+Selection among admissible diameters is made on minimum \emph{wheel mass}
+rather than minimum diameter. Since $I \sim m r^2$, mass placed at a large
+radius contributes inertia more efficiently than mass at a small one, so the
+smallest admissible wheel is the most expensive in mass terms: it must make up
+its inertia shortfall with a large number of ballast stations, and that mass
+enters $M$ and raises the requirement in turn. The sweep quantifies the effect,
+with the smaller candidate diameters requiring several times the ballast of the
+larger ones to reach the same inertia.
 
 
 \subsection{Electrical Design}
@@ -471,7 +468,7 @@ bench data; the heaviest load reached the motor thermal limit at
 \label{sec:power_arch}
 
 The power architecture is shown in Figure~\ref{fig:power_tree}. A single 6S LiPo
-pack (\qty{22.2}{\volt} nominal, \qty{3600}{\milli\ampere\hour}) feeds everything
+pack (\qty{22.2}{\volt} nominal, \qty{1550}{\milli\ampere\hour}) feeds everything
 through one XT90 connector, behind a combined E-stop and fuse using an XT90-S
 anti-spark connector to limit inrush into the driver bulk capacitance. The bus
 then splits into two rails. The \emph{motor bus} runs at pack voltage
@@ -481,11 +478,11 @@ regenerative braking transients---which are not incidental here, since the
 jump-up maneuver of Section~\ref{sec:jumpup} dumps the full wheel kinetic energy
 back into the bus. The \emph{logic rail} is derived by an LM2596 buck converter
 stepping \qty{22}{\volt} down to \qty{5}{\volt} for the Teensy, the ESP32
-telemetry link, the brake servo and the IMU. Keeping the two rails separate
+telemetry link, the three brake servos and the IMU. Keeping the two rails separate
 downstream of the E-stop means motor-current ripple does not reach the sensing
 and processing electronics.
 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.9\textwidth]{images/cubli_power_tree.png}
 \caption[Power distribution tree]{Power distribution tree. A single 6S pack feeds the motor bus directly
@@ -501,7 +498,7 @@ figure that matters for the \qty{5}{\volt} rail is the coincident worst case ---
 telemetry transmit burst, servo stall and full sensor load at once --- and not
 the sum of typical values.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Rail current budget]{Rail current budget. Measured values replace estimates during bench
 bring-up; the \qty{5}{\volt} total is checked against the LM2596 rating, which
@@ -515,7 +512,7 @@ Load & Rail & Typical (mA) & Worst case (mA) & Basis \\
 Teensy 4.1                & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Datasheet \\
 XIAO ESP32-C6 telemetry   & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & TX burst governs \\
 BMI270 IMU                & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Datasheet \\
-MG92B brake servo         & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Stall current governs \\
+MG92B brake servos ($3\times$) & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Simultaneous stall current governs \\
 MA600 encoders ($3\times$)& \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Datasheet \\
 \midrule
 \textbf{Logic rail total} & \qty{5}{\volt}  & \textcolor{red}{\textbf{TBD}} & \textcolor{red}{\textbf{TBD}} & \textbf{vs.\ converter rating} \\
@@ -535,7 +532,7 @@ Appendix~\ref{app:schematics}, together with the connector and pin-assignment
 tables that a person holding the harness needs and a reader of this section does
 not.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Schematic sheet index]{Schematic sheet index. Each sheet is checked against the governing
 constraint stated in its row before release.}
@@ -576,7 +573,7 @@ axes fix the encoders, encoders fix the drivers, drivers fix the bus route, and
 only then is the board outline of Section~\ref{sec:layout} drawn around what
 remains.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Signal-integrity design rules and verification]{Signal-integrity design rules and how each is verified. These are
 checked before cube closure, since all are hard to access afterwards.}
@@ -652,7 +649,7 @@ $x = [g_B, \omega, h]$ is assembled from the estimator output and the wheel
 speeds; the LQR law of Section~\ref{sec:control2d} evaluates $u = -Kx$ with a
 penalty on stored momentum $h$ to bleed off wheel saturation; and the resulting
 commands leave as CAN torque requests to the drivers and a PWM signal to the
-brake servo. Telemetry is tapped off the assembled state to SD and Wi-Fi outside
+brake servos. Telemetry is tapped off the assembled state to SD and Wi-Fi outside
 the control path, so logging cannot perturb loop timing.
 
 The fixed ordering matters: with no dynamic allocation and no blocking calls, the
@@ -660,7 +657,7 @@ worst-case cycle time is bounded by construction rather than measured after the
 fact, which is what makes the \qty{1}{\kilo\hertz} sample period of the discrete
 LQR design a design guarantee rather than an average.
 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.78\textwidth]{images/teensy_software_pipeline.png}
 \caption[Teensy 4.1 control-loop software pipeline]{Teensy 4.1 control-loop software pipeline. The estimator and controller
@@ -686,7 +683,7 @@ different failure mode and a different verification method, and the interfaces
 between them are what allow the controller validated in simulation to be the
 same code that runs on the cube.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Control software layers]{Control software layers. Each is verified by a different method, which
 is why the boundaries are held.}
@@ -704,16 +701,15 @@ Supervision          & Mode transitions, arming, watchdog and fault response & F
 \end{tabular}
 \end{table}
 
-\paragraph{Operating modes.} The machine is never in a single control regime.
-The supervisory layer sequences the modes of Table~\ref{tab:sw_modes}, with
-hysteresis on every threshold to prevent chattering at a boundary, and with a
-disarm transition available from every mode. Documenting the modes as a state
-machine rather than as a set of conditionals matters here because the dangerous
-transitions are the ones back down the ladder: a fall detected during corner
-balance must reach a safe state with the wheels commanded down, not merely
-switch to a different gain.
+\paragraph{Operating modes.} The supervisory layer sequences the modes of
+Table~\ref{tab:sw_modes}, with hysteresis on every threshold to prevent
+chattering at a boundary, and with a disarm transition available from every
+mode. The modes are specified as a state machine because the critical
+transitions are the descending ones: a fall detected during corner balance must
+reach a safe state with the wheels commanded down, not merely switch to a
+different gain.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Operating modes and transitions]{Operating modes and transitions. Every mode has a disarm exit; the
 detailed conditions and hysteresis bands are in

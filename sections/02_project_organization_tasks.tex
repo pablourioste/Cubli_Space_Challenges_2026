@@ -42,17 +42,17 @@ A15 & TDD v2 final submission & Final consistency pass and submission of the cor
 \midrule
 B1 & Sim environment + plant & Simulation setup and the 1-DoF plant, validated by energy conservation & Andrea & 23 Jul--3 Aug \\
 B2 & LQR design (1-DoF, sim) & Tune the regulator and sweep robustness to inertia error, delay and saturation & Andrea & 26 Jul--6 Aug \\
-B3 & State estimator & Complementary tilt filter with injected noise and bias in simulation & Nicc & 27 Jul--7 Aug \\
-B4 & Firmware \& comms & Raspberry Pi software architecture, loop rates, driver configuration and the CAN-FD command/reply protocol & Deyan & 24 Jul--7 Aug \\
+B3 & State estimator & Complementary tilt filter with injected noise and bias in simulation & Niccolò &27 Jul--7 Aug \\
+B4 & Firmware \& comms & Teensy~4.1 software architecture, loop rates, driver configuration and the CAN-FD command/reply protocol & Deyan & 24 Jul--7 Aug \\
 B5 & Sensor drivers + cal & IMU and encoder drivers, gyro/accel calibration and the lever-arm correction & Deyan & 28 Jul--7 Aug \\
-B6 & Safety \& mode logic & Watchdog, tilt-limit disarm, wheel-speed cap and the mode state machine & Nicc & 30 Jul--7 Aug \\
+B6 & Safety \& mode logic & Watchdog, tilt-limit disarm, wheel-speed cap and the mode state machine & Niccolò &30 Jul--7 Aug \\
 B7 & 1-DoF control design complete & Consolidated 1-DoF control stack --- plant, regulator, estimator and safety logic --- released as the baseline for the rig & Andrea & 8--9 Aug \\
 B8 & System identification & Measure $K_t$, wheel inertia, friction and loop latency on the rig & Andrea & 7--9 Aug \\
 B9 & 3D model + LQR (sim) & 3D plant and the edge/corner regulators with the CAD inertia tensor & Andrea & 10--14 Aug \\
-B10 & EKF / MEKF estimator & 3D estimator with gyro-bias states; characterise the yaw drift & Nicc & 12--15 Aug \\
+B10 & EKF / MEKF estimator & 3D estimator with gyro-bias states; characterise the yaw drift & Niccolò &12--15 Aug \\
 B11 & Edge balance (S2a) & Retune the edge controller on the assembled cube; log disturbance recovery & Andrea & 15--17 Aug \\
 B12 & Corner balance + slew (S2b/c) & Coupled three-axis corner balance and a commanded slew; report ADCS metrics & Andrea & 17--19 Aug \\
-B13 & Jump-up (S3) & Spin-up profile and brake release for a face-to-edge jump. Sacrificial scope: yields to G6 and G7 if the schedule is contested & Nicc & 19--20 Aug \\
+B13 & Jump-up (S3) & Spin-up profile and brake release for a face-to-edge jump. Sacrificial scope: yields to G6 and G7 if the schedule is contested & Niccolò &19--20 Aug \\
 \midrule
 \multicolumn{5}{@{}l}{\textbf{Hardware Design \& Build}} \\
 \midrule
@@ -66,6 +66,10 @@ C8 & Fabricate wheel rings & Print the PET-CF rings and hubs to the frozen wheel
 C8b & Wheel ballast \& completion & Install the M6 bolt/nut ballast stations to the sizing specification and complete each wheel & Suvanna & 4--6 Aug \\
 C9 & Balance \& spin-test & Static-balance and containment spin-test every wheel, including a per-wheel ballast-count verification & Suvanna & 5--6 Aug \\
 C10 & Assemble 1-DoF rig & Motor, balanced wheel, encoder gap, IMU and hard stops, on reinforced rig supports & Pablo & 31 Jul--2 Aug \\
+C11 & Print structure + frame & Structural print set and the fabricated, orthogonal frame & Suvanna & 8--12 Aug \\
+C12 & Perfboard + harness & Power/signal board and the full power and CAN harness & Pablo & 8--12 Aug \\
+C13 & Cube integration + power-on & Assemble the three axes, then bench and battery smoke test & Pablo & 13--15 Aug \\
+C14 & Brake mechanism build & Fabricate and fit the three servo brakes; bench-test the deceleration & Suvanna & 15--18 Aug \\
 \midrule
 \multicolumn{5}{@{}l}{\textbf{3D Design}} \\
 \midrule
@@ -76,10 +80,6 @@ D4 & Detail CAD & Brackets, electronics bay, harness routing and the electrical 
 D5 & Procurement order (round 2) & Consolidate the bill of materials arising from the 3D design and place the second order & Pablo & 5 Aug \\
 D6 & Tolerance \& clearance analysis & Fit and tolerance study, including the wheel sweep envelope and fastener access & Nasia & 5--6 Aug \\
 D7 & Manufacturing package release & Issue the drawings, print set and assembly instructions for fabrication & Nasia & 7 Aug \\
-C11 & Print structure + frame & Structural print set and the fabricated, orthogonal frame & Suvanna & 8--12 Aug \\
-C12 & Perfboard + harness & Power/signal board and the full power and CAN harness & Pablo & 8--12 Aug \\
-C13 & Cube integration + power-on & Assemble the three axes, then bench and battery smoke test & Pablo & 13--15 Aug \\
-C14 & Brake mechanism build & Fabricate and fit the servo brake; bench-test the deceleration & Suvanna & 15--18 Aug \\
 \midrule
 \multicolumn{5}{@{}l}{\textbf{Electrical \& Electronics}} \\
 \midrule

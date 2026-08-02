@@ -37,7 +37,7 @@ stage that produced the offending assumption rather than to proceed with a
 known-invalid input; Section~\ref{sec:schedule} records the contingency for the
 schedule consequences of doing so.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Validation stages]{Validation stages. Exit gates refer to Table~\ref{tab:gates}; no gate
 or date is introduced here that is not already defined there.}
@@ -63,10 +63,14 @@ V10 & Jump-up (Sec.~\ref{sec:test_jumpup}) & V8 passed (hard kill) & Face-to-edg
 \end{table}
 
 Gate G6 is a hard kill for the jump-up objective: if edge balance is not
-demonstrated by 13~August, V10 is abandoned rather than attempted, since a cube
-that cannot hold an edge cannot re-stabilise after arriving on one. This is a
-consequence of the objective ordering of Section~\ref{sec:objectives}, in which
-jump-up is a capability built on balance rather than an alternative to it.
+demonstrated when G6 is assessed on 17~August (Table~\ref{tab:gates}), V10 is
+abandoned rather than attempted, since a cube that cannot hold an edge cannot
+re-stabilise after arriving on one. This is a consequence of the objective
+ordering of Section~\ref{sec:objectives}, in which jump-up is a capability built
+on balance rather than an alternative to it. The decision point is G6 itself
+rather than an earlier date, because the jump-up build (B13) and its gate G8 sit
+on 19--20~August: a call taken at G6 still leaves the whole of that window
+available if edge balance passes, and releases it to G7 if it does not.
 
 \subsection{Pre-Fabrication Feasibility Verification}
 \label{sec:test_feasibility}
@@ -94,7 +98,7 @@ is a finding in its own right and is reported rather than reconciled by choosing
 the more favourable result. The comparison is recorded in
 Table~\ref{tab:jumpup_gate}.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Pre-fabrication feasibility gate]{Pre-fabrication feasibility gate. Pass conditions are stated as
 relations because the quantities they relate are outputs of the closure
@@ -205,13 +209,13 @@ purpose is to establish that the gains are not knife-edge: a gain set that
 stabilises only the nominal plant is not a result, because the nominal plant is
 not the one that will be built.
 
-\paragraph{Direction of validation.} Simulation predicts and hardware corrects.
-The measured parameters of Section~\ref{sec:test_paramid} are substituted into
-the plant and the gains re-derived before hardware balance is attempted; the
-simulation is validated against the measured plant, never the reverse. A
-discrepancy between simulated and measured closed-loop behaviour is treated as a
-finding about the model, and Section~\ref{sec:test_perf} defines the metrics in
-which that comparison is expressed.
+\paragraph{Direction of validation.} The measured parameters of
+Section~\ref{sec:test_paramid} are substituted into the plant and the gains
+re-derived before hardware balance is attempted; the simulation is validated
+against the measured plant, never the reverse. A discrepancy between simulated
+and measured closed-loop behaviour is treated as a finding about the model, and
+Section~\ref{sec:test_perf} defines the metrics in which that comparison is
+expressed.
 
 \subsection{Electrical Bring-up and Isolation}
 \label{sec:test_electrical}
@@ -225,7 +229,7 @@ wiring error. The detailed bring-up and isolation checklists are given in
 Appendix~\ref{app:electrical} and are not restated here; what follows is the set
 of numeric criteria that close each step.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Electrical acceptance criteria]{Electrical acceptance criteria. Task references are to the electrical
 workstream schedule, which is the source of each figure.}
@@ -293,7 +297,7 @@ design of Section~\ref{sec:test_sim}. Each is measured by a method chosen so tha
 the quantity of interest dominates the measurement rather than appearing as a
 small correction to something else.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Plant parameters measured on the 1-DoF rig]{Plant parameters measured on the 1-DoF rig. Expected values follow from
 the design point and are populated when it closes.}
@@ -391,7 +395,7 @@ the walking objective --- is reachable.
 The metrics used above are defined once here so that simulated and measured
 results are expressed in the same terms and remain comparable across stages.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Control performance metrics]{Control performance metrics. Definitions and methods are fixed;
 targets follow from the closed design point.}
@@ -421,7 +425,7 @@ produces the evidence. It is the closing element of the traceability chain that
 runs from the objectives of Section~\ref{sec:objectives}, through the required
 capabilities of Section~\ref{sec:requirements}, to the test that confirms them.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Objective acceptance criteria and supporting evidence]{Objective acceptance criteria and the evidence that supports each.}
 \label{tab:acceptance}

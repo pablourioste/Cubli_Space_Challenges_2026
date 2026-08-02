@@ -33,7 +33,7 @@ The nonlinear equations of motion are
 with motor current-torque relation $T_m = K_m u$. Symbols are defined in
 Table~\ref{tab:2d_vars} and used throughout this section.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[2D pendulum model variables]{2D pendulum model variables.}
 \label{tab:2d_vars}
@@ -69,7 +69,7 @@ motor cogging; nominal values will be estimated for the initial control
 design, with dedicated testing planned once the prototype is fabricated.
 
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Parameter determination method]{Parameter determination method (symbols per Table~\ref{tab:2d_vars}).}
 \label{tab:params}
@@ -127,12 +127,10 @@ h_{w,\text{ideal}} = \sqrt{\eta}\;\frac{\sqrt{2 g\,\lambda\,\kappa}}{n}\;M L^{3/
 \end{equation}
 where $M, L, g$ are cube mass, edge length, and gravity, $\eta$ is an energy
 margin, and $\kappa,\lambda,n$ are dimensionless geometric factors set by the
-contact case (Table~\ref{tab:contact_factors}). 
-\newpage
-The corner case is more
+contact case (Table~\ref{tab:contact_factors}). The corner case is more
 demanding and governs the design.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Contact-case geometric factors]{Contact-case geometric factors.}
 \label{tab:contact_factors}
@@ -175,7 +173,7 @@ speed. The brake torque must therefore be checked against $\tau_g = MgL/2$ on
 every iteration, and a comfortable ratio $\tau_b/\tau_g$ maintained rather than
 a merely positive margin.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Torque-limited wheel-inertia target (corner case)]{Torque-limited wheel-inertia target (corner case). Inputs are fixed by
 the closure procedure of Section~\ref{sec:massbudget}; the table is populated on
@@ -199,11 +197,11 @@ $I_{w,\text{target}}$ & \textbf{Target wheel inertia} & \textcolor{red}{TBD} \\
 \end{tabular}
 \end{table}
 
-\paragraph{Choice of $\omega_{\max}$.} The maximum wheel speed is a design
+\paragraph{Selection of $\omega_{\max}$.} The maximum wheel speed is a design
 choice rather than a datasheet figure, and it enters the sizing directly
-through $I_{w,\text{target}} = h_w/\omega_{\max}$: a higher assumed speed buys a
-proportionally smaller wheel. It is therefore the natural relief valve when the
-envelope caps the wheel below the requirement (step~5,
+through $I_{w,\text{target}} = h_w/\omega_{\max}$: a higher assumed speed
+permits a proportionally smaller wheel. It is therefore the primary relief
+variable when the envelope caps the wheel below the requirement (step~5,
 Table~\ref{tab:sizing_procedure}), but it must be set from what the drive can
 sustain in service, not from the no-load figure $K_v V_{\text{bus}}$. Three
 effects separate the two: winding resistance, which costs speed under the torque
@@ -218,16 +216,15 @@ bus voltage, and the electrical frequency $\omega_{\max}p/2\pi$ at $p$ pole
 pairs must sit inside the driver's commutation capability---both checks to be
 confirmed once the motor and pack are selected.
 
-\paragraph{Choice of $\tau_b$, and what it is not.} The brake torque requires
-more care than the other inputs, because the mechanism does not generate it in
-the way the symbol suggests. The brake is a servo-driven barrier struck by a
-bolt head on the wheel: the servo only \emph{holds} the barrier in the wheel's
-path, and the wheel's own momentum does the work of the collision. The servo's
-stall torque is therefore \emph{not} $\tau_b$ and need not approach it---the
-TowerPro MG92B of Table~\ref{tab:bom-supplied} is rated near
-\qty{0.29}{\newton\metre}, roughly one seventeenth of the value used in sizing,
-and this is not an inconsistency. It must resist the barrier being deflected,
-not decelerate the wheel.
+\paragraph{Selection of $\tau_b$.} The brake torque requires more care than the other inputs, because the
+mechanism does not generate it in the way the symbol suggests. The brake is a
+servo-driven barrier struck by a bolt head on the wheel: the servo only
+\emph{holds} the barrier in the wheel's path, and the wheel's own momentum does
+the work of the collision. The servo's stall torque is therefore not $\tau_b$
+and need not approach it---the TowerPro MG92B of
+Table~\ref{tab:bom-supplied} is rated near \qty{0.29}{\newton\metre}, roughly
+one seventeenth of the value used in sizing. The servo must resist the barrier
+being deflected, not decelerate the wheel.
 
 Because the stop is a collision rather than a friction clutch, $\tau_b$ is not
 an independent property of any component and cannot be read from a datasheet.
@@ -254,9 +251,9 @@ present $\tau_g$, raising $\tau_b$ from \qtyrange{5}{10}{\newton\metre} relaxes
 $I_{w,\text{target}}$ by only about \qty{12}{\percent}, whereas lowering it to
 \qty{2}{\newton\metre} inflates the requirement by roughly \qty{65}{\percent}
 and to \qty{1.5}{\newton\metre} by over \qty{150}{\percent}. The penalty for
-being wrong is concentrated almost entirely on the low side, which is why a
-mid-range value is adopted in preference to the higher figure a short impact
-would justify.
+error is concentrated almost entirely on the low side, and a mid-range value is
+therefore adopted in preference to the higher figure a short impact would
+justify.
 
 One consequence must be carried into the structural design rather than left
 implicit: $\tau_b$ is also a \emph{load}. The sizing value is chosen for the
@@ -323,7 +320,7 @@ so $d$ is absorbed by $x_f$ at steady state, requiring no separate calibration
 stage. This fixed-gain design is the baseline balancing controller;
 Table~\ref{tab:control2d_vars} summarizes the control variables.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Control-design variables]{Control-design variables (2D and corner-balancing 3D model).}
 \label{tab:control2d_vars}
@@ -394,7 +391,7 @@ I_{w,i}\big(\dot\omega_{b,i} + \dot\omega_{w,i}\big) = T_{m,i} - C_{w,i}\,\omega
 \end{equation}
 Table~\ref{tab:3d_vars} defines all symbols.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Full-body (3D) model variables]{Full-body (3D) model variables.}
 \label{tab:3d_vars}
