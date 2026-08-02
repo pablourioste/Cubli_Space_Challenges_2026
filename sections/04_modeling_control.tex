@@ -6,14 +6,14 @@
 The full Cubli is underactuated and simultaneously unstable about all three
 axes when balanced on a corner (Section~\ref{sec:objectives}). The modelling,
 identification, and control workflow is therefore first validated on a
-two-dimensional (2D) single-face prototype with one rotational degree of
-freedom, before being generalized to the 3D cube in
+single-face 1-DoF prototype, whose planar dynamics are the two-dimensional (2D)
+model used throughout this section, before being generalized to the 3D cube in
 Section~\ref{sec:3dmodel}.
 
 \subsection{2D Reaction-Wheel Pendulum}
 \label{sec:2dmodel}
 
-The 2D prototype is a 3D-printed plate sized to one cube face, with a
+The 1-DoF prototype is a 3D-printed plate sized to one cube face, with a
 motor-driven momentum wheel at its centre and a braking mechanism at one
 corner. The plate pivots on a bearing at that corner, constraining motion to a
 single rotational degree of freedom in a vertical plane.
@@ -431,7 +431,7 @@ $u_i, K_{m,i}$ & Motor current, torque constant, wheel $i$ \\
 \end{table}
 
 Restricting motion to a single vertical plane with two wheel torques set to
-zero recovers the 2D prototype model exactly, with $I_b, l_b, m_b, m_w, I_w,
+zero recovers the 2D model exactly, with $I_b, l_b, m_b, m_w, I_w,
 C_b, C_w$ the corresponding single-axis projections of $I, r_{cm}, m, I_{w,i},
 C_{w,i}$.
 
