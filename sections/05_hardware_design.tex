@@ -594,10 +594,7 @@ Grounding        & Single return topology; no motor return current through the s
 \subsubsection{Board Layout and Harness}
 \label{sec:layout}
 
-The electronics are built on a double-sided perfboard rather than a fabricated
-PCB. This is a schedule decision, not a technical preference: fabrication
-turnaround does not fit inside the build window, and a perfboard can be
-modified in place when bring-up reveals a change. Its consequence is that
+The electronics are built on a double-sided perfboard rather than a fabricated PCB. A PCB would have a long lead time, and a perfboard allows for iteration and modification throughout the process. Its consequence is that
 layout discipline --- rail separation, decoupling at each device, deliberate
 routing of the bus pair --- must be enforced by hand and checked explicitly,
 since no design-rule check will do it.

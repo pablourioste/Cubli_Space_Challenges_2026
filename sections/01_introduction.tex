@@ -27,9 +27,9 @@ The Cubli is not presented here as a balancing novelty but as a terrestrial, gra
 Framed as an Attitude Determination and Control System (ADCS) problem, the Cubli's core behaviours map directly onto a spacecraft's day-to-day pointing task:
 
 \begin{itemize}
-    \item \textbf{Edge / corner balance} $\rightarrow$ regulation to a commanded reference attitude and disturbance rejection — holding a pointing setpoint against perturbations.
+    \item \textbf{Edge / corner balance} $\rightarrow$ regulation to a commanded reference attitude and disturbance rejection --- holding a pointing setpoint against perturbations.
     \item \textbf{Controlled rotation} $\rightarrow$ a slew manoeuvre: reference tracking to a new commanded attitude, exactly as a satellite re-aims a payload or antenna.
-    \item \textbf{Jump / walk} $\rightarrow$ momentum-exchange hopping mobility, flight-proven on small bodies where wheeled traction is impossible. JAXA's Hayabusa2 mission deployed the MINERVA-II1 rovers \cite{yoshimitsu1999minerva} and the MASCOT lander \cite{ho2017mascot} on asteroid Ryugu (2018), both of which move by spinning up and braking an internal flywheel or eccentric mass to hop across the surface, with MASCOT additionally self-righting the same way. Walking, as a sequence of controlled, directional hops, is a genuine step beyond a single ballistic hop and is an active research frontier (e.g.\ ETH's SpaceHopper \cite{spiridonov2024spacehopper}).
+    \item \textbf{Jump / walk} $\rightarrow$ momentum-exchange hopping mobility, flight-proven on small bodies where wheeled traction is impossible (Figure~\ref{fig:momentum_exchange_applications}). Walking, as a sequence of controlled directional hops, extends single-hop capabilities and represents an active research frontier (Section~\ref{sec:objectives}).
 \end{itemize}
 
 % Panels are cropped to a common 4:3 aspect ratio so the three source images
@@ -53,15 +53,7 @@ Framed as an Attitude Determination and Control System (ADCS) problem, the Cubli
   \includegraphics[trim=321.2pt 0 321.2pt 0,clip,width=\linewidth]{images/spacehopper.jpg}\\[2pt]
   {\small (c) SpaceHopper}
 \end{minipage}
-\caption[Flight and research platforms using momentum-exchange mobility]{Momentum-exchange actuation in flight and research hardware, the
-mechanism the Cubli demonstrates terrestrially. (a) JAXA's MINERVA-II1 rovers
-\cite{yoshimitsu1999minerva} and (b) the MASCOT lander \cite{ho2017mascot},
-both deployed by Hayabusa2 onto asteroid Ryugu in 2018, hop across the surface
-by spinning up and braking an internal flywheel or eccentric mass; MASCOT
-self-rights the same way. (c) ETH Zurich's SpaceHopper
-\cite{spiridonov2024spacehopper} extends the principle to controlled,
-directional hopping in low gravity --- the research frontier that the walking
-objective of Section~\ref{sec:objectives} targets.}
+\caption[Flight and research platforms using momentum-exchange mobility]{Momentum-exchange actuation in flight and research hardware: (a) JAXA's MINERVA-II1 rovers \cite{yoshimitsu1999minerva} and (b) the MASCOT lander \cite{ho2017mascot}, deployed by Hayabusa2 onto asteroid Ryugu (2018), hop across the surface and self-right by spinning up and braking an internal flywheel or eccentric mass; (c) ETH Zurich's SpaceHopper \cite{spiridonov2024spacehopper} extends this principle to controlled, directional hopping in low gravity.}
 \label{fig:momentum_exchange_applications}
 \end{figure}
 
