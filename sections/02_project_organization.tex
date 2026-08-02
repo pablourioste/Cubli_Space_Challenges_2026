@@ -5,7 +5,7 @@
 
 The project is developed by a multidisciplinary team, with responsibilities
 distributed across the main technical domains of the Cubli: mathematical
-modeling, control, embedded software, mechanical and three-dimensional design,
+modelling, control, embedded software, mechanical and three-dimensional design,
 electrical build, and system integration and validation. Table
 \ref{tab:team_roles} states each member's role and the scope they are
 accountable for.
@@ -21,29 +21,33 @@ accountable for.
 \midrule
 Pablo Urioste Alarcón &
 \href{mailto:pb.urioste4@gmail.com}{pb.urioste4@gmail.com}\newline +34 654 491 174 &
-\textbf{Integration, electrical build and schedule.} Schedule and gate
-criteria; the electrical--mechanical interfaces (board outline, keep-outs,
-harness routing) released to the 3D design; experimental validation on the
-single-axis rig, reconciling measured torque, inertia and friction against the
-sizing analysis. Assembles and edits this document. \\
+\textbf{Project management and hardware-facing software.} Schedule, gate
+criteria and task allocation; motor-driver configuration, the
+flight-computer--driver communication link, the sensor drivers and their
+calibration, and the fixed-rate loop that carries them. Owns the
+hardware--software seam: the bring-up decisions and the code that depends on
+them. Assembles and edits this document. \\
 \addlinespace
 Deyan Nikolaev Vlaev &
 \href{mailto:vlaev.dido@gmail.com}{vlaev.dido@gmail.com}\newline +359 877 082 499 &
-\textbf{Dynamics and embedded software.} Derivation of the equations of motion
-and the dynamic model; flight-computer programming, motor-driver configuration
-and the communication protocols between processing and actuation hardware. \\
+\textbf{Dynamics and technical documentation.} Derivation of the equations of
+motion, linearisation and the jump-up energy sizing; drafting and deepening of
+this document against the model. \\
 \addlinespace
 Niccolò Tonetto&
 \href{mailto:niccolo.tonetto@gmail.com}{niccolo.tonetto@gmail.com} &
-\textbf{Control.} Design, tuning and analysis of the balancing and manoeuvre
-control strategy, including the state estimator and the safety and mode
-logic. \\
+\textbf{Control stack and build support.} Single owner of the control and
+estimation software --- estimator, safety and mode logic, and the consolidated
+control release --- written against the sensor interface Pablo maintains.
+Fabrication of the distribution board and cube harness, and lead on the
+sacrificial brake and jump-up scope. \\
 \addlinespace
 Andrea Liang &
 \href{mailto:andrea.liang.2006@gmail.com}{andrea.liang.2006@gmail.com}\newline +31 06 5796 2976 &
-\textbf{Control design and analytical sizing.} Sizing calculations and the
-inertia and control budgets; conversion of the rig-measured parameters into the
-validated plant model the balancing controllers are designed on. \\
+\textbf{Plant identification and control design.} Sizing calculations and the
+inertia and control budgets; sole owner of the rig parameter measurement, from
+the instrumented measurement itself through to the validated plant model the
+balancing controllers are designed on. \\
 \addlinespace
 Suvanna Viriyanti Wu &
 \href{mailto:Viriyanti.wu@gmail.com}{Viriyanti.wu@gmail.com}\newline +39 329 074 7550 &

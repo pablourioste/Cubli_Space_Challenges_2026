@@ -24,24 +24,24 @@ violate.
     Section~\ref{sec:test_paramid} (Table~\ref{tab:params}). Bearing friction,
     wiring drag and motor cogging also change with temperature, wear and
     reassembly, so the identified values are a snapshot rather than a
-    constant. The inertia tensor $I$ and the center-of-mass offset $r_{cm}$
+    constant. The inertia tensor $I$ and the centre-of-mass offset $r_{cm}$
     are subject to the same objection at the few-percent level, and $r_{cm}$
     in particular shifts whenever the pack or harness is disturbed.
     \item \textbf{Payload and configuration changes.} Any added mass changes
     $m$, $r_{cm}$ and $I$ simultaneously, and therefore changes $A$. A gain
     tuned for one configuration is not merely suboptimal for another; near a
-    fully unstable equilibrium it may be destabilizing.
-    \item \textbf{Contact and surface variation.} The pivot is modeled as an
+    fully unstable equilibrium it may be destabilising.
+    \item \textbf{Contact and surface variation.} The pivot is modelled as an
     ideal frictionless point or line. A real corner resting on a real surface
     slips, deforms and dissipates energy in a way that is neither in the model
-    nor constant across surfaces, and this is the dominant unmodeled effect
+    nor constant across surfaces, and this is the dominant unmodelled effect
     for the walking objective of Section~\ref{sec:objectives}.
 \end{itemize}
 
 The standard remedy within the existing design is gain scheduling on
 $\hat\theta_b$ (Section~\ref{sec:control2d}), but scheduling interpolates
 between gains that were themselves computed from the same assumed parameters.
-It addresses the weakening of the small-angle linearization; it does not
+It addresses the weakening of the small-angle linearisation; it does not
 address a plant that differs from the model. The proposal here is to keep the
 verified feedback law and adapt its coefficients online.
 
@@ -64,12 +64,12 @@ First, the inner loop remains a linear state feedback at every instant, so
 the controller that runs on the hardware is the one already implemented and
 tested. Second, $\phi$ is updated on a timescale far slower than the control
 period $\Delta t$, which keeps the frozen-gain analysis approximately valid
-and prevents the tuner from acting as an unmodeled fast feedback path. Three
+and prevents the tuner from acting as an unmodelled fast feedback path. Three
 candidate tuners are of interest, and they are not equivalent in cost:
 
 \begin{itemize}
-    \item \textbf{Bayesian optimization} over a low-dimensional
-    parameterization of $Q$ and $R$, minimizing a measured cost from short
+    \item \textbf{Bayesian optimisation} over a low-dimensional
+    parameterization of $Q$ and $R$, minimising a measured cost from short
     balancing trials \cite{shahriari2016bayesopt}. This is the cheapest option
     and the one with a direct precedent on this class of hardware: automatic
     LQR tuning has been demonstrated on an inverted pendulum with on the order
@@ -112,8 +112,8 @@ parameterizations are worth comparing:
     $K_d$ follows from the discrete algebraic Riccati equation. The
     logarithmic parameterization enforces positive definiteness by
     construction, so every $\phi$ the policy can emit corresponds to a
-    well-posed LQR problem and, for a stabilizable $(A_d,B_d)$, to a
-    stabilizing gain for the \emph{modeled} plant. The cost is that a Riccati
+    well-posed LQR problem and, for a stabilisable $(A_d,B_d)$, to a
+    stabilising gain for the \emph{modelled} plant. The cost is that a Riccati
     solve must run onboard whenever $\phi$ changes, which is what confines
     updates to a slow outer loop.
     \item \textbf{Gain-space tuning.} The policy perturbs the entries of $K_d$
@@ -146,7 +146,7 @@ for disturbance rejection.
 A policy trained against a single nominal parameter set learns to exploit that
 parameter set. Domain randomization instead samples the plant parameters from
 a distribution at the start of each training episode
-\cite{tobin2017domainrand}, so that the policy is optimized against a family
+\cite{tobin2017domainrand}, so that the policy is optimised against a family
 of plants rather than one, and the transfer method has a substantial record on
 physical legged hardware \cite{hwangbo2019anymal}. For this cube the
 randomized quantities follow directly from the identification gaps already
@@ -181,9 +181,9 @@ is an empirical question, settled by bench testing; the principal failure mode
 of this module is a distribution selected for convenience rather than
 representativeness.
 
-\subsubsection{Module 3: Jump-Up Energy Optimization}
+\subsubsection{Module 3: Jump-Up Energy Optimisation}
 
-The jump-up analysis of Section~\ref{sec:jumpup_target} treats the maneuver as
+The jump-up analysis of Section~\ref{sec:jumpup_target} treats the manoeuvre as
 a spin-up to $\omega_{\max}$ followed by an abrupt stop, with all deviation
 from the ideal absorbed into a single brake-amplification factor
 $\beta = \tau_b/(\tau_b-\tau_g)$. That model is adequate for sizing and is
@@ -192,8 +192,8 @@ does: the servo-driven barrier has finite travel, the collision is not
 instantaneous, and the resulting torque profile is neither a step nor known in
 advance.
 
-The proposal is to treat the torque command over the maneuver window as a
-profile to be optimized rather than a constant. Parameterizing the
+The proposal is to treat the torque command over the manoeuvre window as a
+profile to be optimised rather than a constant. Parameterizing the
 pre-brake and post-impact torque commands by a small vector $\psi$ --- for
 instance the timing of brake release relative to the wheel-speed trajectory,
 and the shape of the recovery torque applied by the remaining wheels
@@ -205,21 +205,21 @@ immediately after impact --- the objective is
 \label{eq:jump_opt}
 \end{equation}
 where $t_f$ is the instant the controller hands over to the balancing law at
-$|\hat\theta_b| < \theta_{\text{th}}$. Minimizing residual body rate at
+$|\hat\theta_b| < \theta_{\text{th}}$. Minimising residual body rate at
 handover is the quantity of interest, because a jump that reaches the
 equilibrium with excess rate demands recovery authority the balancing
 controller may not have. Because each evaluation of \eqref{eq:jump_opt} is a
 physical jump, the sample budget is small and the appropriate method is
-Bayesian optimization rather than a policy-gradient method, with the initial
+Bayesian optimisation rather than a policy-gradient method, with the initial
 design taken from the analytical $h_w$ of Equation~\eqref{eq:hw_ideal}.
 
 Two constraints on this module must be stated. First, it presupposes the
 measurement described in Section~\ref{sec:jumpup_target}: until the spin-down
 test of Section~\ref{sec:test_jumpup} reports both the impulse-equivalent mean
 $\bar\tau_b = h_w/\Delta t$ and the peak torque, there is no validated model to
-optimize against and no way to distinguish an improved profile from a
+optimise against and no way to distinguish an improved profile from a
 mis-measured one. Second, the structural caveat carries over unchanged ---
-optimization must not be permitted to search toward shorter stopping times,
+optimisation must not be permitted to search toward shorter stopping times,
 since $\tau_b$ is simultaneously a load on the barrier, bolt, bracket and
 spokes, and the sizing value was chosen for the dynamics and not for that load
 path. The search space must be bounded by the structural case, not by the
@@ -244,19 +244,19 @@ classical inner loop is the form most likely to survive that scrutiny.
 
 For \textbf{low-gravity surface mobility}, the case is stronger, because the
 plant is genuinely unknown before arrival. Regolith mechanical properties on a
-small body are not characterized to the precision a hopping controller would
+small body are not characterised to the precision a hopping controller would
 want, and the flight-proven hoppers cited in Section~\ref{sec:application}
 \cite{yoshimitsu1999minerva, ho2017mascot} move ballistically rather than
 under closed-loop control for this reason. The contact randomization of
-Module~2 and the profile optimization of Module~3 map onto that problem
+Module~2 and the profile optimisation of Module~3 map onto that problem
 directly: a hop whose landing attitude is controlled, on a surface whose
 properties were sampled from a distribution rather than assumed, is the
 capability that separates directional walking from a ballistic tumble
 \cite{spiridonov2024spacehopper}. The cube tests this under $1$~g, where the
-destabilizing torque is larger and never relents --- a harder case in that one
+destabilising torque is larger and never relents --- a harder case in that one
 respect, as argued in Section~\ref{sec:application}, though it does not
 reproduce the low-gravity contact dynamics that would decide the real
-maneuver.
+manoeuvre.
 
 \subsection{Single-Wheel Variant / Extensions}
 

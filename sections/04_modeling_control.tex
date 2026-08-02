@@ -1,10 +1,10 @@
-% ================= 4. DYNAMIC MODELING & CONTROL =================
-\section{Dynamic Modeling \& Control}
-\label{sec:modeling}
+% ================= 4. DYNAMIC Modelling & CONTROL =================
+\section{Dynamic Modelling \& Control}
+\label{sec:modelling}
 
 
 The full Cubli is underactuated and simultaneously unstable about all three
-axes when balanced on a corner (Section~\ref{sec:objectives}). The modeling,
+axes when balanced on a corner (Section~\ref{sec:objectives}). The modelling,
 identification, and control workflow is therefore first validated on a
 two-dimensional (2D) single-face prototype with one rotational degree of
 freedom, before being generalized to the 3D cube in
@@ -14,7 +14,7 @@ Section~\ref{sec:3dmodel}.
 \label{sec:2dmodel}
 
 The 2D prototype is a 3D-printed plate sized to one cube face, with a
-motor-driven momentum wheel at its center and a braking mechanism at one
+motor-driven momentum wheel at its centre and a braking mechanism at one
 corner. The plate pivots on a bearing at that corner, constraining motion to a
 single rotational degree of freedom in a vertical plane.
 
@@ -207,7 +207,7 @@ sustain in service, not from the no-load figure $K_v V_{\text{bus}}$. Three
 effects separate the two: winding resistance, which costs speed under the torque
 required to spin the wheel up; the reduced phase voltage available under
 sinusoidal field-oriented modulation; and the fall of pack voltage through the
-discharge curve, which must be taken at its lower end if the maneuver is to
+discharge curve, which must be taken at its lower end if the manoeuvre is to
 remain available on a partly-depleted pack rather than only on a fresh one. The
 design value is set below the ceiling those effects imply, leaving margin for
 motor tolerance, bearing and aerodynamic drag, and the residual uncertainty in
@@ -274,14 +274,14 @@ few milliseconds without smoothing the peak away.
 
 \subsubsection{LQR Baseline Control}
 
-Linearizing about the upright equilibrium $(\theta_b,\dot\theta_b,\dot\theta_w)=(0,0,0)$ gives
+Linearising about the upright equilibrium $(\theta_b,\dot\theta_b,\dot\theta_w)=(0,0,0)$ gives
 \begin{equation}
 \dot x(t) = Ax(t) + Bu(t), \qquad x := (\theta_b,\dot\theta_b,\dot\theta_w),
 \end{equation}
 with $A, B$ built from the parameters in Table~\ref{tab:2d_vars}.
 Zero-order-hold discretization at a rate set by the open-loop unstable pole,
 with a safety margin, gives $x[k+1] = A_dx[k]+B_du[k]$. A discrete LQR gain
-$K_d=(K_{d1},K_{d2},K_{d3})$ minimizes
+$K_d=(K_{d1},K_{d2},K_{d3})$ minimises
 \begin{equation}
 J(u) = \sum_k x^{\mathrm T}[k]Qx[k] + u^{\mathrm T}[k]Ru[k],
 \end{equation}
@@ -289,7 +289,7 @@ giving $u[k]=-K_d(\hat\theta_b[k],\hat{\dot\theta}_b[k],\hat{\dot\theta}_w[k])$.
 
 The tilt estimate $\hat\theta_b$ is obtained from a gyroscope and
 accelerometer mounted at, or as close as mechanically feasible to, the pivot
-point rather than at the plate's center. This placement is necessary because
+point rather than at the plate's centre. This placement is necessary because
 an accelerometer at radius $r$ from the pivot measures gravity plus the
 tangential ($r\ddot\theta_b$) and centripetal ($r\dot\theta_b^2$) acceleration
 components induced by the plate's rotation, which corrupt the naive estimate
@@ -329,7 +329,7 @@ Table~\ref{tab:control2d_vars} summarizes the control variables.
 Symbol & Description \\
 \midrule
 $x$ & State vector \\
-$A, B$ & Continuous-time state/input matrices (linearized model) \\
+$A, B$ & Continuous-time state/input matrices (linearised model) \\
 $A_d, B_d$ & Discrete-time (ZOH) counterparts of $A, B$ \\
 $K_d$ & LQR feedback gain \\
 $Q, R$ & LQR state/input weighting matrices \\
@@ -344,7 +344,7 @@ $\Delta t$ & Control/estimation loop sample period \\
 $x_f, \alpha$ & Offset-correction filter state, filter coefficient \\
 $d$ & Constant tilt-sensor offset \\
 $\theta_{\text{th}}$ & Tilt threshold, jump-up $\to$ balancing switch \\
-$K_d^{(i)}$ & Scheduled gain at linearization point $i$ (extension) \\
+$K_d^{(i)}$ & Scheduled gain at linearisation point $i$ (extension) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -355,9 +355,9 @@ The controller switches from the open-loop jump-up sequence to the LQR law
 once $|\hat\theta_b| < \theta_{\text{th}}$, with hysteresis around
 $\theta_{\text{th}}$ to prevent mode chattering. The baseline uses a single
 fixed gain $K_d$ at the upright equilibrium. If recovery degrades near the
-edges of the operating range, where the small-angle linearization weakens,
+edges of the operating range, where the small-angle linearisation weakens,
 gain scheduling will be added: additional gains $K_d^{(i)}$ computed at
-several linearization points, with the controller interpolating between them
+several linearisation points, with the controller interpolating between them
 based on $\hat\theta_b$, reusing the same discrete structure and offset
 filter.
 
@@ -366,7 +366,7 @@ filter.
 
 The dynamics, identification workflow, and control approach validated on the
 2D model extend to the full three-dimensional cube, where three orthogonal
-reaction wheels must stabilize the body about its edge and corner equilibria.
+reaction wheels must stabilise the body about its edge and corner equilibria.
 
 \subsubsection{Full-Body Equations of Motion}
 
@@ -424,7 +424,7 @@ C_b, C_w$ the corresponding single-axis projections of $I, r_{cm}, m, I_{w,i},
 C_{w,i}$.
 
 
-\subsubsection{Edge vs.\ Corner Equilibria \& Linearization}
+\subsubsection{Edge vs.\ Corner Equilibria \& Linearisation}
 
 Jump-up proceeds in two stages: Flat-to-Edge, where one wheel brakes,
 followed by Edge-to-Corner, where a second wheel brakes. \textbf{Edge
@@ -433,7 +433,7 @@ the 2D form, and the 2D LQR baseline and offset filter apply directly, with
 $m_b, l_b, I_b$ replaced by their edge equivalents.
 
 \textbf{Corner balancing} is genuinely 3D: all three wheels contribute across
-three rotational DOF. Linearizing about the corner-up equilibrium
+three rotational DOF. Linearising about the corner-up equilibrium
 $(\theta,\omega_b,\omega_w)=(0,0,0)$, with $\theta\in\mathbb{R}^3$ the small
 orientation error, gives the same state-space form as the 2D case:
 \begin{equation}

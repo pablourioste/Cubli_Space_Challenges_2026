@@ -25,7 +25,7 @@ deadline of Section~\ref{sec:control2d}.
 \includegraphics[width=\textwidth]{images/cubli_full_system_loop.png}
 \caption[System architecture and control loop]{System architecture and control loop. Blue: processing; green: sensing;
 orange: actuation. Rates shown are the design targets of
-Section~\ref{sec:modeling}.}
+Section~\ref{sec:modelling}.}
 \label{fig:system_loop}
 \end{figure}
 
@@ -475,7 +475,7 @@ then splits into two rails. The \emph{motor bus} runs at pack voltage
 (\qtyrange{22}{25}{\volt} across the discharge curve) directly into the three
 moteus drivers, with bulk capacitance rated to at least \qty{50}{\volt} to absorb
 regenerative braking transients---which are not incidental here, since the
-jump-up maneuver of Section~\ref{sec:jumpup} dumps the full wheel kinetic energy
+jump-up manoeuvre of Section~\ref{sec:jumpup} dumps the full wheel kinetic energy
 back into the bus. The \emph{logic rail} is derived by an LM2596 buck converter
 stepping \qty{22}{\volt} down to \qty{5}{\volt} for the Teensy, the ESP32
 telemetry link, the three brake servos and the IMU. Keeping the two rails separate
@@ -669,7 +669,7 @@ side-branch off the control path.}
 \subsubsection{Control Software Architecture}
 \label{sec:control_sw}
 
-Section~\ref{sec:modeling} derives the control law; this subsection states how
+Section~\ref{sec:modelling} derives the control law; this subsection states how
 that law is realised as software, which is a separate set of decisions. The
 implementation detail --- the mode state machine, the estimator and controller
 in executable pseudocode, the fixed gains and tuning parameters, the timing
