@@ -124,8 +124,7 @@ output of the design.
 
 \begin{table}[htbp]
 \centering
-\caption[Mass budget (per cube)]{Mass budget (per cube), rolled up from the bill of materials by
-\texttt{analysis/SIZING.py} (Stage~6). The total is an input to the inertia
+\caption[Mass budget (per cube)]{Mass budget (per cube). The total is an input to the inertia
 requirement, not only a result: the value below is the \emph{converged} one,
 which the closure reproduces to within \qty{0.1}{\gram} of the $M$ assumed in
 Table~\ref{tab:jumpup_budget}.}
@@ -149,12 +148,6 @@ Structure (subframe, frame, fasteners)        & 610.0 & \qty{34.4}{\percent} & \
 \end{tabular}
 
 \vspace{0.4em}
-{\footnotesize\RaggedRight The structure line is an \emph{allowance}, not a
-measurement, and at \qty{34}{\percent} of the total it is the dominant
-uncertainty in the budget. It is reported separately from the specified
-hardware for that reason: the subtotal is what the design currently knows, and
-the total is what it currently projects. Closing the CAD model replaces the
-allowance with a real figure and re-enters the loop at step~6.\par}
 \end{table}
 
 \subsection{Mechanical Design and CAD Construction}
@@ -207,7 +200,7 @@ cannot fail to close in the CAD without the discrepancy being detected.
 The single-face rig is the first article built and the bench on which the
 parameters of Table~\ref{tab:params} are measured. Its structure is a
 3D-printed plate sized to one cube face, a central motor and wheel mount, a
-corner bearing defining the single rotational degree of freedom, and encoders and other hardware. Note that the servo (brake system) is not included in the 2D prototype as its purpose is validating the control loop on a more well-understood problem. Detailed geometry and the drawing set are in Appendix~\ref{app:cad_2d}. 
+corner bearing defining the single rotational degree of freedom, and encoders and other hardware. Note that the servo (brake system) is not included in the 2D prototype as its purpose is validating the control loop on a more well-understood problem. %Detailed geometry and the drawing set are in Appendix~\ref{app:cad_2d}. 
 
 
 
@@ -227,8 +220,7 @@ The split is also the main mechanical interface in the machine, and it is
 managed as one: the inner structure is designed against a fixed bolt pattern and
 keep-out envelope published to the outer frame, so the two can be revised
 independently as long as that interface holds. The controlled interfaces are
-listed in Table~\ref{tab:mech_interfaces}; the parts realising them, with their
-drawings, are in Appendix~\ref{app:cad_3d}.
+listed in Table~\ref{tab:mech_interfaces}.%; the parts realising them, with their drawings, are in Appendix~\ref{app:cad_3d}.
 
 \begin{table}[htbp]
 \centering
