@@ -298,10 +298,11 @@ flags are monitored over a sustained spin rather than sampled once.
 \paragraph{Fusion.} The complementary filter of Section~\ref{sec:control2d} is
 validated against a known static tilt and a known dynamic profile, and the
 cross-over frequency is selected from the measured noise and drift figures above
-rather than assumed. The estimator's behaviour under the accelerometer trust
-gating of Appendix~\ref{app:control_algorithms} is exercised deliberately, by applying a
-body acceleration large enough to trip the gate, since an estimator whose gating
-is never tested is one whose gating is not known to work.
+rather than assumed. The estimator's behaviour when the accelerometer term is
+distrusted is exercised deliberately, by applying a body acceleration large
+enough for the measured inclination to be unusable, since an estimator whose
+fallback to gyro integration is never tested is one whose fallback is not known
+to work.
 
 \subsection{1-DoF Plant Identification}
 \label{sec:test_paramid}
