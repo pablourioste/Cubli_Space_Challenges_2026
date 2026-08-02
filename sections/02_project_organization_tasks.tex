@@ -42,18 +42,18 @@ A15 & TDD v2 final submission & Final consistency pass and submission of the cor
 \midrule
 B1 & Sim environment + plant & Simulation setup and the 1-DoF plant, validated by energy conservation & Andrea & 23 Jul--3 Aug \\
 B2 & LQR design (1-DoF, sim) & Tune the regulator and sweep robustness to inertia error, delay and saturation & Andrea & 26 Jul--6 Aug \\
-B3 & State estimator & Complementary tilt filter, tested against injected noise and bias & Niccolò &27 Jul--7 Aug \\
+B3 & State estimator & Complementary tilt filter, tested against injected noise and bias & Niccolo &27 Jul--7 Aug \\
 B3b & Software interface contract & Fix the sensor and command structs passed between the sensor loop and the controller, with the units and sign convention of every field & Pablo & 3--4 Aug \\
 B4 & Flight computer \& comms & Teensy~4.1 architecture, loop rates, driver configuration and the CAN-FD command/reply protocol & Pablo & 24 Jul--7 Aug \\
 B5 & Sensor drivers + cal & IMU and encoder drivers, gyro/accel calibration and the lever-arm correction & Pablo & 28 Jul--7 Aug \\
-B6 & Safety \& mode logic & Watchdog, tilt-limit disarm, wheel-speed cap and the mode state machine & Niccolò &30 Jul--7 Aug \\
-B7 & 1-DoF control design complete & Consolidated 1-DoF control stack --- plant, regulator, estimator and safety logic --- released as the rig baseline & Niccolò &8--9 Aug \\
+B6 & Safety \& mode logic & Watchdog, tilt-limit disarm, wheel-speed cap and the mode state machine & Niccolo &30 Jul--7 Aug \\
+B7 & 1-DoF control design complete & Consolidated 1-DoF control stack --- plant, regulator, estimator and safety logic --- released as the rig baseline & Niccolo &8--9 Aug \\
 B8 & System identification & Measure $K_t$, wheel inertia, friction and loop latency on the rig. Single owner with E6 & Andrea & 7--9 Aug \\
 B9 & 3D model + LQR (sim) & 3D plant and the edge/corner regulators with the CAD inertia tensor & Andrea & 10--14 Aug \\
-B10 & EKF / MEKF estimator & 3D estimator with gyro-bias states; characterise the yaw drift & Niccolò &12--15 Aug \\
+B10 & EKF / MEKF estimator & 3D estimator with gyro-bias states; characterise the yaw drift & Niccolo &12--15 Aug \\
 B11 & Edge balance (S2a) & Retune the edge controller on the assembled cube; log disturbance recovery & Andrea & 15--17 Aug \\
 B12 & Corner balance + slew (S2b/c) & Coupled three-axis corner balance and a commanded slew; report ADCS metrics & Andrea & 17--19 Aug \\
-B13 & Jump-up (S3) & Spin-up profile and brake release for a face-to-edge jump. Sacrificial scope: yields to G6 and G7 if the schedule is contested & Niccolò &19--20 Aug \\
+B13 & Jump-up (S3) & Spin-up profile and brake release for a face-to-edge jump. Sacrificial scope: yields to G6 and G7 if the schedule is contested & Niccolo &19--20 Aug \\
 \midrule
 \multicolumn{5}{@{}l}{\textbf{Hardware Design \& Build}} \\
 \midrule
@@ -91,10 +91,10 @@ E4 & Board outline \& floorplan & Driver placement from the encoder cable limit,
 E5 & 1-DoF closed-loop bring-up & Closed loop on the rig with the disarm path and watchdog verified before any balance attempt & Pablo & 6--7 Aug \\
 E6 & Rig parameter measurement & Instrumented measurement of $K_t$, wheel inertia, friction and loop latency. Merged with B8: one owner measures and models & Andrea & 7--9 Aug \\
 E6b & Mechanical \& performance validation (1-DoF) & Reconcile the measured torque, inertia, friction and achievable momentum against the jump-up sizing (A9). Deviation beyond tolerance forces a re-sizing decision that day, while the wheel geometry can still change & Andrea & 9 Aug \\
-E7 & Perfboard + battery power chain & Populate the distribution perfboard (two ground domains, one star point, split \qty{5}{\volt} rail); XT90 chain with anti-spark, fuse and ${\ge}\,\qty{50}{\volt}$ bulk capacitance; replicate the remaining actuation sets & Niccolò &8--11 Aug \\
-E8 & 4-node bus + cube harness & Bus scaled to four nodes with stubs ${<}\,\qty{10}{\centi\metre}$ and an error soak at \qty{5}{\mega\bit\per\second}; full power and signal harness fabricated and routed; Wi-Fi telemetry for untethered operation & Niccolò &11--12 Aug \\
+E7 & Perfboard + battery power chain & Populate the distribution perfboard (two ground domains, one star point, split \qty{5}{\volt} rail); XT90 chain with anti-spark, fuse and ${\ge}\,\qty{50}{\volt}$ bulk capacitance; replicate the remaining actuation sets & Niccolo &8--11 Aug \\
+E8 & 4-node bus + cube harness & Bus scaled to four nodes with stubs ${<}\,\qty{10}{\centi\metre}$ and an error soak at \qty{5}{\mega\bit\per\second}; full power and signal harness fabricated and routed; Wi-Fi telemetry for untethered operation & Niccolo &11--12 Aug \\
 E9 & Cube power-on, \qty{48}{\ampere} + thermal & First battery power-on and the three-axis \qty{48}{\ampere} transient; driver thermals in the enclosed volume; all axes addressable & Pablo & 14--15 Aug \\
-E10 & Brake servo rail + measurement & Servo on an isolated \qty{5}{\volt} rail with PWM drive and flyback; rail stability under stall, brake closure time and spin-down brake torque measured. Sacrificial with C14/B13 & Niccolò &16--19 Aug \\
+E10 & Brake servo rail + measurement & Servo on an isolated \qty{5}{\volt} rail with PWM drive and flyback; rail stability under stall, brake closure time and spin-down brake torque measured. Sacrificial with C14/B13 & Niccolo &16--19 Aug \\
 \midrule
 \multicolumn{5}{@{}l}{\textbf{Deliverables}} \\
 \midrule

@@ -356,6 +356,16 @@ the count the gap rule admits, the resulting mass and inertia, and the
 pass\slash fail state of every constraint. It is not an optimiser, and the
 design point it reports was not found by one.
 
+The outer diameter is not among the quantities it is free to choose. $D_w$ is
+\emph{imposed} by the packaging envelope---three orthogonal wheel modules and
+the battery must fit within $L$---so the sweep is retained for what it reveals
+rather than for what it selects. Left free to minimise wheel mass it prefers a
+substantially larger ring, since $I_{zz}$ scales as $mR^2$ and mass placed at a
+large radius buys inertia quadratically more cheaply; at
+\qty{120}{\milli\metre} the constraint therefore costs about \qty{85}{\gram}
+per wheel against that unconstrained optimum. This is the price of a wheel that
+fits, and a wheel that does not fit is not a candidate.
+
 The procedure actually followed is the fixed-point iteration of
 Table~\ref{tab:sizing_procedure}, executed by hand. A cube mass is estimated
 and a mass budget assembled from it; the jump-up analysis converts that mass

@@ -11,8 +11,14 @@
 %  Line numbers are those of the files at scan time and will drift as the
 %  document is edited; the table/label names are the stable identifiers.
 %
-%  Counts at scan: 97 TBD markers, 4 empty sections, 20 comment-only stubs,
-%  21 missing figures.
+%  Counts at original scan: 97 TBD markers, 4 empty sections, 20 comment-only
+%  stubs, 21 missing figures.
+%
+%  UPDATE (sizing closure): A1 (6), A2 (4) and A8 (8) are populated from the
+%  converged run of analysis/SIZING.py, and A5's W3 quantity (1) is committed
+%  -- 19 TBD closed, leaving 78. The three script-versus-document conflicts
+%  recorded in Section 1 are resolved. A4's six TBDs are untouched: they need
+%  the packaging study, which remains the head of the chain.
 % ============================================================================
 \documentclass[11pt,a4paper]{article}
 
@@ -44,9 +50,11 @@
 \definecolor{blockcol}{HTML}{C00000}
 \definecolor{readycol}{HTML}{70AD47}
 \definecolor{waitcol}{HTML}{BF8F00}
+\definecolor{closedcol}{HTML}{2E75B6}
 \newcommand{\blocker}{\textcolor{blockcol}{\textbf{BLOCKER}}}
 \newcommand{\ready}{\textcolor{readycol}{\textbf{READY}}}
 \newcommand{\waiting}{\textcolor{waitcol}{\textbf{WAITING}}}
+\newcommand{\closed}{\textcolor{closedcol}{\textbf{CLOSED}}}
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -81,6 +89,8 @@ Three status labels are used throughout:
   \item \waiting{} --- blocked on an upstream item, named in the row.
   \item \blocker{} --- blocks a large number of downstream items. Close these
         first.
+  \item \closed{} --- resolved since the original scan. Retained in the register
+        so the closure is auditable rather than silently deleted.
 \end{itemize}
 
 Section~\ref{sec:chain} states the dependency chain, which is what makes the
@@ -98,71 +108,92 @@ I_{w,\text{target}} \;\rightarrow\;$ wheel design, feasibility gate, test thresh
 \end{center}
 
 so the packaging study (item \textbf{A4}) is the true head of the register. The
-parametric calculator \texttt{analysis/SIZING.py} already implements Stages~1--6
-of the closure procedure and, at the values currently set in it, reports a
-converged fixed point. The figures below are what it produces today; they are
-provisional because roughly \qty{35}{\percent} of the mass total is still
-structural allowance rather than measured mass.
+parametric calculator \texttt{analysis/SIZING.py} implements Stages~1--6 of the
+closure procedure and now reports a converged fixed point at
+$M = \qty{1.7716}{\kilo\gram}$, reproduced by its own Stage~6 roll-up to within
+\qty{0.1}{\gram}. The figures below have been \textbf{transcribed into the TDD}
+(A1, A2, A8 and parts of A4/A5 are closed). They remain provisional because
+roughly \qty{34}{\percent} of the mass total is still structural allowance
+rather than measured mass.
 
 \begin{table}[h]
 \centering
-\caption[Values currently produced by the sizing calculator]{Values currently
-produced by \texttt{analysis/SIZING.py}. These are candidates for the TBDs of
-item~A1, not yet committed numbers --- the structure mass is an allowance.}
+\caption[Values currently produced by the sizing calculator]{Converged values
+from \texttt{analysis/SIZING.py}, as transcribed into the TDD. The wheel
+diameter is pinned by the packaging envelope
+(\texttt{D\_w\_FIXED\_mm}\,=\,120), not chosen by the mass-minimising sweep.}
 \label{tab:sizing_current}
 \small
 \begin{tabular}{l L{5.0cm} c c}
 \toprule
-Symbol & Quantity & Current value & Status \\
+Symbol & Quantity & Converged value & Status \\
 \midrule
-$M$                   & Cube mass (assumed, Stage 1)   & \qty{1.800}{\kilo\gram} & Provisional \\
-$M_{\text{est}}$      & Cube mass (Stage 6 roll-up)    & \qty{1.756}{\kilo\gram} & 35\% allowance \\
+$M$                   & Cube mass (Stage 1 assumption) & \qty{1.7716}{\kilo\gram} & Fixed point \\
+$M_{\text{est}}$      & Cube mass (Stage 6 roll-up)    & \qty{1.7716}{\kilo\gram} & $\Delta \approx 0$; 34\% allowance \\
 $L$                   & Cube edge length               & \qty{150}{\milli\metre} & Fixed \\
 $\eta$                & Energy margin                  & 1.05                    & Chosen \\
 $\tau_b$              & Brake torque per wheel         & \qty{5}{\newton\metre}  & Assumed \\
-$\tau_g = MgL/2$      & Gravitational tip-over floor   & \qty{1.324}{\newton\metre} & Derived \\
-$\beta$               & Brake-amplification factor     & 1.360                   & Derived \\
-$\omega_{\max}$       & Max wheel speed                & \qty{5000}{\rpm}         & \textbf{Conflicts with TDD} \\
-$h_w$                 & Required angular momentum      & \qty{0.2644}{\kilo\gram\metre\squared\per\second} & Derived \\
-$I_{w,\text{target}}$ & Target wheel inertia           & \qty{5.05e-4}{\kilogram\metre\squared} & Derived \\
+$\tau_g = MgL/2$      & Gravitational tip-over floor   & \qty{1.303}{\newton\metre} & Derived \\
+$\beta$               & Brake-amplification factor     & 1.353                   & Derived \\
+$\omega_{\max}$       & Max wheel speed                & \qty{6000}{\rpm}        & Agreed with TDD \\
+$h_w$                 & Required angular momentum      & \qty{0.2588}{\kilo\gram\metre\squared\per\second} & Derived \\
+$I_{w,\text{target}}$ & Target wheel inertia (corner)  & \qty{4.119e-4}{\kilogram\metre\squared} & Derived \\
+$I_{w,\text{target}}$ & Target wheel inertia (edge)    & \qty{3.737e-4}{\kilogram\metre\squared} & Not critical \\
+$D_w$                 & Wheel outer diameter           & \qty{120}{\milli\metre} & Envelope constraint \\
+$N$                   & Ballast stations per wheel     & 15 of $N_{\max}=39$     & Derived \\
+$m_w$                 & Wheel mass (each)              & \qty{172.5}{\gram}      & Derived \\
+$I_w$                 & Wheel inertia achieved         & \qty{4.599e-4}{\kilogram\metre\squared} & \qty{111.7}{\percent} of target \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\paragraph{Three conflicts to resolve before these values are transcribed.}
-The calculator and the document do not currently agree, and the document must
-not be populated from the script until they do.
+\paragraph{The three script-versus-document conflicts are now closed.}
+Resolved as follows, and the document has been populated accordingly.
 
 \begin{enumerate}
-  \item \textbf{$\omega_{\max}$:} the script uses \qty{5000}{\rpm}; the TDD
-        (Table~\texttt{tab:jumpup\_budget}, and the dashed ceiling on the motor
-        curve figure) states \qty{6000}{\rpm}. The script's own docstring says
-        \qty{6000}{\rpm} while the code sets 5000. One is wrong.
-  \item \textbf{Wheel geometry:} the TDD's \texttt{tab:rw\_params} describes a
-        \qty{13}{\centi\metre} ring with blind hexagonal pockets, ballast radius
-        \qty{5.75}{\centi\metre}, $N = 15$, $m_w = \qty{109}{\gram}$,
-        $I_w = \qty{3.4e-4}{\kilogram\metre\squared}$. The script has moved to
-        round M6 through-holes at \qty{120}{\milli\metre} OD, $N = 15$ on
-        $R_{\text{pcr}} = \qty{54}{\milli\metre}$, giving
-        $m_w = \qty{167}{\gram}$. \textbf{The TDD wheel table is out of date}
-        and describes a superseded design.
-  \item \textbf{Ballast retention:} the TDD text (Sec.~\texttt{rw\_sizing}, and
-        the commented-out ``Bolt retention'' paragraph) argues retention via a
-        blind-pocket floor. The through-hole scheme makes the bolt itself the
-        retention feature and that argument obsolete.
+  \item \textbf{$\omega_{\max}$: resolved to \qty{6000}{\rpm}}, matching the TDD
+        and \texttt{electrical/MOTOR\_SPEED.md}; the script's code has been
+        corrected from \qty{5000}{\rpm}. \qty{5000}{\rpm} is retained as a
+        documented over-dimensioning check --- it raises $I_{w,\text{target}}$
+        by $6/5$, so a wheel closing there closes at \qty{6000}{\rpm} with
+        margin. A footnote to \texttt{tab:jumpup\_budget} records this.
+  \item \textbf{Wheel geometry: resolved.} \texttt{tab:rw\_params} now carries
+        the as-designed ring --- \qty{120}{\milli\metre} OD, \qty{15}{\milli\metre}
+        radial width, round M6 through-holes, $N = 15$ on
+        $R_{\text{pcr}} = \qty{52.5}{\milli\metre}$,
+        $m_w = \qty{172.5}{\gram}$, $I_w = \qty{4.599e-4}{\kilogram\metre\squared}$.
+        The diameter is an envelope constraint: left free, the mass-minimising
+        sweep prefers a larger ring that does not fit the cube, at a cost of
+        \qty{85}{\gram} per wheel.
+  \item \textbf{Ballast retention: resolved.} The blind-pocket language has been
+        removed from \texttt{06\_testing.tex} (part checks) and
+        \texttt{09\_cad.tex} (print settings); the through-bolt in tension is
+        the stated retention feature, at \qty{1.47}{\percent} of M6 class~8.8
+        proof load and \qty{4.02}{\mega\pascal} bearing stress.
 \end{enumerate}
+
+\paragraph{What remains open on the sizing chain.} The residual risk is not a
+conflict but a margin asymmetry: the wheel sits \qty{11.7}{\percent} above
+target while one station is worth \qty{5.9}{\percent}, so downward ballast trim
+is nearly exhausted ($-1$ station) while upward trim is ample ($+24$). A
+structure that comes in \emph{lighter} than the \qty{610}{\gram} allowance is
+therefore the awkward case, and $\omega_{\max}$ is the relief variable.
 
 \clearpage
 \section{TBD items, by owning table}
 \label{sec:tbd}
 
-93 of the 97 TBD markers sit in tables. Each block below is one table.
+93 of the 97 TBD markers sit in tables. Each block below is one table. Items
+marked \closed{} have been populated since the original scan and are retained
+for audit; 78 markers remain open.
 
-\subsection{A1 --- Jump-up sizing budget \quad \blocker}
+\subsection{A1 --- Jump-up sizing budget \quad \closed}
 
-\texttt{tab:jumpup\_budget}, \texttt{sections/04\_modeling\_control.tex},
-lines 189--197. \textbf{6 TBD.} Candidate values in
-Table~\ref{tab:sizing_current}, pending the conflicts above.
+\texttt{tab:jumpup\_budget}, \texttt{sections/04\_modeling\_control.tex}.
+\textbf{6 TBD --- all populated} from the converged run of
+Table~\ref{tab:sizing_current}. The values remain provisional in the sense that
+$M$ carries a \qty{34}{\percent} structural allowance, but they are no longer
+missing and the table is self-consistent with Stage~6.
 
 \begin{table}[h]
 \centering
@@ -184,12 +215,15 @@ Line & Symbol & Quantity & Closed by \\
 Four of the six are pure functions of $M$ and $L$, so this whole block closes
 the moment the mass roll-up is real rather than allowance-based.
 
-\subsection{A2 --- Required inertia by contact case \quad \waiting}
+\subsection{A2 --- Required inertia by contact case \quad \closed}
 
-\texttt{tab:inertia\_cases}, \texttt{sections/05\_hardware\_design.tex},
-lines 127--128. \textbf{4 TBD}: Edge and Corner rows $\times$ ($h_w$,
-$I_{w,\text{target}}$). Downstream of A1; the corner row is the design driver
-and the edge row is reported for completeness.
+\texttt{tab:inertia\_cases}, \texttt{sections/05\_hardware\_design.tex}.
+\textbf{4 TBD --- all populated.} The calculator now evaluates both contact
+cases rather than only the sizing one: edge
+$h_w = \qty{0.2348}{\kilo\gram\metre\squared\per\second}$,
+$I_{w,\text{target}} = \qty{3.737e-4}{\kilogram\metre\squared}$; corner
+\qty{0.2588}{} and \qty{4.119e-4}{} respectively. The corner case demands
+\qty{9.3}{\percent} more inertia, which is now shown rather than asserted.
 
 \subsection{A3 --- Rail current budget \quad \ready}
 
@@ -220,8 +254,13 @@ servo stall and full sensor load simultaneously --- not the sum of typicals.
 
 \subsection{A4 --- Driving CAD parameters \quad \blocker}
 
-\texttt{tab:cad\_params}, \texttt{sections/09\_cad.tex}, lines 34--39.
-\textbf{6 TBD.} $L$, $t_w$ and $D_w$ are already populated.
+\texttt{tab:cad\_params}, \texttt{sections/09\_cad.tex}.
+\textbf{6 TBD, unchanged.} $L$, $t_w$, $D_w$ and $t_r$ are populated: $D_w$ has
+been corrected from \qty{13}{\centi\metre} to the \qty{120}{\milli\metre} of the
+as-designed wheel, and the axial thickness $t_r = \qty{5}{\milli\metre}$ added,
+since the CAD needs it and the sizing fixes it. The six remaining TBDs are
+genuinely open --- they need the packaging study, not the calculator, and the
+sizing work does not touch them.
 
 \begin{table}[h]
 \centering
@@ -278,9 +317,10 @@ Line & Ref & Part & Missing \\
 \end{tabular}
 \end{table}
 
-W3's quantity is $3N$ where $N$ is the ballast count --- currently 15 per wheel
-in the calculator, so 45 --- but see the wheel-geometry conflict above before
-committing it.
+W3's quantity is $3N$ where $N$ is the ballast count. With the wheel geometry
+now settled at $N = 15$ per wheel, this has been committed as \textbf{45} M6
+bolt-and-nut sets, leaving 34 TBD in this table. The rest are fabrication routes
+and statuses, which are decidable today and do not depend on the sizing.
 
 \subsection{A6 --- Print and manufacturing settings \quad \ready}
 
@@ -305,10 +345,16 @@ The CAD column can be filled as soon as the model exists; the measured column
 requires the assembled hardware (assembly step~8). This is the table that closes
 the mass loop, so a discrepancy here re-enters $I_{w,\text{target}}$.
 
-\subsection{A8 --- Pre-fabrication feasibility gate \quad \waiting}
+\subsection{A8 --- Pre-fabrication feasibility gate \quad \closed}
 
-\texttt{tab:jumpup\_gate}, \texttt{sections/06\_testing.tex}, lines 109--116.
-\textbf{8 TBD.}
+\texttt{tab:jumpup\_gate}, \texttt{sections/06\_testing.tex}.
+\textbf{8 TBD --- all populated}, and the gate passes on every row:
+$\omega_w = \qty{5374}{\rpm}$ against $\omega_{\max} = \qty{6000}{\rpm}$ for a
+speed margin of \num{0.896}; $I_w = \qty{4.599e-4}{}$ against
+$I_{w,\text{target}} = \qty{4.119e-4}{}$, a \qty{+11.7}{\percent} route
+disagreement; trim authority $-1/+24$ stations; retention at
+\qty{1.47}{\percent} of proof load. Row~116 has also been reworded off the
+superseded blind-pocket scheme, as flagged below.
 
 \begin{table}[h]
 \centering
@@ -329,10 +375,13 @@ Line & Quantity & Pass condition \\
 \end{tabular}
 \end{table}
 
-Note that row 116 is written against the superseded blind-pocket scheme. Under
-the through-hole design the retention feature is the bolt in tension, and the
-calculator already reports the centrifugal load as a fraction of M6 class~8.8
-proof load, so this row needs rewording as well as populating.
+Row 116 was written against the superseded blind-pocket scheme; it has been
+reworded to ``Ballast retention margin'' with the pass condition stated on bolt
+tension and head/nut bearing stress, which is what the through-hole design
+actually relies on. The same correction was applied to the part-check paragraph
+of \texttt{06\_testing.tex} and the print-settings preamble of
+\texttt{09\_cad.tex}, both of which still referred to pockets and a retention
+floor.
 
 \subsection{A9 --- 1-DoF plant identification \quad \waiting}
 
@@ -494,15 +543,15 @@ is already written, and each is a short fix.
 \# & Location & Defect \\
 \midrule
 1 & \texttt{05\_hardware\_design} :420 vs \texttt{08\_bom}:86 & Battery capacity contradiction: \qty{3600}{\milli\ampere\hour} in the power architecture, \qty{1550}{\milli\ampere\hour} in the BOM, same 6S pack. The sizing script uses 3600. \\
-2 & \texttt{05\_hardware\_design} :289 & \texttt{tab:rw\_params} has \texttt{\textbackslash centering} then \texttt{\textbackslash label} with \textbf{no \textbackslash caption} --- the table will not appear in the List of Tables. \\
+2 & \texttt{05\_hardware\_design} & \closed{} \texttt{tab:rw\_params} was missing its \texttt{\textbackslash caption} and would not have appeared in the List of Tables. A caption is now present. \\
 3 & \texttt{06\_testing}:65--66 vs \texttt{tab:gates} & G6 hard-kill date stated as 13~August; Table~\texttt{tab:gates} puts G6 at 17~August. A kill date cannot precede the gate it kills. \\
 4 & \texttt{02\_project\_organization} \texttt{\_tasks}:46 & Task B4 says ``Raspberry Pi software architecture''; Sec.~5 and the BOM specify Teensy~4.1 throughout. \\
 5 & \texttt{08\_bom}:64 vs \texttt{tab:cad\_parts} & Brake servo quantity: BOM says 1--3, the CAD part list says 3 brackets, Sec.~5 says ``servos'' plural. \\
-6 & Author list vs \texttt{tab:team\_roles} vs task table & Name spelling: ``Niccol\`o'' / ``Niccolo'' / ``Nicc''. \\
+6 & Author list vs \texttt{tab:team\_roles} vs task table & \closed{} Name spelling was inconsistent (``Niccol\`o'' / ``Niccolo'' / ``Nicc''). The report now uses the unaccented ``Niccolo'' throughout: author list, cover, roles table and task table. \\
 7 & \texttt{02\_project\_organization} \texttt{\_tasks}:79--82 & Task IDs C11--C14 appear under the ``3D Design'' block, after D1--D7. \\
 8 & All section files & British/American spelling mixed: realise/realize, characterise/characterize, behaviour/behavior, sometimes within one section. \\
 9 & \texttt{04\_modeling\_control}:131 & Hard-coded \texttt{\textbackslash newpage} splits a sentence across pages mid-argument. \\
-10 & All tables & Every float uses \texttt{[h]}; with this many floats \texttt{[htbp]} is needed for sane placement. \\
+10 & All tables & \closed{} Every float used \texttt{[h]}; all are now \texttt{[htbp]}. No \texttt{[h]} float remains in \texttt{sections/}. \\
 11 & \texttt{sections/} & \texttt{code.cpp} and \texttt{code.exe} are untracked in the repo; a compiled binary should not be committed. \\
 \bottomrule
 \end{tabular}
@@ -511,12 +560,18 @@ is already written, and each is a short fix.
 \section{Suggested order of work}
 
 \begin{enumerate}
-  \item \textbf{Resolve the three script-vs-document conflicts} of
-        Section~\ref{sec:chain} --- $\omega_{\max}$, the wheel geometry, and the
-        ballast retention argument. Until these agree, populating the document
-        from the calculator would propagate a superseded design.
-  \item \textbf{Close the packaging study} (A4). $V_{\min}$ and the clearances
-        release $L$, then $M$, then A1, A2 and A8 --- roughly 25 items.
+  \item \closed{} \textbf{The three script-versus-document conflicts} of
+        Section~\ref{sec:chain} are resolved --- $\omega_{\max}$ at
+        \qty{6000}{\rpm}, the wheel table rebuilt on the as-designed
+        \qty{120}{\milli\metre} through-hole ring, and the blind-pocket
+        retention argument removed. A1, A2 and A8 were then populated from the
+        converged run (19 TBD closed).
+  \item \textbf{Close the packaging study} (A4) --- now the head of the
+        register. $V_{\min}$ and the clearances release $L$, then $M$. Note
+        that A1, A2 and A8 are populated but \emph{provisional}: they rest on a
+        \qty{610}{\gram} structural allowance, so closing A4 will move them
+        again. That is the next turn of the fixed-point iteration, not a
+        re-opening of settled items.
   \item \textbf{Write Appendix~D}, or remove the six cross-references that point
         into it.
   \item \textbf{Write Section~3}, which is three-quarters empty.
