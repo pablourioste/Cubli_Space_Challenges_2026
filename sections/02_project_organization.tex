@@ -5,7 +5,8 @@
 
 The project is developed by a multidisciplinary team, with responsibilities
 distributed across the main technical domains of the Cubli: mathematical
-modeling, control, mechanical/CAD design, and system integration. Table
+modeling, control, embedded software, mechanical and three-dimensional design,
+electrical build, and system integration and validation. Table
 \ref{tab:team_roles} summarizes each member's primary role, and the detailed
 responsibilities are outlined below.
 
@@ -20,54 +21,68 @@ responsibilities are outlined below.
 \midrule
 Pablo Urioste Alarcón &
 \href{mailto:pb.urioste4@gmail.com}{pb.urioste4@gmail.com}\newline +34 654 491 174 &
-System integration and lead: digital actuator and sensor coding, embedded
-software, and integration of the overall design. \\
+Schedule administration, electrical and mechanical system integration
+(interfaces), and experimental validation of the single-axis prototype. \\
 \addlinespace
 Deyan Nikolaev Vlaev &
 \href{mailto:vlaev.dido@gmail.com}{vlaev.dido@gmail.com}\newline +359 877 082 499 &
-Mathematical demonstration and derivation of the system dynamics. \\
+System dynamics derivation, and embedded software: Raspberry Pi programming,
+driver configuration and communication protocols. \\
 \addlinespace
 Niccolo Tonetto&
-niccolo.tonetto@gmail.com &
+\href{mailto:niccolo.tonetto@gmail.com}{niccolo.tonetto@gmail.com} &
 Control system design and analysis. \\
 \addlinespace
 Andrea Liang &
 \href{mailto:andrea.liang.2006@gmail.com}{andrea.liang.2006@gmail.com}\newline +31 06 5796 2976 &
-Support on the control problem and structural/mechanical integration. \\
+Control design and analytical sizing; plant identification from the measured
+rig parameters. \\
 \addlinespace
 Suvanna Viriyanti Wu &
 \href{mailto:Viriyanti.wu@gmail.com}{Viriyanti.wu@gmail.com}\newline +39 329 074 7550 &
-CAD modeling and mechanical design. \\
+One-dimensional functional model: build, mechanical testbench and CAD support
+to the three-dimensional design. \\
 \addlinespace
 Athanasia Nikolova &
-nasia.nikolova@mtel.gr &
-CAD modeling, prototype building/assembly, and product presentation
-(commercial pitch). \\
+\href{mailto:nasia.nikolova@mtel.gr}{nasia.nikolova@mtel.gr} &
+Three-dimensional CAD, frame design and design monitoring; prototype assembly
+and product presentation (commercial pitch). \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \paragraph{Responsibilities.}
 \begin{itemize}
-    \item \textbf{Pablo Urioste Alarcón} --- System integration and overall
-    coordination. Handles the coding of the digital actuators and sensors,
-    the embedded software stack, and the integration of the mechanical,
-    electronic and control subsystems into a working prototype.
-    \item \textbf{Deyan Nikolaev Vlaev} --- Mathematical foundation. Responsible
-    for the analytical demonstration and derivation of the equations of motion
-    and the dynamic model of the Cubli.
-    \item \textbf{Niccolo} --- Control. Leads the design, tuning and analysis of
-    the control strategy used to balance and maneuver the Cubli.
-    \item \textbf{Andrea Liang} --- Control and mechanics support. Assists on
-    the control problem and contributes to the structural and mechanical
-    integration of the system.
-    \item \textbf{Suvanna Viriyanti Wu} --- CAD and mechanical design.
-    Develops the 3D models and mechanical drawings of the structure and
-    reaction-wheel assembly.
-    \item \textbf{Athanasia Nikolova} --- CAD, prototype building and
-    commercialization. Contributes to the 3D modeling, leads the physical
-    building and assembly of the prototype, and is responsible for presenting
-    and pitching the product.
+    \item \textbf{Pablo Urioste Alarcón} --- Schedule administration, system
+    integration and experimental validation. Administers the schedule and the
+    gate criteria, and owns the electrical--mechanical interfaces: the board
+    outline, keep-outs and harness routing released to the three-dimensional
+    design. Leads the electrical build and, on the single-axis rig, the
+    experimental validation of the mechanical and performance behaviour ---
+    confirming that the torque, inertia and friction realised in hardware
+    match the values assumed in the sizing analysis. Assembles and edits the
+    technical design document.
+    \item \textbf{Deyan Nikolaev Vlaev} --- Dynamics and embedded software.
+    Responsible for the analytical derivation of the equations of motion and
+    the dynamic model of the Cubli, and for the embedded software: the
+    Raspberry Pi programming, the configuration of the motor drivers and the
+    communication protocols between the processing and actuation hardware.
+    \item \textbf{Niccolo Tonetto} --- Control. Leads the design, tuning and
+    analysis of the control strategy used to balance and maneuver the Cubli,
+    including the state estimator and the safety and mode logic.
+    \item \textbf{Andrea Liang} --- Control design and analytical sizing.
+    Contributes the sizing calculations and the inertia and control budgets,
+    and converts the parameters measured on the rig into the validated plant
+    model on which the balancing controllers are designed.
+    \item \textbf{Suvanna Viriyanti Wu} --- One-dimensional model and
+    mechanical build. Builds and iterates the single-axis functional prototype
+    and its testbench, fabricates the reaction wheels, and supports the
+    three-dimensional design work.
+    \item \textbf{Athanasia Nikolova} --- Three-dimensional design and
+    commercialization. Leads the 3D CAD, the frame design and the mechanical
+    enclosures, monitors the design for consistency against the frozen mass
+    and interface constraints, and is responsible for presenting and pitching
+    the product.
 \end{itemize}
 
 \subsection{Work Breakdown Structure}
@@ -152,7 +167,7 @@ G4 & TDD v1 delivered for assessment & 3 Aug \\
 M3 & Procurement round 2 consolidated and ordered & 5 Aug \\
 M4 & 1-DoF closed loop live; disarm path and watchdog verified & 7 Aug \\
 M5 & Manufacturing package released for fabrication & 7 Aug \\
-M6 & Plant parameters measured on the rig and validated against simulation & 9 Aug \\
+M6 & Plant parameters measured on the rig and validated against simulation; measured torque, inertia and friction reconciled with the sizing analysis, or a re-sizing decision recorded & 9 Aug \\
 M7 & 1-DoF control design complete: plant, regulator, estimator and safety logic & 9 Aug \\
 G3 & 1-DoF rig balances $\geq$60 s unassisted & 12 Aug \\
 M8 & TDD v2 corrected and finally submitted & 14 Aug \\
