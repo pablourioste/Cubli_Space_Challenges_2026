@@ -47,7 +47,7 @@ redistributed into the corners or thinned, and its dimensions follow from the
 required capacity and discharge rating rather than from any packaging
 preference. Around it must sit an \emph{inner structure}---a rigid subframe
 that locates the three orthogonal motors on mutually perpendicular axes through
-a common centre, carries the three motor drivers, the flight controller, the IMU
+a common centre, carries the three motor drivers, the microcontroller, the IMU
 and the brake servos, and reacts the motor mounting loads into the outer
 frame. The three wheel/motor modules must not intersect one another, the pack,
 or this subframe, and the pack should sit near the geometric centre so that it
@@ -76,7 +76,7 @@ which grows with both the cube mass and the edge length. Enlarging the cube to
 gain wheel diameter therefore also raises the requirement---but the achievable
 inertia grows faster than the requirement does ($D_w^2$ against $L^{3/2}$), so
 the loop does converge, and a wheel that is short at a given $L$ can be closed
-by a modest increase in $L$.
+by a modest increase in $L$. 
 
 \paragraph{Mass closes the loop.} The cube mass $M$ is not merely a logistics
 figure: it re-enters the dynamics through the gravitational tip-over torque
@@ -124,8 +124,8 @@ selected $\omega_{\max}$ once the envelope is fixed.}
 \toprule
 Contact case & $h_w$ (kg\,m$^2$/s) & $I_{w,\text{target}}$ (kg\,m$^2$) \\
 \midrule
-Edge                       & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\textbf{Corner (critical)} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Edge                       & $0.1434$ & $0.2236$ \\
+\textbf{Corner (critical)} & $2.28\times10^{-4}$ & $3.56\times10^{-4}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -208,9 +208,7 @@ paper cannot silently fail to close in the CAD.
 The single-face rig is the first article built and the bench on which the
 parameters of Table~\ref{tab:params} are measured. Its structure is a
 3D-printed plate sized to one cube face, a central motor and wheel mount, a
-corner bearing defining the single rotational degree of freedom, and encoders and other hardware. Note that the servo (brake system) is not included in the 2D prototype as its purpose is validating the control loop on a more well-understood problem. Detailed geometry and the drawing set are in Appendix~\ref{app:cad_2d}. 
-
-
+corner bearing defining the single rotational degree of freedom, and encoders and other hardware. Note that the servo (brake system) is not included in the 2D prototype as its purpose is validating the control loop on a more well-understood problem. The 2D prototype is also a tool for calibrating and verifying the electronic circuit before jumping into a full 3D implementation. Motor calibration, electrical connections, and the telemetry system are all possible points of failure which are best tested in a smaller system first. Identifying errors in software or hardware is substantially easier with only one active wheel. Detailed geometry and the drawing set are in Appendix~\ref{app:cad_2d}. 
 
 \subsubsection{3D Cube Frame}
 
