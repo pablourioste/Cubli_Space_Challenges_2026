@@ -39,51 +39,32 @@ states that chain and the order in which it is closed. No dimensions are
 committed here---component selection is still open (Section~\ref{sec:hardware}),
 and the numbers follow from the procedure rather than preceding it.
 
-\paragraph{Envelope drivers.} The
-dominant volume claim inside the cube is not the reaction wheels but the power
-and support hardware. A LiPo pack sized for the jump-up duty cycle is a
-monolithic, incompressible block: unlike the electronics it cannot be
-redistributed into the corners or thinned, and its dimensions follow from the
-required capacity and discharge rating rather than from any packaging
-preference. Around it must sit an \emph{inner structure}---a rigid subframe
-that locates the three orthogonal motors on mutually perpendicular axes through
-a common centre, carries the three motor drivers, the flight controller, the IMU
-and the brake servos, and reacts the motor mounting loads into the outer
-frame. The three wheel/motor modules must not intersect one another, the pack,
-or this subframe, and the pack should sit near the geometric centre so that it
-does not skew the cube's centre of mass away from the body diagonal.
+The chain runs in the order set out in Table~\ref{tab:sizing_procedure}. The
+volume claim inside the cube is dominated by the LiPo pack and the inner
+structure that carries it --- a rigid subframe locating the three motors on
+mutually perpendicular axes through a common centre, together with the drivers,
+flight controller, IMU and brake servos. The pack is incompressible and sits
+near the geometric centre so as not to skew the centre of mass off the body
+diagonal, so $L$ is the smallest edge length containing that volume plus wall
+thickness and the contact features. $L$ then caps the wheel diameter $D_w$, and
+with it the achievable inertia $I_w \sim m_w D_w^2/4$; ballast cannot rescue a
+wheel that is short at its maximum diameter, because it necessarily sits inboard
+of the ring it displaces.
 
-The minimum internal clear volume is therefore set by the pack, the subframe and
-the electronics stack together, and $L$ is the smallest edge length that
-contains that volume plus the wall thickness and the corner and edge contact
-features. This is the first quantity to fix, and everything downstream depends
-on it.
-
-\paragraph{Envelope cap on wheel inertia.} Once $L$ is set, the largest wheel outer diameter $D_w$ that
-clears the subframe, the motor body and the adjacent orthogonal modules is a
-geometric consequence, and it caps the achievable inertia---not only through
-$I_w \sim m_w D_w^2/4$, but because any ballast necessarily sits inboard of the
-ring it displaces, so a wheel that is short of target at its maximum diameter
-cannot be rescued by adding mass. Against this stands the requirement from the
-jump-up analysis (Section~\ref{sec:jumpup_target}),
+Against that stands the requirement from the jump-up analysis
+(Section~\ref{sec:jumpup_target}),
 \[
 I_{w,\text{target}} = \frac{h_w(M, L)}{\omega_{\max}},
 \qquad
 h_w \propto M L^{3/2},
 \]
-which grows with both the cube mass and the edge length. Enlarging the cube to
-gain wheel diameter therefore also raises the requirement---but the achievable
-inertia grows faster than the requirement does ($D_w^2$ against $L^{3/2}$), so
-the loop does converge, and a wheel that is short at a given $L$ can be closed
-by a modest increase in $L$.
-
-\paragraph{Mass coupling.} The cube mass $M$ re-enters the dynamics through the
-gravitational tip-over torque $\tau_g = MgL/2$, which sets the floor the brake
-torque must exceed, and through $h_w \propto M$. Growing the envelope to fit a
-larger wheel adds frame and wheel mass, which raises $I_{w,\text{target}}$
-again. Mass, volume and inertia are thus one coupled system, closed by the
-iteration of Table~\ref{tab:sizing_procedure} rather than by any of the three in
-isolation.
+which rises with both $M$ and $L$. Two consequences close the loop. Enlarging
+the cube to gain wheel diameter also raises the requirement, but the achievable
+inertia grows faster than the requirement does ($D_w^2$ against $L^{3/2}$), so a
+wheel short at a given $L$ can be closed by a modest increase in $L$. And any
+mass added in doing so feeds back through $h_w \propto M$ and through the
+gravitational tip-over torque $\tau_g = MgL/2$ that the brake must exceed ---
+which is why the procedure terminates at a fixed point rather than in one pass.
 
 \begin{table}[htbp]
 \centering
@@ -115,18 +96,26 @@ Table~\ref{tab:inertia_cases} records both once the procedure closes.
 
 \begin{table}[htbp]
 \centering
-\caption[Required per-wheel inertia by contact case]{Required per-wheel inertia by contact case, to be evaluated at the
-selected $\omega_{\max}$ once the envelope is fixed.}
+\caption[Required per-wheel inertia by contact case]{Required per-wheel inertia by contact case, evaluated at
+$\omega_{\max}=\qty{6000}{\rpm}$ for the converged $M=\qty{1.772}{\kilo\gram}$.
+Only the geometry factor differs between the cases: $\tau_g$ and $\beta$ are
+properties of the cube and the brake, not of the feature it stands on.}
 \label{tab:inertia_cases}
-\begin{tabular}{lcc}
+\begin{tabular}{lccc}
 \toprule
-Contact case & $h_w$ (kg\,m$^2$/s) & $I_{w,\text{target}}$ (kg\,m$^2$) \\
+Contact case & $h_w$ (kg\,m$^2$/s) & $I_{w,\text{target}}$ (kg\,m$^2$) & Relative \\
 \midrule
-Edge                       & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\textbf{Corner (critical)} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Edge                       & \num{0.2348} & \num{3.737e-4} & \qty{90.7}{\percent} \\
+\textbf{Corner (critical)} & \num{0.2588} & \num{4.119e-4} & \qty{100}{\percent} \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+The corner case demands \qty{9.3}{\percent} more inertia than the edge case, so
+sizing on it satisfies the edge requirement with that margin in hand. The
+selected wheel delivers \qty{4.599e-4}{\kilogram\metre\squared}
+(Table~\ref{tab:rw_params}), which is \qty{111.7}{\percent} of the corner
+requirement and \qty{123.1}{\percent} of the edge requirement.
 
 The allocation of Table~\ref{tab:massbudget} is the bookkeeping side of steps 5
 and 6: it is populated as components are selected and re-totalled on each
@@ -135,25 +124,37 @@ output of the design.
 
 \begin{table}[htbp]
 \centering
-\caption[Mass budget (per cube)]{Mass budget (per cube), to be populated as components are selected.
-The total is an input to the inertia requirement, not only a result.}
+\caption[Mass budget (per cube)]{Mass budget (per cube), rolled up from the bill of materials by
+\texttt{analysis/SIZING.py} (Stage~6). The total is an input to the inertia
+requirement, not only a result: the value below is the \emph{converged} one,
+which the closure reproduces to within \qty{0.1}{\gram} of the $M$ assumed in
+Table~\ref{tab:jumpup_budget}.}
 \label{tab:massbudget}
 \small
-\begin{tabular}{l c l}
+\begin{tabular}{l c c l}
 \toprule
-Subsystem & Allocated mass (g) & Status \\
+Subsystem & Mass (g) & Share & Basis \\
 \midrule
-Battery pack                  & 254 & Drives envelope (step 1) \\
-Reaction wheels ($3\times$)   & 109 ($3\times$) & Sized (Sec.~\ref{sec:rw_sizing}) \\
-Motors ($3\times$)            & 68 ($3\times$) & Drives reaction wheels \\
-Inner structure / motor subframe & 120 & Transfers torque \\
-Outer frame / contact features & 350 & Sized \\
-Electronics (MCU, drivers, IMU, servos) & 150 & Allowance \\
-Wiring / fasteners / margin   & 100 & Allowance \\
+Reaction wheels ($3\times\qty{172.5}{\gram}$) & 517.5 & \qty{29.2}{\percent} & Sized (Sec.~\ref{sec:rw_sizing}) \\
+Motors and brake servos ($3\times$ each)      & 245.4 & \qty{13.9}{\percent} & Datasheet \\
+Power (battery, XT90, regulator)              & 279.0 & \qty{15.7}{\percent} & Drives envelope (step 1) \\
+Electronics (drivers, MCU, encoders, IMU)     &  74.2 & \qty{4.2}{\percent}  & Datasheet \\
+Wiring, perfboard and passives                &  45.5 & \qty{2.6}{\percent}  & Estimated \\
 \midrule
-\textbf{Total $M$}            & 1505 & \textbf{Closed by iteration} \\
+\textbf{Subtotal --- specified hardware}      & \textbf{1161.6} & \qty{65.6}{\percent} & Measured or datasheet \\
+Structure (subframe, frame, fasteners)        & 610.0 & \qty{34.4}{\percent} & \textbf{Allowance, pending CAD} \\
+\midrule
+\textbf{Total $M$}                            & \textbf{1771.6} & & \textbf{Converged fixed point} \\
 \bottomrule
 \end{tabular}
+
+\vspace{0.4em}
+{\footnotesize\RaggedRight The structure line is an \emph{allowance}, not a
+measurement, and at \qty{34}{\percent} of the total it is the dominant
+uncertainty in the budget. It is reported separately from the specified
+hardware for that reason: the subtotal is what the design currently knows, and
+the total is what it currently projects. Closing the CAD model replaces the
+allowance with a real figure and re-enters the loop at step~6.\par}
 \end{table}
 
 \subsection{Mechanical Design and CAD Construction}
@@ -299,20 +300,23 @@ Table~\ref{tab:massbudget} remains an allowance.}
 \toprule
 Symbol & Parameter & Value \\
 \midrule
-$D_w$      & Ring outer diameter (capped by envelope) & \qty{120}{\milli\metre} \\
-$w_r$      & Ring radial width                         & \qty{12}{\milli\metre} \\
+$D_w$      & Ring outer diameter (fixed by envelope)   & \qty{120}{\milli\metre} \\
+$D_i$      & Ring inner diameter ($D_w - 2w_r$)        & \qty{90}{\milli\metre} \\
+$w_r$      & Ring radial width                         & \qty{15}{\milli\metre} \\
 $t_r$      & Ring axial thickness (= hole depth)       & \qty{5}{\milli\metre} \\
 $n_s, w_s$ & Spoke count and width                     & $3$, \qty{10}{\milli\metre} \\
 $\rho_p$   & Printed-material density (PET-CF)         & \qty{1290}{\kilo\gram\per\metre\cubed} \\
 $d_h$      & Ballast hole diameter (M6 clearance)      & \qty{6.4}{\milli\metre} \\
-$r_b$      & Ballast pitch circle radius               & \qty{54}{\milli\metre} \\
+$r_b$      & Ballast pitch circle radius               & \qty{52.5}{\milli\metre} \\
 $m_{\text{hw}}$ & Hardware mass per station (bolt $+$ nut) & \qty{9.0}{\gram} \\
 $m_b$      & \emph{Net} mass added per station          & \qty{8.79}{\gram} \\
-$\Delta I_b$ & \emph{Net} inertia added per station     & \qty{2.55e-5}{\kilogram\metre\squared} \\
+$\Delta I_b$ & \emph{Net} inertia added per station     & \qty{2.428e-5}{\kilogram\metre\squared} \\
 $N$        & Station count reaching $I_{w,\text{target}}$ & \num{15} \\
-$N_{\max}$ & Station count admitted by the gap rule    & \num{40} \\
-$m_w$      & Resulting wheel mass                      & \qty{167}{\gram} \\
-$I_w$      & Resulting wheel inertia                   & \qty{5.47e-4}{\kilogram\metre\squared} \\
+$N_{\max}$ & Station count admitted by the gap rule    & \num{39} \\
+$s_{\min}$ & Radial wall, hole edge to ring boundary   & \qty{4.30}{\milli\metre} \\
+$m_w$      & Resulting wheel mass                      & \qty{172.5}{\gram} \\
+$I_w$      & Resulting wheel inertia                   & \qty{4.599e-4}{\kilogram\metre\squared} \\
+           & \quad as a fraction of $I_{w,\text{target}}$ & \qty{111.7}{\percent} \\
 \bottomrule
 \end{tabular}
 \end{table}

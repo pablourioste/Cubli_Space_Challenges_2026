@@ -50,6 +50,23 @@
 \definecolor{mscol}{HTML}{7F7F7F} % milestones
 \definecolor{p0col}{HTML}{C00000} % P0 (critical-path) priority highlight
 
+% ---------- Figure placeholders (pending artwork) ----------
+% A framed, hatched box standing in for artwork that is not yet drawn, so that
+% the figure is numbered, captioned and listed in the List of Figures before the
+% file exists. Replacing a placeholder is a one-line edit: swap \phfig for
+% \includegraphics and keep the surrounding float, caption and label.
+%   \phfig[<height>]{<width>}{<what the drawing will show>}
+\usepackage{tikz}
+\usetikzlibrary{patterns}
+\newcommand{\phfig}[3][0.42\textheight]{%
+  \begin{tikzpicture}
+    \node[draw=black!45, dashed, line width=0.8pt, fill=black!3,
+          minimum width=#2, minimum height=#1, inner sep=6pt,
+          align=center, text width=0.86\dimexpr#2\relax, font=\small]
+         {\textcolor{red}{\textbf{PLACEHOLDER --- artwork pending}}\\[6pt]#3};
+  \end{tikzpicture}%
+}
+
 % ---------- Table & caption styling ----------
 \renewcommand{\arraystretch}{1.15}                 % consistent, slightly tighter rows
 \captionsetup{font=small, labelfont=bf, skip=6pt}  % compact bold "Table N" captions

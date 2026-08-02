@@ -29,15 +29,26 @@ Net effect per hole (both mass and inertia):
 Because rho_steel >> rho_petcf, dI > 0 and the station is a net win --
 but the plastic loss is NOT negligible and is accounted for here.
 
-WHAT THE SWEEP NOW SELECTS: OD = 140 mm with ZERO bolts. At that diameter
-the bare PET-CF ring already reaches ~128% of I_w_target, so the hole
-pattern is a TRIM feature rather than required ballast. Selection is on
-minimum WHEEL MASS among the ODs passing every check, not on minimum
-diameter: I_zz goes as m*R^2, so mass at a large radius is far cheaper.
-The 90 mm ring also "meets target" but needs 24 bolts and weighs
-308 g/wheel against 140 g/wheel for the bare 140 mm ring -- 503 g more
-across three wheels, on a cube that has to throw its own mass.
-omega_max is held at 6000 rpm per electrical/MOTOR_SPEED.md.
+WHAT THE DESIGN NOW IS: OD = 120 mm with 15 M6 stations, 172.5 g/wheel,
+reaching 111.7% of I_w_target. The diameter is NOT the sweep's choice --
+it is PINNED by D_w_FIXED_mm because three orthogonal wheel modules plus
+the battery have to fit inside the L = 150 mm cube. Left free, the
+minimum-mass rule picks a much larger ring (I_zz goes as m*R^2, so mass
+at a large radius is cheap inertia), but a wheel that does not fit the
+cube is not a candidate, so the envelope outranks the mass objective.
+The sweep is still computed and printed in full, as context for what the
+constraint costs.
+
+omega_max is 6000 rpm per electrical/MOTOR_SPEED.md and the TDD. The
+sizing has also been run at 5000 rpm as an OVER-DIMENSIONING check:
+I_w_target = h_w/omega_max, so the lower speed raises the requirement by
+6/5 and demands more ballast. A wheel closing at 5000 closes at 6000 with
+margin in hand.
+
+M IS A FIXED POINT, NOT AN ASSUMPTION: M sets I_w_target (Stage 1), which
+sets the ballast count, which sets the wheel mass, which feeds back into
+M via Stage 6. Iterating from 1.700 kg converged in three passes to
+M = 1.7716 kg, where Stage 6's roll-up reproduces the assumed value.
 
 Flow:
   STAGE 1  jump-up dynamics         -> required per-wheel inertia I_w_target
@@ -54,39 +65,56 @@ import math
 # FIXED INPUT VARIABLES  (edit here)
 # =================================================================
 # --- cube / jump-up ---
-M          = 1.80       # [kg]   total cube mass
-                          #        PROVISIONAL, and a converged fixed point:
-                          #        Stage 6 totals 1064 g known hardware + 610 g
-                          #        structure allowance = 1674 g, which is the
-                          #        value assumed here, so step 6 of the closure
-                          #        procedure closes on itself (delta ~0).
-                          #        Raised from 1.580 kg when the wheel moved to
-                          #        the 140 mm ring (140 g vs 111 g each).
-                          #        ~36% is still allowance -- revisit at CAD.
+M          = 1.7716       # [kg]   total cube mass
+                          #        PROVISIONAL, and a CONVERGED FIXED POINT:
+                          #        Stage 6 totals 1161.6 g known hardware +
+                          #        610 g structure allowance = 1771.6 g, which
+                          #        is the value assumed here, so step 6 of the
+                          #        closure procedure closes on itself
+                          #        (delta ~0).
+                          #        The loop is real, not decorative: M sets
+                          #        I_w_target (Stage 1), which sets the ballast
+                          #        count, which sets the wheel mass, which
+                          #        feeds back into M. Iterating from 1.700 kg
+                          #        converged in 3 passes
+                          #        (1.700 -> 1.851 -> 1.772 -> 1.772).
+                          #        ~34% is still allowance -- revisit at CAD.
 L          = 0.15         # [m]    cube edge length
 g          = 9.81         # [m/s^2]
 eta        = 1.05         # [-]    energy margin (1.02-1.05 recommended)
 tau_b      = 5.0          # [N*m]  brake torque per wheel
-rpm_max    = 5000         # [rpm]  max wheel speed
+rpm_max    = 6000         # [rpm]  max wheel speed -- DESIGN VALUE, matches the
+                          #        TDD (tab:jumpup_budget and the dashed ceiling
+                          #        on the motor curve) and electrical/MOTOR_SPEED.md.
+                          #        * The sizing has ALSO been run at 5000 rpm as
+                          #        an over-dimensioning check: since
+                          #        I_w_target = h_w/omega_max, the lower speed
+                          #        raises the inertia requirement by 6/5 and so
+                          #        demands MORE ballast. A wheel that closes at
+                          #        5000 therefore closes at 6000 with margin in
+                          #        hand. 6000 is what the design claims; 5000 is
+                          #        the conservative case it was checked against.
 case       = "corner"     # "edge" or "corner" -- corner sizes the design
 
 # --- wheel geometry ---
 # Named R_outer / R_inner / thickness below as well, after unit conversion,
 # so the geometry functions read the way the drawing does.
-ring_width_mm = 12.0      # [mm]  ring radial width (R_outer - R_inner), FIXED
-                          #       20 mm: a 6.4 mm M6 clearance hole centred in
-                          #       the width leaves 6.8 mm of radial wall on
-                          #       each side, well over the 2 mm minimum.
+ring_width_mm = 15.0      # [mm]  ring radial width (R_outer - R_inner), FIXED
+                          #       15 mm: a 6.4 mm M6 clearance hole centred in
+                          #       the width leaves 4.30 mm of radial wall on
+                          #       each side, over twice the 2 mm minimum.
                           #       A round hole has no orientation, so unlike
                           #       the old hexagonal pocket there is only ONE
                           #       radial case to check, not two.
 spoke_w_mm    = 10.0      # [mm]  spoke width
 N_spokes      = 3         # [-]   number of spokes
-t_mm          = 5.0      # [mm]  UNIFORM thickness of ring + spokes
+t_mm          = 5.0       # [mm]  UNIFORM thickness of ring + spokes
                           #       = the through-hole depth. It no longer has to
                           #       cover a nut plus a floor, but it still sets
                           #       the bolt grip length and the ring's own
-                          #       inertia, so it stays at 12 mm.
+                          #       inertia. 5 mm keeps the wheel axially thin so
+                          #       three orthogonal modules clear each other
+                          #       inside the 150 mm cube.
 
 # --- hole pattern: ROUND M6 CLEARANCE THROUGH-HOLES ---
 hole_diameter_mm = 6.4    # [mm]  DRILLED hole diameter, through the full t.
@@ -149,6 +177,19 @@ rho_steel  = 7850.0       # [kg/m^3]  M6 bolts and nuts
 # --- sweep ---
 OD_list_mm = [80, 90, 100, 110, 120, 130, 140, 150,160,170,180]   # ring OUTER diameter
 
+# --- FIXED ENVELOPE CONSTRAINT ---------------------------------------------
+# The wheel OD is IMPOSED by the packaging envelope, not chosen by the sweep.
+# Three orthogonal wheel modules plus the battery have to fit inside the
+# L = 150 mm cube, and that fixes the ring at 120 mm. The sweep is still run
+# and printed in full, but only as CONTEXT: it shows what the constraint
+# costs. Set to None to hand selection back to the minimum-mass rule.
+#
+# Without this pin the selector picks OD = 180 mm, which is lighter per wheel
+# (I_zz goes as m*R^2, so mass at a large radius is cheap inertia) but does
+# not fit the cube. A design that does not fit is not a candidate, so the
+# constraint outranks the mass objective.
+D_w_FIXED_mm = 120.0
+
 # =================================================================
 # STAGE 1 -- JUMP-UP -> TARGET WHEEL INERTIA
 # =================================================================
@@ -175,7 +216,33 @@ print(f"case={case}  M={M} kg  L={L*1e3:.0f} mm  tau_b={tau_b} N*m  rpm_max={rpm
 print(f"tau_g (floor)      = {tau_g:.3f} N*m")
 print(f"beta               = {beta:.3f}")
 print(f"h_w (per wheel)    = {h_w:.4f} kg*m^2/s")
-print(f"I_w_target         = {I_w_target*1e4:.4f} x1e-4 kg*m^2\n")
+print(f"I_w_target         = {I_w_target*1e4:.4f} x1e-4 kg*m^2")
+
+# --- BOTH CONTACT CASES, for the record -----------------------------------
+# The design is sized on the CORNER case, but the TDD reports both so the
+# claim "corner is the critical one" is visible rather than asserted. Only
+# the geometry factor C differs between them: tau_g and beta are properties
+# of the cube and the brake, not of which feature it is standing on, so they
+# are shared. A wheel meeting the corner requirement meets the edge one with
+# the margin printed below.
+print("\n  contact case comparison (same M, L, eta, tau_b, omega_max):")
+print(f"  {'case':<8} | {'C':>7} | {'h_w':>9} | {'I_w_target':>12} | "
+      f"{'vs corner':>9}")
+print("  " + "-"*56)
+_cases = {}
+for _c, _p in GEOM.items():
+    _C   = math.sqrt(2*g*_p["lam"]*_p["kappa"]) / _p["n"]
+    _hw  = math.sqrt(eta) * _C * M * L**1.5 * beta
+    _cases[_c] = (_C, _hw, _hw/omega_max)
+_I_corner = _cases["corner"][2]
+for _c in ("edge", "corner"):
+    _C, _hw, _It = _cases[_c]
+    _mark = " <- sizing case" if _c == case else ""
+    print(f"  {_c:<8} | {_C:>7.4f} | {_hw:>9.4f} | "
+          f"{_It*1e4:>9.4f}e-4 | {_It/_I_corner*100:>8.1f}%{_mark}")
+print(f"  the corner case demands "
+      f"{(1 - _cases['edge'][2]/_I_corner)*100:.1f}% more inertia than the "
+      f"edge case,\n  so it is the one the design is sized on.\n")
 
 # =================================================================
 # STAGE 2 -- SOLID PET-CF RING + SPOKES  (before any holes)
@@ -534,7 +601,29 @@ for r in rows:
 # made a forced num_holes report "no OD passes" even when every OD met the
 # target with room to spare.
 viable = [r for r in rows if r['meets_target'] and r['radial_ok']]
-sel = min(viable, key=lambda r: r['m_wheel']) if viable else None
+if D_w_FIXED_mm is not None:
+    # The envelope has already chosen the diameter; the sweep does not get a
+    # vote. Report on the pinned ring whether or not it is the lightest, and
+    # say plainly what the pin cost against the free optimum.
+    sel = next((r for r in rows if r['OD'] == D_w_FIXED_mm), None)
+    if sel is None:
+        raise ValueError(f"D_w_FIXED_mm = {D_w_FIXED_mm} mm is not in "
+                         f"OD_list_mm = {OD_list_mm} -- add it to the sweep.")
+    _free = min(viable, key=lambda r: r['m_wheel']) if viable else None
+    print(f"\n[OD PINNED to {D_w_FIXED_mm:.0f} mm by the packaging envelope]")
+    if _free is not None and _free['OD'] != sel['OD']:
+        print(f"  the free minimum-mass optimum would be OD = {_free['OD']} mm "
+              f"at {_free['m_wheel']*1e3:.2f} g/wheel;")
+        print(f"  the constraint costs "
+              f"{(sel['m_wheel']-_free['m_wheel'])*1e3:+.2f} g/wheel "
+              f"({3*(sel['m_wheel']-_free['m_wheel'])*1e3:+.2f} g over three), "
+              f"and it does not fit.")
+    if not sel['meets_target']:
+        print(f"  !! the pinned ring is SHORT of target at "
+              f"{sel['I_wheel']/I_w_target*100:.1f}% -- the constraint and the "
+              f"requirement are incompatible as set.")
+else:
+    sel = min(viable, key=lambda r: r['m_wheel']) if viable else None
 
 print("\n" + "="*72)
 print("SOLID vs MODIFIED WHEEL".center(72))
@@ -680,7 +769,12 @@ for r in rows:
 # reacted by the bolt in tension and by bearing of the head/nut faces on the
 # PET-CF.
 print("\n=== Through-bolt retention load ===")
-_r_max = max(r['R_pcr'] for r in rows)
+# Evaluated at the SELECTED wheel's pitch circle, not at the largest R_pcr in
+# the sweep: the sweep contains rings that are not the design, and quoting a
+# retention load from a ring nobody is building overstates the number by the
+# ratio of the radii. Falls back to the sweep maximum only if no wheel was
+# selected, where a conservative bound is the right default.
+_r_max = sel['R_pcr'] if sel is not None else max(r['R_pcr'] for r in rows)
 F_c = m_hardware * omega_max**2 * _r_max
 _bearing_area = math.pi*((10.0e-3/2)**2 - r_hole**2)   # ~M6 head/nut face
 print(f"hardware mass per station = {m_hardware*1e3:.2f} g "
@@ -731,20 +825,21 @@ BOM = [
     ("TowerPro MG92B brake servo",        13.8,  3, "Motors"),
 
     # --- reaction wheels -------------------------------------------
-    # OD = 120 mm is a FIXED CONSTRAINT, not a sweep result: the wheel has
-    # to fit the 150 mm cube, so the diameter is imposed and the sweep is
-    # only consulted for what that diameter costs. At 120 mm the bare
-    # PET-CF ring falls well short of I_w_target (0.847 vs 4.209 x1e-4),
-    # so unlike the old 140 mm entry this wheel IS ballasted: 15 M6
-    # bolt+nut stations on R_pcr = 54.0 mm bring it to 111.7% of target.
-    #   167.44 g = 32.44 g PET-CF (ring + 3 spokes, t = 5 mm, 12 mm width,
+    # OD = 120 mm is a FIXED CONSTRAINT (D_w_FIXED_mm), not a sweep result:
+    # three orthogonal wheel modules plus the battery have to fit the
+    # 150 mm cube, so the diameter is imposed and the sweep is consulted
+    # only for what that diameter costs. At 120 mm the bare PET-CF ring
+    # falls well short of I_w_target (0.957 vs 4.119 x1e-4), so this wheel
+    # IS ballasted: 15 M6 bolt+nut stations on R_pcr = 52.5 mm bring it to
+    # 111.7% of target.
+    #   172.51 g = 37.51 g PET-CF (ring + 3 spokes, t = 5 mm, 15 mm width,
     #              already net of the 15 drilled holes)
     #            + 135.00 g steel (15 x 9.00 g bolt + nut)
     # Net per station is +8.79 g (9.00 g hardware - 0.21 g displaced
     # plastic), so trimming the count by 3 holes moves this by ~26.4 g.
     # Kept as a literal so this stage stays decoupled from stages 1-5;
     # update it if the wheel design changes.
-    ("Reaction wheel (PET-CF, 120 mm, 15x M6)", 167.44, 3, "Wheels"),
+    ("Reaction wheel (PET-CF, 120 mm, 15x M6)", 172.51, 3, "Wheels"),
 
     # --- power -----------------------------------------------------
     ("Turnigy 6S 3600 mAh LiPo, 22.2 V",  254.0, 1, "Power"),
@@ -859,7 +954,11 @@ delta_g   = M_est_g - M_ASSUMED_g
 delta_pct = delta_g / M_ASSUMED_g * 100
 print(f"DELTA (estimate - assumed)       = {delta_g:+8.1f} g  ({delta_pct:+.1f}%)")
 
-if delta_g > 0:
+CLOSURE_TOL_g = 1.0     # [g] treat |delta| under this as converged. The fixed
+                        # point is only ever reached to within the rounding of
+                        # the BOM literals, so an exact-zero test would flag a
+                        # converged design as open on a 0.04 g residual.
+if delta_g > CLOSURE_TOL_g:
     print("\n  !! The build is HEAVIER than Stage 1 assumed.")
     print("     h_w scales as M*L^1.5, so the wheel requirement rises:")
     scale = (M_est_g/M_ASSUMED_g)

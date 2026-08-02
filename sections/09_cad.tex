@@ -30,7 +30,8 @@ Symbol & Parameter & Value \\
 \midrule
 $L$         & Cube edge length (outer)                & \qty{15}{\centi\metre} \\
 $t_w$       & Frame wall thickness                    & \qty{5}{\milli\metre} \\
-$D_w$       & Wheel outer diameter (Sec.~\ref{sec:rw_sizing}) & \qty{13}{\centi\metre} \\
+$D_w$       & Wheel outer diameter (Sec.~\ref{sec:rw_sizing}) & \qty{120}{\milli\metre} \\
+$t_r$       & Wheel axial thickness (Sec.~\ref{sec:rw_sizing}) & \qty{5}{\milli\metre} \\
 $d_m$       & Motor axis offset from cube centre      & \textcolor{red}{TBD} \\
 $h_m$       & Motor mounting face height on its axis  & \textcolor{red}{TBD} \\
 $c_w$       & Wheel-to-subframe axial clearance       & \textcolor{red}{TBD} \\
@@ -72,7 +73,7 @@ M5 & Brake servo bracket        & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD
 \midrule
 W1 & Ballasted ring (Sec.~\ref{sec:rw_sizing}) & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
 W2 & Wheel hub / rotor adapter  & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-W3 & Ballast bolt and nut set   & \textcolor{red}{TBD} & Standard hardware & \textcolor{red}{TBD} \\
+W3 & Ballast bolt and nut set (M6, $3\times15$) & 45 & Standard hardware & \textcolor{red}{TBD} \\
 W4 & Brake strike feature       & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
 \midrule
 \multicolumn{5}{@{}l}{\textbf{Outer frame}}\\
@@ -118,7 +119,7 @@ R4 & Hard stops / containment   & \textcolor{red}{TBD} & \textcolor{red}{TBD} & 
 \subsubsection{Print and Manufacturing Settings}
 
 The printed parts are structural, not cosmetic: the wheel ring carries
-centrifugal load at the ballast pockets and the motor mounts carry the brake
+centrifugal load at the ballast holes and the motor mounts carry the brake
 impulse, which is the design load case identified in
 Section~\ref{sec:background}. Settings are therefore recorded per part in
 Table~\ref{tab:print_settings} and treated as part of the design, since a part

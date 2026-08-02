@@ -57,7 +57,7 @@
 % makes the day and week headers readable.
 \ganttset{
   hgrid, vgrid={*6{draw=none}, *1{draw=black!15}},
-  x unit=0.62cm, y unit title=0.58cm, y unit chart=0.44cm,
+  x unit=0.62cm, y unit title=0.58cm, y unit chart=0.40cm,
   title height=1, bar height=0.6, bar top shift=0.2,
   group top shift=0.1, group height=0.5, milestone top shift=0.15,
   bar label font=\small, group label font=\bfseries\small,
@@ -158,6 +158,11 @@ Figure~\ref{fig:gantt-gates}.}
 \begin{figure}[p]
 \thispagestyle{cubligantt}
 \centering
+% This sheet carries the most rows of the three (33 against 30 and 17), so it is
+% given a tighter row pitch than the shared default; without it the chart pushes
+% the caption off the bottom of the landscape page. Scoped to this figure only.
+\begingroup
+\ganttset{y unit chart=0.36cm}
 \begin{ganttchart}{1}{29}
   \cubliganttheader
   % ===== Hardware Design & Build =====
@@ -198,6 +203,7 @@ Figure~\ref{fig:gantt-gates}.}
   \ganttbar[bar/.append style={fill=mfcol}]{E9 Cube power-on}{22}{24} \ganttnewline
   \ganttbar[bar/.append style={fill=mfcol}]{E10 Brake servo rail}{25}{28} \ganttnewline
 \end{ganttchart}
+\endgroup
 \caption[Project schedule (2 of 3): hardware, electrical and deliverables]{Project
 schedule, 23~July--20~August 2026 (sheet 2 of 3): hardware, three-dimensional
 design, electrical and deliverable streams, continued from
@@ -224,7 +230,7 @@ phase are shown in Figure~\ref{fig:gantt-gates}.}
 % a taller row pitch; the time axis is unchanged, keeping columns aligned. The
 % setting is scoped to this figure so later charts keep the default pitch.
 \begingroup
-\ganttset{y unit chart=0.62cm}
+\ganttset{y unit chart=0.56cm}
 \begin{ganttchart}{1}{29}
   \cubliganttheader
   % ===== Milestone gates =====

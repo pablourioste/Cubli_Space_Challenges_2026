@@ -110,17 +110,30 @@ procedure of Section~\ref{sec:massbudget}, not inputs fixed here.}
 \toprule
 Quantity & Source & Value & Pass condition \\
 \midrule
-Required wheel speed $\omega_w$ & Collision relation, Sec.~\ref{sec:jumpup} & \textcolor{red}{TBD} & $\leq$ achievable speed with margin \\
-Achievable wheel speed $\omega_{\max}$ & Drive analysis, Sec.~\ref{sec:jumpup_target} & \textcolor{red}{TBD} & Sustained in service, not no-load \\
-Speed margin $\omega_w/\omega_{\max}$ & Derived & \textcolor{red}{TBD} & $<1$ by a stated margin \\
-Target inertia $I_{w,\text{target}}$ & Eq.~\eqref{eq:Iw_target} & \textcolor{red}{TBD} & --- \\
-Achieved inertia $I_w$ & Wheel design, Sec.~\ref{sec:rw_sizing} & \textcolor{red}{TBD} & $\geq I_{w,\text{target}}$ \\
-Route disagreement & Both of the above & \textcolor{red}{TBD} & Reported; explained if large \\
-Ballast trim authority & Sec.~\ref{sec:rw_sizing} & \textcolor{red}{TBD} & Non-zero in both directions \\
-Ballast retention margin & Sec.~\ref{sec:rw_sizing} & \textcolor{red}{TBD} & Bolt tension and head/nut bearing stress within allowables \\
+Required wheel speed $\omega_w$ & Collision relation, Sec.~\ref{sec:jumpup} & \qty{5374}{\rpm} & $\leq$ achievable speed with margin \\
+Achievable wheel speed $\omega_{\max}$ & Drive analysis, Sec.~\ref{sec:jumpup_target} & \qty{6000}{\rpm} & Sustained in service, not no-load \\
+Speed margin $\omega_w/\omega_{\max}$ & Derived & \num{0.896} & $<1$ by a stated margin \\
+Target inertia $I_{w,\text{target}}$ & Eq.~\eqref{eq:Iw_target} & \qty{4.119e-4}{\kilogram\metre\squared} & --- \\
+Achieved inertia $I_w$ & Wheel design, Sec.~\ref{sec:rw_sizing} & \qty{4.599e-4}{\kilogram\metre\squared} & $\geq I_{w,\text{target}}$ \\
+Route disagreement & Both of the above & \qty{+11.7}{\percent} & Reported; explained if large \\
+Ballast trim authority & Sec.~\ref{sec:rw_sizing} & $-1 / +24$ stations & Non-zero in both directions \\
+Ballast retention margin & Sec.~\ref{sec:rw_sizing} & \qty{1.47}{\percent} of proof; \qty{4.02}{\mega\pascal} bearing & Bolt tension and head/nut bearing stress within allowables \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+The gate passes on every row, but the trim authority is markedly asymmetric and
+that asymmetry is the design's tightest margin. Upward trim is ample: the gap
+rule admits \num{24} further stations, enough to more than double the inertia.
+Downward trim is nearly exhausted, because the wheel sits only
+\qty{11.7}{\percent} above target while each station is worth
+\qty{5.9}{\percent} of it --- removing two stations already falls below
+requirement. The practical consequence is that this design absorbs a
+\emph{heavier}-than-predicted cube comfortably and a lighter one hardly at all,
+which is the favourable direction given that \qty{34}{\percent} of
+Table~\ref{tab:massbudget} is still allowance and allowances more often prove
+optimistic than pessimistic. Should the structure come in light, the relief
+variable is $\omega_{\max}$ rather than the ballast count.
 
 \subsubsection{Brake-Torque Sensitivity}
 
@@ -171,9 +184,11 @@ Table~\ref{tab:massbudget}, which is the input to the feasibility gate of
 Section~\ref{sec:test_feasibility} and must be re-run whenever it changes.
 
 \paragraph{Part checks (post-fabrication).} Dimensional acceptance of the ballast
-pockets and their retention floor, since both are structural features rather than
-cosmetic ones and a print that is dimensionally out of tolerance at the pocket is
-a wheel that cannot be trusted at speed; measured wheel mass against the CAD
+holes --- diameter, pitch circle radius and the radial wall left on each side ---
+since these are structural features rather than cosmetic ones and a print that is
+dimensionally out of tolerance at a hole is a wheel that cannot be trusted at
+speed; verification that each bolt is torqued and its nyloc nut engaged, the
+through-bolt being the retention feature; measured wheel mass against the CAD
 prediction; and static balance of the assembled wheel, which is the first
 opportunity to detect a ballast placement error before it appears as vibration at
 speed.

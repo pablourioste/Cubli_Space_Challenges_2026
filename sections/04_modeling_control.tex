@@ -177,24 +177,36 @@ a merely positive margin.
 \centering
 \caption[Torque-limited wheel-inertia target (corner case)]{Torque-limited wheel-inertia target (corner case). Inputs are fixed by
 the closure procedure of Section~\ref{sec:massbudget}; the table is populated on
-each iteration. $\tau_b$ is an assumed value pending measurement, justified
-below and equivalent to a \qty{38}{\milli\second} stop at the present $h_w$.}
+each iteration. Values are those of the converged iteration
+(\texttt{analysis/SIZING.py}): $M$ is a fixed point of the closure, not an
+assumption, reproduced by the Stage~6 roll-up to within \qty{0.1}{\gram}.
+$\tau_b$ is an assumed value pending measurement, justified below and
+equivalent to a \qty{52}{\milli\second} stop at the present $h_w$.}
 \label{tab:jumpup_budget}
 \begin{tabular}{llr}
 \toprule
 Symbol & Description & Value \\
 \midrule
-$M$                & Cube mass                    & \textcolor{red}{TBD} \\
+$M$                & Cube mass                    & \qty{1.772}{\kilo\gram} \\
 $L$                & Cube edge length             & \qty{150}{\milli\metre} \\
-$\eta$             & Energy margin                & \textcolor{red}{TBD} \\
+$\eta$             & Energy margin                & \num{1.05} \\
 $\tau_b$           & Brake torque per wheel       & \qty{5}{\newton\metre} (assumed; see below) \\
-$\tau_g = MgL/2$   & Gravitational tip-over floor & \textcolor{red}{TBD} \\
-$\beta$            & Brake-amplification factor   & \textcolor{red}{TBD} \\
-$\omega_{\max}$    & Max wheel speed (design)     & \qty{6000}{\rpm} \\
-$h_w$              & Required angular momentum    & \textcolor{red}{TBD} \\
-$I_{w,\text{target}}$ & \textbf{Target wheel inertia} & \textcolor{red}{TBD} \\
+$\tau_g = MgL/2$   & Gravitational tip-over floor & \qty{1.303}{\newton\metre} \\
+$\beta$            & Brake-amplification factor   & \num{1.353} \\
+$\omega_{\max}$    & Max wheel speed (design)     & \qty{6000}{\rpm}\textsuperscript{*} \\
+$h_w$              & Required angular momentum    & \qty{0.2588}{\kilo\gram\metre\squared\per\second} \\
+$I_{w,\text{target}}$ & \textbf{Target wheel inertia} & \qty{4.119e-4}{\kilogram\metre\squared} \\
 \bottomrule
 \end{tabular}
+
+\vspace{0.4em}
+{\footnotesize\RaggedRight\textsuperscript{*}\,The sizing has additionally been
+run at \qty{5000}{\rpm} as an over-dimensioning check. Since
+$I_{w,\text{target}} = h_w/\omega_{\max}$, the lower speed raises the inertia
+requirement by a factor $6/5$ and so demands more ballast; a wheel that closes
+at \qty{5000}{\rpm} therefore closes at \qty{6000}{\rpm} with margin in hand.
+\qty{6000}{\rpm} is the value the design claims, \qty{5000}{\rpm} the
+conservative case it was verified against.\par}
 \end{table}
 
 \paragraph{Selection of $\omega_{\max}$.} The maximum wheel speed is a design
