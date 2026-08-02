@@ -17,34 +17,25 @@
 
 Since this is a proof-of-concept demonstration of the control loop, a system actuated with orthogonal reaction wheels is well-suited to represent principles applicable to smallsat ADCS. The momentum-exchange actuation principle and closed-loop control architecture are the same as those used on real spacecraft, even though the Cubli's dynamics (balancing against gravity) differ from a satellite's free-fall attitude control problem. Reaction wheels are also structurally simpler and require less specialized hardware than control moment gyros, which offer higher torque density but at the cost of gimbal mechanisms and more complex control software, complexity that is typically only justified on larger spacecraft. For a low-cost, resource-limited project, a reaction wheel Cubli therefore demonstrates the core actuation and control principles of smallsat ADCS in a practical and relevant way.
 
-
 \subsection{Requirements \& Objectives Traceability}
 \label{sec:requirements}
 
-Each project objective (Section~\ref{sec:objectives}) imposes a required capability,
-which in turn is confirmed by a specific test in the validation plan
-% (Section~\ref{sec:testing})
-. The mapping below keeps every requirement traceable
-from motivation to verification.
+Each project objective (Section~\ref{sec:objectives}) imposes a required capability.
+The mapping below keeps every requirement traceable from motivation to capability.
 
 \begin{table}[htbp]
 \centering
-\caption[Objective-to-requirement-to-verification traceability]{Objective-to-requirement-to-verification traceability.}
+\caption[Objective-to-requirement traceability]{Objective-to-requirement traceability.}
 \label{tab:traceability}
-\begin{tabular}{lll}
+\begin{tabular}{lp{0.65\textwidth}}
 \toprule
-Objective & Required capability & Verified by \\
+Objective & Required capability \\
 \midrule
-Edge balance        & Regulation about a line-contact equilibrium & Sec.~\ref{sec:test_edge} \\
-Corner balance      & Regulation about a point-contact equilibrium, all axes & Sec.~\ref{sec:test_corner} \\
-Controlled rotation & Reference tracking / slew between equilibria & Sec.~\ref{sec:test_slew} \\
-Walking (stretch)   & Chained jump-up + re-stabilisation & Sec.~\ref{sec:test_jumpup} \\
+Edge balance        & The system must actively maintain dynamic stability and regulate its posture about a single line-contact equilibrium position. \\[0.5em]
+Corner balance      & The system must maintain multi-axis closed-loop balance and attitude control around a highly unstable point-contact equilibrium. \\[0.5em]
+Controlled rotation & The controller must accurately track dynamic reference trajectories to execute smooth slew maneuvers between distinct equilibrium states. \\[0.5em]
+Walking (stretch)   & The system must execute a sequential series of dynamic jump-up maneuvers and rapidly re-stabilize itself upon each landing impact. \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{Coordinate Frames \& Conventions}
-\label{sec:frames}
-
-% Define the body frame, world/inertial frame, and the sign conventions for
-% tilt angle and wheel angle used consistently throughout the modelling section.
