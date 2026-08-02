@@ -127,11 +127,12 @@ encoder SPI.}
 \subsubsection{Full Schematic Sheet}
 \label{app:schematic_full}
 
-The seven sheets above are also reproduced as a single drawing on the landscape
-page that follows, at the largest size the format allows, so that the
-interconnections between sheets can be followed without turning pages. The
-landscape sheet is the reference copy; the per-sheet figures above are the
-working views.
+Figure~\ref{fig:schematic_full} is the schematic as currently captured: one flat
+KiCad sheet carrying the whole system, reproduced on the landscape page that
+follows at the largest size the format allows. It is the working drawing the
+build is wired from, and it is the source the seven sheets above are split out
+of --- the split is a release step, not a redraw, so the two must agree net for
+net whenever a sheet is issued.
 
 % The full schematic is drawn on its own landscape page rather than scaled into
 % the text block: reduced to \textwidth in portrait the reference designators
@@ -158,11 +159,14 @@ working views.
 \begin{figure}[p]
 \thispagestyle{cublischematic}
 \centering
-\includegraphics[width=\linewidth,height=0.86\textwidth,keepaspectratio]{images/schematic_full.pdf}
-\caption[Full electrical schematic (landscape sheet)]{Full electrical schematic, reproduced at page size. Combines
-sheets 1--7 (Figures~\ref{fig:sch_power_entry}--\ref{fig:sch_servo}) on a
-single drawing so that the nets crossing between sheets can be traced
-directly.}
+\includegraphics[width=\linewidth,height=0.98\textwidth,keepaspectratio]{images/schematic_full.pdf}
+\caption[Full electrical schematic (landscape sheet)]{Full electrical schematic as captured, reproduced at page size.
+Covers the flight computer (Teensy 4.1) and its ESP32 telemetry module, the
+BMI270 IMU, the three moteus driver and motor connectors, the CAN-FD
+transceiver and termination, the LM2596 \qty{5}{\volt} converter from the pack,
+and the three brake servos. The per-sheet views of
+Figures~\ref{fig:sch_power_entry}--\ref{fig:sch_servo} are drawn from this
+capture as it is split for release.}
 \label{fig:schematic_full}
 \end{figure}
 \end{landscape}
