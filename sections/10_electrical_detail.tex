@@ -138,11 +138,12 @@ working views.
 % and net labels fall below legibility. Same treatment as the Gantt sheets of
 % Sec. 2 -- see sections/02_project_organization_gantt.tex.
 %
-% To insert the real drawing, replace the \phfig line with, e.g.
-%   \includegraphics[width=\linewidth,height=0.86\textwidth,keepaspectratio]{images/schematic_full.pdf}
-% (on a landscape page \linewidth is the long edge; the height limit keeps a
-% tall drawing inside the page). A multi-page PDF export can be repeated with
-% \includegraphics[page=<n>]{...} inside further landscape blocks.
+% Source: images/schematic_full.pdf, a single-page A4 landscape vector export
+% from KiCad (a copy of "Circuit Schematic - Classic Color.pdf", renamed because
+% \includegraphics does not take spaces in a path). Re-export over that file to
+% update the sheet; no edit here is needed. On a landscape page \linewidth is the
+% long edge, so the height limit is expressed in \textwidth -- with
+% keepaspectratio, whichever bound binds first is the one applied.
 
 % Empty page style for the rotated sheet: the running header and footer would
 % otherwise be typeset sideways along the page edge.
@@ -157,11 +158,7 @@ working views.
 \begin{figure}[p]
 \thispagestyle{cublischematic}
 \centering
-\phfig[0.80\textwidth]{0.96\linewidth}{Full electrical schematic ---
-the complete sheet set of Table~\ref{tab:schematic_sheets} on one drawing:
-power entry and protection, \qty{5}{\volt} logic rail, CAN-FD bus,
-encoder interfaces, flight computer and IMU, telemetry link and brake servo
-drive, with the inter-sheet nets shown.}
+\includegraphics[width=\linewidth,height=0.86\textwidth,keepaspectratio]{images/schematic_full.pdf}
 \caption[Full electrical schematic (landscape sheet)]{Full electrical schematic, reproduced at page size. Combines
 sheets 1--7 (Figures~\ref{fig:sch_power_entry}--\ref{fig:sch_servo}) on a
 single drawing so that the nets crossing between sheets can be traced
