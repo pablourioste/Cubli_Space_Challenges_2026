@@ -1,5 +1,207 @@
-% ================= 7. FUTURE WORK =================
-\section{Future Work}
+% ================= 8. CONCLUSIONS & NEXT STEPS =================
+\section{Conclusions \& Next Steps}
+\label{sec:conclusions}
+
+\subsection{Conclusions}
+\label{sec:conclusions_summary}
+
+The sizing closure of Section~\ref{sec:sizing} has converged to a fixed point:
+\texttt{analysis/SIZING.py} reports a cube mass of \qty{1.772}{\kilo\gram} at
+which the mass budget, the jump-up inertia requirement and the ballasted
+reaction-wheel design agree to within \qty{0.1}{\gram}, with the wheel
+delivering \qty{111.7}{\percent} of the corner-case target and a trim
+authority that absorbs a heavier-than-predicted structure comfortably (Section
+\ref{sec:sizing_verification}). Both prototypes named in the methodology of
+Section~\ref{sec:methodology} exist as concept articles: the single-face 1-DoF
+rig is built to its released drawing (Figure~\ref{fig:rig_2d}), and a first
+printed concept of the three-axis cube frame demonstrates the two-part
+architecture and internal packaging (Figure~\ref{fig:cube_3d}), though its
+final dimensions remain open pending the packaging study below. The dynamics
+are derived for both the 2D and 3D cases, the LQR baseline controller and its
+executable logic are stated in full (Section~\ref{sec:control_algorithms}),
+and the electrical architecture --- power tree, bus topology, schematic sheet
+set --- is fixed at the level needed to build a harness (Section
+\ref{sec:electrical}).
+
+What remains open is concentrated in a small number of places rather than
+spread evenly across the design. The structural mass in
+Table~\ref{tab:massbudget} is still a \qty{34}{\percent} allowance rather than
+a measured figure, which is the dominant uncertainty in the sizing closure.
+The final motor and the three-dimensional frame's driving dimensions
+(Table~\ref{tab:cad_params}) are not yet confirmed. Appendix
+\ref{app:control_algorithms}'s gains, timing budget and several guard
+conditions are stated as TBD pending plant identification and the simulation
+work of Section~\ref{sec:sim_environment}. And the hardware validation of
+Section~\ref{sec:validation_results} below is, at the time of writing, a set
+of defined criteria rather than a set of results.
+
+\subsection{Validation Results to Date}
+\label{sec:validation_results}
+
+This subsection reports evidence against the validation stages of
+Section~\ref{sec:test_strategy} and the acceptance criteria of
+Table~\ref{tab:traceability}, in the order the stages are entered. Where no
+result exists yet, the criterion is stated so the gap is explicit rather than
+silent.
+
+\subsubsection{1-DoF Control Validation}
+\label{sec:test_1dof}
+
+The single-axis rig is the protected experimental item of
+Section~\ref{sec:schedule}, and its balance result is the evidence carried into
+this document. Gate G3 requires the rig to balance for at least 60~s unassisted.
+
+Beyond the duration criterion, three quantities are recorded because they
+determine whether the result transfers to the integrated cube rather than merely
+holding on the rig. Recovery from a defined impulse establishes that the balance
+is a stabilised equilibrium and not a fortunate initial condition. Steady-state
+wheel-speed drift measures momentum accumulation: a controller that balances
+while monotonically spinning up is one that will saturate, and the drift rate
+predicts when. Control effort is compared against the continuous and peak current
+limits of the driver given in Appendix~\ref{app:bom}, since a balance sustained
+only by exceeding the continuous rating is not a balance that survives to the
+demonstration.
+
+\subsubsection{Edge, Corner and Jump-Up Validation}
+\label{sec:test_milestones}
+
+The three hardware milestones follow the objective ordering of
+Section~\ref{sec:objectives}, each entered only on the passing of the previous.
+
+\paragraph{Edge balance.}
+\label{sec:test_edge}
+Regulation about a
+line-contact equilibrium, and the hard-kill gate for the jump-up objective. G6
+requires balance for at least 60~s with disturbance recovery. Recorded:
+sustained duration; the maximum initial tilt from which the controller
+recovers, which is the experimental region of attraction and is compared
+against the simulated figure from Section~\ref{sec:sim_environment}; the
+disturbance-rejection bandwidth; and wheel-speed drift as in
+Section~\ref{sec:test_1dof}. Numeric targets beyond the gate criterion are
+\textcolor{red}{TBD}.
+
+\paragraph{Corner balance and commanded slew.}
+\label{sec:test_corner}
+Regulation about a point-contact equilibrium on all three axes simultaneously,
+which is the case the wheel was sized against and therefore the first test in
+which the sizing assumption of Section~\ref{sec:sizing_verification} is
+exercised directly. Recorded: sustained duration, per-axis control effort, and
+cross-axis coupling, the last being absent from the 2D model and observable
+only here.
+\label{sec:test_slew}
+Commanded rotation between equilibria is verified in the same stage: the cube is
+commanded through a slew and the tracking error against the reference recorded,
+together with the settling behaviour on arrival. Targets \textcolor{red}{TBD}.
+
+\paragraph{Jump-up.}
+\label{sec:test_jumpup}
+The face-to-edge transition,
+captured on video at a frame rate sufficient to resolve the manoeuvre, per G8.
+This test closes the loop opened in Section~\ref{sec:sizing_verification}. The
+wheel speed at brake release is measured and compared against the value
+predicted before fabrication, and the two routes of Section
+\ref{sec:sizing_verification} are re-evaluated against the measured brake
+torque. The discrepancy is the quantitative measure of the inelastic-collision
+idealisation, and its measurement is the experimental refinement of $\omega_w$
+that Section~\ref{sec:jumpup} anticipates. Recorded: wheel speed at release,
+achieved versus predicted; whether the edge is reached and held; and, on a
+successful transition, the time to re-stabilise, which is the quantity that
+determines whether chained jump-up --- the walking objective --- is reachable.
+
+\subsubsection{Control Performance Evaluation}
+\label{sec:test_perf}
+
+The metrics used above are defined once here so that simulated and measured
+results are expressed in the same terms and remain comparable across stages.
+
+\begin{table}[htbp]
+\centering
+\caption[Control performance metrics]{Control performance metrics. Definitions and methods are fixed;
+targets follow from the closed design point.}
+\label{tab:perf_metrics}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{L{2.8cm} L{4.7cm} L{4.1cm} c}
+\toprule
+Metric & Definition & Measurement method & Target \\
+\midrule
+Recovery angle & Largest initial tilt from which the equilibrium is regained & Ramped initial-condition release & \textcolor{red}{TBD} \\
+Settling time & Time to enter and remain within a stated band about the equilibrium & Step or impulse response log & \textcolor{red}{TBD} \\
+Disturbance-rejection bandwidth & Frequency to which body disturbances are attenuated & Swept or impulsive disturbance & \textcolor{red}{TBD} \\
+Slew tracking error & Peak and RMS deviation from the commanded trajectory & Reference versus estimated attitude & \textcolor{red}{TBD} \\
+Control effort & RMS and peak wheel current over the run & Driver current telemetry & Within Appendix~\ref{app:bom} limits \\
+Momentum drift & Rate of change of mean wheel speed while regulating & Encoder log over a sustained run & \textcolor{red}{TBD} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Milestone Acceptance Criteria}
+\label{sec:test_acceptance}
+
+Table~\ref{tab:acceptance} states the condition under which each objective of
+Table~\ref{tab:traceability} is accepted as demonstrated, and the subsection that
+produces the evidence. It is the closing element of the traceability chain that
+runs from the objectives of Section~\ref{sec:objectives}, through the required
+capabilities of Section~\ref{sec:requirements}, to the test that confirms them.
+
+\begin{table}[htbp]
+\centering
+\caption[Objective acceptance criteria and supporting evidence]{Objective acceptance criteria and the evidence that supports each.}
+\label{tab:acceptance}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{L{3.0cm} L{6.4cm} c c}
+\toprule
+Objective & Acceptance condition & Evidence & Gate \\
+\midrule
+Edge balance & Balanced $\geq$60 s unassisted with recovery from a defined disturbance & Sec.~\ref{sec:test_edge} & G6 \\
+Corner balance & Point-contact regulation sustained on all three axes & Sec.~\ref{sec:test_corner} & G7 \\
+Controlled rotation & Commanded slew completed within the stated tracking error & Sec.~\ref{sec:test_slew} & G7 \\
+Jump-up & Face-to-edge transition achieved and captured on video & Sec.~\ref{sec:test_jumpup} & G8 \\
+Walking (stretch) & Chained jump-up with re-stabilisation between transitions & Sec.~\ref{sec:test_jumpup} & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Immediate Next Steps}
+\label{sec:next_steps}
+
+In priority order, the work that closes the open items of
+Section~\ref{sec:conclusions_summary}:
+
+\begin{enumerate}
+  \item \textbf{Close the packaging study} (Table~\ref{tab:cad_params}): the
+        minimum internal clear volume $V_{\min}$, the motor axis offsets and
+        the inter-module clearances are the head of the sizing dependency
+        chain $V_{\min}\to L\to M\to h_w\to I_{w,\text{target}}$, and every
+        other open item downstream of it moves again once it closes.
+  \item \textbf{Build and run the Simulink/Simscape environment}
+        (Section~\ref{sec:sim_environment}) against the CAD of both
+        prototypes, and use it to re-derive the gains of
+        Table~\ref{tab:gains} once the 1-DoF plant identification of
+        Section~\ref{sec:paramid} reports measured parameters.
+  \item \textbf{Complete Appendix~\ref{app:control_algorithms}}: the guard
+        conditions of Table~\ref{tab:state_transitions}, the gains of
+        Table~\ref{tab:gains} and the timing budget of
+        Table~\ref{tab:timing_budget} close once steps~1--2 above do.
+  \item \textbf{Run the electrical and calibration checks of
+        Section~\ref{sec:verification}} in order --- CAN-bus termination and
+        rail voltages, then IMU and moteus calibration, then the gradual
+        control-authority ramp --- before any unassisted balancing attempt.
+  \item \textbf{Populate the decidable-now tables}: fabrication routes and
+        print settings (Appendix~\ref{app:cad}), the physical pin numbers of
+        the per-sheet tables in Appendix~\ref{app:electrical} once the board
+        layout of Section~\ref{sec:layout} is drawn, and the connector/wire
+        schedules.
+  \item \textbf{Carry the milestone validations of
+        Section~\ref{sec:validation_results} to completion} against the gate
+        schedule of Table~\ref{tab:gates}, reporting results in place of the
+        stated criteria as each stage closes.
+\end{enumerate}
+
+The longer-horizon research directions below are explicitly not part of this
+punch-list: none of them is a precondition for the milestones above, and the
+baseline LQR controller is not contingent on any of them.
 
 % \subsection{NMPC \& Warm-Start Control (Future Implementation)}
 
@@ -21,9 +223,7 @@ violate.
 \begin{itemize}
     \item \textbf{Parametric drift.} $C_b$ and $C_w$ are not obtained from
     CAD and are carried as estimates until the identification tests of
-    % Section~\ref{sec:test_paramid} (
-    Table~\ref{tab:params}. 
-    % )
+    Table~\ref{tab:params}.
     Bearing friction,
     wiring drag and motor cogging also change with temperature, wear and
     reassembly, so the identified values are a snapshot rather than a
@@ -157,7 +357,8 @@ documented:
 
 \begin{itemize}
     \item \textbf{Damping:} $C_b, C_w$ over a wide interval, since these are
-    estimated rather than measured until the test pyramid closes. % Section~\ref{sec:test_paramid} closes.
+    estimated rather than measured until the identification of
+    Section~\ref{sec:paramid} closes.
     \item \textbf{Inertia and mass distribution:} $I$, $m$ and $r_{cm}$
     perturbed by a few percent, covering print-density variation, fastener
     placement and harness routing.
@@ -216,9 +417,8 @@ Bayesian optimisation rather than a policy-gradient method, with the initial
 design taken from the analytical $h_w$ of Equation~\eqref{eq:hw_ideal}.
 
 Two constraints on this module must be stated. First, it presupposes the
-measurement described in Section~\ref{sec:jumpup_target}: until the spin-down test
-% of Section~\ref{sec:test_jumpup} 
-reports both the impulse-equivalent mean
+measurement described in Section~\ref{sec:jumpup_target}: until the spin-down
+test reports both the impulse-equivalent mean
 $\bar\tau_b = h_w/\Delta t$ and the peak torque, there is no validated model to
 optimise against and no way to distinguish an improved profile from a
 mis-measured one. Second, the structural caveat carries over unchanged ---

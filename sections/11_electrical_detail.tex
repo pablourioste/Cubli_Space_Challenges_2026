@@ -35,95 +35,238 @@ The per-block schematic sheets, split out of this capture as a release step
 rather than a redraw, are to be added in the final draft.
 
 % ---------------------------------------------------------------------------
-% Per-sheet placeholder figures, held for the final draft. Each is to be split
-% out of images/schematic_full.pdf (a release step, not a redraw: the sheets
-% must agree with the capture net for net). Cross-references to these labels
-% must stay commented out with them.
-%
-% \subsubsection{Sheet 1 --- Power Entry and Protection}
-% \begin{figure}[htbp]
-% \centering
-% \phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 1 --- power entry and protection:
-% pack connector, anti-spark inrush path, combined E-stop and fuse, and the split
-% to the motor bus and the logic rail.}
-% \caption[Schematic sheet 1: power entry and protection]{Schematic sheet 1 --- power entry and protection. To be verified
-% against the fuse rating vs.\ worst-case bus current
-% (Table~\ref{tab:power_budget}) and the inrush into the driver bulk
-% capacitance.}
-% \label{fig:sch_power_entry}
-% \end{figure}
-%
-% \subsubsection{Sheet 2 --- Logic Rail}
-% \begin{figure}[htbp]
-% \centering
-% \phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 2 --- \qty{5}{\volt} logic rail:
-% buck converter, back-feed protection diode, rail bulk capacitance and
-% per-device decoupling.}
-% \caption[Schematic sheet 2: logic rail]{Schematic sheet 2 --- \qty{5}{\volt} logic rail. To be verified against
-% the converter rating vs.\ the worst-case rail total, and against capacitor
-% voltage ratings by position: low-voltage parts on the logic rail only, never on
-% the pack bus.}
-% \label{fig:sch_logic_rail}
-% \end{figure}
-%
-% \subsubsection{Sheet 3 --- CAN-FD Bus}
-% \begin{figure}[htbp]
-% \centering
-% \phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 3 --- CAN-FD bus:
-% linear chain across the three drivers and the flight computer, with split
-% termination at the two physical ends.}
-% \caption[Schematic sheet 3: CAN-FD bus]{Schematic sheet 3 --- CAN-FD bus. To be verified against the topology
-% rules of Table~\ref{tab:signal_rules}: linear chain, bounded stubs, termination
-% at the two physical ends only.}
-% \label{fig:sch_can_bus}
-% \end{figure}
-%
-% \subsubsection{Sheet 4 --- Encoder Interfaces}
-% \begin{figure}[htbp]
-% \centering
-% \phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 4 --- encoder interfaces:
-% the SPI interface from driver to encoder, one instance per axis, with the
-% air-gap dimension called out.}
-% \caption[Schematic sheet 4: encoder interfaces]{Schematic sheet 4 --- encoder interfaces ($3\times$). To be verified
-% against the SPI cable length limit and the \qty{3.3}{\milli\metre} air gap; these
-% fix the driver positions rather than the reverse
-% (Sec.~\ref{sec:bus_topology}).}
-% \label{fig:sch_encoders}
-% \end{figure}
-%
-% \subsubsection{Sheet 5 --- Flight Computer and IMU}
-% \begin{figure}[htbp]
-% \centering
-% \phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 5 --- flight computer and IMU:
-% MCU, IMU interface, and the sensor orientation relative to the body frame.}
-% \caption[Schematic sheet 5: flight computer and IMU]{Schematic sheet 5 --- flight computer and IMU. To be verified against
-% the sensor orientation relative to the body frame of
-% Sec.~\ref{sec:cad_method} and the mounting location relative to the pivot
-% required by Sec.~\ref{sec:control2d}.}
-% \label{fig:sch_fc_imu}
-% \end{figure}
-%
-% \subsubsection{Sheet 6 --- Telemetry Link}
-% \begin{figure}[htbp]
-% \centering
-% \phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 6 --- telemetry link:
-% telemetry module, serial interface to the MCU, and the supply decoupling sized
-% for the transmit burst.}
-% \caption[Schematic sheet 6: telemetry link]{Schematic sheet 6 --- telemetry link. To be verified against the
-% transmit-burst current and its return path off the logic rail.}
-% \label{fig:sch_telemetry}
-% \end{figure}
-%
-% \subsubsection{Sheet 7 --- Brake Servo Drive}
-% \begin{figure}[htbp]
-% \centering
-% \phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 7 --- brake servo drive:
-% servo supply, decoupling and PWM routing, one instance per axis.}
-% \caption[Schematic sheet 7: brake servo drive]{Schematic sheet 7 --- brake servo drive. To be verified against
-% stall-current headroom on the logic rail, with the PWM routed clear of the
-% encoder SPI.}
-% \label{fig:sch_servo}
-% \end{figure}
+% Per-sheet figures, split out of images/schematic_full.pdf as a release step
+% (not a redraw: the sheets must agree with the capture net for net). Each is
+% followed by a per-pin electrical/logic table -- net name, direction, level
+% and function -- so the sheet can be wired from this document without a
+% KiCad viewer. Physical pin numbers are marked TBD where they depend on the
+% board layout of Section~\ref{sec:layout}, which is not yet drawn; the net
+% identity, direction and level are fixed by the architecture of
+% Section~\ref{sec:electrical} and are not TBD.
+
+\subsubsection{Sheet 1 --- Power Entry and Protection}
+\begin{figure}[htbp]
+\centering
+\phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 1 --- power entry and protection:
+pack connector, anti-spark inrush path, combined E-stop and fuse, and the split
+to the motor bus and the logic rail.}
+\caption[Schematic sheet 1: power entry and protection]{Schematic sheet 1 --- power entry and protection. To be verified
+against the fuse rating vs.\ worst-case bus current
+(Table~\ref{tab:power_budget}) and the inrush into the driver bulk
+capacitance.}
+\label{fig:sch_power_entry}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\caption[Sheet 1 pin/net logic]{Sheet 1 pin/net logic. Connector refs are J1--J2 of Table~\ref{tab:connectors}.}
+\label{tab:pins_power_entry}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{c L{2.6cm} c L{2.4cm} L{5.4cm}}
+\toprule
+Pin & Net & Direction & Level & Function \\
+\midrule
+J1-1 & PACK+ & In & \qty{22.2}{\volt} nominal (6S) & Battery positive, upstream of E-stop and fuse \\
+J1-2 & PACK$-$ & In & 0\,V (system return) & Battery negative \\
+\textcolor{red}{TBD} & ESTOP\_SENSE & In & Switched PACK+ & E-stop contact; open interrupts the bus, not a logic signal \\
+\textcolor{red}{TBD} & FUSE & In/Out & Switched PACK+ & Series fuse element, motor-bus rated \\
+J2-1 & MOTOR\_BUS+ & Out & \qtyrange{22}{25}{\volt} (discharge curve) & To distribution board, motor bus (Sec.~\ref{sec:power_arch}) \\
+J2-2 & MOTOR\_BUS$-$ & Out & 0\,V (system return) & Motor bus return \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Sheet 2 --- Logic Rail}
+\begin{figure}[htbp]
+\centering
+\phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 2 --- \qty{5}{\volt} logic rail:
+buck converter, back-feed protection diode, rail bulk capacitance and
+per-device decoupling.}
+\caption[Schematic sheet 2: logic rail]{Schematic sheet 2 --- \qty{5}{\volt} logic rail. To be verified against
+the converter rating vs.\ the worst-case rail total, and against capacitor
+voltage ratings by position: low-voltage parts on the logic rail only, never on
+the pack bus.}
+\label{fig:sch_logic_rail}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\caption[Sheet 2 pin/net logic]{Sheet 2 pin/net logic (LM2596 buck converter).}
+\label{tab:pins_logic_rail}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{c L{2.6cm} c L{2.4cm} L{5.4cm}}
+\toprule
+Pin & Net & Direction & Level & Function \\
+\midrule
+\textcolor{red}{TBD} & VIN & In & \qtyrange{22}{25}{\volt} & Converter input, tapped off MOTOR\_BUS+ upstream of the motor drivers \\
+\textcolor{red}{TBD} & GND & In/Out & 0\,V & Converter ground, common with system return \\
+\textcolor{red}{TBD} & VOUT (5V\_LOGIC) & Out & \qty{5.00}{\volt} $\pm$\qty{0.05}{\volt} & Logic rail feed, back-fed through a series diode into the rail bus \\
+\textcolor{red}{TBD} & EN & In & 3.3--5\,V logic & Converter enable, tied to the E-stop chain \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Sheet 3 --- CAN-FD Bus}
+\begin{figure}[htbp]
+\centering
+\phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 3 --- CAN-FD bus:
+linear chain across the three drivers and the flight computer, with split
+termination at the two physical ends.}
+\caption[Schematic sheet 3: CAN-FD bus]{Schematic sheet 3 --- CAN-FD bus. To be verified against the topology
+rules of Table~\ref{tab:signal_rules}: linear chain, bounded stubs, termination
+at the two physical ends only.}
+\label{fig:sch_can_bus}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\caption[Sheet 3 pin/net logic]{Sheet 3 pin/net logic. J6/J7 are the chain-end connectors of
+Table~\ref{tab:connectors}; each moteus driver and the flight computer tap the
+chain as a short stub, per Section~\ref{sec:bus_topology}.}
+\label{tab:pins_can_bus}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{c L{2.6cm} c L{2.4cm} L{5.4cm}}
+\toprule
+Pin & Net & Direction & Level & Function \\
+\midrule
+J6-1 / J7-1 & CAN\_H & Bidir, differential & \qty{2.5}{\volt} $\pm$ swing & Bus high, chain end A / end B \\
+J6-2 / J7-2 & CAN\_L & Bidir, differential & \qty{2.5}{\volt} $\mp$ swing & Bus low, chain end A / end B \\
+J6-3 / J7-3 & GND & In/Out & 0\,V & Bus reference, common return (Sec.~\ref{sec:bus_topology}) \\
+\textcolor{red}{TBD} & $R_{\text{term}}$ (end A, end B) & --- & \qty{120}{\ohm} each & Termination, two physical ends only; \qty{60}{\ohm} $\pm$\qty{3}{\ohm} unpowered across CAN\_H--CAN\_L (Sec.~\ref{sec:elec_checks}) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Sheet 4 --- Encoder Interfaces}
+\begin{figure}[htbp]
+\centering
+\phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 4 --- encoder interfaces:
+the SPI interface from driver to encoder, one instance per axis, with the
+air-gap dimension called out.}
+\caption[Schematic sheet 4: encoder interfaces]{Schematic sheet 4 --- encoder interfaces ($3\times$). To be verified
+against the SPI cable length limit and the \qty{3.3}{\milli\metre} air gap; these
+fix the driver positions rather than the reverse
+(Sec.~\ref{sec:bus_topology}).}
+\label{fig:sch_encoders}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\caption[Sheet 4 pin/net logic]{Sheet 4 pin/net logic, per axis $i\in\{1,2,3\}$. Connector J8 of
+Table~\ref{tab:connectors}; MA600 encoder SPI, one instance per moteus driver.}
+\label{tab:pins_encoders}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{c L{2.6cm} c L{2.4cm} L{5.4cm}}
+\toprule
+Pin & Net & Direction & Level & Function \\
+\midrule
+J8-1 & MOSI\_$i$ & Out (driver$\to$encoder) & \qty{3.3}{\volt} logic & SPI data to encoder \\
+J8-2 & MISO\_$i$ & In (encoder$\to$driver) & \qty{3.3}{\volt} logic & SPI data from encoder (absolute angle) \\
+J8-3 & SCK\_$i$ & Out (driver$\to$encoder) & \qty{3.3}{\volt} logic & SPI clock \\
+J8-4 & CS\_$i$ & Out (driver$\to$encoder) & \qty{3.3}{\volt} logic & SPI chip select, active low \\
+J8-5 & 3V3 & Out (driver$\to$encoder) & \qty{3.3}{\volt} & Encoder supply \\
+J8-6 & GND & In/Out & 0\,V & Encoder return \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Sheet 5 --- Flight Computer and IMU}
+\begin{figure}[htbp]
+\centering
+\phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 5 --- flight computer and IMU:
+MCU, IMU interface, and the sensor orientation relative to the body frame.}
+\caption[Schematic sheet 5: flight computer and IMU]{Schematic sheet 5 --- flight computer and IMU. To be verified against
+the sensor orientation relative to the body frame of
+Sec.~\ref{sec:cad_method} and the mounting location relative to the pivot
+required by Sec.~\ref{sec:control_algorithms}.}
+\label{fig:sch_fc_imu}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\caption[Sheet 5 pin/net logic]{Sheet 5 pin/net logic. Connector J9 of Table~\ref{tab:connectors};
+Teensy~4.1 to BMI270, plus the CAN-FD transceiver interface consumed by
+Sheet~3.}
+\label{tab:pins_fc_imu}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{c L{2.6cm} c L{2.4cm} L{5.4cm}}
+\toprule
+Pin & Net & Direction & Level & Function \\
+\midrule
+J9-1 & IMU\_MOSI & Out (Teensy$\to$IMU) & \qty{3.3}{\volt} logic & SPI data to BMI270 \\
+J9-2 & IMU\_MISO & In (IMU$\to$Teensy) & \qty{3.3}{\volt} logic & SPI data from BMI270 \\
+J9-3 & IMU\_SCK & Out (Teensy$\to$IMU) & \qty{3.3}{\volt} logic & SPI clock \\
+J9-4 & IMU\_CS & Out (Teensy$\to$IMU) & \qty{3.3}{\volt} logic & SPI chip select, active low \\
+J9-5 & IMU\_INT & In (IMU$\to$Teensy) & \qty{3.3}{\volt} logic & Data-ready interrupt, sampled each \qty{1}{\milli\second} tick (Sec.~\ref{sec:software_pipeline}) \\
+J9-6 & 3V3 / GND & Out / In-Out & \qty{3.3}{\volt} / 0\,V & IMU supply and return \\
+\textcolor{red}{TBD} & CAN\_TX / CAN\_RX & Out / In & \qty{3.3}{\volt} logic (to transceiver) & Teensy CAN-FD peripheral to the bus transceiver of Sheet~3 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Sheet 6 --- Telemetry Link}
+\begin{figure}[htbp]
+\centering
+\phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 6 --- telemetry link:
+telemetry module, serial interface to the MCU, and the supply decoupling sized
+for the transmit burst.}
+\caption[Schematic sheet 6: telemetry link]{Schematic sheet 6 --- telemetry link. To be verified against the
+transmit-burst current and its return path off the logic rail.}
+\label{fig:sch_telemetry}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\caption[Sheet 6 pin/net logic]{Sheet 6 pin/net logic. Connector J10 of Table~\ref{tab:connectors};
+Teensy~4.1 to the XIAO ESP32-C6 telemetry module.}
+\label{tab:pins_telemetry}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{c L{2.6cm} c L{2.4cm} L{5.4cm}}
+\toprule
+Pin & Net & Direction & Level & Function \\
+\midrule
+J10-1 & UART\_TX & Out (Teensy$\to$ESP32) & \qty{3.3}{\volt} logic & Telemetry data to the ESP32 \\
+J10-2 & UART\_RX & In (ESP32$\to$Teensy) & \qty{3.3}{\volt} logic & Command/ack path from the ESP32 \\
+J10-3 & 5V\_LOGIC & Out (board$\to$ESP32) & \qty{5.00}{\volt} & ESP32 supply, sized for the \qty{300}{\milli\ampere} transmit burst (Table~\ref{tab:electrical_criteria}) \\
+J10-4 & GND & In/Out & 0\,V & Return \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Sheet 7 --- Brake Servo Drive}
+\begin{figure}[htbp]
+\centering
+\phfig[0.30\textheight]{0.82\textwidth}{Schematic sheet 7 --- brake servo drive:
+servo supply, decoupling and PWM routing, one instance per axis.}
+\caption[Schematic sheet 7: brake servo drive]{Schematic sheet 7 --- brake servo drive. To be verified against
+stall-current headroom on the logic rail, with the PWM routed clear of the
+encoder SPI.}
+\label{fig:sch_servo}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\caption[Sheet 7 pin/net logic]{Sheet 7 pin/net logic, per axis $i\in\{1,2,3\}$. Connector J11 of
+Table~\ref{tab:connectors}; TowerPro MG92B brake servos.}
+\label{tab:pins_servo}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{c L{2.6cm} c L{2.4cm} L{5.4cm}}
+\toprule
+Pin & Net & Direction & Level & Function \\
+\midrule
+J11-1 & PWM\_$i$ & Out (Teensy$\to$servo) & \qty{3.3}{\volt} logic, \qty{50}{\hertz} & Servo position command, routed clear of the encoder SPI runs of Sheet~4 \\
+J11-2 & 5V\_LOGIC & Out (board$\to$servo) & \qty{5.00}{\volt} & Servo supply \\
+J11-3 & GND & In/Out & 0\,V & Servo return; flyback path verified per Table~\ref{tab:electrical_criteria} \\
+\bottomrule
+\end{tabular}
+\end{table}
 % ---------------------------------------------------------------------------
 
 % The full schematic is drawn on its own landscape page rather than scaled into

@@ -1,0 +1,175 @@
+% ================= APPENDIX: CONTROL ALGORITHM DETAIL =================
+\section{Control Algorithm Detail}
+\label{app:control_algorithms}
+
+This appendix holds the implementation detail kept out of
+Section~\ref{sec:control_algorithms}: the mode state machine's guard
+conditions, the estimator and controller as executable pseudocode, the fixed
+gains and tuning parameters, the per-cycle timing budget and the fault
+responses. The control law and its rationale --- why an LQR baseline, why a
+complementary filter, why the loop runs at \qty{1}{\kilo\hertz} --- stay in
+Section~\ref{sec:control_algorithms} and are not repeated here. Anything in
+this appendix may change (a re-tuned gain, a revised timing margin) without
+the design intent changing; anything in Section~\ref{sec:control_algorithms}
+may not.
+
+\subsection{Mode State Machine}
+\label{app:state_machine}
+
+Table~\ref{tab:sw_modes} states the seven modes and their behaviour;
+Table~\ref{tab:state_transitions} adds the guard condition on every
+transition, since the qualitative "exit condition" column of
+Table~\ref{tab:sw_modes} is not by itself enough to re-implement the
+supervisor.
+
+\begin{table}[htbp]
+\centering
+\caption[Mode transition guard conditions]{Mode transition guard conditions. Every transition also carries an
+unconditional disarm path to Fault/safe, omitted below for brevity.}
+\label{tab:state_transitions}
+\small
+\begin{tabular}{L{2.6cm} L{2.6cm} L{8.2cm}}
+\toprule
+From & To & Guard \\
+\midrule
+Idle / disarmed & Wheel spin-up & Explicit arm command; all bring-up checks of Section~\ref{sec:verification} passed \\
+Wheel spin-up   & Jump-up       & $|\hat{\dot\theta}_w - \dot\theta_{w,\text{target}}| < $ \textcolor{red}{TBD}, held for \textcolor{red}{TBD} \\
+Jump-up         & Edge balance  & $|\hat\theta_b| < \theta_{\text{th}}$, held for a debounce interval (hysteresis band \textcolor{red}{TBD}) \\
+Edge balance    & Corner balance & Commanded transition, only once edge balance has held $\geq$\textcolor{red}{TBD} \\
+Edge / Corner balance & Slew / rotation & Reference command received while balance is held \\
+Slew / rotation & Edge / Corner balance & Reference tracking error $<$\textcolor{red}{TBD} for a debounce interval \\
+Any balancing mode & Fault / safe & $|\hat\theta_b|$ (or any axis of $\theta$) exceeds the capture-region bound of Section~\ref{sec:sim_environment}; sensor dropout or bus error flagged \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Estimator Pseudocode}
+\label{app:estimator_pseudocode}
+
+The block below is the executable form of the complementary filter of
+Equations~\eqref{eq:complementary}--\eqref{eq:offset_filter}, run once per
+\qty{1}{\milli\second} tick, ahead of the controller step.
+
+\begin{verbatim}
+function ESTIMATE(gyro_rate, accel_x, accel_y, dt):
+    theta_accel   = atan2(-accel_x, accel_y)
+    theta_hat     = (1 - gamma) * (theta_hat_prev + gyro_rate * dt)
+                    + gamma * theta_accel
+    x_f           = (1 - alpha) * x_f_prev + alpha * theta_hat
+    theta_hat_prev = theta_hat
+    x_f_prev       = x_f
+    return theta_hat - x_f      # offset-corrected tilt fed to the controller
+\end{verbatim}
+
+\subsection{Controller Pseudocode}
+\label{app:controller_pseudocode}
+
+The block below is the executable form of Section~\ref{sec:pure_lqr_logic},
+including saturation and the momentum-desaturation bias omitted from the
+high-level listing there.
+
+\begin{verbatim}
+function CONTROL_STEP(state_estimate, wheel_speed, mode):
+    if mode != EDGE_BALANCE and mode != CORNER_BALANCE:
+        return MODE_OPEN_LOOP_COMMAND(mode)
+
+    x_hat = ASSEMBLE_STATE(state_estimate, wheel_speed)   # eq. (x_hat)
+    u     = -K_d * x_hat                                  # gain per mode: 3x1 (edge) or 3x9 (corner)
+
+    u = CLAMP(u, -I_CONT_MAX, I_CONT_MAX)                 # driver continuous rating, App. A
+
+    if abs(wheel_speed) > OMEGA_DESAT_THRESHOLD:
+        u += DESAT_BIAS(wheel_speed)                      # small bias torque, momentum bleed-off
+
+    return u   # issued as a CAN-FD torque request, one per axis
+\end{verbatim}
+
+\subsection{Fixed Gains and Tuning Parameters}
+\label{app:gains}
+
+Table~\ref{tab:gains} records the values used on hardware. It is populated
+once the plant identification of Section~\ref{sec:paramid} closes and the
+gains are re-derived against measured, not CAD/datasheet, parameters
+(Section~\ref{sec:sim_environment}, ``direction of validation'').
+
+\begin{table}[htbp]
+\centering
+\caption[Fixed gains and tuning parameters]{Fixed gains and tuning parameters. Symbols per
+Table~\ref{tab:control2d_vars}.}
+\label{tab:gains}
+\small
+\begin{tabular}{l L{6.0cm} c}
+\toprule
+Symbol & Parameter & Value \\
+\midrule
+$Q$ (edge)          & LQR state weighting, 2D model              & \textcolor{red}{TBD} \\
+$R$ (edge)          & LQR input weighting, 2D model               & \textcolor{red}{TBD} \\
+$K_d$ (edge)         & Resulting discrete gain, 2D model            & \textcolor{red}{TBD} \\
+$Q$ (corner)        & LQR state weighting, 9-state model          & \textcolor{red}{TBD} \\
+$R$ (corner)        & LQR input weighting, 9-state model           & \textcolor{red}{TBD} \\
+$K_d$ (corner)       & Resulting discrete gain, 9-state model        & \textcolor{red}{TBD} \\
+$\gamma$            & Complementary-filter weight (Eq.~\eqref{eq:complementary}) & \textcolor{red}{TBD} \\
+$\alpha$            & Offset-filter coefficient (Eq.~\eqref{eq:offset_filter}) & \textcolor{red}{TBD} \\
+$\theta_{\text{th}}$ & Jump-up $\to$ balance switch threshold      & \textcolor{red}{TBD} \\
+OMEGA\_DESAT\_THRESHOLD & Wheel-speed desaturation trigger        & \textcolor{red}{TBD} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Timing Budget}
+\label{app:timing}
+
+The \qty{1}{\kilo\hertz} cycle of Section~\ref{sec:software_pipeline} must
+complete every stage of Section~\ref{sec:pure_lqr_logic} inside its
+\qty{1}{\milli\second} period with margin, since the discrete LQR design
+assumes the period is met, not merely averaged. Table~\ref{tab:timing_budget}
+allocates that period; measured figures replace the allowance once the
+pipeline is benchmarked on hardware.
+
+\begin{table}[htbp]
+\centering
+\caption[Per-cycle timing budget]{Per-cycle timing budget within the \qty{1}{\milli\second} control
+period. Allowance is the design target; measured replaces it on hardware.}
+\label{tab:timing_budget}
+\small
+\begin{tabular}{L{3.8cm} L{4.6cm} c c}
+\toprule
+Stage & Work & Allowance & Measured \\
+\midrule
+Sensor ingest & BMI270 SPI read; moteus CAN replies (3$\times$) & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Estimation    & Complementary filter, offset filter (App.~\ref{app:estimator_pseudocode}) & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Control       & Gain multiply, saturation, desaturation bias (App.~\ref{app:controller_pseudocode}) & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Actuate       & CAN-FD torque requests (3$\times$), servo PWM update & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Telemetry (side-branch) & State tap to SD and Wi-Fi, off the control path & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\midrule
+\textbf{Total, worst-case} & & \textbf{\textcolor{red}{TBD}} & \textbf{\textcolor{red}{TBD}} \\
+\textbf{Margin to \qty{1}{\milli\second}} & & \textbf{\textcolor{red}{TBD}} & \textbf{\textcolor{red}{TBD}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Fault Responses}
+\label{app:fault_responses}
+
+Table~\ref{tab:fault_responses} expands the four failure cases named in
+Section~\ref{sec:control_sw} into a detection method and a defined response
+for each, since ``a controlled shutdown'' is not itself an implementable
+instruction.
+
+\begin{table}[htbp]
+\centering
+\caption[Fault detection and response]{Fault detection and response. The last row is a controlled shutdown
+rather than a recovery attempt, per Section~\ref{sec:control_sw}.}
+\label{tab:fault_responses}
+\small
+\begin{tabular}{L{2.6cm} L{4.6cm} L{6.0cm}}
+\toprule
+Fault & Detection & Response \\
+\midrule
+Sensor dropout & IMU or encoder read timeout / stale sample counter & Hold last valid estimate for \textcolor{red}{TBD} ticks, then transition to Fault/safe \\
+Bus error & CAN-FD error-frame count or missed driver reply & Retry per driver for \textcolor{red}{TBD} ticks; transition to Fault/safe if unresolved \\
+Wheel saturation & $|\hat{\dot\theta}_w|$ exceeds OMEGA\_DESAT\_THRESHOLD and desaturation bias does not reduce it & Escalate desaturation bias; if sustained, treat as loss of equilibrium \\
+Loss of equilibrium & Any tilt axis exceeds the capture-region bound (Table~\ref{tab:state_transitions}) & Wheels commanded down, drivers disarmed; manual reset required (Table~\ref{tab:sw_modes}) \\
+\bottomrule
+\end{tabular}
+\end{table}
