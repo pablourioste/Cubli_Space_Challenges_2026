@@ -1,4 +1,4 @@
-﻿% ============================================================================
+% ============================================================================
 %  OPEN ITEMS REGISTER -- Cubli Technical Design Document
 % ----------------------------------------------------------------------------
 %  Standalone working document. NOT input by main.tex -- it is a checklist for
@@ -8,17 +8,22 @@
 %
 %  Scope: every \textcolor{red}{TBD} in sections/*.tex, every empty section,
 %  every comment-only stub and every missing figure, as of the scan date below.
-%  Line numbers are those of the files at scan time and will drift as the
-%  document is edited; the table/label names are the stable identifiers.
 %
-%  Counts at original scan: 97 TBD markers, 4 empty sections, 20 comment-only
-%  stubs, 21 missing figures.
-%
-%  UPDATE (sizing closure): A1 (6), A2 (4) and A8 (8) are populated from the
-%  converged run of analysis/SIZING.py, and A5's W3 quantity (1) is committed
-%  -- 19 TBD closed, leaving 78. The three script-versus-document conflicts
-%  recorded in Section 1 are resolved. A4's six TBDs are untouched: they need
-%  the packaging study, which remains the head of the chain.
+%  RESTRUCTURE (second/final draft): the document was reorganised from
+%  Introduction / Project Organisation / System Analysis / Dynamic Modelling &
+%  Control / Preliminary Hardware Design / Future Work into Introduction /
+%  Project Organisation / Preliminary Sizing / Methodology / CAD Design /
+%  Electronics / Control Algorithms & Approach / Conclusions & Next Steps.
+%  Section~\ref{sec:filemap} maps old content to its new home. The two
+%  previously BLOCKER content gaps -- Appendix D (control algorithms) at 0
+%  bytes, and Section 3 (System Analysis) three-quarters empty -- are both
+%  CLOSED structurally: real prose and tables exist at both locations now.
+%  What remains open at those locations is tracked below as ordinary TBD
+%  markers (mostly gains, timing and physical pin numbers), not as missing
+%  sections. Uncommenting the electrical schematic-sheet placeholders and
+%  adding a per-pin logic table to each also added a new block of TBD figures
+%  (the physical pin numbers, pending the board layout) that did not exist at
+%  the previous scan.
 % ============================================================================
 \documentclass[11pt,a4paper]{article}
 
@@ -93,9 +98,48 @@ Three status labels are used throughout:
         so the closure is auditable rather than silently deleted.
 \end{itemize}
 
+Section~\ref{sec:filemap} gives the section-file map for the current draft.
 Section~\ref{sec:chain} states the dependency chain, which is what makes the
 ordering non-arbitrary: roughly a quarter of the register closes automatically
 once the packaging study closes.
+
+\section{Section-file map (current draft)}
+\label{sec:filemap}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{c L{4.4cm} L{7.0cm}}
+\toprule
+\# & Section & File \\
+\midrule
+1 & Introduction (incl.\ RW-vs-CMG trade) & \texttt{01\_introduction.tex} \\
+2 & Project Organisation (incl.\ validation stage-gate table) & \texttt{02\_project\_organization*.tex} \\
+3 & Preliminary Sizing & \texttt{03\_preliminary\_sizing.tex} \\
+4 & Methodology (incl.\ verification/checks) & \texttt{04\_methodology.tex} \\
+5 & CAD Design (incl.\ CAD verification) & \texttt{05\_cad\_design.tex} \\
+6 & Electronics & \texttt{06\_electronics.tex} \\
+7 & Control Algorithms \& Approach & \texttt{07\_control\_algorithms.tex} \\
+8 & Conclusions \& Next Steps (incl.\ validation results, future work) & \texttt{08\_conclusions.tex} \\
+A & Bill of Materials & \texttt{09\_bom.tex} \\
+B & CAD \& Construction Detail & \texttt{10\_cad\_detail.tex} \\
+C & Electrical System Detail (schematic sheets, now uncommented, plus per-pin tables) & \texttt{11\_electrical\_detail.tex} \\
+D & Control Algorithm Detail (state machine, pseudocode, gains, timing, faults) & \texttt{12\_control\_algorithm\_detail.tex} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The former \texttt{03\_analysis.tex} (RW-vs-CMG trade, requirements
+traceability) and \texttt{06\_testing.tex} (excluded from the build) are
+retired; their content is redistributed into the files above rather than
+existing as standalone sections. Section labels most items are still
+addressed by (\texttt{sec:massbudget}, \texttt{sec:jumpup\_target},
+\texttt{sec:rw\_sizing}, \texttt{sec:control2d}, \texttt{sec:test\_feasibility}
+$\to$ \texttt{sec:sizing\_verification}, \texttt{sec:test\_electrical} $\to$
+\texttt{sec:elec\_checks}, \texttt{sec:test\_cad} $\to$
+\texttt{sec:cad\_verification}, \texttt{sec:test\_sim} $\to$
+\texttt{sec:sim\_environment}) are unchanged or carried forward under a new
+name; the label, not the file, is the stable identifier to search on.
 
 \section{Dependency chain}
 \label{sec:chain}
@@ -107,14 +151,16 @@ $V_{\min} \;\rightarrow\; L \;\rightarrow\; M \;\rightarrow\; h_w \;\rightarrow\
 I_{w,\text{target}} \;\rightarrow\;$ wheel design, feasibility gate, test thresholds
 \end{center}
 
-so the packaging study (item \textbf{A4}) is the true head of the register. The
+so the packaging study (item \textbf{A4}, Table~\ref{tab:cad_params} in
+\texttt{10\_cad\_detail.tex}) is the true head of the register. The
 parametric calculator \texttt{analysis/SIZING.py} implements Stages~1--6 of the
-closure procedure and now reports a converged fixed point at
+closure procedure (Section~\ref{sec:massbudget}, now in
+\texttt{03\_preliminary\_sizing.tex}) and reports a converged fixed point at
 $M = \qty{1.7716}{\kilo\gram}$, reproduced by its own Stage~6 roll-up to within
-\qty{0.1}{\gram}. The figures below have been \textbf{transcribed into the TDD}
-(A1, A2, A8 and parts of A4/A5 are closed). They remain provisional because
-roughly \qty{34}{\percent} of the mass total is still structural allowance
-rather than measured mass.
+\qty{0.1}{\gram}. The figures below are \textbf{transcribed into the TDD}
+(A1, A2 and A8 are closed). They remain provisional because roughly
+\qty{34}{\percent} of the mass total is still structural allowance rather than
+measured mass.
 
 \begin{table}[h]
 \centering
@@ -147,286 +193,148 @@ $I_w$                 & Wheel inertia achieved         & \qty{4.599e-4}{\kilogra
 \end{tabular}
 \end{table}
 
-\paragraph{The three script-versus-document conflicts are now closed.}
-Resolved as follows, and the document has been populated accordingly.
-
-\begin{enumerate}
-  \item \textbf{$\omega_{\max}$: resolved to \qty{6000}{\rpm}}, matching the TDD
-        and \texttt{electrical/MOTOR\_SPEED.md}; the script's code has been
-        corrected from \qty{5000}{\rpm}. \qty{5000}{\rpm} is retained as a
-        documented over-dimensioning check --- it raises $I_{w,\text{target}}$
-        by $6/5$, so a wheel closing there closes at \qty{6000}{\rpm} with
-        margin. A footnote to \texttt{tab:jumpup\_budget} records this.
-  \item \textbf{Wheel geometry: resolved.} \texttt{tab:rw\_params} now carries
-        the as-designed ring --- \qty{120}{\milli\metre} OD, \qty{15}{\milli\metre}
-        radial width, round M6 through-holes, $N = 15$ on
-        $R_{\text{pcr}} = \qty{52.5}{\milli\metre}$,
-        $m_w = \qty{172.5}{\gram}$, $I_w = \qty{4.599e-4}{\kilogram\metre\squared}$.
-        The diameter is an envelope constraint: left free, the mass-minimising
-        sweep prefers a larger ring that does not fit the cube, at a cost of
-        \qty{85}{\gram} per wheel.
-  \item \textbf{Ballast retention: resolved.} The blind-pocket language has been
-        removed from \texttt{06\_testing.tex} (part checks) and
-        \texttt{09\_cad.tex} (print settings); the through-bolt in tension is
-        the stated retention feature, at \qty{1.47}{\percent} of M6 class~8.8
-        proof load and \qty{4.02}{\mega\pascal} bearing stress.
-\end{enumerate}
-
 \paragraph{What remains open on the sizing chain.} The residual risk is not a
 conflict but a margin asymmetry: the wheel sits \qty{11.7}{\percent} above
 target while one station is worth \qty{5.9}{\percent}, so downward ballast trim
 is nearly exhausted ($-1$ station) while upward trim is ample ($+24$). A
 structure that comes in \emph{lighter} than the \qty{610}{\gram} allowance is
-therefore the awkward case, and $\omega_{\max}$ is the relief variable.
+therefore the awkward case, and $\omega_{\max}$ is the relief variable. This is
+unchanged by the restructure --- the numbers moved files, not values.
 
 \clearpage
 \section{TBD items, by owning table}
 \label{sec:tbd}
 
-93 of the 97 TBD markers sit in tables. Each block below is one table. Items
-marked \closed{} have been populated since the original scan and are retained
-for audit; 78 markers remain open.
-
 \subsection{A1 --- Jump-up sizing budget \quad \closed}
 
-\texttt{tab:jumpup\_budget}, \texttt{sections/04\_modeling\_control.tex}.
-\textbf{6 TBD --- all populated} from the converged run of
-Table~\ref{tab:sizing_current}. The values remain provisional in the sense that
-$M$ carries a \qty{34}{\percent} structural allowance, but they are no longer
-missing and the table is self-consistent with Stage~6.
-
-\begin{table}[h]
-\centering
-\small
-\begin{tabular}{c l L{6.4cm} L{3.2cm}}
-\toprule
-Line & Symbol & Quantity & Closed by \\
-\midrule
-189 & $M$                   & Cube mass                    & CAD mass roll-up \\
-191 & $\eta$                & Energy margin                & Design choice (1.02--1.05) \\
-193 & $\tau_g = MgL/2$      & Gravitational tip-over floor & Derived from $M$, $L$ \\
-194 & $\beta$               & Brake-amplification factor   & Derived from $\tau_b$, $\tau_g$ \\
-196 & $h_w$                 & Required angular momentum    & Derived, Eq.~(hw\_ideal) \\
-197 & $I_{w,\text{target}}$ & \textbf{Target wheel inertia} & Derived, Eq.~(Iw\_target) \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Four of the six are pure functions of $M$ and $L$, so this whole block closes
-the moment the mass roll-up is real rather than allowance-based.
+\texttt{tab:jumpup\_budget}, \texttt{03\_preliminary\_sizing.tex}
+(\texttt{sec:jumpup\_target}). All 6 values populated from the converged run
+of Table~\ref{tab:sizing_current}; provisional in the sense that $M$ carries a
+\qty{34}{\percent} structural allowance.
 
 \subsection{A2 --- Required inertia by contact case \quad \closed}
 
-\texttt{tab:inertia\_cases}, \texttt{sections/05\_hardware\_design.tex}.
-\textbf{4 TBD --- all populated.} The calculator now evaluates both contact
-cases rather than only the sizing one: edge
-$h_w = \qty{0.2348}{\kilo\gram\metre\squared\per\second}$,
+\texttt{tab:inertia\_cases}, \texttt{03\_preliminary\_sizing.tex}
+(\texttt{sec:massbudget}). Both contact cases populated: edge
 $I_{w,\text{target}} = \qty{3.737e-4}{\kilogram\metre\squared}$; corner
-\qty{0.2588}{} and \qty{4.119e-4}{} respectively. The corner case demands
-\qty{9.3}{\percent} more inertia, which is now shown rather than asserted.
+\qty{4.119e-4}{}. The corner case demands \qty{9.3}{\percent} more inertia.
 
 \subsection{A3 --- Rail current budget \quad \ready}
 
-\texttt{tab:power\_budget}, \texttt{sections/05\_hardware\_design.tex},
-lines 461--469. \textbf{14 TBD}: typical and worst case for each load.
-
-\begin{table}[h]
-\centering
-\small
-\begin{tabular}{c L{4.6cm} L{6.4cm}}
-\toprule
-Line & Load & Governing figure \\
-\midrule
-461 & Teensy 4.1                    & Datasheet \\
-462 & XIAO ESP32-C6 telemetry       & TX burst ($\approx$\qty{300}{\milli\ampere}) governs \\
-463 & BMI270 IMU                    & Datasheet \\
-464 & MG92B brake servo             & Stall current governs \\
-465 & MA600 encoders ($3\times$)    & Datasheet \\
-467 & \textbf{Logic rail total}     & Checked against LM2596 rating (derates without heatsink) \\
-469 & moteus-n1 drivers ($3\times$) & Spin-up, not balance, governs \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Typical values are datasheet lookups and can be filled today. Worst case is
-explicitly defined in the TDD as the \emph{coincident} case --- telemetry burst,
-servo stall and full sensor load simultaneously --- not the sum of typicals.
+\texttt{tab:power\_budget}, \texttt{06\_electronics.tex}
+(\texttt{sec:power\_arch}). \textbf{14 TBD}: typical and worst case for each of
+five loads plus the logic-rail total and the driver spin-up figure. This table
+was previously wrapped in a LaTeX \texttt{comment} environment and did not
+render at all, despite being referenced from Appendix~C; it is now a live
+table with the same TBD content. Typical values are datasheet lookups and can
+be filled today; worst case is the \emph{coincident} case (telemetry burst,
+servo stall and full sensor load together), not the sum of typicals.
 
 \subsection{A4 --- Driving CAD parameters \quad \blocker}
 
-\texttt{tab:cad\_params}, \texttt{sections/09\_cad.tex}.
-\textbf{6 TBD, unchanged.} $L$, $t_w$, $D_w$ and $t_r$ are populated: $D_w$ has
-been corrected from \qty{13}{\centi\metre} to the \qty{120}{\milli\metre} of the
-as-designed wheel, and the axial thickness $t_r = \qty{5}{\milli\metre}$ added,
-since the CAD needs it and the sizing fixes it. The six remaining TBDs are
-genuinely open --- they need the packaging study, not the calculator, and the
-sizing work does not touch them.
-
-\begin{table}[h]
-\centering
-\small
-\begin{tabular}{c l L{7.6cm}}
-\toprule
-Line & Symbol & Parameter \\
-\midrule
-34 & $d_m$      & Motor axis offset from cube centre \\
-35 & $h_m$      & Motor mounting face height on its axis \\
-36 & $c_w$      & Wheel-to-subframe axial clearance \\
-37 & $c_o$      & Clearance between orthogonal wheel modules \\
-38 & $V_{\min}$ & \textbf{Minimum internal clear volume} \\
-39 & $r_c$      & Corner contact feature radius \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-$V_{\min}$ is step~2 of the closure procedure and therefore the head of the
-whole dependency chain: it fixes $L$, which fixes $M$, which fixes
-$I_{w,\text{target}}$. $c_w$ and $c_o$ are additionally consumed by the
-interference checks of the CAD verification stage.
+\texttt{tab:cad\_params}, \texttt{10\_cad\_detail.tex}. \textbf{6 TBD,
+unchanged}: $d_m$, $h_m$, $c_w$, $c_o$, $V_{\min}$, $r_c$. These need the
+packaging study, not the calculator. $V_{\min}$ is step~2 of the closure
+procedure and therefore the head of the whole dependency chain: it fixes $L$,
+which fixes $M$, which fixes $I_{w,\text{target}}$. $c_w$ and $c_o$ are
+additionally consumed by the interference checks of
+\texttt{sec:cad\_verification} in \texttt{05\_cad\_design.tex}.
 
 \subsection{A5 --- CAD model tree and part list \quad \ready}
 
-\texttt{tab:cad\_parts}, \texttt{sections/09\_cad.tex}, lines 65--89.
-\textbf{35 TBD}: fabrication route and status for every part, plus five missing
-quantities.
-
-\begin{table}[h]
-\centering
-\small
-\begin{tabular}{c l L{5.0cm} L{4.6cm}}
-\toprule
-Line & Ref & Part & Missing \\
-\midrule
-65 & M1 & Motor subframe                & Qty, route, status \\
-66 & M2 & Motor mount ($\times$ axis)   & Route, status \\
-67 & M3 & Battery cradle / retention    & Route, status \\
-68 & M4 & Electronics tray              & Route, status \\
-69 & M5 & Brake servo bracket           & Route, status \\
-73 & W1 & Ballasted ring                & Route, status \\
-74 & W2 & Wheel hub / rotor adapter     & Route, status \\
-75 & W3 & Ballast bolt and nut set      & Qty, status \\
-76 & W4 & Brake strike feature          & Route, status \\
-80 & F1 & Frame member / edge rail      & Qty, route, status \\
-81 & F2 & Corner contact feature        & Route, status \\
-82 & F3 & Face panel / wheel guard      & Qty, route, status \\
-86 & R1 & Face plate (1-DoF rig)        & Route, status \\
-87 & R2 & Pivot bearing mount           & Route, status \\
-88 & R3 & Rig motor mount               & Route, status \\
-89 & R4 & Hard stops / containment      & Qty, route, status \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-W3's quantity is $3N$ where $N$ is the ballast count. With the wheel geometry
-now settled at $N = 15$ per wheel, this has been committed as \textbf{45} M6
-bolt-and-nut sets, leaving 34 TBD in this table. The rest are fabrication routes
-and statuses, which are decidable today and do not depend on the sizing.
+\texttt{tab:cad\_parts}, \texttt{10\_cad\_detail.tex}. \textbf{34 TBD}:
+fabrication route and status for every part across the inner structure, wheel
+assembly, outer frame and 1-DoF rig, unchanged from the previous scan. All are
+decidable today and do not depend on the sizing.
 
 \subsection{A6 --- Print and manufacturing settings \quad \ready}
 
-\texttt{tab:print\_settings}, \texttt{sections/09\_cad.tex}, lines 138--143.
-\textbf{18 TBD}: material, infill/walls and orientation for W1, W2, M1, M2, F1,
-F2 --- the six structural printed parts.
-
-The TDD states the requirement these settings must meet: the wheel ring carries
-centrifugal load at the ballast holes and the motor mounts carry the brake
-impulse, so orientation is specified relative to the principal load direction
-and a part reprinted differently is not the part that was analysed. The
-calculator assumes PET-CF at \qty{1290}{\kilo\gram\per\metre\cubed}, which
-should be the material entry for W1 at minimum.
+\texttt{tab:print\_settings}, \texttt{10\_cad\_detail.tex}. \textbf{18 TBD}:
+material, infill/walls and orientation for the six structural printed parts
+(W1, W2, M1, M2, F1, F2). The calculator assumes PET-CF at
+\qty{1290}{\kilo\gram\per\metre\cubed}, which should be the material entry for
+W1 at minimum.
 
 \subsection{A7 --- Mass properties verification \quad \waiting}
 
-\texttt{tab:mass\_verification}, \texttt{sections/09\_cad.tex}, lines 197--200.
-\textbf{12 TBD}: CAD value, measured value and discrepancy for total cube mass
-$M$, wheel mass $m_w$, wheel inertia $I_w$ and CoM offset.
-
-The CAD column can be filled as soon as the model exists; the measured column
-requires the assembled hardware (assembly step~8). This is the table that closes
-the mass loop, so a discrepancy here re-enters $I_{w,\text{target}}$.
+\texttt{tab:mass\_verification}, \texttt{10\_cad\_detail.tex}. \textbf{12
+TBD}: CAD value, measured value and discrepancy for $M$, $m_w$, $I_w$ and CoM
+offset. The CAD column can be filled once the model exists; the measured
+column requires assembled hardware.
 
 \subsection{A8 --- Pre-fabrication feasibility gate \quad \closed}
 
-\texttt{tab:jumpup\_gate}, \texttt{sections/06\_testing.tex}.
-\textbf{8 TBD --- all populated}, and the gate passes on every row:
-$\omega_w = \qty{5374}{\rpm}$ against $\omega_{\max} = \qty{6000}{\rpm}$ for a
-speed margin of \num{0.896}; $I_w = \qty{4.599e-4}{}$ against
-$I_{w,\text{target}} = \qty{4.119e-4}{}$, a \qty{+11.7}{\percent} route
-disagreement; trim authority $-1/+24$ stations; retention at
-\qty{1.47}{\percent} of proof load. Row~116 has also been reworded off the
-superseded blind-pocket scheme, as flagged below.
-
-\begin{table}[h]
-\centering
-\small
-\begin{tabular}{c L{4.8cm} L{6.4cm}}
-\toprule
-Line & Quantity & Pass condition \\
-\midrule
-109 & Required wheel speed $\omega_w$        & $\leq$ achievable speed with margin \\
-110 & Achievable wheel speed $\omega_{\max}$ & Sustained in service, not no-load \\
-111 & Speed margin $\omega_w/\omega_{\max}$  & $<1$ by a stated margin \\
-112 & Target inertia $I_{w,\text{target}}$   & --- \\
-113 & Achieved inertia $I_w$                 & $\geq I_{w,\text{target}}$ \\
-114 & Route disagreement                     & Reported; explained if large \\
-115 & Ballast trim authority                 & Non-zero in both directions \\
-116 & Nut retention margin                   & Retention load carried by a stated feature \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Row 116 was written against the superseded blind-pocket scheme; it has been
-reworded to ``Ballast retention margin'' with the pass condition stated on bolt
-tension and head/nut bearing stress, which is what the through-hole design
-actually relies on. The same correction was applied to the part-check paragraph
-of \texttt{06\_testing.tex} and the print-settings preamble of
-\texttt{09\_cad.tex}, both of which still referred to pockets and a retention
-floor.
+\texttt{tab:jumpup\_gate}, \texttt{03\_preliminary\_sizing.tex}
+(\texttt{sec:sizing\_verification}, formerly \texttt{sec:test\_feasibility}).
+All 8 values populated and the gate passes on every row: speed margin
+\num{0.896}; inertia route disagreement \qty{+11.7}{\percent}; ballast trim
+$-1/+24$ stations; retention at \qty{1.47}{\percent} of proof load.
 
 \subsection{A9 --- 1-DoF plant identification \quad \waiting}
 
-\texttt{tab:paramid\_methods}, \texttt{sections/06\_testing.tex},
-lines 307--310. \textbf{4 TBD}: torque constant $K_t$, body inertia $J$,
-friction, loop latency. Methods and instruments are already specified --- only
-the measured values and their tolerances are pending. Requires the rig
-(gate M6).
+\texttt{tab:paramid\_methods}, \texttt{04\_methodology.tex}
+(\texttt{sec:paramid}). \textbf{4 TBD}: torque constant $K_t$, body inertia
+$J$, friction, loop latency. Methods and instruments are specified; only the
+measured values and tolerances are pending. Requires the rig.
 
 \subsection{A10 --- Control performance metrics \quad \waiting}
 
-\texttt{tab:perf\_metrics}, \texttt{sections/06\_testing.tex}, lines 405--410.
-\textbf{5 TBD}: targets for recovery angle, settling time,
-disturbance-rejection bandwidth, slew tracking error, momentum drift. Control
-effort is already defined by reference to the driver limits and carries no TBD.
+\texttt{tab:perf\_metrics}, \texttt{08\_conclusions.tex}
+(\texttt{sec:test\_perf}). \textbf{5 TBD}: targets for recovery angle,
+settling time, disturbance-rejection bandwidth, slew tracking error, momentum
+drift. Control effort is already defined by reference to the driver limits.
 
 \subsection{A11 --- Connector schedule \quad \ready}
 
-\texttt{tab:connectors}, \texttt{sections/10\_electrical\_detail.tex},
-lines 78--88. \textbf{11 TBD}: housing and keying for J1--J11.
-
-The governing rule is already stated in the TDD: no two connectors carrying
+\texttt{tab:connectors}, \texttt{11\_electrical\_detail.tex}. \textbf{11 TBD}:
+housing and keying for J1--J11, unchanged. No two connectors carrying
 different voltages may share a housing type, so a mis-mate is impossible by
-construction. J1 is fixed by the BOM (XT60). The remaining ten are open choices
-and can be decided today.
+construction; J1 is fixed by the BOM (XT60).
 
 \subsection{A12 --- Wire schedule \quad \ready}
 
-\texttt{tab:wire\_schedule}, \texttt{sections/10\_electrical\_detail.tex},
-lines 112--118. \textbf{14 TBD}: gauge and length for H1--H7. The sizing basis
-is already stated per row (peak bus current for H1--H2, per-axis spin-up for H3,
-motor phase current for H4, topology for H5, length limit for H6, stall current
-for H7). Gauge follows from A3; length follows from the CAD envelope.
+\texttt{tab:wire\_schedule}, \texttt{11\_electrical\_detail.tex}. \textbf{14
+TBD}: gauge and length for H1--H7, unchanged. Gauge follows from A3; length
+follows from the CAD envelope.
 
 \subsection{A13 --- As-built electrical measurements \quad \waiting}
 
-\texttt{tab:electrical\_measured},
-\texttt{sections/10\_electrical\_detail.tex}, lines 200--206. \textbf{7 TBD}:
-$K_m$, $I_w$ from spin-down, viscous and Coulomb friction, command-to-encoder
-latency, achievable wheel speed on the bus, worst-case logic rail load, runtime
-per charge. Each row already names the estimate it replaces. Requires hardware.
+\texttt{tab:electrical\_measured}, \texttt{11\_electrical\_detail.tex}.
+\textbf{7 TBD}: $K_m$, $I_w$ from spin-down, viscous and Coulomb friction,
+command-to-encoder latency, achievable wheel speed on the bus, worst-case
+logic rail load, runtime per charge. Requires hardware.
+
+\subsection{A14 --- Per-sheet pin/net logic tables \quad \ready\ / \waiting (mixed)}
+
+\texttt{tab:pins\_power\_entry} through \texttt{tab:pins\_servo},
+\texttt{11\_electrical\_detail.tex}, Sheets~1--7. \textbf{New since the
+restructure}: uncommenting the schematic-sheet placeholders and adding a
+per-pin electrical/logic table to each (net name, direction, level, function)
+surfaced \textbf{9 TBD} physical-pin-number entries (E-stop/fuse pin
+positions, the LM2596 pin-out, the CAN termination component refs, the Teensy
+CAN-FD peripheral pins). The net identity, direction and level in every row
+are fixed by the architecture of \texttt{sec:electrical} and are \emph{not}
+TBD; only the physical pin number is, and it is \ready{} in the sense that it
+needs a board layout decision (\texttt{sec:layout}), not upstream data --- but
+that decision itself has not been made, so it is listed \waiting{} on it.
+
+\subsection{A15 --- Appendix D: gains, timing budget, guard conditions \quad \waiting}
+
+\texttt{12\_control\_algorithm\_detail.tex}. \textbf{New since the
+restructure}: Appendix D was 0 bytes at the previous scan (see
+Section~\ref{sec:filemap} note) and is now written in full --- the mode-
+transition guard conditions (\texttt{tab:state\_transitions}, 5 TBD), the
+fixed gains and tuning parameters (\texttt{tab:gains}, 10 TBD: $Q$, $R$,
+$K_d$ for both the edge and corner models, $\gamma$, $\alpha$,
+$\theta_{\text{th}}$, the desaturation threshold), the per-cycle timing budget
+(\texttt{tab:timing\_budget}, 12 TBD across five pipeline stages), and two
+fault-response timeouts (\texttt{tab:fault\_responses}, 2 TBD). All of these
+close only once the plant identification (A9) and the Simulink/Simscape
+simulation work of \texttt{sec:sim\_environment} report measured parameters
+and re-derived gains --- they are a consequence of A9 closing, not an
+independent blocker.
 
 \section{TBD in prose}
-
-Four TBD markers sit in running text rather than in a table.
 
 \begin{table}[h]
 \centering
@@ -435,15 +343,31 @@ Four TBD markers sit in running text rather than in a table.
 \toprule
 Location & Pending \\
 \midrule
-\texttt{06\_testing.tex}:12  & Generic statement that thresholds are TBD. Resolves itself when the tables close; no separate action. \\
-\texttt{06\_testing.tex}:202 & \textbf{Robustness sweep magnitude} --- how far plant parameters are perturbed about nominal. Set once the identification tolerances of A9 are known. \\
-\texttt{06\_testing.tex}:355 & \textbf{Edge-balance numeric targets} beyond the G6 gate criterion. \\
-\texttt{06\_testing.tex}:369 & \textbf{Slew tracking targets}. \\
+\texttt{08\_conclusions.tex}, \texttt{sec:test\_edge} & Edge-balance numeric
+targets beyond the G6 gate criterion. \\
+\texttt{08\_conclusions.tex}, \texttt{sec:test\_slew} & Slew tracking
+targets. \\
+\texttt{07\_control\_algorithms.tex}, \texttt{sec:sim\_environment} &
+Robustness-sweep perturbation magnitude --- set once the identification
+tolerances of A9 are known. \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \section{Empty sections}
+
+\textbf{None.} Both previously-empty content blocks are closed: Appendix D
+(\texttt{12\_control\_algorithm\_detail.tex}) now carries the mode state
+machine, estimator and controller pseudocode, gains table, timing budget and
+fault-response table (residual TBDs tracked as A15); and the former Section~3
+(RW-vs-CMG trade, requirements traceability) is folded into the Introduction
+and the opening of Preliminary Sizing respectively, so there is no longer a
+stub section for it.
+
+Three headings remain deliberately empty, by standing decision rather than by
+omission --- they are commented-out placeholders reserved for content not yet
+written, per the placeholder convention used throughout the document
+(numbered heading + label + one-line note, no filler prose):
 
 \begin{table}[h]
 \centering
@@ -452,47 +376,19 @@ Location & Pending \\
 \toprule
 Section & File & State \\
 \midrule
-\textbf{Appendix D --- Control Algorithms} & \texttt{11\_control\_algorithms.tex} & \blocker{} \textbf{0 bytes.} Input by \texttt{main.tex}:151 and cross-referenced six times as \texttt{app:control\_algorithms} from Sec.~5 and Sec.~6 \\
-\S7.1 NMPC \& warm-start control   & \texttt{07\_future\_work.tex}:4     & Heading only \\
-\S7.2 Autonomous stand-up          & \texttt{07\_future\_work.tex}:6     & Heading only \\
-\S7.4 Single-wheel variant         & \texttt{07\_future\_work.tex}:262   & Heading + comment \\
+NMPC \& warm-start control   & \texttt{08\_conclusions.tex} & Heading only (commented) \\
+Autonomous stand-up          & \texttt{08\_conclusions.tex} & Heading only (commented) \\
+Single-wheel variant         & \texttt{08\_conclusions.tex} & Heading + comment \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-Appendix~D is the most serious content gap in the document: six live
-cross-references point into an empty file. The TDD promises it will contain the
-mode state machine, the estimator and controller in executable pseudocode, the
-fixed gains and tuning parameters, the timing budget and the fault responses.
-
-The three empty Future Work headings should either be written or deleted ---
-empty subsections in a submitted document read worse than a shorter list.
 
 \section{Comment-only stubs}
 
-Twenty subsections exist only as LaTeX comments describing what should be there.
-
-\subsection*{Section 3 --- System Analysis \& Requirements \quad \blocker}
-
-Three of four subsections are stubs. At roughly 230 words this section is a hole
-in the middle of the document and is more conspicuous to an assessor than any
-amount of over-length prose elsewhere.
-
-\begin{table}[h]
-\centering
-\small
-\begin{tabular}{c L{5.0cm} L{7.0cm}}
-\toprule
-Line & Subsection & What the comment asks for \\
-\midrule
-7  & \S3.1 Scope of work \& use cases      & Boundaries of the design effort; the four target behaviours as primary use cases \\
-14 & \S3.2 Actuation trade-off             & RW-vs-CMG justification. Prose exists; the comment is unresolved \\
-48 & \S3.4 Coordinate frames \& conventions & Body frame, world frame, sign conventions for tilt and wheel angle \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection*{Mechanical}
+Down from twenty at the previous scan to one: the seven electrical
+schematic-sheet placeholders (\texttt{11\_electrical\_detail.tex}) are now
+live \texttt{\textbackslash phfig} figures with captions and per-pin tables
+(A14), and the former Section~3 stubs no longer exist as a section.
 
 \begin{table}[h]
 \centering
@@ -501,39 +397,34 @@ Line & Subsection & What the comment asks for \\
 \toprule
 Location & Content \\
 \midrule
-\texttt{05\_hardware\_design.tex}:204 & 2D prototype structural concept \\
-\texttt{05\_hardware\_design.tex}:586 & \S5.5 System Integration --- ``TBD pending CAD'' \\
-\texttt{09\_cad.tex}:97, 101          & 2D prototype construction notes; rig general-assembly figure \\
-\texttt{09\_cad.tex}:107, 111, 112    & 3D cube drawings; exploded view; section view through two orthogonal wheel modules \\
+\texttt{05\_cad\_design.tex}, \texttt{app:cad\_3d} in
+\texttt{10\_cad\_detail.tex} & 3D cube drawings: exploded view; section view
+through two orthogonal wheel modules. Drawing set not yet released --- waits
+on A4. \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection*{Electrical --- eleven figure placeholders}
-
-\texttt{sections/10\_electrical\_detail.tex}: schematic sheets 1--7 at lines 18,
-25, 32, 38, 44, 50 and 55; harness drawing and as-built photograph at lines 123
-and 125; perfboard floorplan and board outline drawing at lines 130 and 133.
-
-Each placeholder already names the constraint the sheet must be verified
-against, so the drawing brief is written --- only the drawings are missing.
-
 \section{Missing figures}
 
-Twenty-one figures are referenced or described but not present: the twenty
-placeholders above, plus one more.
-
 \begin{itemize}
-  \item \texttt{04\_modeling\_control.tex}:21--22 --- free-body diagram of the
-        2D pendulum, labelling $\theta_b$, $\theta_w$, $l$, $l_b$ and the pivot.
-        This is the only figure suggested in Sec.~4, and that section currently
-        has no figures at all.
+  \item \texttt{04\_methodology.tex}, \texttt{sec:2dmodel} --- free-body
+        diagram of the 2D pendulum, labelling $\theta_b$, $\theta_w$, $l$,
+        $l_b$ and the pivot. Unchanged from the previous scan; this is still
+        the only figure suggested but not present in the dynamics section.
+  \item \texttt{05\_cad\_design.tex}, \texttt{app:cad\_3d} --- cube exploded
+        view and the section view named in the comment-only stub above.
 \end{itemize}
+
+The seven electrical schematic sheets are no longer in this list: they render
+as placeholder-art figures (Section~\ref{sec:tbd}, A14) rather than as
+comments, so they are tracked as artwork-pending rather than as missing
+figures.
 
 \section{Defects found alongside the TBDs}
 
-These are not open items in the same sense --- they are errors in content that
-is already written, and each is a short fix.
+Historical record, retained for audit. All rows below predate the
+restructure; renumbered section/table references are current.
 
 \begin{table}[h]
 \centering
@@ -542,16 +433,16 @@ is already written, and each is a short fix.
 \toprule
 \# & Location & Defect \\
 \midrule
-1 & \texttt{05\_hardware\_design} :420 vs \texttt{08\_bom}:86 & \closed{} Battery capacity contradiction (\qty{3600}{} vs \qty{1550}{\milli\ampere\hour}) resolved against the procured pack: Tattu R-Line V5.0, \qty{22.2}{\volt}, \qty{1550}{\milli\ampere\hour}, \num{150}C, XT60. The BOM, the power architecture and \texttt{analysis/SIZING.py} now agree. Note the connector is XT60, not XT90 as previously written. \\
-2 & \texttt{05\_hardware\_design} & \closed{} \texttt{tab:rw\_params} was missing its \texttt{\textbackslash caption} and would not have appeared in the List of Tables. A caption is now present. \\
-3 & \texttt{06\_testing}:65--66 vs \texttt{tab:gates} & G6 hard-kill date stated as 13~August; Table~\texttt{tab:gates} puts G6 at 17~August. A kill date cannot precede the gate it kills. \\
-4 & \texttt{02\_project\_organization} \texttt{\_tasks}:46 & Task B4 says ``Raspberry Pi software architecture''; Sec.~5 and the BOM specify Teensy~4.1 throughout. \\
-5 & \texttt{08\_bom}:64 vs \texttt{tab:cad\_parts} & Brake servo quantity: BOM says 1--3, the CAD part list says 3 brackets, Sec.~5 says ``servos'' plural. \\
-6 & Author list vs \texttt{tab:team\_roles} vs task table & \closed{} Name spelling was inconsistent (``Niccol\`o'' / ``Niccolo'' / ``Nicc''). The report now uses the unaccented ``Niccolo'' throughout: author list, cover, roles table and task table. \\
-7 & \texttt{02\_project\_organization} \texttt{\_tasks}:79--82 & Task IDs C11--C14 appear under the ``3D Design'' block, after D1--D7. \\
-8 & All section files & British/American spelling mixed: realise/realize, characterise/characterize, behaviour/behavior, sometimes within one section. \\
-9 & \texttt{04\_modeling\_control}:131 & Hard-coded \texttt{\textbackslash newpage} splits a sentence across pages mid-argument. \\
-10 & All tables & \closed{} Every float used \texttt{[h]}; all are now \texttt{[htbp]}. No \texttt{[h]} float remains in \texttt{sections/}. \\
+1 & Power architecture vs.\ BOM & \closed{} Battery capacity contradiction resolved against the procured pack: Tattu R-Line V5.0, \qty{22.2}{\volt}, \qty{1550}{\milli\ampere\hour}, \num{150}C, XT60. \\
+2 & \texttt{tab:rw\_params} & \closed{} Missing \texttt{\textbackslash caption} added; now appears in the List of Tables. \\
+3 & G6 hard-kill date vs.\ \texttt{tab:gates} & \closed{} Both now state 17~August. \\
+4 & \texttt{02\_project\_organization\_tasks} & Task B4 says ``Raspberry Pi software architecture''; the rest of the document specifies Teensy~4.1 throughout. \\
+5 & BOM vs.\ CAD part list & Brake servo quantity: BOM says 1--3, the CAD part list says 3 brackets. \\
+6 & Author list vs.\ role/task tables & \closed{} Name spelling unified to ``Niccolo'' throughout. \\
+7 & \texttt{02\_project\_organization\_tasks} & Task IDs C11--C14 appear under the ``3D Design'' block, after D1--D7. \\
+8 & All section files & British/American spelling mixed: realise/realize, characterise/characterize, behaviour/behavior. \\
+9 & \closed{} Hard-coded \texttt{\textbackslash newpage} & Removed with the section it sat in during the restructure. \\
+10 & All tables & \closed{} Every float now uses \texttt{[htbp]}; no \texttt{[h]} float remains in \texttt{sections/}. \\
 11 & \texttt{sections/} & \texttt{code.cpp} and \texttt{code.exe} are untracked in the repo; a compiled binary should not be committed. \\
 \bottomrule
 \end{tabular}
@@ -559,29 +450,31 @@ is already written, and each is a short fix.
 
 \section{Suggested order of work}
 
+This mirrors, and should be kept in sync with, the Immediate Next Steps
+subsection of \texttt{08\_conclusions.tex} (\texttt{sec:next\_steps}).
+
 \begin{enumerate}
-  \item \closed{} \textbf{The three script-versus-document conflicts} of
-        Section~\ref{sec:chain} are resolved --- $\omega_{\max}$ at
-        \qty{6000}{\rpm}, the wheel table rebuilt on the as-designed
-        \qty{120}{\milli\metre} through-hole ring, and the blind-pocket
-        retention argument removed. A1, A2 and A8 were then populated from the
-        converged run (19 TBD closed).
-  \item \textbf{Close the packaging study} (A4) --- now the head of the
-        register. $V_{\min}$ and the clearances release $L$, then $M$. Note
-        that A1, A2 and A8 are populated but \emph{provisional}: they rest on a
-        \qty{610}{\gram} structural allowance, so closing A4 will move them
-        again. That is the next turn of the fixed-point iteration, not a
-        re-opening of settled items.
-  \item \textbf{Write Appendix~D}, or remove the six cross-references that point
-        into it.
-  \item \textbf{Write Section~3}, which is three-quarters empty.
+  \item \textbf{Close the packaging study} (A4) --- still the head of the
+        register. $V_{\min}$ and the clearances release $L$, then $M$. A1, A2
+        and A8 are populated but \emph{provisional}: they rest on a
+        \qty{610}{\gram} structural allowance, so closing A4 moves them again
+        as the next turn of the fixed-point iteration, not a re-opening of
+        settled items.
+  \item \textbf{Build and run the Simulink/Simscape environment}
+        (\texttt{sec:sim\_environment}) against both prototypes' CAD, and
+        re-derive the gains of A15 once A9 (plant ID) reports measured
+        parameters.
   \item \textbf{Do the \ready{} items}, which need no upstream data: A3 (rail
-        budget), A5 (fabrication routes), A6 (print settings), A11 (connectors),
-        A12 (wire gauges).
-  \item \textbf{Fix the eleven defects}, which cost credibility out of
-        proportion to the effort of fixing them.
-  \item \textbf{The remaining \waiting{} items} (A7, A9, A10, A13 and the four
-        prose TBDs) close on hardware and cannot be accelerated on paper.
+        budget), A5 (fabrication routes), A6 (print settings), A11
+        (connectors), A12 (wire gauges).
+  \item \textbf{Decide the board layout} (\texttt{sec:layout}) to close the
+        physical pin numbers of A14.
+  \item \textbf{Fix the remaining defects} (Section~\ref{sec:tbd} above),
+        which cost credibility out of proportion to the effort of fixing
+        them.
+  \item \textbf{The remaining \waiting{} items} (A7, A9, A10, A13, A15 and the
+        three prose TBDs) close on hardware and cannot be accelerated on
+        paper.
 \end{enumerate}
 
 \end{document}
