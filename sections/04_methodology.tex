@@ -17,6 +17,122 @@ command --- is derived separately in Section~\ref{sec:control_algorithms}, since
 sizing, dynamics and control are three passes over the same plant rather than
 three independent problems.
 
+\subsection{Development and Iteration Workflow}
+\label{sec:dev_workflow}
+
+Figure~\ref{fig:methodology_workflow} sets out the six-stage pipeline used to
+take the Cubli from sizing to a validated prototype, and the feedback paths
+that make it an iteration rather than a single pass: a CAD mass update can
+send Stage~1 (Preliminary Sizing) back around, a simulation or control finding
+can send Stage~2 (CAD Design) back around, and hardware-measured plant
+parameters from Stage~6 (Experimental Validation) feed back into Stage~3
+(Simulation and Control). Each stage is detailed in the sections that follow:
+sizing's own internal loop in Section~\ref{sec:sizing_algorithm}, CAD in
+Section~\ref{sec:cad}, simulation and control in
+Sections~\ref{sec:2dmodel}--\ref{sec:3dmodel} and~\ref{sec:control_algorithms},
+electronics and firmware in Section~\ref{sec:electrical}, and validation in
+Section~\ref{sec:verification}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\linewidth]{images/methodology_diagram.png}
+\caption[Development and iteration workflow]{Development and iteration
+workflow, with the three feedback loops that keep sizing, CAD and control
+consistent with each other and with measured hardware.}
+\label{fig:methodology_workflow}
+\end{figure}
+
+\subsection{Sizing Closure Algorithm}
+\label{sec:sizing_algorithm}
+
+The wheel sizing of Section~\ref{sec:massbudget} is not evaluated once: cube
+mass, target inertia and wheel design are mutually dependent, and the design
+point reported there is the fixed point of an iteration, not the result of a
+single pass. Table~\ref{tab:sizing_procedure} states that iteration's six
+stages in prose; Algorithm~\ref{alg:sizing_closure} is their formal statement,
+as implemented in \texttt{analysis/SIZING.py} and run to convergence by hand.
+
+\begin{algorithm}[htbp]
+\caption{Mass--inertia closure procedure (\texttt{analysis/SIZING.py})}
+\label{alg:sizing_closure}
+\begin{algorithmic}[1]
+\Require Initial mass guess $M_0$; fixed inputs $L,\eta,\tau_b,\omega_{\max}$;
+  envelope diameter $D_w$; bill-of-materials line items; structure allowance
+  $A$; closure tolerance $\varepsilon$
+\Ensure Converged cube mass $M^\star$ and wheel design $(D_w,N,m_w,I_w)$
+\State $M \gets M_0$
+\Repeat
+  \State \textit{Stage 1 (jump-up target):} $\tau_g \gets MgL/2$;
+    \textbf{abort} if $\tau_b \le \tau_g$ (brake floor violated)
+  \State \phantom{\textit{Stage 1:}} $\beta \gets \tau_b/(\tau_b-\tau_g)$;\ \
+    $h_w \gets \beta\sqrt{\eta}\,C_{\text{corner}}\,ML^{3/2}$;\ \
+    $I_{w,\text{target}} \gets h_w/\omega_{\max}$
+  \State \textit{Stage 2 (solid wheel):} evaluate bare ring$+$spoke mass
+    $m_{\text{solid}}$ and inertia $I_{\text{solid}}$ at $D_w$
+  \State \textit{Stage 3 (per-station increment):} compute net mass $m_b$ and
+    net inertia $\Delta I_b$ added by one ballast station at its forced
+    centroid radius
+  \State \textit{Stage 4 (solve station count):}
+    $N \gets \big\lceil (I_{w,\text{target}}-I_{\text{solid}})/\Delta I_b
+    \big\rceil$, rounded to the nearest admissible multiple
+  \State \textit{Stage 5 (feasibility):} cap $N$ at $N_{\max}$ (edge-gap
+    rule); check axial wall clearance and bolt retention load; if no $D_w$ in
+    the swept range is feasible, widen the sweep or relax $\omega_{\max}$
+  \State \textit{Stage 6 (mass roll-up):} $m_w \gets m_{\text{solid}} +
+    N\,m_b$;\ \ $M_{\text{est}} \gets \sum(\text{known BOM}) + 3m_w + A$
+  \State $\delta \gets M_{\text{est}} - M$;\qquad $M \gets M_{\text{est}}$
+\Until{$|\delta| < \varepsilon$}
+\State \Return $M^\star \gets M$,\ $(D_w,N,m_w,I_w)$
+\end{algorithmic}
+\end{algorithm}
+
+\paragraph{Convergence behaviour.} Because the achievable inertia grows with
+$D_w^2$ while the requirement grows with $L^{3/2}$ (Section~\ref{sec:massbudget}),
+successive mass estimates approach the fixed point monotonically rather than
+oscillating, and because the station count $N$ moves in discrete steps rather
+than continuously with $M$, the iteration typically lands on the fixed point
+in one or two passes once $N$ stops changing. Table~\ref{tab:convergence_trace}
+records the trace for the current design point: starting from the working
+guess $M_0=\qty{1.4652}{\kilo\gram}$, the station count is already stable at
+the first pass, and the second pass reproduces its own input to
+\qty{0.0}{\gram}. The same fixed point is reached from other starting guesses
+(cold-started at \qty{1.700}{\kilo\gram}, or from the previous design's
+$M=\qty{1.772}{\kilo\gram}$), which is the evidence that the reported point is
+a genuine attractor of the iteration rather than an artefact of the starting
+guess.
+
+\begin{table}[htbp]
+\centering
+\caption[Sizing closure convergence trace]{Sizing closure convergence trace
+for the converged design point (\qty{374}{\gram} structure allowance).}
+\label{tab:convergence_trace}
+\small
+\begin{tabular}{c c c c c c}
+\toprule
+Pass & $M$ assumed (kg) & $N$ & $m_w$ (g) & $M_{\text{est}}$ (kg) & $\delta$ (g) \\
+\midrule
+1 & 1.4652 & 3 & 149.11 & 1.4654 & $+0.2$ \\
+2 & 1.4654 & 3 & 149.11 & 1.4654 & $+0.0$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{A caution specific to this implementation.} Stage~6 is implemented
+as a literal bill of materials, decoupled from Stages~2--5 so that the mass
+budget can be edited independently of the wheel model. The consequence is that
+the reaction-wheel line in that BOM is \emph{not} automatically kept in sync
+with the station count $N$ solved in Stage~4: if a pass changes $N$ --- for
+instance because a lower $M$ lowers $I_{w,\text{target}}$ enough to drop a
+station --- the BOM line must be updated by hand to the new $m_w$ before
+Stage~6 is re-run, or the reported closure is spurious: Stage~6 will silently
+reconcile against the wrong wheel and report $\delta\approx0$ regardless. This
+is not a hypothetical failure mode; it is the one actually encountered while
+re-converging the design in Table~\ref{tab:convergence_trace}, where an
+intermediate pass at an untested $M$ briefly reported an apparent closure that
+was only the stale BOM line still describing the wheel sized for the previous
+guess. The station count and the BOM line should therefore always be checked
+together, not the closure delta alone.
+
 \subsection{2D Reaction-Wheel Pendulum}
 \label{sec:2dmodel}
 
