@@ -135,7 +135,7 @@ a merely positive margin.
 \caption[Torque-limited wheel-inertia target (corner case)]{Torque-limited wheel-inertia target (corner case). Inputs are fixed by
 the closure procedure of Section~\ref{sec:massbudget}; the table is populated on
 each iteration. Values are those of the converged iteration
-(\texttt{analysis/SIZING.py}, Algorithm~\ref{alg:sizing_closure}): $M$ is a
+(\texttt{analysis/SIZING.py}): $M$ is a
 fixed point of the closure, not an assumption, reproduced exactly
 ($\delta=\qty{0.0}{\gram}$) by the Stage~6 roll-up at the rounding used in the
 bill of materials.
@@ -298,8 +298,7 @@ Step & Determines & Governing consideration \\
 \end{tabular}
 \end{table}
 
-Algorithm~\ref{alg:sizing_closure} (Section~\ref{sec:sizing_algorithm}) states
-this procedure formally, as implemented in \texttt{analysis/SIZING.py} and run
+This procedure is implemented formally in \texttt{analysis/SIZING.py} and run
 to convergence by hand.
 
 The two contact cases are not equally demanding. The corner equilibrium requires a larger rise of the
