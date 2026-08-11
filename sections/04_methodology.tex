@@ -41,12 +41,13 @@ after it consumes an output only it produces:
   inertia tensor is validated against the wrong plant.
 \item \textbf{Assembly and Electronics} (Section~\ref{sec:electrical}) begins
   only once a control law exists to bring the hardware up against, so the
-  first closed-loop command a newly wired axis receives is a designed one
-  (Section~\ref{sec:gradual_control}), not an improvised one.
+  first closed-loop command a newly wired axis receives is a designed one,
+  ramped up in stages rather than commanded at full authority
+  (Section~\ref{sec:control_algorithms}).
 \item \textbf{Firmware Architecture} integrates the calibrated sensors and
   drivers of the previous stage into the estimator and control loop Stage~3
   designed.
-\item \textbf{Experimental Validation} (Section~\ref{sec:verification}) is
+\item \textbf{Experimental Validation} (Section~\ref{sec:test_strategy}) is
   last because it is the only stage that checks the previous five against
   reality rather than against each other.
 \end{enumerate}

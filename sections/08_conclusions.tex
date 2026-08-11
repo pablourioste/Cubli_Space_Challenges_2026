@@ -184,10 +184,11 @@ Section~\ref{sec:conclusions_summary}:
         conditions of Table~\ref{tab:state_transitions}, the gains of
         Table~\ref{tab:gains} and the timing budget of
         Table~\ref{tab:timing_budget} close once steps~1--2 above do.
-  \item \textbf{Run the electrical and calibration checks of
-        Section~\ref{sec:verification}} in order --- CAN-bus termination and
-        rail voltages, then IMU and moteus calibration, then the gradual
-        control-authority ramp --- before any unassisted balancing attempt.
+  \item \textbf{Run the electrical and calibration checks} in order --- CAN-bus
+        termination and rail voltages, then IMU and moteus calibration, then
+        the gradual control-authority ramp --- against the validation stage
+        gates of Section~\ref{sec:test_strategy}, before any unassisted
+        balancing attempt.
   \item \textbf{Populate the decidable-now tables}: fabrication routes and
         print settings (Appendix~\ref{app:cad}), the physical pin numbers of
         the per-sheet tables in Appendix~\ref{app:electrical} once the board

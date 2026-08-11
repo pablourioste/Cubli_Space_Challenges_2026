@@ -32,7 +32,7 @@ unconditional disarm path to Fault/safe, omitted below for brevity.}
 \toprule
 From & To & Guard \\
 \midrule
-Idle / disarmed & Wheel spin-up & Explicit arm command; all bring-up checks of Section~\ref{sec:verification} passed \\
+Idle / disarmed & Wheel spin-up & Explicit arm command; all bring-up checks of Section~\ref{sec:test_strategy} passed \\
 Wheel spin-up   & Jump-up       & $|\hat{\dot\theta}_w - \dot\theta_{w,\text{target}}| < $ \textcolor{red}{TBD}, held for \textcolor{red}{TBD} \\
 Jump-up         & Edge balance  & $|\hat\theta_b| < \theta_{\text{th}}$, held for a debounce interval (hysteresis band \textcolor{red}{TBD}) \\
 Edge balance    & Corner balance & Commanded transition, only once edge balance has held $\geq$\textcolor{red}{TBD} \\

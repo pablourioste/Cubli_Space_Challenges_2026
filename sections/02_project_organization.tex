@@ -190,7 +190,7 @@ V1  & Pre-fabrication feasibility (Sec.~\ref{sec:sizing_verification}) & Candida
 V2  & CAD and dimensional verification (Sec.~\ref{sec:cad_verification}) & V1 passed; model complete & No interference; mass roll-up within budget & G2 \\
 V3  & Simulation-first control (Sec.~\ref{sec:sim_environment}) & 2D model of Sec.~\ref{sec:control2d} & Stable under all test cases and perturbation & G2 \\
 V4  & Fabrication and mechanical acceptance (Sec.~\ref{sec:cad_verification}) & V1, V2 passed & Parts within dimensional tolerance; wheel balanced & pre-G3 \\
-V5  & Electrical bring-up (Sec.~\ref{sec:elec_checks}) & V4 parts available & All criteria of Table~\ref{tab:electrical_criteria} & G3, G5 \\
+V5  & Electrical bring-up (Sec.~\ref{sec:electrical}) & V4 parts available & Rail voltage, CAN-bus termination, driver commutation and encoder calibration nominal & G3, G5 \\
 V6  & 1-DoF plant identification (Sec.~\ref{sec:paramid}) & V5 single axis live & Four parameters measured to tolerance & G3 \\
 V7  & 1-DoF control validation (Sec.~\ref{sec:test_1dof}) & V3, V6 passed & Rig balances $\geq$60 s unassisted & G3 \\
 V8  & Edge balance (Sec.~\ref{sec:test_edge}) & V7 passed; cube integrated & $\geq$60 s with disturbance recovery & \textbf{G6} \\

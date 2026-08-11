@@ -135,7 +135,7 @@ Pin & Net & Direction & Level & Function \\
 J6-1 / J7-1 & CAN\_H & Bidir, differential & \qty{2.5}{\volt} $\pm$ swing & Bus high, chain end A / end B \\
 J6-2 / J7-2 & CAN\_L & Bidir, differential & \qty{2.5}{\volt} $\mp$ swing & Bus low, chain end A / end B \\
 J6-3 / J7-3 & GND & In/Out & 0\,V & Bus reference, common return (Sec.~\ref{sec:bus_topology}) \\
-\textcolor{red}{TBD} & $R_{\text{term}}$ (end A, end B) & --- & \qty{120}{\ohm} each & Termination, two physical ends only; \qty{60}{\ohm} $\pm$\qty{3}{\ohm} unpowered across CAN\_H--CAN\_L (Sec.~\ref{sec:elec_checks}) \\
+\textcolor{red}{TBD} & $R_{\text{term}}$ (end A, end B) & --- & \qty{120}{\ohm} each & Termination, two physical ends only; \qty{60}{\ohm} $\pm$\qty{3}{\ohm} unpowered across CAN\_H--CAN\_L (Sec.~\ref{sec:electrical}) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -233,7 +233,7 @@ Pin & Net & Direction & Level & Function \\
 \midrule
 J10-1 & UART\_TX & Out (Teensy$\to$ESP32) & \qty{3.3}{\volt} logic & Telemetry data to the ESP32 \\
 J10-2 & UART\_RX & In (ESP32$\to$Teensy) & \qty{3.3}{\volt} logic & Command/ack path from the ESP32 \\
-J10-3 & 5V\_LOGIC & Out (board$\to$ESP32) & \qty{5.00}{\volt} & ESP32 supply, sized for the \qty{300}{\milli\ampere} transmit burst (Table~\ref{tab:electrical_criteria}) \\
+J10-3 & 5V\_LOGIC & Out (board$\to$ESP32) & \qty{5.00}{\volt} & ESP32 supply, sized for the \qty{300}{\milli\ampere} transmit burst \\
 J10-4 & GND & In/Out & 0\,V & Return \\
 \bottomrule
 \end{tabular}
@@ -263,7 +263,7 @@ Pin & Net & Direction & Level & Function \\
 \midrule
 J11-1 & PWM\_$i$ & Out (Teensy$\to$servo) & \qty{3.3}{\volt} logic, \qty{50}{\hertz} & Servo position command, routed clear of the encoder SPI runs of Sheet~4 \\
 J11-2 & 5V\_LOGIC & Out (board$\to$servo) & \qty{5.00}{\volt} & Servo supply \\
-J11-3 & GND & In/Out & 0\,V & Servo return; flyback path verified per Table~\ref{tab:electrical_criteria} \\
+J11-3 & GND & In/Out & 0\,V & Servo return; flyback path verified during electrical bring-up (Sec.~\ref{sec:electrical}) \\
 \bottomrule
 \end{tabular}
 \end{table}

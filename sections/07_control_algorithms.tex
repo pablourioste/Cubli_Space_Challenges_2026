@@ -184,11 +184,11 @@ torque source at its joint, saturated and rate-limited to the envelope of
 Section~\ref{sec:electrical}; the brake is a discrete event that zeroes the
 relevant wheel-body relative velocity over the $\Delta t$ of
 Equation~\eqref{eq:tau_b_from_dt}. Simulated IMU and encoder blocks apply
-noise and bias models set from the sensor characterisation of
-Section~\ref{sec:sensor_cal} once measured, so that the same estimator and
-control logic of Section~\ref{sec:pure_lqr_logic} --- not a re-implementation
-of it --- runs against simulated sensor data in a controller-in-the-loop
-configuration before it runs against real sensors.
+noise and bias models set from the sensors' characterised behaviour once
+measured on hardware, so that the same estimator and control logic of
+Section~\ref{sec:pure_lqr_logic} --- not a re-implementation of it --- runs
+against simulated sensor data in a controller-in-the-loop configuration
+before it runs against real sensors.
 
 \paragraph{Test cases.} Three cases are run against the LQR baseline: recovery
 from an initial tilt offset, which establishes the region of attraction;
