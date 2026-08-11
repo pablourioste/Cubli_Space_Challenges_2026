@@ -2,36 +2,19 @@
 \section{Methodology}
 \label{sec:methodology}
 
-The full Cubli is underactuated and simultaneously unstable about all three
-axes when balanced on a corner (Section~\ref{sec:objectives}). The approach
-taken here is therefore incremental: a first, single-face 1-DoF prototype is
-built and modelled in two dimensions, so that the dynamics, the parameter
-identification procedure and the estimator can be validated on a plant simple
-enough to reason about directly; the same modelling, identification and
-verification workflow is then generalised to the second and final prototype,
-the fully three-dimensional cube, in Section~\ref{sec:3dmodel}. Each
-subsection below states the equations that define the problem at that stage
-and the method used to determine every parameter that appears in them; the
-control law itself --- how those equations are turned into a feedback
-command --- is derived separately in Section~\ref{sec:control_algorithms}, since
-sizing, dynamics and control are three passes over the same plant rather than
-three independent problems.
+Section~\ref{sec:wbs} assigns every task an owner and a date. This section
+states the reasoning that assignment is built on: the procedure the team
+follows to take the Cubli from a sizing target to a validated prototype, why
+its six stages run in this order and not another, and why the result is an
+iteration rather than a single pass through them.
 
 \subsection{Development and Iteration Workflow}
 \label{sec:dev_workflow}
 
-Figure~\ref{fig:methodology_workflow} sets out the six-stage pipeline used to
-take the Cubli from sizing to a validated prototype, and the feedback paths
-that make it an iteration rather than a single pass: a CAD mass update can
-send Stage~1 (Preliminary Sizing) back around, a simulation or control finding
-can send Stage~2 (CAD Design) back around, and hardware-measured plant
-parameters from Stage~6 (Experimental Validation) feed back into Stage~3
-(Simulation and Control). Each stage is detailed in the sections that follow:
-sizing's own internal loop in Section~\ref{sec:sizing_algorithm}, CAD in
-Section~\ref{sec:cad}, simulation and control in
-Sections~\ref{sec:2dmodel}--\ref{sec:3dmodel} and~\ref{sec:control_algorithms},
-electronics and firmware in Section~\ref{sec:electrical}, and validation in
-Section~\ref{sec:verification}.
+Figure~\ref{fig:methodology_workflow} is that procedure: six stages, each
+committing an output the next stage cannot start without, and three feedback
+paths that reopen an earlier stage when a downstream finding invalidates an
+upstream assumption.
 
 \begin{figure}[htbp]
 \centering
@@ -41,6 +24,70 @@ workflow, with the three feedback loops that keep sizing, CAD and control
 consistent with each other and with measured hardware.}
 \label{fig:methodology_workflow}
 \end{figure}
+
+\paragraph{Why this order.} Each stage sits where it does because the stage
+after it consumes an output only it produces:
+\begin{enumerate}
+\item \textbf{Preliminary Sizing} (Section~\ref{sec:sizing}) fixes cube mass,
+  edge length and target wheel inertia before anything is drawn, because a
+  part modelled to the wrong mass has to be redrawn no matter how well it is
+  drawn.
+\item \textbf{CAD Design} (Section~\ref{sec:cad}) turns those targets into a
+  3D model and an internal packaging study that returns a measured inertia
+  tensor and centre of mass --- figures Stage~1 could only estimate.
+\item \textbf{Simulation and Control} (Sections~\ref{sec:2dmodel}--\ref{sec:3dmodel},
+  \ref{sec:control_algorithms}) is designed against that CAD-derived inertia
+  rather than the Stage~1 estimate, since a controller tuned on the wrong
+  inertia tensor is validated against the wrong plant.
+\item \textbf{Assembly and Electronics} (Section~\ref{sec:electrical}) begins
+  only once a control law exists to bring the hardware up against, so the
+  first closed-loop command a newly wired axis receives is a designed one
+  (Section~\ref{sec:gradual_control}), not an improvised one.
+\item \textbf{Firmware Architecture} integrates the calibrated sensors and
+  drivers of the previous stage into the estimator and control loop Stage~3
+  designed.
+\item \textbf{Experimental Validation} (Section~\ref{sec:verification}) is
+  last because it is the only stage that checks the previous five against
+  reality rather than against each other.
+\end{enumerate}
+
+\paragraph{Why it loops.} A single pass through that order is not sufficient,
+because three of its outputs correct an assumption made earlier in the same
+pass rather than only feeding forward:
+\begin{itemize}
+\item \emph{Mass update.} CAD's as-modelled mass and CoM close the loop into
+  Stage~1's assumed $M$ (Section~\ref{sec:massbudget}), exactly as
+  Algorithm~\ref{alg:sizing_closure} states it: the sizing reported there is
+  the fixed point of this loop, not its first iteration.
+\item \emph{Geometry change.} A control or simulation finding --- inertia
+  short of target, an infeasible slew, an interference the 2D model could not
+  see --- returns to CAD rather than being absorbed by re-tuning gains, since
+  no gain fixes a wheel that does not fit or a body the controller cannot
+  actuate against.
+\item \emph{Measured parameters.} Once hardware exists, the torque constant,
+  friction and latency measured on it (Section~\ref{sec:paramid}) replace the
+  CAD/datasheet estimates Stage~3 was designed on, and the control gains are
+  re-derived against the measured plant rather than flown on assumed values.
+\end{itemize}
+This is also why the schedule of Section~\ref{sec:schedule} gates CAD on the
+sizing numbers rather than running the two in parallel: a frame frozen ahead
+of the inertia tensor is a frame that may have to be reprinted, which costs
+more than the days spent waiting on the number.
+
+The full Cubli is underactuated and simultaneously unstable about all three
+axes when balanced on a corner (Section~\ref{sec:objectives}). Stage~3 of the
+procedure above is therefore itself incremental: a first, single-face 1-DoF
+prototype is built and modelled in two dimensions, so that the dynamics, the
+parameter identification procedure and the estimator can be validated on a
+plant simple enough to reason about directly; the same modelling,
+identification and verification workflow is then generalised to the second
+and final prototype, the fully three-dimensional cube, in
+Section~\ref{sec:3dmodel}. Each subsection below states the equations that
+define the problem at that stage and the method used to determine every
+parameter that appears in them; the control law itself --- how those
+equations are turned into a feedback command --- is derived separately in
+Section~\ref{sec:control_algorithms}, since sizing, dynamics and control are
+three passes over the same plant rather than three independent problems.
 
 \subsection{Sizing Closure Algorithm}
 \label{sec:sizing_algorithm}
