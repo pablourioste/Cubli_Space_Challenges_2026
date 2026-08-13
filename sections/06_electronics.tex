@@ -40,7 +40,16 @@ Section~\ref{sec:control_algorithms}.}
 
 \subsection{Components}
 
-The electronics and software will be built around a microcontroller communicating over a CAN bus with a motor driver that closes the current loop for the selected brushless motor. Wheel speed will be measured with a magnetic encoder on the motor shaft, and body tilt will be estimated from an onboard IMU. Braking will be actuated by a digital servo driven directly from the microcontroller, and a wireless module will provide a telemetry and debugging link. Power will be supplied by a LiPo battery, stepped down through a DC-DC converter for the logic-level electronics, with the motor driver powered directly from the battery bus.
+The electronics and software are built around the Teensy~4.1 microcontroller,
+which communicates over the CAN-FD bus with the mjbots moteus-n1 driver that
+closes the current loop for the MN4006 brushless motor. Wheel speed is
+measured with the MA600 magnetic encoder on the motor shaft, and body tilt is
+estimated from the BMI270 IMU. Braking is actuated by a TowerPro MG92B digital
+servo driven directly from the microcontroller, and the XIAO ESP32-C6 wireless
+module provides a telemetry and debugging link. Power is supplied by the 6S
+LiPo battery, stepped down through an LM2596 DC-DC converter for the
+logic-level electronics, with the motor drivers powered directly from the
+battery bus.
 
 The full parts list is catalogued in Appendix~\ref{app:bom}
 (Table~\ref{tab:bom-supplied}). The supplied set is an electronics-only BOM;

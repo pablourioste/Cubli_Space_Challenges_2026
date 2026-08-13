@@ -67,13 +67,24 @@ The nominal Cubli problem was solved a decade ago on precisely manufactured hard
 \subsection{Objectives}
 \label{sec:objectives}
 
-The project targets four behaviours, deliberately ordered as a difficulty ramp in which each milestone is a control precondition for the next:
+Each project objective imposes a required capability. The mapping below keeps
+every requirement traceable from motivation to capability, and is what the
+sizing and control work below must be shown to satisfy.
 
-\begin{enumerate}
-    \item \textbf{Edge balance} — stabilise the cube on a single edge, the least unstable equilibrium (contact is a line, one primary axis of instability).
-    \item \textbf{Corner balance} — stabilise the cube on a single vertex, the fully unstable equilibrium (point contact, all three axes coupled and unstable simultaneously).
-    \item \textbf{Controlled rotation} — execute a commanded slew between equilibria (e.g.\ edge to edge, or in-place reorientation), demonstrating reference tracking rather than pure regulation.
-    \item \textbf{Walking} — chain repeated, directional controlled falls between edges/corners into a net translation across a surface, re-stabilising after each transition.
-\end{enumerate}
+\begin{table}[htbp]
+\centering
+\caption[Objective-to-requirement traceability]{Objective-to-requirement traceability.}
+\label{tab:traceability}
+\begin{tabular}{lp{0.65\textwidth}}
+\toprule
+Objective & Required capability \\
+\midrule
+Edge balance        & The system must actively maintain dynamic stability and regulate its posture about a single line-contact equilibrium position. \\[0.5em]
+Corner balance      & The system must maintain multi-axis closed-loop balance and attitude control around a highly unstable point-contact equilibrium. \\[0.5em]
+Controlled rotation & The controller must accurately track dynamic reference trajectories to execute smooth slew maneuvers between distinct equilibrium states. \\[0.5em]
+Walking (stretch)   & The system must execute a sequential series of dynamic jump-up maneuvers and rapidly re-stabilize itself upon each landing impact. \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 These map one-to-one onto the applications of Section~\ref{sec:application}: (1)–(2) demonstrate pointing regulation and disturbance rejection of increasing difficulty; (3) demonstrates slew/reference-tracking; (4) demonstrates momentum-exchange mobility of the kind flown on Hayabusa2. Milestones (1)–(3) are treated as committed deliverables for this design; walking (4) is scoped as the stretch objective, contingent on hardware confirmation and the jump-up feasibility check (angular momentum required to tip the cube vs.\ available motor/wheel torque), to be resolved once final components are known.

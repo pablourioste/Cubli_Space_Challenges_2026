@@ -1,0 +1,37 @@
+\section{Results}
+\subsection{Validation Results to Date}
+\label{sec:validation_results}
+
+This subsection reports evidence against the validation stages of
+Section~\ref{sec:test_strategy} and the acceptance criteria of
+Table~\ref{tab:traceability}, in the order the stages are entered. Where no
+result exists yet, the criterion is stated so the gap is explicit rather than
+silent.
+
+\subsubsection{1-DoF Control Validation}
+\label{sec:test_1dof}
+
+The single-axis rig is the protected experimental item of
+Section~\ref{sec:schedule}, and its balance result is the evidence carried into
+this document. Gate G3 requires the rig to balance for at least 60~s unassisted.
+
+Beyond the duration criterion, three quantities are recorded because they
+determine whether the result transfers to the integrated cube rather than merely
+holding on the rig. Recovery from a defined impulse establishes that the balance
+is a stabilised equilibrium and not a fortunate initial condition. Steady-state
+wheel-speed drift measures momentum accumulation: a controller that balances
+while monotonically spinning up is one that will saturate, and the drift rate
+predicts when. Control effort is compared against the continuous and peak current
+limits of the driver given in Appendix~\ref{app:bom}, since a balance sustained
+only by exceeding the continuous rating is not a balance that survives to the
+demonstration.
+
+\subsubsection{3-DoF Control Validation}
+\label{sec:test_3dof}
+
+For the 3D model, control-loop validation to date has achieved edge balance on
+the final prototype using the 1-DoF control law; corner balance has not yet
+been demonstrated. \textcolor{red}{TODO: results comparing edge-balance
+duration, disturbance recovery and control effort against the acceptance
+criteria of Table~\ref{tab:traceability} and the 1-DoF bench results of
+Section~\ref{sec:test_1dof}.} 

@@ -6,7 +6,11 @@ Section~\ref{sec:wbs} assigns every task an owner and a date. This section
 states the reasoning that assignment is built on: the procedure the team
 follows to take the Cubli from a sizing target to a validated prototype, why
 its six stages run in this order and not another, and why the result is an
-iteration rather than a single pass through them.
+iteration rather than a single pass through them. The Cubli is an
+interdisciplinary system whose subsystems cannot be sized, modelled or
+validated in isolation, which is why the methodology below is organised as a
+sequence of stages and validation gates rather than a single design pass.
+
 
 \subsection{Development and Iteration Workflow}
 \label{sec:dev_workflow}
@@ -25,34 +29,41 @@ consistent with each other and with measured hardware.}
 \label{fig:methodology_workflow}
 \end{figure}
 
-\paragraph{Why this order.} Each stage sits where it does because the stage
+\paragraph{Workflow steps} Each stage sits where it does because the stage
 after it consumes an output only it produces:
 \begin{enumerate}
-\item \textbf{Preliminary Sizing} (Section~\ref{sec:sizing}) fixes cube mass,
-  edge length and target wheel inertia before anything is drawn, because a
+\item \textbf{Preliminary Sizing} is the first stage of the project: it derives
+  the physics behind the Cubli and justifies the design parameters and
+  performance targets the rest of the design must meet. It fixes the cube
+  mass, edge length and target wheel inertia before anything is drawn, because a
   part modelled to the wrong mass has to be redrawn no matter how well it is
-  drawn.
-\item \textbf{CAD Design} (Section~\ref{sec:cad}) turns those targets into a
-  3D model and an internal packaging study that returns a measured inertia
-  tensor and centre of mass --- figures Stage~1 could only estimate.
-\item \textbf{Simulation and Control} (Sections~\ref{sec:2dmodel}--\ref{sec:3dmodel},
-  \ref{sec:control_algorithms}) is designed against that CAD-derived inertia
-  rather than the Stage~1 estimate, since a controller tuned on the wrong
-  inertia tensor is validated against the wrong plant.
-\item \textbf{Assembly and Electronics} (Section~\ref{sec:electrical}) begins
-  only once a control law exists to bring the hardware up against, so the
-  first closed-loop command a newly wired axis receives is a designed one,
-  ramped up in stages rather than commanded at full authority
-  (Section~\ref{sec:control_algorithms}).
-\item \textbf{Firmware Architecture} integrates the calibrated sensors and
-  drivers of the previous stage into the estimator and control loop Stage~3
-  designed.
-\item \textbf{Experimental Validation} (Section~\ref{sec:test_strategy}) is
-  last because it is the only stage that checks the previous five against
-  reality rather than against each other.
+  designed (Section~\ref{sec:sizing}).
+\item \textbf{CAD Design} turns those targets into a
+  3D model and an internal packaging study, returning a measured inertia
+  tensor and centre of mass where Stage~1 could only estimate them (Section~\ref{sec:cad}).
+\item \textbf{Simulation and Control} tests control feasibility against the
+  CAD-derived inertia, mass and geometry rather than the Stage~1 estimate,
+  since a controller tuned on the wrong
+  inertia tensor is validated against the wrong plant (Sections~\ref{sec:2dmodel}--\ref{sec:3dmodel},
+  \ref{sec:control_algorithms}).
+\item \textbf{Assembly and Electronics} begins once the design is closed: the
+  cube is assembled, the electronics are placed and wired, and every axis is
+  tested before it is commanded (Section~\ref{sec:electrical}).
+\item \textbf{Firmware Architecture} is developed in parallel with the
+  previous stage: it integrates the electronics around the MCU and implements
+  the control-dynamics loop that converts IMU orientation data into
+  wheel-torque commands. Alongside the flight code, sub-programs are
+  developed to test and calibrate each electronic module individually
+  (Section~\ref{sec:control_sw}).
+\item \textbf{Experimental Validation} is the last stage: once integration
+  concludes, results are tested against the Simulink/Simscape simulation
+  analysis, and any shortfall is traced back to the CAD design, hardware or
+  software rather than patched locally. The workflow accommodates iteration at
+  every stage rather than assuming a single pass succeeds
+  (Section~\ref{sec:test_strategy}).
 \end{enumerate}
 
-\paragraph{Why it loops.} A single pass through that order is not sufficient,
+\paragraph{Iterative loop at each stage} A single pass through that order is not sufficient,
 because three of its outputs correct an assumption made earlier in the same
 pass rather than only feeding forward:
 \begin{itemize}

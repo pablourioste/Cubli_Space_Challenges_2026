@@ -5,12 +5,11 @@
 This section establishes, before any part is committed to fabrication, that a
 cube built to a candidate mass and edge length can actually perform the
 jump-up manoeuvre and carry the components the design assumes. It states what
-sizing must satisfy (Section~\ref{sec:requirements}), the physics that turns a
+sizing must satisfy (Section~\ref{sec:objectives}), the physics that turns a
 target manoeuvre into a required wheel inertia (Section~\ref{sec:jumpup}), the
 packaging constraint that closes the loop between cube size and wheel size
-(Section~\ref{sec:massbudget}), the wheel design that meets the resulting
-target (Section~\ref{sec:rw_sizing}), and the checks that confirm the closure
-is real rather than assumed (Section~\ref{sec:sizing_verification}).
+(Section~\ref{sec:massbudget}) and the wheel design that meets the resulting
+target (Section~\ref{sec:rw_sizing}).
 
 Sizing and the control loop are not a sequence of independent steps: they are
 solved as one problem. The wheel inertia fixed here sets the angular momentum
@@ -25,28 +24,6 @@ Section~\ref{sec:massbudget} is the fixed-point iteration that reconciles
 them, rather than a one-pass mechanical calculation handed to the controller
 afterwards.
 
-\subsection{Requirements Traceability}
-\label{sec:requirements}
-
-Each project objective (Section~\ref{sec:objectives}) imposes a required capability.
-The mapping below keeps every requirement traceable from motivation to capability,
-and is what the sizing and control work below must be shown to satisfy.
-
-\begin{table}[htbp]
-\centering
-\caption[Objective-to-requirement traceability]{Objective-to-requirement traceability.}
-\label{tab:traceability}
-\begin{tabular}{lp{0.65\textwidth}}
-\toprule
-Objective & Required capability \\
-\midrule
-Edge balance        & The system must actively maintain dynamic stability and regulate its posture about a single line-contact equilibrium position. \\[0.5em]
-Corner balance      & The system must maintain multi-axis closed-loop balance and attitude control around a highly unstable point-contact equilibrium. \\[0.5em]
-Controlled rotation & The controller must accurately track dynamic reference trajectories to execute smooth slew maneuvers between distinct equilibrium states. \\[0.5em]
-Walking (stretch)   & The system must execute a sequential series of dynamic jump-up maneuvers and rapidly re-stabilize itself upon each landing impact. \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 \subsection{Jump-Up Feasibility Analysis}
 \label{sec:jumpup}
@@ -134,13 +111,7 @@ a merely positive margin.
 \centering
 \caption[Torque-limited wheel-inertia target (corner case)]{Torque-limited wheel-inertia target (corner case). Inputs are fixed by
 the closure procedure of Section~\ref{sec:massbudget}; the table is populated on
-each iteration. Values are those of the converged iteration
-(\texttt{analysis/SIZING.py}): $M$ is a
-fixed point of the closure, not an assumption, reproduced exactly
-($\delta=\qty{0.0}{\gram}$) by the Stage~6 roll-up at the rounding used in the
-bill of materials.
-$\tau_b$ is an assumed value pending measurement, justified below and
-equivalent to a \qty{40}{\milli\second} stop at the present $h_w$.}
+each iteration. Values are those of the converged iteration.}
 \label{tab:jumpup_budget}
 \begin{tabular}{llr}
 \toprule
@@ -498,107 +469,3 @@ step~6 of Table~\ref{tab:sizing_procedure} returns approximately zero.
 Selection among admissible diameters is made on minimum \emph{wheel mass}
 rather than minimum diameter.
 
-\subsection{Sizing Verification}
-\label{sec:sizing_verification}
-
-The purpose of this stage is to establish, before any part is committed to
-fabrication, that the wheel about to be built can deliver the jump-up manoeuvre.
-This is a stricter question than whether the wheel meets its inertia target,
-because the target is itself the output of a model whose assumptions are not
-exact.
-
-\subsubsection{Two Independent Routes, Compared}
-
-Section~\ref{sec:jumpup} contains two derivations of the jump-up requirement that
-proceed from different assumptions, and this stage evaluates both rather than
-selecting one. The collision relation of Section~\ref{sec:jumpup} treats the
-wheel--body interaction as a perfectly inelastic impact and returns the required
-wheel speed $\omega_w$ directly from the body inertia and mass distribution. The
-torque-limited momentum budget of Equations~\eqref{eq:hw_ideal}
-and~\eqref{eq:Iw_target} instead treats the achievable wheel speed as fixed and
-returns the required inertia $I_{w,\text{target}}$, while additionally accounting
-for a finite brake torque that the collision relation idealises away.
-
-Agreement between the two is the evidence that the sizing is sound; disagreement
-is a finding in its own right and is reported rather than reconciled by choosing
-the more favourable result. The comparison is recorded in
-Table~\ref{tab:jumpup_gate}.
-
-\begin{table}[htbp]
-\centering
-\caption[Pre-fabrication feasibility gate]{Pre-fabrication feasibility gate. Pass conditions are stated as
-relations because the quantities they relate are outputs of the closure
-procedure of Section~\ref{sec:massbudget}, not inputs fixed here.}
-\label{tab:jumpup_gate}
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{L{4.0cm} L{3.0cm} L{2.4cm} L{3.7cm}}
-\toprule
-Quantity & Source & Value & Pass condition \\
-\midrule
-Required wheel speed $\omega_w$ & Collision relation, Sec.~\ref{sec:jumpup} & \textcolor{red}{TBD}\textsuperscript{\textdagger} & $\leq$ achievable speed with margin \\
-Achievable wheel speed $\omega_{\max}$ & Drive analysis, Sec.~\ref{sec:jumpup_target} & \qty{6000}{\rpm} & Sustained in service, not no-load \\
-Speed margin $\omega_w/\omega_{\max}$ & Derived & \textcolor{red}{TBD}\textsuperscript{\textdagger} & $<1$ by a stated margin \\
-Target inertia $I_{w,\text{target}}$ & Eq.~\eqref{eq:Iw_target} & \qty{3.1735e-4}{\kilogram\metre\squared} & --- \\
-Achieved inertia $I_w$ & Wheel design, Sec.~\ref{sec:rw_sizing} & \qty{3.6903e-4}{\kilogram\metre\squared} & $\geq I_{w,\text{target}}$ \\
-Route disagreement & Both of the above & \qty{+16.3}{\percent} & Reported; explained if large \\
-Ballast trim authority & Sec.~\ref{sec:rw_sizing} & $-2 / +34$ stations & Non-zero in both directions \\
-Ballast retention margin & Sec.~\ref{sec:rw_sizing} & \qty{1.28}{\percent} of proof; \qty{3.51}{\mega\pascal} bearing & Bolt tension and head/nut bearing stress within allowables \\
-\bottomrule
-\end{tabular}
-
-\vspace{0.4em}
-{\footnotesize\RaggedRight\textsuperscript{\textdagger}\,The collision-route cross-check ($\omega_w$ and the
-speed margin) draws on CAD-derived body inertia and mass-distribution figures
-($I_b, m_b, l_b$) that are independent of the mass--inertia closure of
-Section~\ref{sec:massbudget} and were not re-run as part of this convergence
-pass; the values above are cleared pending that re-derivation against the
-revised $M$, rather than carried forward from the pre-convergence design
-point.\par}
-\end{table}
-
-The gate passes on every row except the two pending re-derivation. Trim
-authority is now considerably more comfortable in both directions than the
-previous iteration. Upward trim is ample: the gap rule admits \num{34} further
-stations before $N_{\max}=37$ is reached, enough to more than treble the
-inertia. Downward trim is real but tight in absolute terms, because only three
-stations are installed to begin with: the wheel sits \qty{16.3}{\percent}
-above target while each station is worth roughly \qty{6.8}{\percent} of it, so
-two of the three stations may be removed with margin in hand, but removing all
-three (returning to the bare ring, which alone reaches only
-\qty{95.9}{\percent} of target) fails the requirement. The practical
-consequence is unchanged in direction: this design absorbs a
-\emph{heavier}-than-predicted cube comfortably and has less room for a lighter
-one, which is the favourable direction given that roughly \qty{26}{\percent}
-of Table~\ref{tab:massbudget} is still allowance and allowances more often
-prove optimistic than pessimistic. Should the structure come in light, the
-relief variable is $\omega_{\max}$ rather than the ballast count.
-
-\subsubsection{Brake-Torque Sensitivity}
-
-The brake-amplification factor $\beta = \tau_b/(\tau_b - \tau_g)$ of
-Equation~\eqref{eq:Iw_target} diverges as $\tau_b \to \tau_g$, so the inertia
-target is not merely uncertain in $\tau_b$ but unboundedly sensitive to it near
-the floor. A single assumed value of $\tau_b$ would therefore carry an unstated
-and potentially unbounded error into every downstream number.
-
-This stage consequently requires $\tau_b$ to be reported as a sensitivity sweep
-rather than as a point value: $I_{w,\text{target}}$ is tabulated across a range
-of candidate brake torques, and the achieved wheel inertia is checked against
-each. The output of interest is the lowest brake torque at which the design still
-closes, which converts an unmeasured parameter into a stated requirement on the
-brake. That requirement is discharged when the brake torque is measured on
-hardware during the electrical bring-up of Section~\ref{sec:electrical}; until
-then the sweep, not an assumption, is what the design rests on.
-
-\subsubsection{Trim Authority}
-
-Because $h_w \propto M L^{3/2}$, a mass overrun raises the inertia requirement
-rather than leaving it fixed, and the wheel must therefore retain the ability to
-be corrected in both directions after the cube is weighed. The ballast scheme of
-Section~\ref{sec:rw_sizing} provides this as a discrete trim, and this stage
-records how much of it remains unspent at the selected operating point: a design
-sitting only marginally above its target has no authority to absorb a mass
-overrun and is recorded as failing this gate even when the nominal inertia check
-passes. The trim is reported as the number of ballast elements that may be added
-or removed before the target is missed.

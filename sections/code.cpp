@@ -16,6 +16,7 @@ constexpr float kRpm = 12.0f;  // negate this to spin the other direction
 constexpr auto kMaxDuration = std::chrono::milliseconds(600000);  // 10 min hard safety cap; Ctrl+C stops sooner -- raise this for a longer continuous run
 constexpr auto kCommandPeriod = std::chrono::milliseconds(20);    // well under moteus's 100ms watchdog
 
+
 constexpr char kPort[] = R"(\\.\COM7)";
 const std::string kMoteusId = "8001";  // same target that worked for the status query
 
