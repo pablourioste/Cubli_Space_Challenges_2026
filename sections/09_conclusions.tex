@@ -141,7 +141,7 @@ the wheels are treated as identical. A reward or cost of the form
 c[k] = \hat x^{\mathrm T}[k]\,W_x\,\hat x[k] + \rho\,\|u[k]\|^2 + \sigma\,\|\omega_w[k]\|^2
 \label{eq:tuner_cost}
 \end{equation}
-adds an explicit penalty on stored wheel momentum, which the nominal LQR cost
+Equation~\eqref{eq:tuner_cost} adds an explicit penalty on stored wheel momentum, which the nominal LQR cost
 $J(u)$ of Section~\ref{sec:control2d} does not distinguish from any other
 state deviation. This term is the one directly relevant to the saturation
 problem raised in Section~\ref{sec:application}: it expresses a preference for
