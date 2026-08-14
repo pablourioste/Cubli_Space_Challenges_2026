@@ -1,293 +1,469 @@
-% ================= 4. METHODOLOGY =================
-\section{Methodology}
-\label{sec:methodology}
+% ================= 3. PRELIMINARY SIZING =================
+\section{Preliminary Sizing}
+\label{sec:sizing}
 
-Section~\ref{sec:wbs} assigns every task an owner and a date. This section
-states the reasoning that assignment is built on: the procedure the team
-follows to take the Cubli from a sizing target to a validated prototype, why
-its six stages run in this order and not another, and why the result is an
-iteration rather than a single pass through them. The Cubli is an
-interdisciplinary system whose subsystems cannot be sized, modelled or
-validated in isolation, which is why the methodology below is organised as a
-sequence of stages and validation gates rather than a single design pass.
+This section confirms, before fabrication, that a cube of a candidate mass and
+edge length can perform the jump-up manoeuvre while carrying its own
+components. It covers: the sizing requirements
+(Section~\ref{sec:objectives}); the physics converting a target manoeuvre into
+a required wheel inertia (Section~\ref{sec:jumpup}); the packaging constraint
+linking cube size to wheel size (Section~\ref{sec:massbudget}); and the wheel
+design meeting that target (Section~\ref{sec:rw_sizing}).
 
+Sizing and control are solved together, not sequentially. Wheel inertia sets
+the angular momentum and torque available to the controller for arresting a
+fall --- a wheel sized without the control law in mind can be mechanically
+sufficient yet dynamically useless. Conversely, the control law's saturation
+behaviour (how aggressively it must desaturate stored momentum, how much
+recovery angle it must cover) sets how much sizing margin is needed. Each
+depends on the other, so Section~\ref{sec:massbudget}'s closure procedure is a
+fixed-point iteration between them, not a one-pass calculation handed off
+afterward.
 
-\subsection{Development and Iteration Workflow}
-\label{sec:dev_workflow}
+\subsection{Jump-Up Feasibility Analysis}
+\label{sec:jumpup}
 
-Figure~\ref{fig:methodology_workflow} is that procedure: six stages, each
-committing an output the next stage cannot start without, and three feedback
-paths that reopen an earlier stage when a downstream finding invalidates an
-upstream assumption.
+Given CAD-derived $I_b, I_w, m_b, l_b, m_w, l$, the wheel speed $\omega_w$
+required for jump-up is estimated before fabrication, assuming a perfectly
+inelastic wheel-body collision. Conservation of angular momentum at impact and
+of energy from impact to edge-standing yield
+\begin{equation}
+\omega_w^2 = (2-\sqrt2)\,\frac{I_w+I_b+m_wl^2}{I_w^2}\,(m_bl_b+m_wl)\,g.
+\end{equation}
+This value is checked against the motor's achievable speed at the available
+bus voltage and used to size wheel inertia (radius, rim mass) within the
+motor's operating range without excessively reducing the balancing recovery
+angle. Post-fabrication, $\omega_w$ is refined experimentally to correct for
+deviations from the ideal collision assumption.
 
-\begin{figure}[htbp]
+The braking mechanism uses a servo-driven barrier that strikes a bolt head on
+the wheel to stop it abruptly. Servo response time bounds the validity of the
+``instantaneous stop'' assumption; a slower stop yields a lower effective
+post-impact body velocity than predicted, compensated through the same tuning
+process.
+
+\subsubsection{Torque-Limited Wheel-Inertia Target}
+\label{sec:jumpup_target}
+
+The relation above assumes an instantaneous, lossless momentum transfer. For
+preliminary sizing, motor speed is treated as fixed and the required per-wheel
+inertia is instead derived from a momentum budget that also accounts for
+finite brake torque, giving an ideal per-wheel angular momentum:
+\begin{equation}
+h_{w,\text{ideal}} = \sqrt{\eta}\;\frac{\sqrt{2 g\,\lambda\,\kappa}}{n}\;M L^{3/2},
+\label{eq:hw_ideal}
+\end{equation}
+where $M, L, g$ are cube mass, edge length, and gravity, $\eta$ is an energy
+margin, and $\kappa,\lambda,n$ are dimensionless geometric factors set by the
+contact case (Table~\ref{tab:contact_factors}). The corner case is more
+demanding and governs the design.
+
+\begin{table}[htbp]
 \centering
-\includegraphics[width=0.8\linewidth]{images/methodology_diagram.png}
-\caption[Development and iteration workflow]{Development and iteration
-workflow, with the three feedback loops that keep sizing, CAD and control
-consistent with each other and with measured hardware.}
-\label{fig:methodology_workflow}
-\end{figure}
+\caption[Contact-case geometric factors]{Contact-case geometric factors.}
+\label{tab:contact_factors}
+\begin{tabular}{lccc}
+\toprule
+Case & $\kappa$ (pivot inertia) & $\lambda$ (CoM rise) & $n$ (momentum transfer) \\
+\midrule
+Edge & $2/3$ & $1/\sqrt2 - 1/2$ & $1$ \\
+Corner (governs design) & $11/12$ & $\sqrt3/2 - 1/2$ & $\sqrt2$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\paragraph{Workflow steps} Each stage sits where it does because the stage
-after it consumes an output only it produces:
-\begin{enumerate}
-\item \textbf{Preliminary Sizing} is the first stage of the project: it derives
-  the physics behind the Cubli and justifies the design parameters and
-  performance targets the rest of the design must meet. It fixes the cube
-  mass, edge length and target wheel inertia before anything is drawn, because a
-  part modelled to the wrong mass has to be redrawn no matter how well it is
-  designed (Section~\ref{sec:sizing}).
-\item \textbf{CAD Design} turns those targets into a
-  3D model and an internal packaging study, returning a measured inertia
-  tensor and centre of mass where Stage~1 could only estimate them (Section~\ref{sec:cad}).
-\item \textbf{Simulation and Control} tests control feasibility against the
-  CAD-derived inertia, mass and geometry rather than the Stage~1 estimate,
-  since a controller tuned on the wrong
-  inertia tensor is validated against the wrong plant (Sections~\ref{sec:2dmodel}--\ref{sec:3dmodel},
-  \ref{sec:control_algorithms}).
-\item \textbf{Assembly and Electronics} begins once the design is closed: the
-  cube is assembled, the electronics are placed and wired, and every axis is
-  tested before it is commanded (Section~\ref{sec:electrical}).
-\item \textbf{Firmware Architecture} is developed in parallel with the
-  previous stage: it integrates the electronics around the MCU and implements
-  the control-dynamics loop that converts IMU orientation data into
-  wheel-torque commands. Alongside the flight code, sub-programs are
-  developed to test and calibrate each electronic module individually
-  (Section~\ref{sec:control_sw}).
-\item \textbf{Experimental Validation} is the last stage: once integration
-  concludes, results are tested against the Simulink/Simscape simulation
-  analysis, and any shortfall is traced back to the CAD design, hardware or
-  software rather than patched locally. The workflow accommodates iteration at
-  every stage rather than assuming a single pass succeeds
-  (Section~\ref{sec:test_strategy}).
-\end{enumerate}
+A finite brake torque $\tau_b$ cannot deliver the impulse instantaneously and
+must exceed the gravitational tip-over torque $\tau_g = MgL/2$. This loss is
+captured by a brake-amplification factor
+\begin{equation}
+\beta = \frac{\tau_b}{\tau_b - \tau_g},
+\qquad
+h_w = \beta\,h_{w,\text{ideal}},
+\qquad
+I_{w,\text{target}} = \frac{h_w}{\omega_{\max}},
+\label{eq:Iw_target}
+\end{equation}
+where $\omega_{\max}$ is the maximum practical wheel speed.
+Equations~\eqref{eq:hw_ideal}--\eqref{eq:Iw_target} are the sizing relations
+used at step~4 of Section~\ref{sec:massbudget}'s closure procedure: given a
+candidate mass and edge length, they return the inertia the wheel of
+Section~\ref{sec:rw_sizing} must meet. Their inputs, recorded in
+Table~\ref{tab:jumpup_budget}, are not fixed in advance --- $M$ and $L$ are
+outputs of the packaging closure, not assumptions preceding it.
 
-\paragraph{Iterative loop at each stage} A single pass through that order is not sufficient,
-because three of its outputs correct an assumption made earlier in the same
-pass rather than only feeding forward:
+\begin{table}[htbp]
+\centering
+\caption[Torque-limited wheel-inertia target (corner case)]{Torque-limited wheel-inertia target (corner case). Inputs are fixed by
+the closure procedure of Section~\ref{sec:massbudget}; the table is populated on
+each iteration. Values are those of the converged iteration.}
+\label{tab:jumpup_budget}
+\begin{tabular}{llr}
+\toprule
+Symbol & Description & Value \\
+\midrule
+$M$                & Cube mass                    & \qty{1.4654}{\kilo\gram} \\
+$L$                & Cube edge length             & \qty{149}{\milli\metre} \\
+$\eta$             & Energy margin                & \num{1.05} \\
+$\tau_b$           & Brake torque per wheel       & \qty{5}{\newton\metre} (assumed; see below) \\
+$\tau_g = MgL/2$   & Gravitational tip-over floor & \qty{1.071}{\newton\metre} \\
+$\beta$            & Brake-amplification factor   & \num{1.273} \\
+$\omega_{\max}$    & Max wheel speed (design)     & \qty{6000}{\rpm}\textsuperscript{*} \\
+$h_w$              & Required angular momentum    & \qty{0.1994}{\kilo\gram\metre\squared\per\second} \\
+$I_{w,\text{target}}$ & \textbf{Target wheel inertia} & \qty{3.1735e-4}{\kilogram\metre\squared} \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.4em}
+{\footnotesize\RaggedRight\textsuperscript{*}\,The sizing has additionally been
+run at \qty{5000}{\rpm} as an over-dimensioning check. Since
+$I_{w,\text{target}} = h_w/\omega_{\max}$, the lower speed raises the inertia
+requirement by a factor $6/5$ and so demands more ballast; a wheel that closes
+at \qty{5000}{\rpm} therefore closes at \qty{6000}{\rpm} with margin in hand.
+\qty{6000}{\rpm} is the value the design claims, \qty{5000}{\rpm} the
+conservative case it was verified against.\par}
+\end{table}
+
+Two features of these relations govern how the iteration behaves:
 \begin{itemize}
-\item \emph{Mass update.} CAD's as-modelled mass and CoM close the loop into
-  Stage~1's assumed $M$ (Section~\ref{sec:massbudget}): the sizing reported
-  there is the fixed point of this loop, not its first iteration.
-\item \emph{Geometry change.} A control or simulation finding --- inertia
-  short of target, an infeasible slew, an interference the 2D model could not
-  see --- returns to CAD rather than being absorbed by re-tuning gains, since
-  no gain fixes a wheel that does not fit or a body the controller cannot
-  actuate against.
-\item \emph{Measured parameters.} Once hardware exists, the torque constant,
-  friction and latency measured on it (Section~\ref{sec:paramid}) replace the
-  CAD/datasheet estimates Stage~3 was designed on, and the control gains are
-  re-derived against the measured plant rather than flown on assumed values.
+  \item $h_w \propto ML^{3/2}$ --- growing the cube to fit a larger wheel also
+  raises the requirement; convergence needs achievable inertia ($\sim D_w^2$)
+  to grow faster than this.
+  \item $\beta$ diverges as $\tau_b\to\tau_g$ --- a brake only marginally above
+  the tip-over torque cannot deliver the required impulse at any wheel speed.
+  $\tau_b$ must therefore be checked against $\tau_g=MgL/2$ every iteration,
+  keeping a comfortable ratio $\tau_b/\tau_g$ rather than a bare positive
+  margin.
 \end{itemize}
-This is also why the schedule of Section~\ref{sec:schedule} gates CAD on the
-sizing numbers rather than running the two in parallel: a frame frozen ahead
-of the inertia tensor is a frame that may have to be reprinted, which costs
-more than the days spent waiting on the number.
 
-The full Cubli is underactuated and simultaneously unstable about all three
-axes when balanced on a corner (Section~\ref{sec:objectives}). Stage~3 of the
-procedure above is therefore itself incremental: a first, single-face 1-DoF
-prototype is built and modelled in two dimensions, so that the dynamics, the
-parameter identification procedure and the estimator can be validated on a
-plant simple enough to reason about directly; the same modelling,
-identification and verification workflow is then generalised to the second
-and final prototype, the fully three-dimensional cube, in
-Section~\ref{sec:3dmodel}. Each subsection below states the equations that
-define the problem at that stage and the method used to determine every
-parameter that appears in them; the control law itself --- how those
-equations are turned into a feedback command --- is derived separately in
-Section~\ref{sec:control_algorithms}, since sizing, dynamics and control are
-three passes over the same plant rather than three independent problems.
+\paragraph{Selection of $\omega_{\max}$.} Maximum wheel speed is a design
+choice, not a datasheet figure: it enters sizing directly through
+$I_{w,\text{target}}=h_w/\omega_{\max}$, so a higher assumed speed permits a
+proportionally smaller wheel. It is the primary relief variable when the
+envelope caps the wheel below the requirement (step~5,
+Table~\ref{tab:sizing_procedure}) --- but it must reflect what the drive can
+sustain in service, not the no-load figure $K_vV_{\text{bus}}$. Three effects
+separate the two:
+\begin{itemize}
+  \item winding resistance, which costs speed under the torque needed to spin
+  the wheel up;
+  \item reduced phase voltage available under sinusoidal field-oriented
+  modulation;
+  \item pack voltage sag through the discharge curve, taken at its lower end so
+  the manoeuvre stays available on a partly-depleted pack, not only a fresh
+  one.
+\end{itemize}
+The design value sits below the resulting ceiling, leaving margin for motor
+tolerance, bearing and aerodynamic drag, and residual uncertainty in $M$.
+Back-EMF should remain a comfortable fraction of usable bus voltage, and the
+electrical frequency $\omega_{\max}p/2\pi$ (at $p$ pole pairs) must sit inside
+the driver's commutation capability --- both to be confirmed once motor and
+pack are selected.
 
-\subsection{2D Reaction-Wheel Pendulum}
-\label{sec:2dmodel}
+\paragraph{Selection of $\tau_b$.} Unlike the other inputs, $\tau_b$ cannot be
+read from a datasheet, because the brake does not generate it directly. The
+mechanism is a servo-driven barrier struck by a bolt head on the wheel: the
+servo only \emph{holds} the barrier in the wheel's path, while the wheel's own
+momentum does the work of the collision. The servo's stall torque is therefore
+not $\tau_b$ and need not approach it --- the TowerPro MG92B
+(Table~\ref{tab:bom-supplied}) is rated near \qty{0.29}{\newton\metre}, about
+one seventeenth of the sizing value. The servo only resists the barrier being
+deflected; it does not decelerate the wheel.
 
-The 1-DoF prototype is a 3D-printed plate sized to one cube face, with a
-motor-driven momentum wheel at its centre and a braking mechanism at one
-corner. The plate pivots on a bearing at that corner, constraining motion to a
-single rotational degree of freedom in a vertical plane.
+Since the stop is a collision rather than a friction clutch, $\tau_b$ is not
+an independent property of any component and is fixed entirely by how quickly
+angular momentum is destroyed:
+\begin{equation}
+\tau_b = \frac{h_w}{\Delta t}.
+\label{eq:tau_b_from_dt}
+\end{equation}
+Quoting a brake torque is therefore equivalent to asserting a stopping time. At
+the present operating point ($h_w \approx
+\qty{0.1994}{\kilo\gram\metre\squared\per\second}$), the design value
+$\tau_b=\qty{5}{\newton\metre}$ implies $\Delta t \approx
+\qty{40}{\milli\second}$ --- characteristic of servo travel, not a rigid
+impact. A bolt head striking a printed barrier should instead arrest the wheel
+in a few milliseconds, implying a substantially larger $\tau_b$, so the design
+value is expected to be conservative for sizing.
 
-\subsubsection{Equations of Motion}
-\label{sec:2deom}
-
-The nonlinear equations of motion are
-\begin{align}
-\ddot{\theta}_b &= \frac{(m_b l_b + m_w l)\, g \sin\theta_b - T_m - C_b \dot{\theta}_b + C_w \dot{\theta}_w}{I_b + m_w l^2}, \\
-\ddot{\theta}_w &= \frac{(I_b + I_w + m_w l^2)(T_m - C_w \dot{\theta}_w)}{I_w (I_b + m_w l^2)} \notag \\
-&\quad - \frac{(m_b l_b + m_w l)\, g \sin\theta_b - C_b \dot{\theta}_b}{I_b + m_w l^2},
-\end{align}
-with motor current-torque relation $T_m = K_m u$. Symbols are defined in
-Table~\ref{tab:2d_vars} and used throughout this section.
+That conservatism is deliberate and asymmetric: since
+$\beta=\tau_b/(\tau_b-\tau_g)$ falls toward unity as $\tau_b$ grows,
+\emph{underestimating} $\tau_b$ inflates the inertia requirement (the safe
+direction), while overestimating it leaves the wheel undersized.
+Table~\ref{tab:taub_sensitivity} shows how lopsided this is: the penalty
+concentrates almost entirely on the low side, so a mid-range value is adopted
+over the higher figure a short impact would justify.
 
 \begin{table}[htbp]
 \centering
-\caption[2D pendulum model variables]{2D pendulum model variables.}
-\label{tab:2d_vars}
-\begin{tabular}{lll}
+\caption[Sensitivity of $I_{w,\text{target}}$ to $\tau_b$]{Sensitivity of the inertia requirement to the assumed brake torque, relative to the design value $\tau_b=\qty{5}{\newton\metre}$.}
+\label{tab:taub_sensitivity}
+\begin{tabular}{lc}
 \toprule
-Symbol & Description & Unit \\
+$\tau_b$ change & Effect on $I_{w,\text{target}}$ \\
 \midrule
-$\theta_b$ & Body tilt angle & rad \\
-$\theta_w$ & Wheel rotation relative to body & rad \\
-$m_b, m_w$ & Body, wheel mass & kg \\
-$I_b, I_w$ & Body (about pivot), wheel (about motor axis) inertia & kg\,m$^2$ \\
-$l$ & Motor axis to pivot distance & m \\
-$l_b$ & Body CoM to pivot distance & m \\
-$g$ & Gravitational acceleration & m/s$^2$ \\
-$T_m$ & Motor torque & N\,m \\
-$C_b, C_w$ & Body, wheel damping coefficient & kg\,m$^2$/s \\
-$K_m$ & Motor torque constant & N\,m/A \\
-$u$ & Motor current input & A \\
+\qty{5}{\newton\metre} $\to$ \qty{10}{\newton\metre}  & $-\qty{12}{\percent}$ (relaxes) \\
+\qty{5}{\newton\metre} $\to$ \qty{2}{\newton\metre}   & $+\qty{69}{\percent}$ (inflates) \\
+\qty{5}{\newton\metre} $\to$ \qty{1.5}{\newton\metre} & $+\qty{175}{\percent}$ (inflates) \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\newpage
-\subsection{Parameter Identification \& the 2D Testbed}
-\label{sec:paramid}
+One consequence carries into the structural design: $\tau_b$ is also a
+\emph{load}, and the sizing value should not be reused to size the barrier,
+bolt, servo bracket, or wheel spokes --- a genuine few-millisecond stop puts an
+order of magnitude more torque through that load path. Until measurement
+settles the question, the structure is checked against a short-$\Delta t$ case
+while the dynamics use $\tau_b=\qty{5}{\newton\metre}$. The spin-down test of
+Section~\ref{sec:sizing_verification} closes this gap, reporting both the
+impulse-equivalent mean $\bar\tau_b=h_w/\Delta t$ (the sizing quantity) and the
+peak torque (the structural one); the two may differ several-fold, and the
+logging rate must resolve a few-millisecond event without smoothing the peak
+away.
 
-CAD mass-properties simulation, accounting for print material, infill, and
-mounted hardware (driver, encoder, MCU, gyroscope/accelerometer, wiring),
-gives $m_b, m_w, I_b, I_w$ directly, while $l$ and $l_b$ follow from the
-plate's design geometry. The damping coefficients $C_b$ and $C_w$ cannot be
-obtained from CAD, since they depend on bearing friction, wiring drag, and
-motor cogging; nominal values are used for the initial control design and
-replaced by the measured values below once the prototype is fabricated.
+\subsection{Sizing Constraints and Closure Procedure}
+\label{sec:massbudget}
+
+Cube edge length $L$ and reaction-wheel inertia $I_w$ are not independent
+choices --- they are two ends of a single constraint chain, beginning with
+what must physically fit inside the cube. This section states that chain and
+the order in which it closes. No dimensions are committed here: component
+selection remains open (Sections~\ref{sec:cad}, \ref{sec:electrical}), and the
+numbers follow from the procedure rather than preceding it.
+
+The chain runs in the order of Table~\ref{tab:sizing_procedure}. Internal
+volume is dominated by the LiPo pack and the subframe carrying it (locating
+the three motors on mutually perpendicular axes through a common centre,
+together with drivers, flight controller, IMU, and brake servos). The pack is
+incompressible and sits near the geometric centre to keep the centre of mass
+on the body diagonal, so $L$ is the smallest edge length containing that
+volume plus wall thickness and contact features. $L$ then caps wheel diameter
+$D_w$, and with it the achievable inertia $I_w \sim m_wD_w^2/4$ --- ballast
+cannot rescue a wheel short of its maximum diameter, since it necessarily sits
+inboard of the ring it displaces.
+
+Against that stands the jump-up requirement (Section~\ref{sec:jumpup_target}),
+\[
+I_{w,\text{target}} = \frac{h_w(M, L)}{\omega_{\max}},
+\qquad
+h_w \propto M L^{3/2},
+\]
+which rises with both $M$ and $L$. Two consequences close the loop: enlarging
+the cube to gain wheel diameter also raises the requirement, but achievable
+inertia grows faster than the requirement ($D_w^2$ against $L^{3/2}$), so a
+short wheel at a given $L$ can be closed by a modest increase in $L$; and any
+mass added this way feeds back through $h_w\propto M$ and through the tip-over
+torque $\tau_g=MgL/2$ the brake must exceed --- which is why the procedure
+terminates at a fixed point rather than in one pass.
 
 \begin{table}[htbp]
 \centering
-\caption[Parameter determination method]{Parameter determination method (symbols per Table~\ref{tab:2d_vars}).}
-\label{tab:params}
-\begin{tabular}{ll}
-\toprule
-Symbol & Determination method \\
-\midrule
-$l$   & Calculated during design \\
-$l_b$ & Calculated during design \\
-$m_b$ & CAD mass properties \\
-$m_w$ & CAD mass properties \\
-$I_b$ & CAD mass properties \\
-$I_w$ & CAD mass properties \\
-$C_b$ & Estimated (measured on the 1-DoF rig, below) \\
-$C_w$ & Estimated (measured on the 1-DoF rig, below) \\
-$K_m$ & Motor datasheet \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\paragraph{1-DoF plant identification.} Four parameters are measured on the
-single-axis rig once it is built, each by a method chosen so that the quantity
-of interest dominates the measurement rather than appearing as a small
-correction to something else. These measured values replace the CAD/datasheet
-estimates of Table~\ref{tab:params} before the control gains used on hardware
-are finalised (Section~\ref{sec:control_algorithms}).
-
-\begin{table}[htbp]
-\centering
-\caption[Plant parameters measured on the 1-DoF rig]{Plant parameters measured on the 1-DoF rig. Expected values follow from
-the design point and are populated when it closes.}
-\label{tab:paramid_methods}
+\caption[Sizing closure procedure]{Sizing closure procedure. Steps are executed in order; a failure at
+step 4 returns to step 3 or step 1 as indicated.}
+\label{tab:sizing_procedure}
 \small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{L{2.9cm} L{6.1cm} L{2.6cm} c}
+\begin{tabular}{c L{4.6cm} L{6.4cm}}
 \toprule
-Parameter & Method & Instrument & Value \\
+Step & Determines & Governing consideration \\
 \midrule
-Torque constant $K_t$ & Current step against a locked rotor; torque from measured reaction & Driver current telemetry & \textcolor{red}{TBD} \\
-Body inertia $J$ & Free-swing test about the pivot; inertia from the measured oscillation period & Encoder or IMU log & \textcolor{red}{TBD} \\
-Friction & Wheel coast-down from speed; viscous and Coulomb terms separated by fit & Encoder log & \textcolor{red}{TBD} \\
-Loop latency & Command-to-response timestamp through the full sense--compute--actuate path & Loopback on the flight computer & \textcolor{red}{TBD} \\
+1 & Battery pack geometry & Capacity and discharge rating for the jump-up duty cycle \\
+2 & Inner clear volume $V_{\min}$, hence minimum $L$ & Pack $+$ motor subframe $+$ driver/controller stack, non-intersecting; pack near centre \\
+3 & Maximum wheel diameter $D_w$, hence achievable $I_w$ & Clearance to subframe, motor body and the two orthogonal modules \\
+4 & Requirement $I_{w,\text{target}} = h_w(M,L)/\omega_{\max}$ & Corner jump-up, Eqs.~\eqref{eq:hw_ideal}--\eqref{eq:Iw_target} \\
+5 & Accept or iterate & If $I_w < I_{w,\text{target}}$: raise $L$ (step 2), raise $\omega_{\max}$, or trim $M$; re-enter at step 3 \\
+6 & Mass reconciliation & Updated $M$ feeds back into step 4; iterate to a fixed point \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Tolerances are stated with the measured values, since a parameter without a
-tolerance cannot support the robustness sweep of Section~\ref{sec:control_algorithms}
-that consumes it. Loop latency is measured through the complete path rather than
-estimated from the \qty{1}{\kilo\hertz} loop rate, because the scheduling and
-bus-transport contributions are the ones a rate figure omits.
+This procedure is implemented formally in \texttt{analysis/SIZING.py} and run
+to convergence by hand.
 
-\subsection{Generalization to the 3D Cube}
-\label{sec:3dmodel}
-
-The dynamics, identification workflow, and verification approach validated on the
-2D model of the first prototype extend to the second and final prototype: the
-full three-dimensional cube, where three orthogonal reaction wheels must
-stabilise the body about its edge and corner equilibria.
-
-\subsubsection{Full-Body Equations of Motion}
-
-With $R\in SO(3)$ the cube's orientation and $\omega_b\in\mathbb{R}^3$ its
-body-frame angular velocity, the attitude kinematics are
-\begin{equation}
-\dot R = R\,[\omega_b]_\times,
-\end{equation}
-where $[\cdot]_\times$ is the skew-symmetric cross-product matrix. The
-assembly's angular momentum about the pivot, expressed in the body frame,
-generalizes the single-axis momentum term of the 2D model:
-\begin{equation}
-H = I\omega_b + \sum_{i=1}^{3} I_{w,i}\,\omega_{w,i}\,e_i.
-\end{equation}
-Euler's equation gives
-\begin{equation}
-\dot H + \omega_b \times H = \tau_g - C_b\,\omega_b,
-\end{equation}
-and each wheel obeys
-\begin{equation}
-I_{w,i}\big(\dot\omega_{b,i} + \dot\omega_{w,i}\big) = T_{m,i} - C_{w,i}\,\omega_{w,i}, \qquad i=1,2,3.
-\end{equation}
-Table~\ref{tab:3d_vars} defines all symbols.
+The two contact cases are not equally demanding: the corner equilibrium needs
+a larger centre-of-mass rise and a less favourable momentum-transfer geometry
+than the edge equilibrium, so at a common $\omega_{\max}$ it demands the
+greater wheel inertia (Table~\ref{tab:contact_factors}). Step~4 is therefore
+always evaluated for the corner case --- a wheel meeting the corner
+requirement meets the edge requirement with margin. Table~\ref{tab:inertia_cases}
+records both once the procedure closes.
 
 \begin{table}[htbp]
 \centering
-\caption[Full-body (3D) model variables]{Full-body (3D) model variables.}
-\label{tab:3d_vars}
-\begin{tabular}{ll}
+\caption[Required per-wheel inertia by contact case]{Required per-wheel inertia by contact case, evaluated at
+$\omega_{\max}=\qty{6000}{\rpm}$ for the converged $M=\qty{1.4654}{\kilo\gram}$.
+Only the geometry factor differs between the cases: $\tau_g$ and $\beta$ are
+properties of the cube and the brake, not of the feature it stands on.}
+\label{tab:inertia_cases}
+\begin{tabular}{lccc}
 \toprule
-Symbol & Description \\
+Contact case & $h_w$ (kg\,m$^2$/s) & $I_{w,\text{target}}$ (kg\,m$^2$) & Relative \\
 \midrule
-$R$ & Cube orientation relative to world frame \\
-$\omega_b$ & Body angular velocity, body frame ($\in\mathbb{R}^3$) \\
-$\omega_{b,i} = e_i^{\mathrm T}\omega_b$ & Body angular velocity about wheel axis $i$ \\
-$\omega_w = (\omega_{w,1},\omega_{w,2},\omega_{w,3})$ & Wheel angular velocities relative to body \\
-$e_i$ & Spin axis of wheel $i$ (face normal) \\
-$I$ & $3\times3$ inertia tensor, body+wheels, about pivot \\
-$H$ & Total angular momentum about pivot \\
-$\tau_g = m\,r_{cm}\times(R^{\mathrm T}\hat g)$ & Gravity torque about pivot \\
-$m$ & Total assembly mass \\
-$r_{cm}$ & Body-frame vector, pivot to assembly CoM \\
-$\hat g$ & World vertical unit vector \\
-$C_b$ & $3\times3$ body damping matrix \\
-$I_{w,i}, C_{w,i}$ & Inertia, damping of wheel $i$ \\
-$T_{m,i} = K_{m,i}u_i$ & Motor torque, wheel $i$ \\
-$u_i, K_{m,i}$ & Motor current, torque constant, wheel $i$ \\
+Edge                       & \num{0.1809} & \num{2.8790e-4} & \qty{90.7}{\percent} \\
+\textbf{Corner (critical)} & \num{0.1994} & \num{3.1735e-4} & \qty{100}{\percent} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Restricting motion to a single vertical plane with two wheel torques set to
-zero recovers the 2D model exactly, with $I_b, l_b, m_b, m_w, I_w,
-C_b, C_w$ the corresponding single-axis projections of $I, r_{cm}, m, I_{w,i},
-C_{w,i}$.
+The corner case demands \qty{9.3}{\percent} more inertia than the edge case,
+so sizing on it covers the edge case with margin. The selected wheel delivers
+\qty{3.6903e-4}{\kilogram\metre\squared} (Table~\ref{tab:rw_params}) ---
+\qty{116.3}{\percent} of the corner requirement and \qty{128.2}{\percent} of
+the edge requirement.
 
-\subsubsection{Edge vs.\ Corner Equilibria \& Linearisation}
+Table~\ref{tab:massbudget} is the bookkeeping side of steps 5 and 6:
+populated as components are selected and re-totalled each iteration, since the
+total is both an input to $I_{w,\text{target}}$ and an output of the design.
 
-Jump-up proceeds in two stages: Flat-to-Edge, where one wheel brakes,
-followed by Edge-to-Corner, where a second wheel brakes. \textbf{Edge
-balancing} constrains the body to a single axis, so the dynamics reduce to
-the 2D form of Section~\ref{sec:2deom}, with $m_b, l_b, I_b$ replaced by their
-edge equivalents.
+\begin{table}[htbp]
+\centering
+\caption[Mass budget (per cube)]{Mass budget (per cube), rolled up from the bill of materials by
+\texttt{analysis/SIZING.py} (Stage~6). The total is an input to the inertia
+requirement, not only a result: the value below is the \emph{converged} one,
+which the closure reproduces exactly ($\delta = \qty{0.0}{\gram}$) against the
+$M$ assumed in Table~\ref{tab:jumpup_budget}.}
+\label{tab:massbudget}
+\small
+\begin{tabular}{l c c l}
+\toprule
+Subsystem & Mass (g) & Share & Basis \\
+\midrule
+Reaction wheels ($3\times\qty{149.11}{\gram}$) & 447.3 & \qty{30.5}{\percent} & Sized (Sec.~\ref{sec:rw_sizing}) \\
+Motors and brake servos ($3\times$ each)      & 245.4 & \qty{16.7}{\percent} & Datasheet \\
+Power (battery, XT60, regulator)              & 279.0 & \qty{19.0}{\percent} & Drives envelope (step 1) \\
+Electronics (drivers, MCU, encoders, IMU)     &  74.2 & \qty{5.1}{\percent}  & Datasheet \\
+Wiring, perfboard and passives                &  45.5 & \qty{3.1}{\percent}  & Estimated \\
+\midrule
+\textbf{Subtotal --- specified hardware}      & \textbf{1091.4} & \qty{74.5}{\percent} & Measured or datasheet \\
+Structure (subframe, frame, fasteners)        & 374.0 & \qty{25.5}{\percent} & \textbf{Allowance, pending CAD} \\
+\midrule
+\textbf{Total $M$}                            & \textbf{1465.4} & & \textbf{Converged fixed point} \\
+\bottomrule
+\end{tabular}
 
-\textbf{Corner balancing} is genuinely 3D: all three wheels contribute across
-three rotational DOF. Linearising about the corner-up equilibrium
-$(\theta,\omega_b,\omega_w)=(0,0,0)$, with $\theta\in\mathbb{R}^3$ the small
-orientation error, gives the same state-space form as the 2D case:
-\begin{equation}
-\dot x(t) = Ax(t) + Bu(t), \qquad x := (\theta,\omega_b,\omega_w) \in \mathbb{R}^9,
-\end{equation}
-with $A \in \mathbb{R}^{9\times9}$ and $B \in \mathbb{R}^{9\times3}$ built
-from $I$, $r_{cm}$, and the per-wheel parameters $I_{w,i}, C_{w,i}, K_{m,i}$
-(Table~\ref{tab:3d_vars}). This linear model, together with its 2D counterpart
-of Section~\ref{sec:2deom}, is the plant the balancing controller of
-Section~\ref{sec:control_algorithms} is designed on.
+\vspace{0.4em}
+{\footnotesize\RaggedRight The structure line is an \emph{allowance}, not a
+measurement, and at roughly \qty{26}{\percent} of the total it is still the
+dominant uncertainty in the budget, even after the \qty{610}{\gram} figure of
+the previous iteration was revised down to \qty{374}{\gram}
+(subframe \qty{153}{\gram}, frame \qty{184}{\gram}, fasteners/harness
+\qty{37}{\gram}, held at the same relative split). It is reported separately
+from the specified hardware for that reason: the subtotal is what the design
+currently knows, and the total is what it currently projects. Closing the CAD
+model replaces the allowance with a real figure and re-enters the loop at
+step~6.\par}
+\end{table}
+
+\subsection{Reaction-Wheel Sizing}
+\label{sec:rw_sizing}
+
+The wheel must supply the inertia $I_{w,\text{target}}$ demanded by the corner
+jump-up (Section~\ref{sec:jumpup_target}), fit within the envelope's outer
+diameter (step~3, Table~\ref{tab:sizing_procedure}), and stay light enough not
+to dominate cube mass, since its own mass feeds back into $I_{w,\text{target}}$
+through $M$. These three demands pull against each other, so the wheel
+architecture is chosen to be trimmable after fabrication rather than needing
+to be right the first time.
+
+\paragraph{Architecture: ballasted ring.} Rather than scaling a solid disc,
+the wheel is a printed \emph{ring plus spokes} tuned by \emph{ballast}:
+standard M6 steel bolt-and-nut sets fitted through round clearance holes
+drilled \emph{radially} through the ring's cross-section, from the inner bore
+surface to the outer rim surface --- a true ID-to-OD through-hole, not one
+drilled through the wheel's face. Each hole's depth is fixed at the ring's
+radial width, and its centroid sits at the mean radius
+$R_{\text{mean}}=(D_w+D_i)/4$ by construction, with no free pitch-circle radius
+to choose. Hole diameter is instead capped by the wheel's axial thickness, with
+a printed wall retained on both faces. Each station removes plastic and adds
+steel at very nearly the largest available radius, so the net inertia gain per
+station is large, and the target is reached simply by choosing how many
+stations to populate.
+
+The bolt is also the retention feature: the nut threads on and clamps the
+ring, so nothing depends on a plastic pocket floor. Each station carries the
+centrifugal load $F=m_{\text{hw}}\,\omega_{\max}^2\,R_{\text{mean}}$ of its own
+hardware, reacted by the bolt in tension and by bearing of the head and nut
+faces --- now against the ring's curved ID and OD surfaces rather than a flat
+face, so both are spot-faced flat (or fitted with a curved washer) to seat
+squarely, checked in Section~\ref{sec:sizing_verification}. A nyloc or
+threadlocked nut is specified so vibration cannot back it off.
+
+The geometry is defined by the quantities of Table~\ref{tab:rw_params}, all of
+which follow from the envelope closure of Section~\ref{sec:massbudget} and are
+recorded there once fixed.
+
+\begin{table}[htbp]
+\centering
+\caption[Reaction-wheel geometry and ballast parameters]{Reaction-wheel
+geometry and ballast parameters. Values are the current design point of the
+iteration described below; they are provisional while the structural mass of
+Table~\ref{tab:massbudget} remains an allowance.}
+\label{tab:rw_params}
+\small
+\begin{tabular}{l L{6.4cm} c}
+\toprule
+Symbol & Parameter & Value \\
+\midrule
+$D_w$      & Ring outer diameter (fixed by envelope)   & \qty{120}{\milli\metre} \\
+$D_i$      & Ring inner diameter ($D_w - 2w_r$)        & \qty{100}{\milli\metre} \\
+$w_r$      & Ring radial width (= ballast hole depth)  & \qty{10}{\milli\metre} \\
+$t$        & Wheel axial thickness (caps hole diameter) & \qty{20}{\milli\metre} \\
+$n_s, w_s$ & Spoke count and width                     & $3$, \qty{10}{\milli\metre} \\
+$\rho_p$   & Printed-material density (PET-CF)          & \qty{1290}{\kilo\gram\per\metre\cubed} \\
+$d_h$      & Ballast hole diameter (M6 clearance)      & \qty{6.4}{\milli\metre} \\
+$R_{\text{mean}}$ & Ballast centroid radius (forced, $=(D_w{+}D_i)/4$) & \qty{55.0}{\milli\metre} \\
+$m_{\text{hw}}$ & Hardware mass per station (bolt $+$ nut) & \qty{7.5}{\gram} \\
+$m_b$      & \emph{Net} mass added per station          & \qty{7.085}{\gram} \\
+$\Delta I_b$ & \emph{Net} inertia added per station     & \qty{2.151e-5}{\kilogram\metre\squared} \\
+$N$        & Station count reaching $I_{w,\text{target}}$ (of $N_{\max}=37$) & \num{3} \\
+$m_w$      & Resulting wheel mass                      & \qty{149.11}{\gram} \\
+$I_w$      & Resulting wheel inertia                   & \qty{3.6903e-4}{\kilogram\metre\squared} \\
+           & \quad as a fraction of $I_{w,\text{target}}$ & \qty{116.3}{\percent} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The ballast is characterised \emph{net} of the plastic each hole displaces:
+$m_b$ and $\Delta I_b$ are the increments the installed bolt-and-nut adds over
+the radial cylinder of material it replaces, evaluated at the forced centroid
+radius $R_{\text{mean}}$. Both corrections use the parallel-axis theorem about
+the spin axis, retaining each feature's own-axis term rather than treating it
+as a point mass --- here the \emph{transverse} solid-cylinder term
+$r_h^2/4+w_r^2/12$, since the hole's axis is radial (perpendicular to the spin
+axis), unlike a face-drilled hole. Sizing then reduces to solving
+\[
+I_w(D_w,N) = I_{w,\text{ring}}(D_w) + N\,\Delta I_b \geq I_{w,\text{target}}
+\]
+for the smallest admissible $N$ at each candidate $D_w$, subject to the fit
+and mass checks below.
+
+\paragraph{Sizing calculator and iteration procedure.} These relations are
+implemented as a parametric calculator mapping the geometry of
+Table~\ref{tab:rw_params} onto the mass and inertia of one wheel: it sweeps
+candidate outer diameters and, for each, returns the required station count,
+the count the gap rule admits, resulting mass and inertia, and the pass/fail
+state of every constraint. It is not an optimiser, and the reported design
+point was not found by one.
+
+Outer diameter $D_w$ is not free to choose --- it is imposed by the packaging
+envelope, since three orthogonal wheel modules and the battery must fit within
+$L$ --- so the sweep is retained for what it reveals, not what it selects.
+Left free to minimise wheel mass, the calculator prefers a larger ring, since
+$I_{zz}\sim mR^2$ makes mass at large radius buy inertia more cheaply: the
+unconstrained optimum at the present target is \qty{130}{\milli\metre}
+(\qty{139.83}{\gram}/wheel, no ballast needed), so the envelope constraint at
+\qty{120}{\milli\metre} costs about \qty{9.3}{\gram} per wheel
+(\qty{27.8}{\gram} over three) --- a modest penalty at this design point. This
+is the price of a wheel that fits, and a wheel that does not fit is not a
+candidate.
+
+The procedure followed is the fixed-point iteration of
+Table~\ref{tab:sizing_procedure}, run by hand: a cube mass is estimated and a
+mass budget assembled; the jump-up analysis converts that mass into an
+inertia requirement; the wheel is sized against it subject to volume and
+hole-pattern constraints; and the resulting wheel mass feeds back into the
+budget that started the loop. The cycle repeats until the geometry
+simultaneously fits the internal volume, meets the inertia requirement, and
+reproduces the cube mass it assumed --- convergence is what closes the design,
+with step~6 of Table~\ref{tab:sizing_procedure} returning approximately zero.
+
+Selection among admissible diameters is made on minimum \emph{wheel mass}, not
+minimum diameter.
