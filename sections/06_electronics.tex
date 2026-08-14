@@ -143,35 +143,14 @@ E-stop and fuse.}
 \end{figure}
 
 The rail-by-rail current budget that sizes the buck converter and the harness
-conductors is Table~\ref{tab:power_budget}. It is populated from measurement
+conductors --- Teensy 4.1, ESP32-C6 telemetry, BMI270 IMU, the three MG92B
+brake servos and three MA600 encoders on the \qty{5}{\volt} logic rail, and the
+three moteus-n1 drivers on the pack rail --- is populated from measurement
 during bench bring-up rather than from datasheet maxima alone, because the
 figure that matters for the \qty{5}{\volt} rail is the coincident worst case ---
 telemetry transmit burst, servo stall and full sensor load at once --- and not
-the sum of typical values.
-
-\begin{table}[htbp]
-\centering
-\caption[Rail current budget]{Rail current budget. Measured values replace estimates during bench
-bring-up; the \qty{5}{\volt} total is checked against the LM2596 rating, which
-derates without a heatsink.}
-\label{tab:power_budget}
-\small
-\begin{tabular}{L{4.4cm} c c c L{3.4cm}}
-\toprule
-Load & Rail & Typical (mA) & Worst case (mA) & Basis \\
-\midrule
-Teensy 4.1                & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Datasheet \\
-XIAO ESP32-C6 telemetry   & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & TX burst governs \\
-BMI270 IMU                & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Datasheet \\
-MG92B brake servos ($3\times$) & \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Simultaneous stall current governs \\
-MA600 encoders ($3\times$)& \qty{5}{\volt}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Datasheet \\
-\midrule
-\textbf{Logic rail total} & \qty{5}{\volt}  & \textcolor{red}{\textbf{TBD}} & \textcolor{red}{\textbf{TBD}} & \textbf{vs.\ converter rating} \\
-\midrule
-moteus-n1 drivers ($3\times$) & Pack & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Spin-up, not balance, governs \\
-\bottomrule
-\end{tabular}
-\end{table}
+the sum of typical values. The \qty{5}{\volt} total is checked against the
+LM2596 rating, which derates without a heatsink.
 
 \subsection{Schematic and Interconnect Diagrams}
 \label{sec:schematics}
@@ -193,7 +172,7 @@ capture of Figure~\ref{fig:schematic_full} before bring-up.}
 Block & Governing constraint to verify \\
 \midrule
 Power entry and protection & E-stop, fuse rating, anti-spark inrush into the driver bulk capacitance \\
-\qty{5}{\volt} logic rail & Converter rating vs.\ Table~\ref{tab:power_budget} worst case; back-feed diode; rail bulk capacitance voltage rating \\
+\qty{5}{\volt} logic rail & Converter rating vs.\ measured worst-case rail current; back-feed diode; rail bulk capacitance voltage rating \\
 CAN-FD bus & Linear topology, stub length, split termination at the two physical ends only (Sec.~\ref{sec:bus_topology}) \\
 Encoder interfaces ($3\times$) & SPI cable length and encoder air gap; driver placement follows from this, not the reverse \\
 Flight computer and IMU & Sensor orientation and mounting location relative to the pivot (Sec.~\ref{sec:control_algorithms}) \\

@@ -34,7 +34,7 @@ distance in order to achieve the \qty{20}{\milli\tesla} --
 Each block of the capture is checked against its governing constraint before
 bring-up: power entry and protection against the fuse rating and the inrush
 into the driver bulk capacitance; the \qty{5}{\volt} logic rail against the
-converter rating and the worst-case rail total of Table~\ref{tab:power_budget};
+converter rating and the measured worst-case rail total (Section~\ref{sec:power_arch});
 the CAN-FD bus against the linear-topology and termination rules of
 Table~\ref{tab:signal_rules}; the encoder interfaces against the SPI cable
 length limit and the \qty{3.3}{\milli\metre} air gap; the flight computer and
@@ -119,32 +119,15 @@ J11 & Board              & Brake servo, axis $i$ & \textcolor{red}{TBD} & PWM, \
 \subsection{Harness Drawings and Wire Schedule}
 \label{app:harness}
 
-Table~\ref{tab:wire_schedule} is the wire schedule. Conductor gauge on the motor
-bus is set by the spin-up current rather than the balancing current, since
-spin-up is the sustained high-current phase; the signal runs are set by length
-limits rather than by current.
-
-\begin{table}[htbp]
-\centering
-\caption[Wire schedule]{Wire schedule. Motor-bus gauge is sized on spin-up current; signal runs
-are length-limited (Table~\ref{tab:signal_rules}). Note: values have not been finalized at this preliminary stage. }
-\label{tab:wire_schedule}
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{c L{3.4cm} c c L{3.8cm}}
-\toprule
-Ref & Run & Gauge & Length & Sizing basis \\
-\midrule
-H1 & Pack to protection      & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Peak bus current \\
-H2 & Protection to board     & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Peak bus current \\
-H3 & Board to driver drops (3) & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Per-axis spin-up current \\
-H4 & Motor phase leads (3)   & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Motor phase current \\
-H5 & CAN chain segments      & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Topology, not current \\
-H6 & Encoder SPI runs (3)    & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Length limit governs \\
-H7 & Servo drives (3)        & \textcolor{red}{TBD} & \textcolor{red}{TBD} & Stall current \\
-\bottomrule
-\end{tabular}
-\end{table}
+The harness is organised into seven runs: pack to protection, protection to
+board, board to the three driver drops, the three motor phase leads, the CAN
+chain segments, the three encoder SPI runs, and the three servo drives. Wire
+gauge on the motor bus (pack-to-protection, protection-to-board, driver drops
+and motor phase leads) is sized on spin-up current rather than the balancing
+current, since spin-up is the sustained high-current phase; the CAN and
+encoder SPI runs are sized on length limits rather than current
+(Table~\ref{tab:signal_rules}); the servo drives are sized on stall current.
+Gauge and run length are recorded once measured on the assembled harness.
 
 % Figure placeholder: distribution harness drawing -- pack lead, protection
 % element, and the three driver drops, with labelling scheme.
@@ -228,7 +211,7 @@ Wheel inertia $I_w$ (spin-down)& \textcolor{red}{TBD} & Table~\ref{tab:params}, 
 Viscous and Coulomb friction   & \textcolor{red}{TBD} & $C_b$, $C_w$ estimates \\
 Command-to-encoder latency     & \textcolor{red}{TBD} & Loop timing, Sec.~\ref{sec:control_sw} \\
 Achievable wheel speed on bus  & \textcolor{red}{TBD} & $\omega_{\max}$, Sec.~\ref{sec:jumpup_target} \\
-Logic rail load, worst case    & \textcolor{red}{TBD} & Table~\ref{tab:power_budget} \\
+Logic rail load, worst case    & \textcolor{red}{TBD} & Sec.~\ref{sec:power_arch} \\
 Runtime per charge under balance load & \textcolor{red}{TBD} & Demonstration planning \\
 \bottomrule
 \end{tabular}
