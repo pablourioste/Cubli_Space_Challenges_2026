@@ -31,20 +31,49 @@ distance in order to achieve the \qty{20}{\milli\tesla} --
 \qty{80}{\milli\tesla} nominal magnetic field for the MA600 encoder is
 \qty{3.3}{\milli\metre}.
 
-Each block of the capture is checked against its governing constraint before
-bring-up: power entry and protection against the fuse rating and the inrush
-into the driver bulk capacitance; the \qty{5}{\volt} logic rail against the
-converter rating and the measured worst-case rail total (Section~\ref{sec:power_arch});
-the CAN-FD bus against the linear-topology and termination rules of
-Table~\ref{tab:signal_rules}; the encoder interfaces against the SPI cable
-length limit and the \qty{3.3}{\milli\metre} air gap; the flight computer and
-IMU against the sensor orientation and mounting location relative to the pivot
-required by Section~\ref{sec:control_algorithms}; the telemetry link against
-its transmit-burst current and return path off the logic rail; and the brake
-servo drive against stall-current headroom on the logic rail, with its PWM
-routed clear of the encoder SPI. The full constraint table is given in
-Section~\ref{sec:schematics} (Table~\ref{tab:schematic_sheets}) and is not
-repeated here.
+Each block of the capture is checked against its own layout, mounting and
+connection constraint before bring-up. That constraint table
+(Table~\ref{tab:schematic_sheets}) is given in Section~\ref{sec:components},
+ahead of the schematic itself, and is not repeated here. Component current
+ratings are given in Appendix~\ref{app:electrical_ratings}
+(Table~\ref{tab:electrical_ratings}).
+
+\subsection{Component Current Ratings}
+\label{app:electrical_ratings}
+
+Table~\ref{tab:electrical_ratings} states the current each component on the
+\qty{5}{\volt} logic rail and the pack rail is rated to draw. It replaces a
+measured-consumption table: at this stage no bench data exists, and a table of
+data\-sheet ratings is a stronger design input than an empty one, since the
+\qty{5}{\volt} rail is sized against the coincident worst case --- telemetry
+transmit burst, servo stall and full sensor load at once --- and not the sum
+of typical values. Two entries are marked as unavailable rather than
+estimated: neither manufacturer publishes a stall or supply-current figure for
+that part, and a fabricated number would be worse than an honest gap. Both are
+closed by the bench measurement of Table~\ref{tab:electrical_measured} during
+electrical bring-up (Section~\ref{sec:electrical_safety}).
+
+\begin{table}[htbp]
+\centering
+\caption[Component current ratings]{Component current ratings, by rail. Datasheet figures where
+published; measured values replace these per Table~\ref{tab:electrical_measured}.}
+\label{tab:electrical_ratings}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{L{3.4cm} c L{2.6cm} L{5.2cm}}
+\toprule
+Component & Rail & Rated current & Basis \\
+\midrule
+Teensy 4.1 & \qty{5}{\volt} & ${\approx}\,\qty{100}{\milli\ampere}$ & Board only, \qty{600}{\mega\hertz}, no shields (PJRC community data) \\
+XIAO ESP32-C6 telemetry & \qty{5}{\volt} & ${\approx}\,\qty{300}{\milli\ampere}$ & TX burst (Table~\ref{tab:bom-supplied}) \\
+BMI270 IMU & \qty{5}{\volt} & ${\approx}\,\qty{0.7}{\milli\ampere}$ & Typical, full \qty{6.4}{\kilo\hertz} ODR (Bosch datasheet) \\
+MG92B brake servo (each, $3\times$) & \qty{5}{\volt} & \textcolor{red}{Not published} & TowerPro does not publish a stall-current figure; measure during bring-up \\
+MA600 encoder (each, $3\times$) & \qty{5}{\volt} & \textcolor{red}{Not published} & MPS datasheet does not state supply current in the accessible electrical table; measure during bring-up \\
+moteus-n1 driver (each, $3\times$) & Pack & \qty{100}{\ampere} peak / \qty{9}{\ampere} cont. & Datasheet (Table~\ref{tab:bom-supplied}) \\
+MN4006 motor (each, $3\times$, via driver) & Pack & \qty{16}{\ampere} peak, thermally limited & Manufacturer bench data (Sec.~\ref{sec:architecture}) \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 % The full schematic is drawn on its own landscape page rather than scaled into
 % the text block: reduced to \textwidth in portrait the reference designators
@@ -211,7 +240,9 @@ Wheel inertia $I_w$ (spin-down)& \textcolor{red}{TBD} & Table~\ref{tab:params}, 
 Viscous and Coulomb friction   & \textcolor{red}{TBD} & $C_b$, $C_w$ estimates \\
 Command-to-encoder latency     & \textcolor{red}{TBD} & Loop timing, Sec.~\ref{sec:control_sw} \\
 Achievable wheel speed on bus  & \textcolor{red}{TBD} & $\omega_{\max}$, Sec.~\ref{sec:jumpup_target} \\
-Logic rail load, worst case    & \textcolor{red}{TBD} & Sec.~\ref{sec:power_arch} \\
+Logic rail load, worst case    & \textcolor{red}{TBD} & Table~\ref{tab:electrical_ratings} \\
+MG92B servo stall current      & \textcolor{red}{TBD} & Table~\ref{tab:electrical_ratings}, not published \\
+MA600 encoder supply current   & \textcolor{red}{TBD} & Table~\ref{tab:electrical_ratings}, not published \\
 Runtime per charge under balance load & \textcolor{red}{TBD} & Demonstration planning \\
 \bottomrule
 \end{tabular}

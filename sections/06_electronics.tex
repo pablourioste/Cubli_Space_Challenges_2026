@@ -39,6 +39,7 @@ Section~\ref{sec:control_algorithms}.}
 \end{figure}
 
 \subsection{Components}
+\label{sec:components}
 
 The electronics and software are built around the Teensy~4.1 microcontroller,
 which communicates over the CAN-FD bus with the mjbots moteus-n1 driver that
@@ -49,12 +50,80 @@ servo driven directly from the microcontroller, and the XIAO ESP32-C6 wireless
 module provides a telemetry and debugging link. Power is supplied by the 6S
 LiPo battery, stepped down through an LM2596 DC-DC converter for the
 logic-level electronics, with the motor drivers powered directly from the
-battery bus.
+battery bus. Table~\ref{tab:component_overview} lists each component against
+the schematic block it belongs to (Appendix~\ref{app:schematics}); current
+ratings are given in Appendix~\ref{app:electrical_ratings} rather than here,
+so that a part substitution does not require an edit to this section.
+
+\begin{table}[htbp]
+\centering
+\caption[Component overview]{Component overview: each part against the schematic block that
+carries it (Figure~\ref{fig:schematic_full}, Appendix~\ref{app:schematics}).}
+\label{tab:component_overview}
+\small
+\begin{tabular}{L{3.4cm} L{5.6cm} L{4.2cm}}
+\toprule
+Component & Function & Schematic block \\
+\midrule
+Teensy 4.1 & Flight computer: estimator + control law & Flight computer and IMU \\
+BMI270 IMU & Body attitude reference (tilt + rates) & Flight computer and IMU \\
+mjbots moteus-n1 ($3\times$) & FOC current/torque driver, inner loop & Power entry and protection; CAN-FD bus \\
+T-Motor MN4006 ($3\times$) & Reaction-wheel torque source, via driver & Power entry and protection \\
+MA600 encoder ($3\times$) & Wheel angle: commutation + state feedback & Encoder interfaces \\
+TowerPro MG92B servo ($3\times$) & Wheel brake actuator (jump-up) & Brake servo drive \\
+XIAO ESP32-C6 & Wi-Fi telemetry / command link & Telemetry link \\
+LM2596 buck converter & \qty{5}{\volt} logic rail source & \qty{5}{\volt} logic rail \\
+6S LiPo pack & Primary energy store & Power entry and protection \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 The full parts list is catalogued in Appendix~\ref{app:bom}
 (Table~\ref{tab:bom-supplied}). The supplied set is an electronics-only BOM;
 the reaction wheels, the frame and all printed parts are the team's design
 responsibility, and their fabrication is the leading schedule risk.
+
+Table~\ref{tab:schematic_sheets} states, block by block, the layout, mounting
+and connection constraints each part is checked against before bring-up: what
+governs its placement, and how the assembled machine confirms it. These are
+assembly and layout restrictions on the physical prototype, not schematic
+content, which is why they are stated here rather than repeated against each
+schematic block of Section~\ref{sec:schematics}.
+
+\begin{table}[htbp]
+\centering
+\caption[Electrical layout, mounting and connection constraints]{Electrical layout, mounting and connection constraints, by block.
+Checked against the assembled prototype before and during bring-up.}
+\label{tab:schematic_sheets}
+\label{tab:signal_rules}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{L{3.2cm} L{5.6cm} L{5.4cm}}
+\toprule
+Component / block & Layout, mounting \& connection rule & Verification \\
+\midrule
+Power entry and protection & Pack connector, anti-spark inrush path, E-stop and fuse in series, upstream of the split to the motor bus and logic rail & E-stop functional; fuse rated to worst-case bus current; anti-spark path intact \\
+\qty{5}{\volt} logic rail & LM2596 buck converter off the motor bus, back-feed diode, bulk capacitance and per-device decoupling at each load & Converter rating vs.\ measured worst-case rail current (Appendix~\ref{app:electrical_ratings}); capacitor voltage ratings confirmed by position \\
+CAN-FD bus & Linear chain across the three moteus drivers and the flight computer, short stubs, termination at the two physical ends only (Sec.~\ref{sec:bus_topology}) & Differential-pair scope capture; sustained error-frame count at full data rate with all nodes addressed \\
+Encoder interfaces ($3\times$) & Short SPI run from each driver to its own encoder; encoder positions fix the driver positions, not the reverse & Air gap ${\le}\,\qty{0.5}{\milli\metre}$ confirmed; read-back with no error flags, re-checked after mechanical assembly \\
+Flight computer and IMU & Teensy 4.1 and BMI270 mounted at or as close as possible to the pivot, oriented per the body frame of Sec.~\ref{sec:cad_method} & Static orientation check; noise floor confirmed with wheels spinning \\
+Telemetry link & ESP32-C6 module fed off the logic rail, sized for its transmit-burst current & Transmit-burst return path verified off the logic rail \\
+Brake servo drive & Servo PWM routed clear of the encoder SPI runs, one instance per axis & Stall-current headroom confirmed on the logic rail \\
+Rail separation & Motor bus and logic rail kept separate downstream of the E-stop & Ripple measurement on the logic rail under motor load \\
+Grounding & Single return topology; no motor return current through the sensing ground & Continuity and isolation check before first power-on \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\phfig[0.30\textheight]{0.75\textwidth}{Assembled electronics of the Cubli:
+flight computer, driver stack, distribution board and harness in place inside
+the frame.}
+\caption[Assembled electronics of the Cubli]{Assembled electronics of the Cubli. To be replaced with a photograph
+once the perfboard and harness of Section~\ref{sec:layout} are populated.}
+\label{fig:electronics_assembled}
+\end{figure}
 
 \paragraph{Motor characterisation and operating envelope.}
 Figure~\ref{fig:mn4006_curves} shows measured torque and speed against phase
@@ -143,44 +212,23 @@ E-stop and fuse.}
 \end{figure}
 
 The rail-by-rail current budget that sizes the buck converter and the harness
-conductors --- Teensy 4.1, ESP32-C6 telemetry, BMI270 IMU, the three MG92B
-brake servos and three MA600 encoders on the \qty{5}{\volt} logic rail, and the
-three moteus-n1 drivers on the pack rail --- is populated from measurement
-during bench bring-up rather than from datasheet maxima alone, because the
-figure that matters for the \qty{5}{\volt} rail is the coincident worst case ---
-telemetry transmit burst, servo stall and full sensor load at once --- and not
-the sum of typical values. The \qty{5}{\volt} total is checked against the
-LM2596 rating, which derates without a heatsink.
+conductors is given in Appendix~\ref{app:electrical_ratings}
+(Table~\ref{tab:electrical_ratings}), populated from datasheet ratings and
+completed from measurement during bench bring-up rather than from typical
+values alone, because the figure that matters for the \qty{5}{\volt} rail is
+the coincident worst case --- telemetry transmit burst, servo stall and full
+sensor load at once. The \qty{5}{\volt} total is checked against the LM2596
+rating, which derates without a heatsink.
 
 \subsection{Schematic and Interconnect Diagrams}
 \label{sec:schematics}
 
 The signal-level design is captured as one flat schematic
 (Figure~\ref{fig:schematic_full}, Appendix~\ref{app:schematics}), together with
-the connector and pin-assignment tables. Table~\ref{tab:schematic_sheets}
-states, block by block, the constraint each part of that capture is checked
-against before bring-up.
-
-\begin{table}[htbp]
-\centering
-\caption[Electrical design constraints by block]{Electrical design constraints by block. Each is checked against the
-capture of Figure~\ref{fig:schematic_full} before bring-up.}
-\label{tab:schematic_sheets}
-\small
-\begin{tabular}{L{3.8cm} L{8.2cm}}
-\toprule
-Block & Governing constraint to verify \\
-\midrule
-Power entry and protection & E-stop, fuse rating, anti-spark inrush into the driver bulk capacitance \\
-\qty{5}{\volt} logic rail & Converter rating vs.\ measured worst-case rail current; back-feed diode; rail bulk capacitance voltage rating \\
-CAN-FD bus & Linear topology, stub length, split termination at the two physical ends only (Sec.~\ref{sec:bus_topology}) \\
-Encoder interfaces ($3\times$) & SPI cable length and encoder air gap; driver placement follows from this, not the reverse \\
-Flight computer and IMU & Sensor orientation and mounting location relative to the pivot (Sec.~\ref{sec:control_algorithms}) \\
-Telemetry link & Transmit-burst current and its return path off the logic rail \\
-Brake servo drive & Stall current headroom on the logic rail; PWM routing away from the encoder SPI \\
-\bottomrule
-\end{tabular}
-\end{table}
+the connector and pin-assignment tables. The layout, mounting and connection
+constraints each block is checked against are given in
+Table~\ref{tab:schematic_sheets} of Section~\ref{sec:components}, ahead of the
+schematic itself, and are not repeated here.
 
 \subsection{Bus Topology, Termination and Signal Integrity}
 \label{sec:bus_topology}
@@ -192,7 +240,9 @@ a linear chain with short stubs and termination at exactly the two physical
 ends; a star topology or a mid-chain termination will pass a bench continuity
 check and then fail intermittently under wheel vibration, which is the hardest
 class of fault to diagnose once the cube is closed. The design rules and their
-verification are listed in Table~\ref{tab:signal_rules}.
+verification are listed in Table~\ref{tab:signal_rules} of
+Section~\ref{sec:components}, together with every other block's layout and
+connection constraints.
 
 The encoder interfaces impose the complementary constraint. Each absolute
 encoder requires a short SPI run to its own driver and a tightly held air gap to
@@ -201,25 +251,6 @@ those in turn by the motor axes. The physical layout order is therefore: motor
 axes fix the encoders, encoders fix the drivers, drivers fix the bus route, and
 only then is the board outline of Section~\ref{sec:layout} drawn around what
 remains.
-
-\begin{table}[htbp]
-\centering
-\caption[Signal-integrity design rules and verification]{Signal-integrity design rules and how each is verified. These are
-checked before cube closure, since all are hard to access afterwards.}
-\label{tab:signal_rules}
-\small
-\begin{tabular}{L{3.4cm} L{4.6cm} L{6.0cm}}
-\toprule
-Interface & Rule & Verification \\
-\midrule
-CAN-FD bus       & Linear chain; short stubs; split termination at the two physical ends only & Differential-pair scope capture; sustained error-frame count at full rate with all nodes addressed \\
-Encoder SPI      & Short run to its own driver; air gap and chip centring per the assembly spec & Read-back with no error flags; re-checked after mechanical assembly \\
-IMU              & Mounted at or near the pivot; orientation per the body frame of Sec.~\ref{sec:cad_method} & Static orientation check; noise floor with wheels spinning \\
-Rail separation  & Motor bus and logic rail separated downstream of the E-stop & Ripple measurement on the logic rail under motor load \\
-Grounding        & Single return topology; no motor return current through the sensing ground & Continuity and isolation check before first power-on \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 \subsection{Board Layout and Harness}
 \label{sec:layout}
