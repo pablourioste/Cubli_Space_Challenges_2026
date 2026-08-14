@@ -25,12 +25,103 @@ limits of the driver given in Appendix~\ref{app:bom}, since a balance sustained
 only by exceeding the continuous rating is not a balance that survives to the
 demonstration.
 
+\paragraph{Balancing performance examples.} Table~\ref{tab:balance_examples}
+reports representative runs against Gate~G3, each initialised from rest at the
+upright equilibrium with no applied disturbance.
+
+\begin{table}[htbp]
+\centering
+\caption[1-DoF unassisted balance examples]{Representative unassisted balance
+runs on the single-axis rig, against the Gate~G3 threshold of
+\qty{60}{\second}.}
+\label{tab:balance_examples}
+\begin{tabular}{lccc}
+\toprule
+Run & Balance duration & Steady-state wheel-speed drift & Peak driver current \\
+\midrule
+1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+2 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Recovery-angle disturbance tests.} Beyond the zero-disturbance case,
+the rig was displaced by hand to a defined initial angle, measured from the
+support, and released to test whether the controller recovers to upright
+rather than merely holding a small perturbation. Table~\ref{tab:recovery_angle}
+reports the three angles used to characterise this margin.
+
+\begin{table}[htbp]
+\centering
+\caption[Recovery from a defined initial angle]{Recovery outcome versus the
+initial displacement angle, measured from the support.}
+\label{tab:recovery_angle}
+\begin{tabular}{lccc}
+\toprule
+Initial angle & Recovered? & Recovery time & Peak driver current \\
+\midrule
+\qty{7}{\degree}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\qty{8}{\degree}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\qty{12}{\degree} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The largest initial angle tested to date, again measured from the support, is
+\qty{24}{\degree}; recovery from this angle was also satisfactory, so the
+demonstrated disturbance-rejection envelope currently extends at least this
+far beyond the three angles of Table~\ref{tab:recovery_angle}.
+\textcolor{red}{TODO: confirm the \qty{24}{\degree} recovery time and peak
+current, and state whether this is the rig's mechanical limit (hard stop) or
+simply the largest angle attempted so far.}
+
 \subsubsection{3-DoF Control Validation}
 \label{sec:test_3dof}
 
 For the 3D model, control-loop validation to date has achieved edge balance on
 the final prototype using the 1-DoF control law; corner balance has not yet
-been demonstrated. \textcolor{red}{TODO: results comparing edge-balance
-duration, disturbance recovery and control effort against the acceptance
-criteria of Table~\ref{tab:traceability} and the 1-DoF bench results of
-Section~\ref{sec:test_1dof}.} 
+been demonstrated. Table~\ref{tab:balance_3dof_template} sets out the result
+template that will be populated once edge-balance testing on the cube is
+complete, mirroring the 1-DoF quantities of
+Section~\ref{sec:test_1dof} so the two are directly comparable, and
+Table~\ref{tab:recovery_angle_3dof_template} mirrors the recovery-angle
+protocol of Table~\ref{tab:recovery_angle} for the cube. \textcolor{red}{TODO:
+populate both tables from edge-balance testing on the final prototype, run the
+corner-balance case once edge balance is closed out, and compare against the
+acceptance criteria of Table~\ref{tab:traceability} and the 1-DoF bench
+results of Section~\ref{sec:test_1dof}.}
+
+\begin{table}[htbp]
+\centering
+\caption[3-DoF unassisted balance results template]{Result template: unassisted
+balance on the cube, edge and corner equilibria, against the Gate~G3 threshold
+of \qty{60}{\second}.}
+\label{tab:balance_3dof_template}
+\begin{tabular}{lccc}
+\toprule
+Equilibrium & Balance duration & Steady-state wheel-speed drift & Peak driver current \\
+\midrule
+Edge   & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Corner & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption[3-DoF recovery-angle results template]{Result template: recovery from
+a defined initial angle on the cube, measured from the support, edge
+equilibrium.}
+\label{tab:recovery_angle_3dof_template}
+\begin{tabular}{lccc}
+\toprule
+Initial angle & Recovered? & Recovery time & Peak driver current \\
+\midrule
+\qty{7}{\degree}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\qty{8}{\degree}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\qty{12}{\degree} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\qty{24}{\degree} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\bottomrule
+\end{tabular}
+\end{table} 

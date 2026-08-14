@@ -147,23 +147,42 @@ the balancing adjustment of Section~\ref{sec:rw_sizing}.}
 \subsection{3D Cube Construction}
 \label{app:cad_3d}
 
-% Cube drawings: inner structure general assembly, the three motor modules on
-% their orthogonal axes, outer frame and contact features, and the section view
-% showing the battery at the geometric centre.
+The general-assembly drawing of the three-axis cube is given in
+Figure~\ref{fig:dwg_3d}. The frame realises the two-part architecture of
+Section~\ref{sec:mechanical}: an outer frame of edge rails and corner contact
+features encloses an inner structure carrying the three orthogonal
+reaction-wheel modules and the electronics tray. The sheet carries an isometric
+cutaway of the inner structure showing the stacked electronics (upper left), an
+isometric view of the closed assembly with the three wheel modules visible
+through the open frame faces (upper centre), a front elevation of a single
+motor/wheel module in section, showing the electronics tray edge-on against the
+motor mount (right), and two front orthographic views of individual face
+modules giving the motor bolt circle and corner fastener pattern (lower left and
+centre). This drawing supersedes the concept prototype of
+Figure~\ref{fig:cube_3d}, which validated the two-part architecture and internal
+packaging but did not carry final dimensions; the edge length $L$ and wheel
+geometry realised here follow the closure of Section~\ref{sec:rw_sizing}.
 
-% Figure placeholder: cube exploded view.
-% Figure placeholder: section view through two orthogonal wheel modules,
-% showing the clearances c_w and c_o of Table~\ref{tab:cad_params}.
-
-The drawing set for the three-axis cube is not yet released. The frame has been
-realised so far as the concept prototype of Figure~\ref{fig:cube_3d}, which
-fixes the two-part architecture and the internal packaging but not the final
-dimensions: the edge length $L$ and the wheel geometry close only once the
-sizing iteration of Section~\ref{sec:rw_sizing} converges on a confirmed motor.
-The drawings to be issued here on that closure are the inner-structure general
-assembly, the three motor modules on their orthogonal axes, the outer frame with
-its contact features, and a section view through two orthogonal wheel modules
-showing the clearances $c_w$ and $c_o$ of Table~\ref{tab:cad_params}.
+\begin{landscape}
+\pagestyle{cublidrawing}
+\begin{figure}[p]
+\thispagestyle{cublidrawing}
+\centering
+\includegraphics[width=\linewidth,height=1.0\textwidth,keepaspectratio]{images/armonia_assembly.pdf}
+\caption[General-assembly drawing of the three-axis cube]{General-assembly
+drawing of the three-axis cube --- the final released design of the flight
+article --- sheet 1 of 1 at 1:1. Upper left: isometric cutaway of the inner
+structure, showing the stacked flight-controller and driver boards on their
+mount. Upper centre: isometric view of the closed assembly, showing the three
+orthogonal reaction-wheel modules through the open frame faces. Right: front
+elevation in section of a single motor/wheel module, showing the electronics
+tray edge-on against the motor mount. Lower left and lower centre: front
+orthographic views of two face modules, giving the motor bolt circle and the
+corner fastener pattern of Table~\ref{tab:mech_interfaces}.}
+\label{fig:dwg_3d}
+\end{figure}
+\end{landscape}
+\pagestyle{fancy}
 
 \subsection{Fabrication and Assembly}
 \label{app:cad_fab}
