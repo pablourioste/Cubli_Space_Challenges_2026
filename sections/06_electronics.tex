@@ -176,32 +176,29 @@ moteus-n1 drivers ($3\times$) & Pack & \textcolor{red}{TBD} & \textcolor{red}{TB
 \subsection{Schematic and Interconnect Diagrams}
 \label{sec:schematics}
 
-The signal-level design is documented as a set of sheets rather than a single
-drawing, so that each can be checked against the constraint that governs it.
-Table~\ref{tab:schematic_sheets} is the index; the sheets themselves are in
-Appendix~\ref{app:schematics}, together with the connector and pin-assignment
-tables. The design is currently captured as one flat schematic
-(Figure~\ref{fig:schematic_full}), from which these sheets are split as each is
-verified against its governing constraint; the index below is therefore the
-release plan as much as it is a table of contents.
+The signal-level design is captured as one flat schematic
+(Figure~\ref{fig:schematic_full}, Appendix~\ref{app:schematics}), together with
+the connector and pin-assignment tables. Table~\ref{tab:schematic_sheets}
+states, block by block, the constraint each part of that capture is checked
+against before bring-up.
 
 \begin{table}[htbp]
 \centering
-\caption[Schematic sheet index]{Schematic sheet index. Each sheet is checked against the governing
-constraint stated in its row before release.}
+\caption[Electrical design constraints by block]{Electrical design constraints by block. Each is checked against the
+capture of Figure~\ref{fig:schematic_full} before bring-up.}
 \label{tab:schematic_sheets}
 \small
-\begin{tabular}{c L{4.2cm} L{7.4cm}}
+\begin{tabular}{L{3.8cm} L{8.2cm}}
 \toprule
-Sheet & Content & Governing constraint to verify \\
+Block & Governing constraint to verify \\
 \midrule
-1 & Power entry and protection & E-stop, fuse rating, anti-spark inrush into the driver bulk capacitance \\
-2 & \qty{5}{\volt} logic rail & Converter rating vs.\ Table~\ref{tab:power_budget} worst case; back-feed diode; rail bulk capacitance voltage rating \\
-3 & CAN-FD bus & Linear topology, stub length, split termination at the two physical ends only (Sec.~\ref{sec:bus_topology}) \\
-4 & Encoder interfaces ($3\times$) & SPI cable length and encoder air gap; driver placement follows from this, not the reverse \\
-5 & Flight computer and IMU & Sensor orientation and mounting location relative to the pivot (Sec.~\ref{sec:control_algorithms}) \\
-6 & Telemetry link & Transmit-burst current and its return path off the logic rail \\
-7 & Brake servo drive & Stall current headroom on the logic rail; PWM routing away from the encoder SPI \\
+Power entry and protection & E-stop, fuse rating, anti-spark inrush into the driver bulk capacitance \\
+\qty{5}{\volt} logic rail & Converter rating vs.\ Table~\ref{tab:power_budget} worst case; back-feed diode; rail bulk capacitance voltage rating \\
+CAN-FD bus & Linear topology, stub length, split termination at the two physical ends only (Sec.~\ref{sec:bus_topology}) \\
+Encoder interfaces ($3\times$) & SPI cable length and encoder air gap; driver placement follows from this, not the reverse \\
+Flight computer and IMU & Sensor orientation and mounting location relative to the pivot (Sec.~\ref{sec:control_algorithms}) \\
+Telemetry link & Transmit-burst current and its return path off the logic rail \\
+Brake servo drive & Stall current headroom on the logic rail; PWM routing away from the encoder SPI \\
 \bottomrule
 \end{tabular}
 \end{table}
