@@ -131,7 +131,8 @@ Two features of these relations govern how the iteration behaves:
   \item $\beta$ diverges as $\tau_b\to\tau_g$ --- a brake only marginally above
   the tip-over torque cannot deliver the required impulse at any wheel speed.
   $\tau_b$ must therefore be checked against $\tau_g=MgL/2$ every iteration,
-  keeping a comfortable ratio rather than a bare positive margin.
+  keeping a comfortable ratio $\tau_b/\tau_g$ rather than a bare positive
+  margin.
 \end{itemize}
 
 \paragraph{Selection of $\omega_{\max}$.} Maximum wheel speed is a design
@@ -168,8 +169,9 @@ not $\tau_b$ and need not approach it --- the TowerPro MG92B
 one seventeenth of the sizing value. The servo only resists the barrier being
 deflected; it does not decelerate the wheel.
 
-Since the stop is a collision rather than a friction clutch, $\tau_b$ is fixed
-entirely by how quickly angular momentum is destroyed:
+Since the stop is a collision rather than a friction clutch, $\tau_b$ is not
+an independent property of any component and is fixed entirely by how quickly
+angular momentum is destroyed:
 \begin{equation}
 \tau_b = \frac{h_w}{\Delta t}.
 \label{eq:tau_b_from_dt}
@@ -364,9 +366,10 @@ to be right the first time.
 \paragraph{Architecture: ballasted ring.} Rather than scaling a solid disc,
 the wheel is a printed \emph{ring plus spokes} tuned by \emph{ballast}:
 standard M6 steel bolt-and-nut sets fitted through round clearance holes
-drilled \emph{radially} through the ring's cross-section --- a true ID-to-OD
-through-hole, not one drilled through the wheel's face. Each hole's depth is
-fixed at the ring's radial width, and its centroid sits at the mean radius
+drilled \emph{radially} through the ring's cross-section, from the inner bore
+surface to the outer rim surface --- a true ID-to-OD through-hole, not one
+drilled through the wheel's face. Each hole's depth is fixed at the ring's
+radial width, and its centroid sits at the mean radius
 $R_{\text{mean}}=(D_w+D_i)/4$ by construction, with no free pitch-circle radius
 to choose. Hole diameter is instead capped by the wheel's axial thickness, with
 a printed wall retained on both faces. Each station removes plastic and adds
@@ -374,15 +377,14 @@ steel at very nearly the largest available radius, so the net inertia gain per
 station is large, and the target is reached simply by choosing how many
 stations to populate.
 
-The bolt passing through the ring is also the retention feature: the nut
-threads onto it and clamps the ring, so nothing depends on a plastic pocket
-floor. Each station carries the centrifugal load
-$F = m_{\text{hw}}\,\omega_{\max}^2\,R_{\text{mean}}$ of its own hardware,
-reacted by the bolt in tension and by bearing of the head and nut faces ---
-now against the ring's curved ID and OD surfaces rather than a flat face, so
-both are spot-faced flat (or fitted with a curved washer) to seat squarely,
-and a nyloc or threadlocked
-nut is specified so that vibration cannot back it off.
+The bolt is also the retention feature: the nut threads on and clamps the
+ring, so nothing depends on a plastic pocket floor. Each station carries the
+centrifugal load $F=m_{\text{hw}}\,\omega_{\max}^2\,R_{\text{mean}}$ of its own
+hardware, reacted by the bolt in tension and by bearing of the head and nut
+faces --- now against the ring's curved ID and OD surfaces rather than a flat
+face, so both are spot-faced flat (or fitted with a curved washer) to seat
+squarely, checked in Section~\ref{sec:sizing_verification}. A nyloc or
+threadlocked nut is specified so vibration cannot back it off.
 
 The geometry is defined by the quantities of Table~\ref{tab:rw_params}, all of
 which follow from the envelope closure of Section~\ref{sec:massbudget} and are
@@ -449,8 +451,9 @@ $I_{zz}\sim mR^2$ makes mass at large radius buy inertia more cheaply: the
 unconstrained optimum at the present target is \qty{130}{\milli\metre}
 (\qty{139.83}{\gram}/wheel, no ballast needed), so the envelope constraint at
 \qty{120}{\milli\metre} costs about \qty{9.3}{\gram} per wheel
-(\qty{27.8}{\gram} over three) --- a modest penalty at this design point, and
-the price of a wheel that actually fits.
+(\qty{27.8}{\gram} over three) --- a modest penalty at this design point. This
+is the price of a wheel that fits, and a wheel that does not fit is not a
+candidate.
 
 The procedure followed is the fixed-point iteration of
 Table~\ref{tab:sizing_procedure}, run by hand: a cube mass is estimated and a
