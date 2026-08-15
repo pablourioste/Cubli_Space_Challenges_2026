@@ -198,44 +198,20 @@ not $\tau_b$ and need not approach it --- the TowerPro MG92B
 one seventeenth of the sizing value. The servo only resists the barrier being
 deflected; it does not decelerate the wheel.
 
-Since the stop is a collision rather than a friction clutch, $\tau_b$ is not
-an independent property of any component and is fixed entirely by how quickly
-angular momentum is destroyed:
+Since the stop is a collision rather than a friction clutch, $\tau_b$ is fixed
+entirely by how quickly angular momentum is destroyed,
 \begin{equation}
-\tau_b = \frac{h_w}{\Delta t}.
+\tau_b = \frac{h_w}{\Delta t},
 \label{eq:tau_b_from_dt}
 \end{equation}
-Quoting a brake torque is therefore equivalent to asserting a stopping time. At
-the present operating point ($h_w \approx
-\qty{0.1994}{\kilo\gram\metre\squared\per\second}$), the design value
-$\tau_b=\qty{5}{\newton\metre}$ implies $\Delta t \approx
-\qty{40}{\milli\second}$ --- characteristic of servo travel, not a rigid
-impact. A bolt head striking a printed barrier should instead arrest the wheel
-in a few milliseconds, implying a substantially larger $\tau_b$, so the design
-value is expected to be conservative for sizing.
-
-That conservatism is deliberate and asymmetric: since
-$\beta=\tau_b/(\tau_b-\tau_g)$ falls toward unity as $\tau_b$ grows,
-\emph{underestimating} $\tau_b$ inflates the inertia requirement (the safe
-direction), while overestimating it leaves the wheel undersized.
-Table~\ref{tab:taub_sensitivity} shows how lopsided this is: the penalty
-concentrates almost entirely on the low side, so a mid-range value is adopted
-over the higher figure a short impact would justify.
-
-\begin{table}[htbp]
-\centering
-\caption[Sensitivity of $I_{w,\text{target}}$ to $\tau_b$]{Sensitivity of the inertia requirement to the assumed brake torque, relative to the design value $\tau_b=\qty{5}{\newton\metre}$.}
-\label{tab:taub_sensitivity}
-\begin{tabular}{lc}
-\toprule
-$\tau_b$ change & Effect on $I_{w,\text{target}}$ \\
-\midrule
-\qty{5}{\newton\metre} $\to$ \qty{10}{\newton\metre}  & $-\qty{12}{\percent}$ (relaxes) \\
-\qty{5}{\newton\metre} $\to$ \qty{2}{\newton\metre}   & $+\qty{69}{\percent}$ (inflates) \\
-\qty{5}{\newton\metre} $\to$ \qty{1.5}{\newton\metre} & $+\qty{175}{\percent}$ (inflates) \\
-\bottomrule
-\end{tabular}
-\end{table}
+so quoting a brake torque is equivalent to asserting a stopping time: at the
+present operating point, $\tau_b=\qty{5}{\newton\metre}$ implies $\Delta t
+\approx \qty{40}{\milli\second}$, whereas a bolt head striking a printed
+barrier should arrest the wheel in a few milliseconds. The design value is
+therefore expected to be conservative, which is the intended direction ---
+since $\beta=\tau_b/(\tau_b-\tau_g)$ falls toward unity as $\tau_b$ grows,
+underestimating $\tau_b$ inflates the inertia requirement while overestimating
+it leaves the wheel undersized.
 
 One consequence carries into the structural design: $\tau_b$ is also a
 \emph{load}, and the sizing value should not be reused to size the barrier,

@@ -95,6 +95,72 @@ $K_d^{(i)}$ & Scheduled gain at linearisation point $i$ (extension) \\
 \end{tabular}
 \end{table}
 
+\subsection{IMU-to-Body Frame Transformation}
+\label{sec:imu_mount}
+
+The BMI270 cannot be mounted with its own sensor axes aligned to the body
+frame $\{B\}$ of Figure~\ref{fig:cubli_3dof}: it sits on Perfboard~1 next to
+the flight computer, placed for wiring and packaging rather than axis
+alignment (Section~\ref{sec:layout}). Every raw gyro/accel sample is therefore
+rotated into $\{B\}$ by a fixed mounting matrix before it reaches the
+complementary filter of Equation~\eqref{eq:complementary} or the MEKF of
+Section~\ref{sec:software_pipeline}.
+
+Raw samples are first put in physical units in the sensor's own frame,
+\begin{equation}
+a_{s,i} = \frac{g_0\,\bar a_{\mathrm{raw},i} - a_{\mathrm{off},i}}{a_{\mathrm{scale},i}},
+\qquad
+\omega_{s,i} = \frac{\pi}{180}\,\bar\omega_{\mathrm{raw},i} - \omega_{\mathrm{bias},i},
+\qquad i=1,2,3,
+\label{eq:imu_calib}
+\end{equation}
+with $g_0=\qty{9.80665}{\metre\per\second\squared}$ and the bias/offset/scale
+constants of Table~\ref{tab:imu_calib}, fixed at calibration and not
+re-estimated online. The sensor-frame vectors are then rotated into the body
+frame by the fixed mounting matrix $C_{SB}$,
+\begin{equation}
+\omega_b = C_{SB}\,\omega_s, \qquad a_b = C_{SB}\,a_s,
+\label{eq:mount_rotation}
+\end{equation}
+where $C_{SB}$ is the classical Z-X-Z (3-1-3) proper Euler-angle rotation
+matrix built from three fixed mounting angles $(\theta_1,\theta_2,\theta_3)$,
+set once from the as-built mounting geometry:
+\begin{equation}
+C_{SB} =
+\begin{bmatrix}
+c_1c_3-c_2s_1s_3 & c_3s_1+c_1c_2s_3 & s_2s_3\\[2pt]
+-c_1s_3-c_2c_3s_1 & c_1c_2c_3-s_1s_3 & c_3s_2\\[2pt]
+s_1s_2 & -c_1s_2 & c_2
+\end{bmatrix},
+\qquad c_i=\cos\theta_i,\ s_i=\sin\theta_i,
+\label{eq:mount_dcm}
+\end{equation}
+with $(\theta_1,\theta_2,\theta_3) = (\qty{-30}{\degree},\ \qty{54.7356}{\degree},\ \qty{45}{\degree})$.
+The middle angle is exactly $\arccos(1/\sqrt3)$, the angle between a cube edge
+and its space diagonal, consistent with a package mounted flush to a face
+while the axis the controller cares about at corner-up runs along the body
+diagonal from $O$. $C_{SB}$ is verified orthonormal (unit determinant, unit
+row norms) whenever the mounting angles are set, guarding against a
+transcription error in $(\theta_1,\theta_2,\theta_3)$.
+
+\begin{table}[htbp]
+\centering
+\caption[IMU calibration constants]{IMU calibration constants, applied per
+Equation~\eqref{eq:imu_calib} before the mounting rotation of
+Equation~\eqref{eq:mount_rotation}.}
+\label{tab:imu_calib}
+\small
+\begin{tabular}{lccc}
+\toprule
+Constant & Axis 1 & Axis 2 & Axis 3 \\
+\midrule
+Gyro bias $\omega_{\mathrm{bias}}$ (rad/s) & $+0.002348$ & $-0.001140$ & $-0.000762$ \\
+Accel offset $a_{\mathrm{off}}$ (m/s$^2$)   & $-0.092282$ & $-0.196510$ & $+0.050664$ \\
+Accel scale $a_{\mathrm{scale}}$ (--)        & $0.991085$  & $0.991035$  & $1.003787$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Gain Scheduling and Mode Transitions}
 \label{sec:gain_scheduling}
 

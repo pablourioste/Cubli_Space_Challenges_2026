@@ -105,7 +105,7 @@ Power entry and protection & Pack connector, anti-spark inrush path, E-stop and 
 \qty{5}{\volt} logic rail & LM2596 buck converter off the motor bus, back-feed diode, bulk capacitance and per-device decoupling at each load & Converter rating vs.\ measured worst-case rail current (Appendix~\ref{app:electrical_ratings}); capacitor voltage ratings confirmed by position \\
 CAN-FD bus & Linear chain across the three moteus drivers and the flight computer, short stubs, termination at the two physical ends only (Sec.~\ref{sec:bus_topology}) & Differential-pair scope capture; sustained error-frame count at full data rate with all nodes addressed \\
 Encoder interfaces ($3\times$) & Short SPI run from each driver to its own encoder; encoder positions fix the driver positions, not the reverse & Air gap ${\le}\,\qty{0.5}{\milli\metre}$ confirmed; read-back with no error flags, re-checked after mechanical assembly \\
-Flight computer and IMU & Teensy 4.1 and BMI270 mounted at or as close as possible to the pivot, oriented per the body frame of Sec.~\ref{sec:cad_method} & Static orientation check; noise floor confirmed with wheels spinning \\
+Flight computer and IMU & Teensy 4.1 and BMI270 mounted at or as close as possible to the pivot; orientation set by packaging, corrected in software by the mounting rotation of Sec.~\ref{sec:imu_mount} & Static orientation check; noise floor confirmed with wheels spinning \\
 Telemetry link & ESP32-C6 module fed off the logic rail, sized for its transmit-burst current & Transmit-burst return path verified off the logic rail \\
 Brake servo drive & Servo PWM routed clear of the encoder SPI runs, one instance per axis & Stall-current headroom confirmed on the logic rail \\
 Rail separation & Motor bus and logic rail kept separate downstream of the E-stop & Ripple measurement on the logic rail under motor load \\
@@ -267,6 +267,14 @@ it. The harness --- battery lead, driver drops, bus chain and servo drive ---
 is fabricated to the drawings in Appendix~\ref{app:harness} and is labelled and
 strain-relieved before installation, because every connector in the machine sits
 on a structure that vibrates by design.
+
+\paragraph{IMU mounting and axis alignment.} The BMI270 is carried on
+Perfboard~1 alongside the Teensy (Figure~\ref{fig:dwg_3d}), placed by wiring
+and packaging convenience rather than by axis alignment to the body frame
+$\{B\}$ of Figure~\ref{fig:cubli_3dof}. Its native sensor axes therefore do not
+coincide with $\{B\}$; every sample is corrected by the fixed mounting
+rotation of Section~\ref{sec:imu_mount} before the estimator uses it, rather
+than by re-orienting the board to match the model.
 
 \subsection{Electrical Safety and Bring-Up Protocol}
 \label{sec:electrical_safety}

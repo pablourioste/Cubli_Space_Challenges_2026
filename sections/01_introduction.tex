@@ -8,7 +8,9 @@ The Cubli is a reaction-wheel inverted pendulum: a cube-shaped platform that bal
 
 Dynamically, the system is an \emph{underactuated}, nonlinear, unstable-equilibrium control problem: three actuators (the wheels) must stabilise a body with more degrees of freedom than actuated inputs, about equilibria (edge and corner balance) that are open-loop unstable and increasingly coupled across axes as the contact geometry shrinks from a line (edge) to a point (corner). This is structurally the same problem as the classical inverted pendulum, extended from a single rotational axis to a fully three-dimensional, momentum-exchange-actuated body — which is why the Cubli has become a standard benchmark platform in the controls community over the past decade.
 
-The problem this project addresses is therefore twofold: (i) derive and validate a dynamic model and controller capable of stabilising this underactuated system about its unstable equilibria and driving it through commanded reorientations, and (ii) realise this in hardware as a modular, largely parametric design, since final actuator and sensor specifications are not yet confirmed at the time of writing. The target capability set, in order of increasing difficulty, is edge balance, corner balance, controlled rotation, and walking (Section~\ref{sec:objectives}).
+Alongside the technical problem sits an educational one. Attitude determination and control is taught almost everywhere as mathematics on a whiteboard, because the hardware it describes is unreachable: flight units are expensive, single-shot and locked behind qualification procedures, so a student may complete an entire aerospace curriculum without ever commanding a reaction wheel and watching a body respond. What is missing is not theory but a system a student is allowed to build, mis-wire, crash and fix. The Cubli is exactly that system --- it runs the same momentum-exchange physics as a real satellite, on a desk, at a cost a school can absorb.
+
+The problem this project addresses is therefore threefold: (i) derive and validate a dynamic model and controller capable of stabilising this underactuated system about its unstable equilibria and driving it through commanded reorientations; (ii) realise this in hardware as a modular, largely parametric design, since final actuator and sensor specifications are not yet confirmed at the time of writing; and (iii) do both in a form that high-school and university students can reproduce, so that the mechanical build, the electronics, the firmware and the control law are documented as \emph{reasoned decisions} a learner can follow and re-derive, not as finished numbers to be copied. The target capability set, in order of increasing difficulty, is edge balance, corner balance, controlled rotation, jump-up, and walking (Section~\ref{sec:objectives}).
 
 No single subsystem is exotic, but each sits close to a physical bound, and the bounds are coupled: relieving one tightens another. Four constraints drive the design, and sizing is therefore treated as the first engineering activity rather than a detail settled once parts arrive.
 
@@ -22,7 +24,9 @@ No single subsystem is exotic, but each sits close to a physical bound, and the 
 \subsection{Purpose, Application \& Mission Context}
 \label{sec:application}
 
-The Cubli is not presented here as a balancing novelty but as a terrestrial, gravity-loaded demonstrator of \textbf{momentum-exchange attitude control} — the same physical mechanism that governs how real spacecraft point themselves. Nearly every three-axis-stabilised satellite holds and changes its attitude using reaction wheels: flywheels whose commanded speed change produces a reaction torque on the spacecraft body, exactly as in the Cubli. Spacecraft typically carry three or four such wheels (often in a pyramidal arrangement for redundancy) — directly analogous to the Cubli's three orthogonal wheels — and this reaction-wheel approach is the standard for CubeSats and small satellites in particular, making the Cubli representative of a real, currently-flown hardware class rather than an idealized toy problem.
+\textbf{The purpose of this project is educational: to make space engineering something a student can hold, build and debug.} The intended application of the hardware described in this document is as a teaching platform for high-school and university students, through which a complete satellite attitude control chain --- structure, electronics, firmware, estimation and control --- is learned by constructing it rather than by reading about it. Every other claim in this section is subordinate to that one: the spacecraft analogy matters because it is what makes the exercise \emph{real}, and the engineering rigour of the sections that follow matters because a teaching platform that does not actually work teaches nothing.
+
+The Cubli is well suited to this role because it is not a simulation of a satellite subsystem; it is one, operated under gravity. The cube is therefore not presented here as a balancing novelty but as a terrestrial, gravity-loaded demonstrator of \textbf{momentum-exchange attitude control} — the same physical mechanism that governs how real spacecraft point themselves. Nearly every three-axis-stabilised satellite holds and changes its attitude using reaction wheels: flywheels whose commanded speed change produces a reaction torque on the spacecraft body, exactly as in the Cubli. Spacecraft typically carry three or four such wheels (often in a pyramidal arrangement for redundancy) — directly analogous to the Cubli's three orthogonal wheels — and this reaction-wheel approach is the standard for CubeSats and small satellites in particular, making the Cubli representative of a real, currently-flown hardware class rather than an idealized toy problem.
 
 \label{sec:tradeoff}
 Reaction wheels are the actuator choice made here, and the alternative is worth stating explicitly because it is the standard smallsat comparison. Since this is a proof-of-concept demonstration of the control loop, a system actuated with orthogonal reaction wheels is well-suited to represent principles applicable to smallsat ADCS: the momentum-exchange actuation principle and closed-loop control architecture are the same as those used on real spacecraft, even though the Cubli's dynamics (balancing against gravity) differ from a satellite's free-fall attitude control problem. Reaction wheels are also structurally simpler and require less specialised hardware than control moment gyros, which offer higher torque density but at the cost of gimbal mechanisms and more complex control software --- complexity that is typically only justified on larger spacecraft. For a low-cost, resource-limited project, a reaction-wheel Cubli therefore demonstrates the core actuation and control principles of smallsat ADCS in a practical and relevant way.
@@ -60,16 +64,44 @@ Framed as an Attitude Determination and Control System (ADCS) problem, the Cubli
 \label{fig:momentum_exchange_applications}
 \end{figure}
 
-The subsystem exercised here is therefore the one a spacecraft uses for pointing: momentum-exchange attitude control under actuator saturation, with desaturation, on an underactuated body whose inertia is imperfectly known. Under gravity the destabilising torque never relents, so an inadequate controller falls over immediately and unambiguously --- the demonstration is self-evaluating, which a free-fall attitude testbed is not.
+The subsystem exercised here is therefore the one a spacecraft uses for pointing: momentum-exchange attitude control under actuator saturation, with desaturation, on an underactuated body whose inertia is imperfectly known. Under gravity the destabilising torque never relents, so an inadequate controller falls over immediately and unambiguously --- the demonstration is self-evaluating, which a free-fall attitude testbed is not. That property is what makes the platform teachable: the student needs no instructor and no test verdict to know whether the design is correct, because the cube either stands up or it does not.
 
-The nominal Cubli problem was solved a decade ago on precisely manufactured hardware \cite{gajamohan2012cubli, gajamohan2013cubli, muehlebach2017cubli}; reproducing it is an engineering exercise, and this document claims no more. A commodity build is adopted for three reasons. It can be crashed repeatedly, so the controller can be tested at its limits; its loose tolerances, imperfectly balanced wheels and drifting IMU supply the parameter uncertainty that robust control methods are intended to tolerate; and a fixed motor, print volume and budget constrain the sizing, since a marginal design cannot be rescued by specifying a larger component. The last of these motivates the adjustable ballast scheme of Section~\ref{sec:rw_sizing}.
+Because the cube is a complete system rather than a single experiment, building it forces a student through the whole engineering chain, each discipline entered because the next one depends on it:
 
-\subsection{Objectives}
+\begin{itemize}
+    \item \textbf{Design \& CAD} $\rightarrow$ parametric modelling, tolerance and fit, centre-of-mass placement, and design for 3D printing (Section~\ref{sec:cad}, Appendix~\ref{app:cad}).
+    \item \textbf{Physics \& sizing} $\rightarrow$ conservation of angular momentum turned into numbers: wheel inertia, torque and speed budgets, and the fixed-point iteration between mass and actuator that makes engineering trade-offs concrete (Section~\ref{sec:sizing}).
+    \item \textbf{Structures \& building} $\rightarrow$ printing, assembly, fastening and balancing real parts, and discovering that the braking manoeuvre which proves the machine works is also the load case that breaks it.
+    \item \textbf{Electronics \& power} $\rightarrow$ motor drivers, battery and power budgeting, harnessing, grounding and the noise a switching motor injects into a sensor sitting centimetres away (Section~\ref{sec:electrical}, Appendix~\ref{app:electrical}).
+    \item \textbf{Coding \& embedded systems} $\rightarrow$ real-time firmware, fixed-rate control loops, sensor drivers, telemetry and debugging on hardware where a software bug becomes a falling cube.
+    \item \textbf{ADCS, estimation \& control} $\rightarrow$ state estimation and sensor fusion from a noisy IMU, feedback design, saturation and momentum management --- the same problems, and largely the same equations, as a CubeSat's pointing loop (Section~\ref{sec:control_algorithms}, Appendix~\ref{app:control_algorithms}).
+    \item \textbf{Systems engineering} $\rightarrow$ requirements traced to capabilities, budgets that must close, staged verification, and the experience of one subsystem's decision propagating into three others (Sections~\ref{sec:wbs} and \ref{sec:methodology}).
+\end{itemize}
+
+The nominal Cubli problem was solved a decade ago on precisely manufactured hardware \cite{gajamohan2012cubli, gajamohan2013cubli, muehlebach2017cubli}; reproducing it is an engineering exercise, and this document claims no more --- but reproducibility is the point when the deliverable is a platform other students are meant to rebuild. A commodity build is adopted for four reasons. It can be crashed repeatedly, so the controller can be tested at its limits and a learner can fail without consequence; its loose tolerances, imperfectly balanced wheels and drifting IMU supply the parameter uncertainty that robust control methods are intended to tolerate; a fixed motor, print volume and budget constrain the sizing, since a marginal design cannot be rescued by specifying a larger component; and every part is a catalogue item or a printed file, so the cost of entry stays within reach of a school or student team rather than a laboratory. The third of these motivates the adjustable ballast scheme of Section~\ref{sec:rw_sizing}.
+
+\subsection{Goal \& Objectives}
 \label{sec:objectives}
 
-Each project objective imposes a required capability. The mapping below keeps
-every requirement traceable from motivation to capability, and is what the
-sizing and control work below must be shown to satisfy.
+\paragraph{Goal.} \emph{To build a low-cost, reproducible reaction-wheel cube
+that teaches high-school and university students the engineering of a real
+satellite --- design, structures, electronics, embedded coding and ADCS --- by
+having them build, program and fly one, and in doing so make space engineering
+an accessible, hands-on discipline rather than an abstract one.}
+
+The goal is deliberately stated as an outcome for the student rather than as a
+performance figure for the machine, because the machine is the teaching
+instrument and not the product. It decomposes into two sets of objectives that
+must both be met: \textbf{technical} objectives, which the hardware and
+controller must demonstrate, and \textbf{educational} objectives, which the
+platform and this document must deliver. The technical objectives are the
+demanding ones --- a cube that cannot balance teaches nothing --- and they are
+treated in the rest of this document with full engineering rigour, on the
+premise that the pedagogy is only as good as the hardware underneath it.
+
+\paragraph{Technical objectives.} Each imposes a required capability. The
+mapping below keeps every requirement traceable from motivation to capability,
+and is what the sizing and control work below must be shown to satisfy.
 
 \begin{table}[htbp]
 \centering
@@ -82,9 +114,51 @@ Objective & Required capability \\
 Edge balance        & The system must actively maintain dynamic stability and regulate its posture about a single line-contact equilibrium position. \\[0.5em]
 Corner balance      & The system must maintain multi-axis closed-loop balance and attitude control around a highly unstable point-contact equilibrium. \\[0.5em]
 Controlled rotation & The controller must accurately track dynamic reference trajectories to execute smooth slew maneuvers between distinct equilibrium states. \\[0.5em]
+Jump-up (stretch)   & The system must store sufficient wheel angular momentum and shed it near-impulsively through a braking event to tip itself from a face rest onto an edge or corner, and then capture the resulting attitude into balance. \\[0.5em]
 Walking (stretch)   & The system must execute a sequential series of dynamic jump-up maneuvers and rapidly re-stabilize itself upon each landing impact. \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-These map one-to-one onto the applications of Section~\ref{sec:application}: (1)–(2) demonstrate pointing regulation and disturbance rejection of increasing difficulty; (3) demonstrates slew/reference-tracking; (4) demonstrates momentum-exchange mobility of the kind flown on Hayabusa2. Milestones (1)–(3) are treated as committed deliverables for this design; walking (4) is scoped as the stretch objective, contingent on hardware confirmation and the jump-up feasibility check (angular momentum required to tip the cube vs.\ available motor/wheel torque), to be resolved once final components are known.
+These map one-to-one onto the applications of Section~\ref{sec:application}: (1)–(2) demonstrate pointing regulation and disturbance rejection of increasing difficulty; (3) demonstrates slew/reference-tracking; (4)–(5) demonstrate momentum-exchange mobility of the kind flown on Hayabusa2, first as a single hop and then as a sequence of them. Milestones (1)–(3) are treated as committed deliverables for this design; jump-up (4) and walking (5) are scoped as stretch objectives, both contingent on the jump-up feasibility check (angular momentum required to tip the cube vs.\ available motor/wheel torque) and on hardware confirmation, to be resolved once final components are known. Walking additionally depends on (4) being achieved, since each step is a jump-up followed by a re-capture.
+
+The technical progression is also the teaching progression. Edge balance is
+reachable by a student who has understood a single-axis model and can tune one
+feedback law; corner balance demands the coupled three-axis treatment, a real
+estimator and honest inertia values; controlled rotation adds trajectory
+tracking; jump-up adds near-impulsive momentum transfer and the braking load
+case; walking adds repeated impact and contact. A learner therefore enters at the
+level they can handle and is pulled upward by the next milestone, using the
+same hardware throughout.
+
+\paragraph{Educational objectives.} These state what the student is expected to
+be able to do, and what the platform must provide for that to be possible.
+
+\begin{table}[htbp]
+\centering
+\caption[Educational objective-to-provision traceability]{Educational objectives and what the platform must provide to deliver them.}
+\label{tab:edu_traceability}
+\begin{tabular}{lp{0.65\textwidth}}
+\toprule
+Learning objective & Required provision \\
+\midrule
+Build it            & The mechanical design must be printable on hobby-grade equipment and assembled with catalogue fasteners and standard tools, so that construction is a student activity rather than a workshop service. \\[0.5em]
+Wire it             & The electrical architecture must be documented to schematic, pinout and harness level, with a bring-up procedure that isolates faults one subsystem at a time. \\[0.5em]
+Program it          & The firmware must expose the control loop, the estimator and the tunable gains as editable, readable code, with telemetry sufficient for a student to see why a run failed. \\[0.5em]
+Understand it       & Every sizing and control result must be derived from stated assumptions and reproducible from the equations given, so the numbers can be re-derived and challenged rather than trusted. \\[0.5em]
+Break and fix it    & The build must tolerate repeated falls and be repairable from spare printed parts and stocked components, so that experimentation carries no penalty beyond time. \\[0.5em]
+Reproduce it        & The design must be transferable: parametric CAD, a complete bill of materials and staged verification tests, so another school or team can rebuild the platform from this document. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The educational objectives are not a separate workstream layered on top of the
+engineering; they are constraints \emph{on} it, and they have already changed
+design decisions. The commodity, crashable build of
+Section~\ref{sec:application}, the parametric CAD of Section~\ref{sec:cad}, the
+adjustable ballast of Section~\ref{sec:rw_sizing} that keeps the cube tunable
+after assembly, the staged 1-DoF-before-3-DoF validation of
+Section~\ref{sec:methodology} and the bill of materials of
+Appendix~\ref{app:bom} all exist in the form they do because the platform has to
+be rebuildable and survivable in a student's hands, not only because they are
+sound engineering.
