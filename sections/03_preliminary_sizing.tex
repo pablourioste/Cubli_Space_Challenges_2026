@@ -153,41 +153,6 @@ at \qty{5000}{\rpm} therefore closes at \qty{6000}{\rpm} with margin in hand.
 conservative case it was verified against.\par}
 \end{table}
 
-% \begin{comment}
-\begin{table}[htbp]
-\centering
-\caption[Torque-limited wheel-inertia target (corner case)]{Torque-limited wheel-inertia target (corner case). Inputs are fixed by
-the closure procedure of Section~\ref{sec:massbudget}; the table is populated on
-each iteration. Values are those of the converged iteration.}
-\label{tab:jumpup_budget}
-\begin{tabular}{llr}
-\toprule
-Symbol & Description & Value \\
-\midrule
-$M$                & Cube mass                    & \qty{1.6}{\kilo\gram} \\
-$L$                & Cube edge length             & \qty{150}{\milli\metre} \\
-$\eta$             & Energy margin                & \num{1.05} \\
-$\tau_b$           & Brake torque per wheel       & \qty{5}{\newton\metre} (assumed; see below) \\
-$\tau_g = MgL/2$   & Gravitational tip-over floor & \qty{1.071}{\newton\metre} \\
-$\beta$            & Brake-amplification factor   & \num{1.273} \\
-$\omega_{\max}$    & Max wheel speed (design)     & \qty{6000}{\rpm}\textsuperscript{*} \\
-$h_w$              & Required angular momentum    & \qty{0.1994}{\kilo\gram\metre\squared\per\second} \\
-$I_{w,\text{target}}$ & \textbf{Target wheel inertia} & \qty{3.1735e-4}{\kilogram\metre\squared} \\
-\bottomrule
-\end{tabular}
-
-
-\vspace{0.4em}
-{\footnotesize\RaggedRight\textsuperscript{*}\,The sizing has additionally been
-run at \qty{5000}{\rpm} as an over-dimensioning check. Since
-$I_{w,\text{target}} = h_w/\omega_{\max}$, the lower speed raises the inertia
-requirement by a factor $6/5$ and so demands more ballast; a wheel that closes
-at \qty{5000}{\rpm} therefore closes at \qty{6000}{\rpm} with margin in hand.
-\qty{6000}{\rpm} is the value the design claims, \qty{5000}{\rpm} the
-conservative case it was verified against.\par}
-\end{table}
-% \end{comment}
-
 Two features of these relations govern how the iteration behaves:
 \begin{itemize}
   \item $h_w \propto ML^{3/2}$ --- growing the cube to fit a larger wheel also
@@ -447,9 +412,8 @@ ring, so nothing depends on a plastic pocket floor. Each station carries the
 centrifugal load $F=m_{\text{hw}}\,\omega_{\max}^2\,R_{\text{mean}}$ of its own
 hardware, reacted by the bolt in tension and by bearing of the head and nut
 faces --- now against the ring's curved ID and OD surfaces rather than a flat
-face, so both are spot-faced flat (or fitted with a curved washer) to seat
-squarely. A nyloc or threadlocked nut is specified so vibration cannot back it
-off.
+face, so both are spot-faced flat to seat
+squarely. 
 
 The geometry is defined by the quantities of Table~\ref{tab:rw_params}, all of
 which follow from the envelope closure of Section~\ref{sec:massbudget} and are
