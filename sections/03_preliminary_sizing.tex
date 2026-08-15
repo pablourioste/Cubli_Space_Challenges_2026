@@ -67,14 +67,19 @@ process.
 \subsubsection{Torque-Limited Wheel-Inertia Target}
 \label{sec:jumpup_target}
 
-Sizing follows the forward chain
-\[
-(M, L)\;\longrightarrow\;h_{w,\text{ideal}}\;\longrightarrow\;\beta
-\;\longrightarrow\;h_w\;\longrightarrow\;
-I_{w,\text{target}}=\frac{h_w}{\omega_{\max}}\;\longrightarrow\;
-\text{wheel geometry (Section~\ref{sec:rw_sizing})},
-\]
-with $\omega_{\max}$ held fixed throughout.
+Sizing follows the forward chain of Figure~\ref{fig:sizing_chain}: cube
+parameters fix an ideal wheel momentum, a geometric/contact factor inflates it
+to a design momentum, and the design momentum converts to the target wheel
+inertia that Section~\ref{sec:rw_sizing} sizes the wheel geometry against, with
+$\omega_{\max}$ held fixed at every step.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\linewidth]{images/sizing_chain_diagram.png}
+\caption[Wheel-inertia sizing chain]{Wheel-inertia sizing chain.}
+\label{fig:sizing_chain}
+\end{figure}
+
 Equation~\eqref{eq:omega_required} assumes an instantaneous, lossless momentum
 transfer; the momentum budget below relaxes that assumption by accounting for
 finite brake torque. Its first step is an ideal per-wheel angular momentum:
