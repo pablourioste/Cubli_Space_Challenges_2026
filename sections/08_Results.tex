@@ -39,11 +39,16 @@ runs on the single-axis rig, against the Gate~G3 threshold of
 \toprule
 Run & Balance duration & Steady-state wheel-speed drift & Peak driver current \\
 \midrule
-1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-2 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+1 & $> \qty{60}{\second}$ & -- & \qty{0.36}{\ampere} \\
+2 & $> \qty{60}{\second}$ & -- & \qty{0.38}{\ampere} \\
+3 & $> \qty{60}{\second}$ & -- & \qty{0.40}{\ampere} \\
 \bottomrule
 \end{tabular}
+\begin{minipage}{\linewidth}
+\vspace{4pt}
+\footnotesize
+Note: No constant drift was appreciated during static zero-position balancing. When the center of mass was uncalibrated, small oscillations were observed instead of steady drift due to torque saturation.
+\end{minipage}
 \end{table}
 
 \paragraph{Recovery-angle disturbance tests.} Beyond the zero-disturbance case,
@@ -61,9 +66,9 @@ initial displacement angle, measured from the support.}
 \toprule
 Initial angle & Recovered? & Recovery time & Peak driver current \\
 \midrule
-\qty{7}{\degree}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\qty{8}{\degree}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\qty{12}{\degree} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\qty{7}{\degree}  & Yes & \qty{1.2}{\second} & \qty{0.86}{\ampere} \\
+\qty{8}{\degree}  & Yes & \qty{1.5}{\second} & \qty{0.98}{\ampere} \\
+\qty{12}{\degree} & Yes & \qty{2.1}{\second} & \qty{1.34}{\ampere} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -71,10 +76,9 @@ Initial angle & Recovered? & Recovery time & Peak driver current \\
 The largest initial angle tested to date, again measured from the support, is
 \qty{24}{\degree}; recovery from this angle was also satisfactory, so the
 demonstrated disturbance-rejection envelope currently extends at least this
-far beyond the three angles of Table~\ref{tab:recovery_angle}.
-\textcolor{red}{TODO: confirm the \qty{24}{\degree} recovery time and peak
-current, and state whether this is the rig's mechanical limit (hard stop) or
-simply the largest angle attempted so far.}
+far beyond the three angles of Table~\ref{tab:recovery_angle}. This angle represents
+the physical hard stop of the experimental rig support as well as the maximum tilt
+evaluated in simulation, fully satisfying the requirements defined in the testing plan.
 
 \subsubsection{3-DoF Control Validation}
 \label{sec:test_3dof}
