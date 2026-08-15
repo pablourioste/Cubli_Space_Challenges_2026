@@ -1,0 +1,292 @@
+% ================= 4. METHODOLOGY =================
+\section{Methodology}
+\label{sec:methodology}
+
+Section~\ref{sec:wbs} assigns every task an owner and a date. This section
+states the reasoning that assignment is built on: the procedure the team
+follows to take the Cubli from a sizing target to a validated prototype, why
+its six stages run in this order and not another, and why the result is an
+iteration rather than a single pass through them. The Cubli is an
+interdisciplinary system whose subsystems cannot be sized, modelled or
+validated in isolation, which is why the methodology below is organised as a
+sequence of stages and validation gates rather than a single design pass.
+
+
+\subsection{Development and Iteration Workflow}
+\label{sec:dev_workflow}
+
+Figure~\ref{fig:methodology_workflow} is that procedure: six stages, each
+committing an output the next stage cannot start without, and three feedback
+paths that reopen an earlier stage when a downstream finding invalidates an
+upstream assumption.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\linewidth]{images/methodology_diagram.png}
+\caption[Development and iteration workflow]{Development and iteration
+workflow, with the three feedback loops that keep sizing, CAD and control
+consistent with each other and with measured hardware.}
+\label{fig:methodology_workflow}
+\end{figure}
+
+\paragraph{Workflow steps} Each stage sits where it does because the stage
+after it consumes an output only it produces:
+\begin{enumerate}
+\item \textbf{Preliminary Sizing} is the first stage of the project: it derives
+  the physics behind the Cubli and justifies the design parameters and
+  performance targets the rest of the design must meet. It fixes the cube
+  mass, edge length and target wheel inertia before anything is drawn, because a
+  part modelled to the wrong mass has to be redrawn no matter how well it is
+  designed (Section~\ref{sec:sizing}).
+\item \textbf{CAD Design} turns those targets into a
+  3D model and an internal packaging study, returning a measured inertia
+  tensor and centre of mass where Stage~1 could only estimate them (Section~\ref{sec:cad}).
+\item \textbf{Simulation and Control} tests control feasibility against the
+  CAD-derived inertia, mass and geometry rather than the Stage~1 estimate,
+  since a controller tuned on the wrong
+  inertia tensor is validated against the wrong plant (Sections~\ref{sec:2dmodel}--\ref{sec:3dmodel},
+  \ref{sec:control_algorithms}).
+\item \textbf{Assembly and Electronics} begins once the design is closed: the
+  cube is assembled, the electronics are placed and wired, and every axis is
+  tested before it is commanded (Section~\ref{sec:electrical}).
+\item \textbf{Firmware Architecture} is developed in parallel with the
+  previous stage: it integrates the electronics around the MCU and implements
+  the control-dynamics loop that converts IMU orientation data into
+  wheel-torque commands. Alongside the flight code, sub-programs are
+  developed to test and calibrate each electronic module individually
+  (Section~\ref{sec:control_sw}).
+\item \textbf{Experimental Validation} is the last stage: once integration
+  concludes, results are tested against the Simulink/Simscape simulation
+  analysis, and any shortfall is traced back to the CAD design, hardware or
+  software rather than patched locally. The workflow accommodates iteration at
+  every stage rather than assuming a single pass succeeds.
+\end{enumerate}
+
+\paragraph{Iterative loop at each stage} A single pass through that order is not sufficient,
+because three of its outputs correct an assumption made earlier in the same
+pass rather than only feeding forward:
+\begin{itemize}
+\item \emph{Mass update.} CAD's as-modelled mass and CoM close the loop into
+  Stage~1's assumed $M$ (Section~\ref{sec:massbudget}): the sizing reported
+  there is the fixed point of this loop, not its first iteration.
+\item \emph{Geometry change.} A control or simulation finding --- inertia
+  short of target, an infeasible slew, an interference the 2D model could not
+  see --- returns to CAD rather than being absorbed by re-tuning gains, since
+  no gain fixes a wheel that does not fit or a body the controller cannot
+  actuate against.
+\item \emph{Measured parameters.} Once hardware exists, the torque constant,
+  friction and latency measured on it (Section~\ref{sec:paramid}) replace the
+  CAD/datasheet estimates Stage~3 was designed on, and the control gains are
+  re-derived against the measured plant rather than flown on assumed values.
+\end{itemize}
+This is also why the schedule of Section~\ref{sec:schedule} gates CAD on the
+sizing numbers rather than running the two in parallel: a frame frozen ahead
+of the inertia tensor is a frame that may have to be reprinted, which costs
+more than the days spent waiting on the number.
+
+The full Cubli is underactuated and simultaneously unstable about all three
+axes when balanced on a corner (Section~\ref{sec:objectives}). Stage~3 of the
+procedure above is therefore itself incremental: a first, single-face 1-DoF
+prototype is built and modelled in two dimensions, so that the dynamics, the
+parameter identification procedure and the estimator can be validated on a
+plant simple enough to reason about directly; the same modelling,
+identification and verification workflow is then generalised to the second
+and final prototype, the fully three-dimensional cube, in
+Section~\ref{sec:3dmodel}. Each subsection below states the equations that
+define the problem at that stage and the method used to determine every
+parameter that appears in them; the control law itself --- how those
+equations are turned into a feedback command --- is derived separately in
+Section~\ref{sec:control_algorithms}, since sizing, dynamics and control are
+three passes over the same plant rather than three independent problems.
+
+\subsection{2D Reaction-Wheel Pendulum}
+\label{sec:2dmodel}
+
+The 1-DoF prototype is a 3D-printed plate sized to one cube face, with a
+motor-driven momentum wheel at its centre and a braking mechanism at one
+corner. The plate pivots on a bearing at that corner, constraining motion to a
+single rotational degree of freedom in a vertical plane.
+
+\subsubsection{Equations of Motion}
+\label{sec:2deom}
+
+The nonlinear equations of motion are
+\begin{align}
+\ddot{\theta}_b &= \frac{(m_b l_b + m_w l)\, g \sin\theta_b - T_m - C_b \dot{\theta}_b + C_w \dot{\theta}_w}{I_b + m_w l^2}, \\
+\ddot{\theta}_w &= \frac{(I_b + I_w + m_w l^2)(T_m - C_w \dot{\theta}_w)}{I_w (I_b + m_w l^2)} \notag \\
+&\quad - \frac{(m_b l_b + m_w l)\, g \sin\theta_b - C_b \dot{\theta}_b}{I_b + m_w l^2},
+\end{align}
+with motor current-torque relation $T_m = K_m u$. Symbols are defined in
+Table~\ref{tab:2d_vars} and used throughout this section.
+
+\begin{table}[htbp]
+\centering
+\caption[2D pendulum model variables]{2D pendulum model variables.}
+\label{tab:2d_vars}
+\begin{tabular}{lll}
+\toprule
+Symbol & Description & Unit \\
+\midrule
+$\theta_b$ & Body tilt angle & rad \\
+$\theta_w$ & Wheel rotation relative to body & rad \\
+$m_b, m_w$ & Body, wheel mass & kg \\
+$I_b, I_w$ & Body (about pivot), wheel (about motor axis) inertia & kg\,m$^2$ \\
+$l$ & Motor axis to pivot distance & m \\
+$l_b$ & Body CoM to pivot distance & m \\
+$g$ & Gravitational acceleration & m/s$^2$ \\
+$T_m$ & Motor torque & N\,m \\
+$C_b, C_w$ & Body, wheel damping coefficient & kg\,m$^2$/s \\
+$K_m$ & Motor torque constant & N\,m/A \\
+$u$ & Motor current input & A \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+\subsection{Parameter Identification \& the 2D Testbed}
+\label{sec:paramid}
+
+CAD mass-properties simulation, accounting for print material, infill, and
+mounted hardware (driver, encoder, MCU, gyroscope/accelerometer, wiring),
+gives $m_b, m_w, I_b, I_w$ directly, while $l$ and $l_b$ follow from the
+plate's design geometry. The damping coefficients $C_b$ and $C_w$ cannot be
+obtained from CAD, since they depend on bearing friction, wiring drag, and
+motor cogging; nominal values are used for the initial control design and
+replaced by the measured values below once the prototype is fabricated.
+
+\begin{table}[htbp]
+\centering
+\caption[Parameter determination method]{Parameter determination method (symbols per Table~\ref{tab:2d_vars}).}
+\label{tab:params}
+\begin{tabular}{ll}
+\toprule
+Symbol & Determination method \\
+\midrule
+$l$   & Calculated during design \\
+$l_b$ & Calculated during design \\
+$m_b$ & CAD mass properties \\
+$m_w$ & CAD mass properties \\
+$I_b$ & CAD mass properties \\
+$I_w$ & CAD mass properties \\
+$C_b$ & Estimated (measured on the 1-DoF rig, below) \\
+$C_w$ & Estimated (measured on the 1-DoF rig, below) \\
+$K_m$ & Motor datasheet \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{1-DoF plant identification.} Four parameters are measured on the
+single-axis rig once it is built, each by a method chosen so that the quantity
+of interest dominates the measurement rather than appearing as a small
+correction to something else. These measured values replace the CAD/datasheet
+estimates of Table~\ref{tab:params} before the control gains used on hardware
+are finalised (Section~\ref{sec:control_algorithms}).
+
+\begin{table}[htbp]
+\centering
+\caption[Plant parameters measured on the 1-DoF rig]{Plant parameters measured on the 1-DoF rig. Expected values follow from
+the design point and are populated when it closes.}
+\label{tab:paramid_methods}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{L{2.9cm} L{6.1cm} L{2.6cm} c}
+\toprule
+Parameter & Method & Instrument & Value \\
+\midrule
+Torque constant $K_t$ & Current step against a locked rotor; torque from measured reaction & Driver current telemetry & \textcolor{red}{TBD} \\
+Body inertia $J$ & Free-swing test about the pivot; inertia from the measured oscillation period & Encoder or IMU log & \textcolor{red}{TBD} \\
+Friction & Wheel coast-down from speed; viscous and Coulomb terms separated by fit & Encoder log & \textcolor{red}{TBD} \\
+Loop latency & Command-to-response timestamp through the full sense--compute--actuate path & Loopback on the flight computer & \textcolor{red}{TBD} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Tolerances are stated with the measured values, since a parameter without a
+tolerance cannot support the robustness sweep of Section~\ref{sec:control_algorithms}
+that consumes it. Loop latency is measured through the complete path rather than
+estimated from the \qty{1}{\kilo\hertz} loop rate, because the scheduling and
+bus-transport contributions are the ones a rate figure omits.
+
+\subsection{Generalization to the 3D Cube}
+\label{sec:3dmodel}
+
+The dynamics, identification workflow, and verification approach validated on the
+2D model of the first prototype extend to the second and final prototype: the
+full three-dimensional cube, where three orthogonal reaction wheels must
+stabilise the body about its edge and corner equilibria.
+
+\subsubsection{Full-Body Equations of Motion}
+
+With $R\in SO(3)$ the cube's orientation and $\omega_b\in\mathbb{R}^3$ its
+body-frame angular velocity, the attitude kinematics are
+\begin{equation}
+\dot R = R\,[\omega_b]_\times,
+\end{equation}
+where $[\cdot]_\times$ is the skew-symmetric cross-product matrix. The
+assembly's angular momentum about the pivot, expressed in the body frame,
+generalizes the single-axis momentum term of the 2D model:
+\begin{equation}
+H = I\omega_b + \sum_{i=1}^{3} I_{w,i}\,\omega_{w,i}\,e_i.
+\end{equation}
+Euler's equation gives
+\begin{equation}
+\dot H + \omega_b \times H = \tau_g - C_b\,\omega_b,
+\end{equation}
+and each wheel obeys
+\begin{equation}
+I_{w,i}\big(\dot\omega_{b,i} + \dot\omega_{w,i}\big) = T_{m,i} - C_{w,i}\,\omega_{w,i}, \qquad i=1,2,3.
+\end{equation}
+Table~\ref{tab:3d_vars} defines all symbols.
+
+\begin{table}[htbp]
+\centering
+\caption[Full-body (3D) model variables]{Full-body (3D) model variables.}
+\label{tab:3d_vars}
+\begin{tabular}{ll}
+\toprule
+Symbol & Description \\
+\midrule
+$R$ & Cube orientation relative to world frame \\
+$\omega_b$ & Body angular velocity, body frame ($\in\mathbb{R}^3$) \\
+$\omega_{b,i} = e_i^{\mathrm T}\omega_b$ & Body angular velocity about wheel axis $i$ \\
+$\omega_w = (\omega_{w,1},\omega_{w,2},\omega_{w,3})$ & Wheel angular velocities relative to body \\
+$e_i$ & Spin axis of wheel $i$ (face normal) \\
+$I$ & $3\times3$ inertia tensor, body+wheels, about pivot \\
+$H$ & Total angular momentum about pivot \\
+$\tau_g = m\,r_{cm}\times(R^{\mathrm T}\hat g)$ & Gravity torque about pivot \\
+$m$ & Total assembly mass \\
+$r_{cm}$ & Body-frame vector, pivot to assembly CoM \\
+$\hat g$ & World vertical unit vector \\
+$C_b$ & $3\times3$ body damping matrix \\
+$I_{w,i}, C_{w,i}$ & Inertia, damping of wheel $i$ \\
+$T_{m,i} = K_{m,i}u_i$ & Motor torque, wheel $i$ \\
+$u_i, K_{m,i}$ & Motor current, torque constant, wheel $i$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Restricting motion to a single vertical plane with two wheel torques set to
+zero recovers the 2D model exactly, with $I_b, l_b, m_b, m_w, I_w,
+C_b, C_w$ the corresponding single-axis projections of $I, r_{cm}, m, I_{w,i},
+C_{w,i}$.
+
+\subsubsection{Edge vs.\ Corner Equilibria \& Linearisation}
+
+Jump-up proceeds in two stages: Flat-to-Edge, where one wheel brakes,
+followed by Edge-to-Corner, where a second wheel brakes. \textbf{Edge
+balancing} constrains the body to a single axis, so the dynamics reduce to
+the 2D form of Section~\ref{sec:2deom}, with $m_b, l_b, I_b$ replaced by their
+edge equivalents.
+
+\textbf{Corner balancing} is genuinely 3D: all three wheels contribute across
+three rotational DOF. Linearising about the corner-up equilibrium
+$(\theta,\omega_b,\omega_w)=(0,0,0)$, with $\theta\in\mathbb{R}^3$ the small
+orientation error, gives the same state-space form as the 2D case:
+\begin{equation}
+\dot x(t) = Ax(t) + Bu(t), \qquad x := (\theta,\omega_b,\omega_w) \in \mathbb{R}^9,
+\end{equation}
+with $A \in \mathbb{R}^{9\times9}$ and $B \in \mathbb{R}^{9\times3}$ built
+from $I$, $r_{cm}$, and the per-wheel parameters $I_{w,i}, C_{w,i}, K_{m,i}$
+(Table~\ref{tab:3d_vars}). This linear model, together with its 2D counterpart
+of Section~\ref{sec:2deom}, is the plant the balancing controller of
+Section~\ref{sec:control_algorithms} is designed on.

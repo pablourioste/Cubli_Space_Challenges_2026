@@ -152,13 +152,13 @@ Figure~\ref{fig:dwg_3d}. The frame realises the two-part architecture of
 Section~\ref{sec:mechanical}: an outer frame of edge rails and corner contact
 features encloses an inner structure carrying the three orthogonal
 reaction-wheel modules and the electronics tray. The sheet carries an isometric
-cutaway of the inner structure showing the stacked electronics (upper left), an
-isometric view of the closed assembly with the three wheel modules visible
-through the open frame faces (upper centre), a front elevation of a single
-motor/wheel module in section, showing the electronics tray edge-on against the
-motor mount (right), and two front orthographic views of individual face
-modules giving the motor bolt circle and corner fastener pattern (lower left and
-centre). This drawing supersedes the concept prototype of
+cutaway of the inner structure with the individual boards called out (upper
+left), an isometric view of the closed assembly with the three wheel modules
+visible through the open frame faces and the ballast bolt set annotated (upper
+centre), a front elevation of a single motor/wheel module in section, with the
+IMU location called out (right), and two front orthographic views of individual
+face modules giving the motor bolt circle and corner fastener pattern (lower
+left and centre). This drawing supersedes the concept prototype of
 Figure~\ref{fig:cube_3d}, which validated the two-part architecture and internal
 packaging but did not carry final dimensions; the edge length $L$ and wheel
 geometry realised here follow the closure of Section~\ref{sec:rw_sizing}.
@@ -169,16 +169,20 @@ geometry realised here follow the closure of Section~\ref{sec:rw_sizing}.
 \thispagestyle{cublidrawing}
 \centering
 \includegraphics[width=\linewidth,height=1.0\textwidth,keepaspectratio]{images/armonia_assembly.pdf}
-\caption[General-assembly drawing of the three-axis cube]{General-assembly
-drawing of the three-axis cube --- the final released design of the flight
-article --- sheet 1 of 1 at 1:1. Upper left: isometric cutaway of the inner
-structure, showing the stacked flight-controller and driver boards on their
-mount. Upper centre: isometric view of the closed assembly, showing the three
-orthogonal reaction-wheel modules through the open frame faces. Right: front
-elevation in section of a single motor/wheel module, showing the electronics
-tray edge-on against the motor mount. Lower left and lower centre: front
-orthographic views of two face modules, giving the motor bolt circle and the
-corner fastener pattern of Table~\ref{tab:mech_interfaces}.}
+\caption[General-assembly drawing of the three-axis cube, with electronics
+callouts]{General-assembly drawing of the three-axis cube --- the final
+released design of the flight article --- sheet 1 of 1 at 1:1, with the
+electronics package called out per Section~\ref{sec:layout}. Upper left:
+isometric cutaway of the inner structure, labelling the three motor drivers
+(Driver~1--3), the three encoder boards (Encoder~1--3) and the three perfboard
+assemblies (Perfboard~1: Teensy flight controller; Perfboard~2: Xiao and
+termination; Perfboard~3: DC-DC converter). Upper centre: isometric view of the
+closed assembly, showing the three orthogonal reaction-wheel modules through the
+open frame faces and the $3\times16$ M6 ballast bolt-and-nut set. Right: front
+elevation in section of a single motor/wheel module, locating the IMU on the
+inner structure. Lower left and lower centre: front orthographic views of two
+face modules, giving the motor bolt circle and the corner fastener pattern of
+Table~\ref{tab:mech_interfaces}.}
 \label{fig:dwg_3d}
 \end{figure}
 \end{landscape}
