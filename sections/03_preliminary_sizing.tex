@@ -23,18 +23,40 @@ afterward.
 \subsection{Jump-Up Feasibility Analysis}
 \label{sec:jumpup}
 
-Given CAD-derived $I_b, I_w, m_b, l_b, m_w, l$, the wheel speed $\omega_w$
-required for jump-up is estimated before fabrication, assuming a perfectly
-inelastic wheel-body collision. Conservation of angular momentum at impact and
-of energy from impact to edge-standing yield
+The analysis runs in one direction, which is worth stating before any equation
+appears. Two quantities enter as \emph{inputs}: the cube mass $M$ and edge
+length $L$, fixed by the packaging closure of Section~\ref{sec:massbudget};
+and the maximum wheel speed $\omega_{\max}$, a design choice bounded by what
+the drive can sustain in service (\emph{Selection of $\omega_{\max}$}, below).
+One quantity leaves as the \emph{output}: the per-wheel inertia
+$I_{w,\text{target}}$ the manoeuvre demands, which the wheel of
+Section~\ref{sec:rw_sizing} must then deliver through its diameter and
+ballast. Wheel speed is never solved for during sizing --- it is set, and the
+wheel is sized around it.
+
+\paragraph{Origin of the requirement.} The physics comes from the jump-up
+collision itself, modelled as a perfectly inelastic transfer between a
+spinning wheel and the body. Conservation of angular momentum at impact and of
+energy from impact to edge-standing give a closed form for the speed a
+\emph{given} wheel would need:
 \begin{equation}
 \omega_w^2 = (2-\sqrt2)\,\frac{I_w+I_b+m_wl^2}{I_w^2}\,(m_bl_b+m_wl)\,g.
+\label{eq:omega_required}
 \end{equation}
-This value is checked against the motor's achievable speed at the available
-bus voltage and used to size wheel inertia (radius, rim mass) within the
-motor's operating range without excessively reducing the balancing recovery
-angle. Post-fabrication, $\omega_w$ is refined experimentally to correct for
-deviations from the ideal collision assumption.
+Equation~\eqref{eq:omega_required} is the inverse of the sizing question
+rather than the sizing path: it presumes a wheel whose inertia $I_w$ is
+already known, which at this stage is precisely the unknown. It serves two
+other purposes. Before fabrication it is a sanity check --- a candidate wheel
+can be substituted to confirm that the speed it implies lies inside the
+motor's operating range at the available bus voltage, without excessively
+reducing the balancing recovery angle. After fabrication it becomes a
+verification relation, evaluated on the CAD- and test-derived $I_b, I_w, m_b,
+l_b, m_w, l$ of the built prototype (Section~\ref{sec:paramid}), with
+$\omega_w$ refined experimentally to absorb deviations from the ideal-collision
+assumption. The $\omega_w$ of Equation~\eqref{eq:omega_required} and the
+$\omega_{\max}$ of Section~\ref{sec:jumpup_target} are the same physical wheel
+speed on opposite sides of one relation: here it is solved for; there it is
+fixed so that inertia can be solved for instead.
 
 The braking mechanism uses a servo-driven barrier that strikes a bolt head on
 the wheel to stop it abruptly. Servo response time bounds the validity of the
@@ -45,10 +67,17 @@ process.
 \subsubsection{Torque-Limited Wheel-Inertia Target}
 \label{sec:jumpup_target}
 
-The relation above assumes an instantaneous, lossless momentum transfer. For
-preliminary sizing, motor speed is treated as fixed and the required per-wheel
-inertia is instead derived from a momentum budget that also accounts for
-finite brake torque, giving an ideal per-wheel angular momentum:
+Sizing follows the forward chain
+\[
+(M, L)\;\longrightarrow\;h_{w,\text{ideal}}\;\longrightarrow\;\beta
+\;\longrightarrow\;h_w\;\longrightarrow\;
+I_{w,\text{target}}=\frac{h_w}{\omega_{\max}}\;\longrightarrow\;
+\text{wheel geometry (Section~\ref{sec:rw_sizing})},
+\]
+with $\omega_{\max}$ held fixed throughout.
+Equation~\eqref{eq:omega_required} assumes an instantaneous, lossless momentum
+transfer; the momentum budget below relaxes that assumption by accounting for
+finite brake torque. Its first step is an ideal per-wheel angular momentum:
 \begin{equation}
 h_{w,\text{ideal}} = \sqrt{\eta}\;\frac{\sqrt{2 g\,\lambda\,\kappa}}{n}\;M L^{3/2},
 \label{eq:hw_ideal}
