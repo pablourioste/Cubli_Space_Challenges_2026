@@ -34,17 +34,12 @@ after it consumes an output only it produces:
 \begin{enumerate}
 \item \textbf{Preliminary Sizing} is the first stage of the project: it derives
   the physics behind the Cubli and justifies the design parameters and
-  performance targets the rest of the design must meet. It fixes the cube
-  mass, edge length and target wheel inertia before anything is drawn, because a
-  part modelled to the wrong mass has to be redrawn no matter how well it is
-  designed (Section~\ref{sec:sizing}).
+  performance targets the rest of the design must meet.
 \item \textbf{CAD Design} turns those targets into a
   3D model and an internal packaging study, returning a measured inertia
   tensor and centre of mass where Stage~1 could only estimate them (Section~\ref{sec:cad}).
 \item \textbf{Simulation and Control} tests control feasibility against the
-  CAD-derived inertia, mass and geometry rather than the Stage~1 estimate,
-  since a controller tuned on the wrong
-  inertia tensor is validated against the wrong plant (Sections~\ref{sec:2dmodel}--\ref{sec:3dmodel},
+  CAD-derived inertia, mass and geometry rather than the Stage~1 estimate (Sections~\ref{sec:2dmodel}--\ref{sec:3dmodel},
   \ref{sec:control_algorithms}).
 \item \textbf{Assembly and Electronics} begins once the design is closed: the
   cube is assembled, the electronics are placed and wired, and every axis is
@@ -55,10 +50,8 @@ after it consumes an output only it produces:
   wheel-torque commands. Alongside the flight code, sub-programs are
   developed to test and calibrate each electronic module individually
   (Section~\ref{sec:control_sw}).
-\item \textbf{Experimental Validation} is the last stage: once integration
-  concludes, results are tested against the Simulink/Simscape simulation
-  analysis, and any shortfall is traced back to the CAD design, hardware or
-  software rather than patched locally. The workflow accommodates iteration at
+\item \textbf{Experimental Validation} is the last stages: once integration
+  concludes, results are tested and validated. The workflow accommodates iteration at
   every stage rather than assuming a single pass succeeds.
 \end{enumerate}
 
@@ -194,24 +187,6 @@ correction to something else. These measured values replace the CAD/datasheet
 estimates of Table~\ref{tab:params} before the control gains used on hardware
 are finalised (Section~\ref{sec:control_algorithms}).
 
-\begin{table}[htbp]
-\centering
-\caption[Plant parameters measured on the 1-DoF rig]{Plant parameters measured on the 1-DoF rig. Expected values follow from
-the design point and are populated when it closes.}
-\label{tab:paramid_methods}
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{L{2.9cm} L{6.1cm} L{2.6cm} c}
-\toprule
-Parameter & Method & Instrument & Value \\
-\midrule
-Torque constant $K_t$ & Current step against a locked rotor; torque from measured reaction & Driver current telemetry & \textcolor{red}{TBD} \\
-Body inertia $J$ & Free-swing test about the pivot; inertia from the measured oscillation period & Encoder or IMU log & \textcolor{red}{TBD} \\
-Friction & Wheel coast-down from speed; viscous and Coulomb terms separated by fit & Encoder log & \textcolor{red}{TBD} \\
-Loop latency & Command-to-response timestamp through the full sense--compute--actuate path & Loopback on the flight computer & \textcolor{red}{TBD} \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 Tolerances are stated with the measured values, since a parameter without a
 tolerance cannot support the robustness sweep of Section~\ref{sec:control_algorithms}
