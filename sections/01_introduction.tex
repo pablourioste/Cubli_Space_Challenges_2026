@@ -130,15 +130,24 @@ the student must be able to do and what the platform must provide for it.
 \centering
 \caption[Educational objective-to-provision traceability]{Educational objectives and what the platform must provide to deliver them.}
 \label{tab:edu_traceability}
-\begin{tabular}{lp{0.65\textwidth}}
+% Each objective is separated by a hairline rule (\cmidrule) rather than by
+% vertical space alone, so the multi-line provisions cannot be read as running
+% together. \addlinespace on either side keeps the rules off the text.
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}>{\bfseries}p{0.21\textwidth}p{0.68\textwidth}@{}}
 \toprule
-Learning objective & Required provision \\
+\textnormal{Learning objective} & Required provision \\
 \midrule
-Build it            & The mechanical design must be printable on hobby-grade equipment and assembled with catalogue fasteners and standard tools, so that construction is a student activity rather than a workshop service. \\[0.5em]
-Wire it             & The electrical architecture must be documented to schematic, pinout and harness level, with a bring-up procedure that isolates faults one subsystem at a time. \\[0.5em]
-Program it          & The firmware must expose the control loop, the estimator and the tunable gains as editable, readable code, with telemetry sufficient for a student to see why a run failed. \\[0.5em]
-Understand it       & Every sizing and control result must be derived from stated assumptions and reproducible from the equations given, so the numbers can be re-derived and challenged rather than trusted. \\[0.5em]
-Break and fix it    & The build must tolerate repeated falls and be repairable from spare printed parts and stocked components, so that experimentation carries no penalty beyond time. \\[0.5em]
+Build it            & The mechanical design must be printable on hobby-grade equipment and assembled with catalogue fasteners and standard tools, so that construction is a student activity rather than a workshop service. \\
+\addlinespace[0.35em] \cmidrule(l{0pt}r{0pt}){1-2} \addlinespace[0.35em]
+Wire it             & The electrical architecture must be documented to schematic, pinout and harness level, with a bring-up procedure that isolates faults one subsystem at a time. \\
+\addlinespace[0.35em] \cmidrule(l{0pt}r{0pt}){1-2} \addlinespace[0.35em]
+Program it          & The firmware must expose the control loop, the estimator and the tunable gains as editable, readable code, with telemetry sufficient for a student to see why a run failed. \\
+\addlinespace[0.35em] \cmidrule(l{0pt}r{0pt}){1-2} \addlinespace[0.35em]
+Understand it       & Every sizing and control result must be derived from stated assumptions and reproducible from the equations given, so the numbers can be re-derived and challenged rather than trusted. \\
+\addlinespace[0.35em] \cmidrule(l{0pt}r{0pt}){1-2} \addlinespace[0.35em]
+Break and fix it    & The build must tolerate repeated falls and be repairable from spare printed parts and stocked components, so that experimentation carries no penalty beyond time. \\
+\addlinespace[0.35em] \cmidrule(l{0pt}r{0pt}){1-2} \addlinespace[0.35em]
 Reproduce it        & The design must be transferable: parametric CAD, a complete bill of materials and staged verification tests, so another school or team can rebuild the platform from this document. \\
 \bottomrule
 \end{tabular}
