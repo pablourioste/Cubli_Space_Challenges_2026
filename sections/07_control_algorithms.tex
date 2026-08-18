@@ -1142,3 +1142,492 @@ into a direction that does not move.
 \emph{A tolerance must be chosen relative to the scale of the matrix it is
 applied to.} MATLAB's default does this; a hand-supplied absolute figure
 carried over from another problem does not.
+
+\subsection{State estimation}
+\label{sec:estimation}
+
+\subsubsection{Why an estimator is unavoidable}
+\label{sec:why-estimator}
+
+An accelerometer does not measure gravity. It measures \emph{specific force}
+--- the difference between the acceleration of its case and free fall.
+Stationary on a bench the case is supported at $1\,g$, the reading is $1\,g$
+upward, and interpreting that as ``down is the other way'' is correct. The
+instant the case accelerates for any other reason, it is not.
+
+On a body rotating about a fixed pivot with the sensor at distance $d$ from
+that pivot, the case experiences two additional accelerations --- tangential
+$\ddot\theta\,d$ and centripetal $\dot\theta^2 d$ --- so in body axes
+%
+\begin{equation}
+  f_x = \ddot\theta\,d + g\sin\theta,
+  \qquad
+  f_y = g\cos\theta - \dot\theta^2 d,
+  \label{eq:specific-force}
+\end{equation}
+%
+and the naive tilt readout $\hat\theta = \mathrm{atan2}(f_x, f_y)$ is
+contaminated by both.
+
+\paragraph{The contamination is largest exactly when the estimate matters
+most.} When the cube is upright and still, $\ddot\theta = 0$ and the
+accelerometer is perfect. When the controller is working hardest ---
+mid-recovery, with the wheels at full authority --- $\ddot\theta$ peaks and
+the accelerometer lies worst. The error is not noise to be averaged down; it
+is correlated with the manoeuvre.
+
+Quantitatively, for this cube with the IMU at the geometric centre
+($d = 130$\,mm to any corner):
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Tilt} & $\ddot\theta$ \textbf{free} & $\ddot\theta$ \textbf{under full control}
+& \textbf{Apparent tilt error at $d=130$\,mm}\\
+\midrule
+$1.00^\circ$ & $1.19$ & $7.30$\,rad\,s$^{-2}$ & $0.90^\circ$ / $5.54^\circ$\\
+$2.00^\circ$ & $2.37$ & $8.49$\,rad\,s$^{-2}$ & $1.80^\circ$ / $6.44^\circ$\\
+$3.00^\circ$ & $3.56$ & $9.67$\,rad\,s$^{-2}$ & $2.70^\circ$ / $7.35^\circ$\\
+$\bm{3.88^\circ}$ \emph{(envelope edge)} & $4.60$ & $\bm{10.71}$\,rad\,s$^{-2}$
+  & $3.49^\circ$ / $\bm{8.14^\circ}$\\
+\bottomrule
+\end{tabular}
+\caption{Angular acceleration during recovery and the lever-arm error it
+produces. ``Free'' is gravity alone; ``under full control'' adds the
+saturated wheel torque $\sqrt{2}\,\tau_{\mathrm{cont}}$ opposing it.}
+\label{tab:lever-arm}
+\end{table}
+
+\begin{quote}
+\textbf{At the envelope edge the accelerometer reports $8.14^\circ$ of tilt
+that is not there --- more than twice the entire $3.88^\circ$ recoverable
+envelope.}
+\end{quote}
+
+\noindent
+Feeding that reading directly to the controller does not degrade performance;
+it inverts it. The measured consequence on the panel, where the same
+arithmetic gives a $25.9^\circ$ apparent error at the envelope edge, was a
+$32.44^\circ$ peak estimate error and a rig that ended at $88.83^\circ$ ---
+flat on its side, having been driven there by its own controller. That
+counterfactual is worth retaining: it establishes that the filter does real
+work rather than merely tidying a signal.
+
+\subsubsection{A second, tighter reason: bias sensitivity}
+\label{sec:bias-sensitivity}
+
+The lever-arm term is transient. There is a second requirement on the
+estimator that is not, and on this machine it binds harder.
+
+A constant tilt-estimate error $e$ means the controller drives the
+\emph{estimate} to zero, so the cube physically balances $e$ off true
+vertical. Gravity then applies a constant moment, and the wheels must absorb
+it indefinitely. Solving the steady state gives a standing wheel speed
+%
+\begin{equation}
+  \dot\varphi_{ss} = \frac{|K_1|}{|K_3|}\,e,
+  \qquad \frac{|K_1|}{|K_3|} = 4365 \ \text{for this cube},
+  \label{eq:standing-wheel}
+\end{equation}
+%
+against $635$ for the planar panel. \textbf{The cube is $6.9\times$ more
+sensitive to estimator bias than the panel was}, and the panel result should
+not be carried across.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Tilt-estimate error} & \textbf{Standing wheel speed} & \textbf{\% of the $40$\,rad\,s$^{-1}$ cap}\\
+\midrule
+$0.05^\circ$ & $3.8$\,rad\,s$^{-1}$ & $10\,\%$\\
+$0.10^\circ$ & $7.6$\,rad\,s$^{-1}$ & $19\,\%$\\
+$0.25^\circ$ & $19.0$\,rad\,s$^{-1}$ & $48\,\%$\\
+$0.50^\circ$ & $38.1$\,rad\,s$^{-1}$ & $95\,\%$\\
+$1.00^\circ$ & $76.2$\,rad\,s$^{-1}$ & $190\,\%$ --- saturated at rest\\
+\bottomrule
+\end{tabular}
+\caption{Momentum consumed by a standing tilt error, before any disturbance
+arrives.}
+\label{tab:bias-budget}
+\end{table}
+
+Allowing a fifth of the momentum budget for standing error, the cube tolerates
+%
+\begin{equation}
+  e_{\max} = 0.105^\circ,
+  \qquad\text{against } 0.722^\circ \text{ for the panel}.
+\end{equation}
+%
+This single number governs the estimator design. It is why the integral term
+of \S\ref{sec:chosen} is not a refinement, and why the accelerometer
+calibration requirements of \S\ref{sec:calibration} are as strict as they are.
+
+\subsubsection{The candidates}
+\label{sec:candidates}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lp{34mm}p{27mm}p{40mm}@{}}
+\toprule
+\textbf{Filter} & \textbf{Structure} & \textbf{Assumes} & \textbf{Cost}\\
+\midrule
+Direct nonlinear complementary &
+  correction from the measured vector directly &
+  a reconstructed attitude is available &
+  needs an attitude reconstruction step, which reintroduces a
+  parameterisation\\[0.4em]
+\textbf{Explicit complementary} &
+  correction built from vector measurements, no reconstruction &
+  at least one reference vector &
+  $P$-only leaves a standing offset proportional to gyro bias\\[0.4em]
+\textbf{Passive complementary} &
+  correction rotated into the estimate frame &
+  same &
+  better conditioned at large error; no advantage in our operating range\\[0.4em]
+Linear Kalman &
+  optimal for a linear plant and Gaussian noise &
+  linearity &
+  see \S\ref{sec:upgrade-path} --- the usual objection does not apply
+  here\\[0.4em]
+\textbf{MEKF} &
+  error-state Kalman on the tangent space, reset each step &
+  small error between resets &
+  estimates gyro bias explicitly; more state, more tuning, more that can go
+  wrong\\
+\bottomrule
+\end{tabular}
+\caption{Estimator structures considered. The taxonomy of the first three is
+that of Mahony, Hamel and Pflimlin \cite{mahony2008complementary}.}
+\label{tab:filters}
+\end{table}
+
+\subsubsection{What was chosen}
+\label{sec:chosen}
+
+\paragraph{Explicit complementary filter with PI correction, on the gravity
+direction directly.} The filter estimates $\hat{\bm{g}}$, the gravity
+direction in body coordinates, and a gyro bias $\hat{\bm{b}}$:
+%
+\begin{align}
+  \bm{e} &= \hat{\bm{g}}\times\hat{\bm{\gamma}}_{\mathrm{meas}}
+    \label{eq:cf-error}\\
+  \dot{\hat{\bm{g}}} &= -\left(\bm{\omega}-\hat{\bm{b}}\right)\times\hat{\bm{g}}
+     \;+\; k_P\,\bm{e}\times\hat{\bm{g}}
+    \label{eq:cf-prop}\\
+  \dot{\hat{\bm{b}}} &= +\,k_I\,\bm{e}
+    \label{eq:cf-bias}
+\end{align}
+%
+with $\hat{\bm{g}}$ renormalised every cycle. The attitude state fed to the
+controller is then $\bm{\phi} = -\hat{\bm{g}}_B\times\hat{\bm{g}}$, one cross
+product (\S\ref{sec:reduced-attitude}).
+
+Read \eqref{eq:cf-prop} as two sensors covering two frequency bands. The gyro
+is integrated forward: accurate over short intervals, drifting over long ones.
+The accelerometer has no drift --- it always knows where down is on average
+--- but is corrupted by $\ddot\theta d$ at high frequency. Trust the gyro
+fast, trust the accelerometer slow; $k_P$ sets the crossover at
+$\tau = 1/k_P$.
+
+\paragraph{The integral term is the load-bearing part, and its sign is not
+obvious.} A $P$-only filter leaves a standing tilt offset $e = b/k_P$
+proportional to gyro bias. Given \cref{tab:bias-budget} that is not
+acceptable:
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Gyro bias} & \textbf{Tilt error, $P$-only at $k_P=4$}
+& \textbf{Standing wheel} & \textbf{\% of cap}\\
+\midrule
+$1.00^\circ$\,s$^{-1}$ \emph{(uncalibrated MEMS)} & $0.250^\circ$ & $19.0$\,rad\,s$^{-1}$ & $47.6\,\%$\\
+$0.05^\circ$\,s$^{-1}$ \emph{(startup calibration)} & $0.013^\circ$ & $1.0$\,rad\,s$^{-1}$ & $2.4\,\%$\\
+$0.01^\circ$\,s$^{-1}$ \emph{(online estimation)} & $0.003^\circ$ & $0.2$\,rad\,s$^{-1}$ & $0.5\,\%$\\
+\bottomrule
+\end{tabular}
+\caption{Gyro bias propagated through a $P$-only filter to standing wheel
+speed. The integral term of \eqref{eq:cf-bias} drives the steady-state error
+to zero regardless of which row applies.}
+\label{tab:gyro-bias}
+\end{table}
+
+An uncalibrated consumer MEMS gyro typically shows $1$--$2^\circ$\,s$^{-1}$ of
+zero-rate offset, which alone would consume half the momentum budget standing
+still. \emph{Startup calibration is mandatory, not optional}, and the
+integral term of \eqref{eq:cf-bias} then removes what remains, including slow
+thermal drift --- plausibly $0.1$--$0.3^\circ$\,s$^{-1}$ over a ten-minute
+session for a sensor sitting near three motors with no airflow.
+
+The sign in \eqref{eq:cf-bias} is $+k_I\bm{e}$. This was established by
+measurement, not derivation: the opposite sign converges, apparently
+correctly, to five times the true bias. A filter that converges to a wrong
+answer smoothly is worse than one that diverges.
+
+\paragraph{A structural result worth stating.} The component of gyro bias
+along $\hat{\bm{g}}_B$ is unobservable --- it is the yaw-rate bias, and
+gravity gives no information about rotation about gravity
+(\S\ref{sec:unobservable}). Tested against a true bias of
+$0.149^\circ$\,s$^{-1}$ along that direction, the estimator returns exactly
+$0.000$, while both perpendicular components converge to truth. This is
+correct behaviour, not a failure: nothing in the measurement set constrains
+it. A quaternion MEKF would represent that direction explicitly and its
+covariance there would grow without bound unless constrained by hand
+\cite{markley2003attitude}. The reduced-attitude form cannot express the
+problem.
+
+\paragraph{Gains.} $k_P = 4$, $k_I = 0.5$.
+\FLAG{Sources disagree. The firmware note and the specification carry
+$k_P = 4$; the cube envelope sweep gives $k_P = 5$ as a clear optimum
+(recovery $2.75^\circ$ against $2.49$--$2.58^\circ$ at $k_P=2$) with a hard
+edge above it. Confirm before this is written down.}
+The response to $k_I$ is flat across $0.1$--$2.0$, so the value is not
+critical. The response to $k_P$ is not flat, and \S\ref{sec:kp-edge}
+explains why.
+
+\subsubsection{Why the lever-arm term very nearly disappears}
+\label{sec:cancellation}
+
+The filter succeeds against \cref{tab:lever-arm} for two reasons, and the
+second is the interesting one.
+
+\begin{enumerate}
+  \item \textbf{Attenuation.} The lever-arm error is a transient lasting
+        ${\sim}0.2$\,s, and the accelerometer path is low-passed at
+        $\tau = 1/k_P$. Most of it never reaches the estimate.
+  \item \textbf{Cancellation.} The error term is $\ddot\theta\,d$, and
+        low-passing is approximately integrating. But
+        $\int\ddot\theta\,\mathrm{d}t = \Delta\dot\theta$, which is
+        \textbf{zero across a completed recovery} --- the rig is at rest
+        before and at rest after. \emph{The accelerometer lies one way while
+        accelerating and the other way while decelerating, and the two
+        cancel.}
+\end{enumerate}
+
+Attenuation alone would not achieve what is observed; the sign reversal does
+the rest. On the panel, where the effect was first measured, a $25.9^\circ$
+raw peak became a $0.29^\circ$ filtered error --- a factor of $300$ ---
+and the residual was not lever arm at all but $b\tau$, the gyro-bias floor:
+$0.005\ \mathrm{rad\,s^{-1}} \times 1.0\ \mathrm{s} = 0.286^\circ$, matching
+the observed $0.29^\circ$ to two decimals at every mounting distance.
+
+Two design consequences follow directly from the cancellation, and both are
+counter-intuitive enough to be worth stating explicitly.
+
+\paragraph{Do not attempt an $\dot{\bm{\omega}}\times\bm{r}$ correction.} It
+requires a differentiated gyro signal, and the filter already rejects that
+term. The correction would add noise to remove something that cancels.
+
+\paragraph{Keep the accelerometer rejection gate deliberately loose.} A gate
+that discards accelerometer samples whose magnitude departs from $1\,g$ by
+more than a few percent will fire during the acceleration phase and not
+during the deceleration phase --- \textbf{which breaks the cancellation} and
+leaves the uncancelled half. A gate at $10$--$20\,\%$ is used, wide enough to
+pass both halves of the transient while still rejecting an impact.
+
+\subsubsection{What does not transfer from one dimension to three}
+\label{sec:1d-to-3d}
+
+The panel study established the mechanism. Three of its conclusions do not
+survive the move to three dimensions, and each was re-measured on the cube.
+
+\paragraph{1. The centripetal term acquires a DC component.} The tangential
+term cancels because $\ddot\theta$ changes sign. The centripetal term
+$\bm{\omega}\times(\bm{\omega}\times\bm{r})$ is quadratic in $\bm{\omega}$
+and always directed inward, so it does not:
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+$\omega$ [rad\,s$^{-1}$] & $\omega^2 r$ at $r=130$\,mm & \% of $g$ & Apparent tilt\\
+\midrule
+$1$ & $0.130$\,m\,s$^{-2}$ & $1.3\,\%$ & $0.76^\circ$\\
+$2$ & $0.520$\,m\,s$^{-2}$ & $5.3\,\%$ & $3.04^\circ$\\
+$3$ & $1.170$\,m\,s$^{-2}$ & $11.9\,\%$ & $6.80^\circ$\\
+$5$ & $3.250$\,m\,s$^{-2}$ & $33.1\,\%$ & $18.34^\circ$\\
+\bottomrule
+\end{tabular}
+\caption{The centripetal term does not average away and must be subtracted
+explicitly. Negligible on the panel; not on the cube.}
+\label{tab:centripetal}
+\end{table}
+
+\noindent
+It is corrected explicitly, using the measured $\bm{\omega}$ and the known
+mounting position $\bm{r}$ --- both available, neither requiring
+differentiation.
+
+\paragraph{2. Mounting position stops being free.} On the panel the estimate
+error was $0.29^\circ$ at every distance from $0$ to $106$\,mm, and the
+conclusion drawn was that the IMU could be mounted wherever convenient. On
+the cube there is a cliff:
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Estimator} & \textbf{IMU at the corner} & \textbf{at $137$\,mm} & \textbf{at $206$\,mm}\\
+\midrule
+Raw accelerometer & $3.18^\circ$ & $\bm{0.00}$ --- falls every time & ---\\
+Complementary filter with bias & $2.85^\circ$ & $2.75^\circ$ & $\bm{0.00}$\\
+\bottomrule
+\end{tabular}
+\caption{Recovery angle against IMU distance from the balancing corner. The
+cancellation of \S\ref{sec:cancellation} has a range limit, and in three
+dimensions that limit binds.}
+\label{tab:imu-placement}
+\end{table}
+
+The geometry is what changed, not the physics. On the panel the largest
+available lever arm was $106$\,mm. On the cube, opposite corners are
+$259.8$\,mm apart, so an IMU mounted near the primary corner sits past the
+cliff for the antipodal one. The design rule follows:
+
+\begin{quote}
+\textbf{Mount the IMU at the geometric centre.} It is then $129.9$\,mm from
+every one of the eight corners --- inside the ${\sim}150$\,mm limit for all of
+them simultaneously, which no other position achieves.
+\end{quote}
+
+\noindent
+Thermal isolation from the motors and clean cable routing remain the
+secondary criteria, as on the panel. Proximity to any particular corner is
+not a criterion at all; equidistance from all of them is.
+
+\paragraph{3. The estimator penalty is $20\,\%$, not $0.5\,\%$.} On the
+panel, closing the loop through the filter cost $11.59^\circ \to 11.53^\circ$
+of envelope. On the cube it costs $3.42^\circ \to 2.75^\circ$.
+
+The cause is neither of the obvious candidates. It is not sensor noise: with
+noise and bias set to zero the recovery is $2.76^\circ$, essentially
+unchanged. It is not the lever arm, which \S\ref{sec:cancellation} disposes
+of. It is \textbf{phase lag}. The complementary filter is model-free --- it
+can only integrate the gyro forward and correct slowly toward the
+accelerometer --- so during a fast transient the estimate trails the truth,
+and on a plant with a $121$\,ms divergence time constant and a $3.88^\circ$
+envelope there is no margin to absorb the delay. This is the specific
+deficiency that \S\ref{sec:upgrade-path} addresses.
+
+\subsubsection{The $k_P$ stability edge}
+\label{sec:kp-edge}
+
+The response to $k_P$ is not the shallow optimum found on the panel. It has a
+hard edge:
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+$k_P$ & $1$ & $2$ & $5$ & $10$ & $20$\\
+\midrule
+Recovery & $2.22$--$2.41^\circ$ & $2.49$--$2.58^\circ$ & $\bm{2.75^\circ}$
+  & $\bm{0.00}$ & $\bm{0.00}$\\
+\bottomrule
+\end{tabular}
+\caption{Recovery angle against complementary-filter proportional gain.
+Above $k_P \approx 5$ the cube falls every time.}
+\label{tab:kp-sweep}
+\end{table}
+
+Below the optimum the filter is too slow and phase lag dominates. Above it,
+enough of the lever-arm error passes through to close a positive feedback
+loop: accelerometer error tilts the estimate, the controller commands torque,
+the torque produces angular acceleration, and the angular acceleration
+produces more accelerometer error in the same direction. \emph{The estimator
+and the plant form a loop of their own}, and $k_P$ is its gain. This is a
+mechanism the panel never exhibited, because there the loop gain was too low
+to close.
+
+The practical consequence is that $k_P$ must not be raised to chase the phase
+lag of \S\ref{sec:1d-to-3d}. That path is closed. The lag has to be removed
+by giving the estimator a model instead.
+
+\subsubsection{Calibration requirements}
+\label{sec:calibration}
+
+Three, in descending order of consequence.
+
+\paragraph{Startup gyro-bias calibration.} Three seconds stationary at boot,
+averaged, subtracted from every subsequent sample. Mandatory
+(\cref{tab:gyro-bias}); five lines of firmware.
+
+\paragraph{Twelve-parameter accelerometer tumble calibration.} Three biases,
+three scale factors, six cross-axis terms, from a set of static orientations.
+This is more than the panel required, and the reason is specific:
+normalising $\hat{\bm{\gamma}}$ to unit length removes \emph{common-mode}
+scale error but not \emph{differential} scale error between axes. On the
+panel, with tilt in one plane, a differential scale error appears as a gain
+change and is largely absorbed. In three dimensions it appears as a
+direction-dependent tilt bias --- and \cref{tab:bias-budget} allows
+$0.105^\circ$ of that in total.
+
+\paragraph{Mounting rotation.} $\bm{R}_{IB}$, the rotation from IMU axes to
+cube body axes, is verified by a six-face test and never taken from the
+datasheet drawing. A mounting misalignment is a constant tilt offset and
+behaves exactly like gyro bias in \cref{tab:bias-budget}.
+
+\subsubsection{A free diagnostic}
+\label{sec:diagnostic}
+
+A non-zero standing wheel speed has two possible causes: gyro bias, or a
+centre-of-mass offset. They are separable in fifteen seconds with no
+instrumentation:
+
+\begin{quote}
+Rotate the cube $180^\circ$ about the vertical and re-run. \textbf{A COM
+offset reverses sign. A gyro bias does not.}
+\end{quote}
+
+\noindent
+That distinguishes recalibrating from shimming, and standing wheel speed
+should be logged on every run in any case --- by \cref{tab:bias-budget} it is
+the single most informative health indicator the machine produces.
+
+\subsubsection{The upgrade path}
+\label{sec:upgrade-path}
+
+The complementary filter is sufficient to balance and is what is flown. The
+remaining $0.67^\circ$ of envelope identified in \S\ref{sec:1d-to-3d} is
+recoverable, and the route is a four-rung ladder rather than a jump to a
+MEKF.
+
+\begin{enumerate}
+  \item \textbf{Explicit complementary filter with PI bias correction} ---
+        implemented, flying.
+  \item \textbf{Steady-state linear Kalman filter} on
+        $[\bm{\phi};\,\bm{\omega};\,\bm{b}_{\mathrm{gyro}}]$. \emph{This is
+        where the $0.67^\circ$ is.} The usual objection to a linear Kalman
+        filter for attitude --- that attitude is not linear, and any
+        parameterisation of $SO(3)$ carries a singularity --- does not apply,
+        because $\bm{\phi}$ is not a parameterisation of $SO(3)$. It is a
+        vector in the tangent plane at the balanced attitude, and it is
+        already linear in the plant (\S\ref{sec:linearisation}). Having the
+        model, the filter \emph{reconstructs} the lever-arm term analytically
+        instead of rejecting it, which is precisely the phase lag removed at
+        source. Runtime cost is identical to the complementary filter --- a
+        constant gain matrix --- and the separation principle means it
+        composes with $\bm{K}_p$ unchanged.
+  \item \textbf{Augment with a disturbance-torque state}, giving integral
+        action against COM offset and constant friction at no additional
+        structure.
+  \item \textbf{MEKF} --- deferred, and correctly so. It buys explicit bias
+        states on top of something already handled by \eqref{eq:cf-bias}, at
+        the cost of six more states and a covariance to tune. It becomes the
+        right structure at Stage~3, where large-attitude tracking against a
+        full reference is required and the reduced-attitude formulation
+        stops being applicable (\S\ref{sec:attitude-representation}).
+\end{enumerate}
+
+\emph{A working closed loop beats an elegant unused filter.} The ordering
+above reflects that judgement, and rung~2 is the next work item rather than
+rung~4.
