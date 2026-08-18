@@ -2,58 +2,55 @@
 \section{System Requirements and Verification}
 \label{sec:requirements}
 
-Section~\ref{sec:objectives} states what this project must achieve. This
-section states what the \emph{system} must do for those objectives to be met,
-and how each statement will be shown to have been met.
+Section~\ref{sec:objectives} states what the project must achieve. This section
+states what the \emph{system} must do for that to happen, and how each
+statement is shown to have been met.
 
-The distinction is one of abstraction and verifiability, not of subject matter.
-An objective is an outcome --- for the machine or for the student --- and is
-not directly testable: ``the system must maintain multi-axis closed-loop
-balance about a point-contact equilibrium'' names a capability but no threshold
-and no method. A requirement is a single \emph{shall} statement about the
-system, carrying a number or a binary condition, a parent objective, and a
-verification method, so that it can be shown to pass or fail. The rewriting of
-the objective above into requirements FUN-02 and PER-03 is what makes it
-something the design can be held to.
+An objective is an outcome, and is not directly testable. A requirement is a
+single \emph{shall} statement about the system, carrying a threshold, a parent
+objective and a verification method, so that it passes or fails. Requirements
+state \emph{what}, never \emph{how}: the control law, the wheel architecture
+and the choice of driver are design decisions, and belong to
+Sections~\ref{sec:sizing}--\ref{sec:control_algorithms}. Those marked~(D) are
+\emph{derived} --- outputs of an analysis rather than inputs to it. PER-07 is
+the case in point: the wheel-inertia figure follows from the cube mass and edge
+length settled in Section~\ref{sec:massbudget}, rather than being imposed on
+them.
 
-Two conventions are worth stating because they are easy to violate. First, a
-requirement says \emph{what}, never \emph{how}: the choice of an LQR law, a
-complementary filter, a ballasted PET-CF ring or a particular driver is a
-design decision belonging to Sections~\ref{sec:sizing}--\ref{sec:control_algorithms},
-and writing it into a requirement would remove the freedom those sections spend
-their length exercising. Second, some requirements are \emph{derived} rather
-than imposed --- marked~(D) below --- because they are outputs of an analysis
-rather than inputs to it. PER-07 is the clearest case: the wheel-inertia figure
-is not a free choice but a consequence of the cube mass and edge length, which
-are themselves outputs of the closure procedure of
-Section~\ref{sec:massbudget}. Recording it as derived keeps that dependency
-visible instead of presenting a computed result as an external demand.
+The learning objectives of Table~\ref{tab:edu_traceability} are not decomposed
+here. They constrain how the engineering is done and documented rather than
+what the hardware does, and the provisions meeting them are stated where they
+take effect. This section is technical throughout.
 
-\paragraph{Verification methods.} Each requirement carries one or more of:
-\textbf{A}nalysis, closure by calculation or simulation against a stated model;
-\textbf{I}nspection, confirmation against drawings, a parts list or a
-measurement of the built article; \textbf{T}est, instrumented measurement
-against a numerical criterion; and \textbf{D}emonstration, observed execution of
-a behaviour without instrumented measurement. The procedure and acceptance
-criterion behind each entry are given in Appendix~\ref{app:verification}, which
-is also where evidence is recorded as testing proceeds.
+Table~\ref{tab:req_key} defines the codes used in the two columns on the right
+of Table~\ref{tab:requirements}. The procedure and acceptance criterion behind
+each requirement are given in Appendix~\ref{app:verification}, which is also
+where evidence is recorded as testing proceeds.
 
-\paragraph{Scope classes.} Requirements are marked \textbf{M} (mandatory, a
-committed deliverable), \textbf{S} (stretch, scoped but sacrificial --- the
-jump-up is designated sacrificial scope by standing decision,
-Section~\ref{sec:schedule}), or \textbf{U} (unscheduled, retained so the scope
-boundary is explicit; no gate exists for it in
-Table~\ref{tab:gates}).
-
-\paragraph{On the educational objectives.} The learning objectives of
-Table~\ref{tab:edu_traceability} are deliberately \emph{not} decomposed into
-requirements here. They are constraints on how the engineering is done and
-documented rather than properties of the delivered hardware, and the provisions
-that satisfy them are stated where they take effect --- the parametric CAD of
-Section~\ref{sec:cad}, the adjustable ballast of Section~\ref{sec:rw_sizing},
-the staged validation of Section~\ref{sec:methodology}, the bring-up protocol
-of Section~\ref{sec:electrical_safety} and the bill of materials of
-Appendix~\ref{app:bom}. This section is therefore technical throughout.
+\begin{table}[htbp]
+\centering
+\caption[Verification methods and scope classes]{Verification methods and scope
+classes used in Table~\ref{tab:requirements}.}
+\label{tab:req_key}
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{} c l L{9.0cm} @{}}
+\toprule
+Code & Name & Meaning \\
+\midrule
+\multicolumn{3}{@{}l}{\textbf{Verification method}} \\
+A & Analysis & Closure by calculation or simulation against a stated model. \\
+I & Inspection & Confirmation against drawings, a parts list, or a measurement of the built article. \\
+T & Test & Instrumented measurement against a numerical criterion. \\
+D & Demonstration & Observed execution of a behaviour, without instrumented measurement. \\
+\midrule
+\multicolumn{3}{@{}l}{\textbf{Scope class}} \\
+M & Mandatory & A committed deliverable. \\
+S & Stretch & Scoped but sacrificial: the jump-up yields first if the balancing demonstrations require the time (Section~\ref{sec:schedule}). \\
+U & Unscheduled & Retained so the scope boundary is explicit; no gate exists for it in Table~\ref{tab:gates}. \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{small}
 \setlength{\tabcolsep}{4pt}
