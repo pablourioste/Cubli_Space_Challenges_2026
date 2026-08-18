@@ -268,3 +268,877 @@ tracking against a full reference and a quaternion MEKF becomes the
 appropriate structure. Finally, a magnetometer would not help: it would make
 yaw observable while leaving it uncontrollable, and the degeneracy is
 two-sided (\S\ref{sec:structural}).
+
+\subsubsection{Loop rate}
+\label{sec:loop-rate}
+
+The outer loop runs at 400\,Hz. The figure is bounded from below by two
+independent requirements and from above by the CAN-FD budget, and the
+binding lower bound is not the one usually quoted.
+
+\paragraph{Lower bound 1: discrete stability.} Discretising the open-loop
+plant with a zero-order hold and closing the loop with the gain of
+\S\ref{sec:lqr}, including the one-cycle computational delay between
+sampling and actuation, the closed loop leaves the unit circle below
+%
+\begin{equation}
+  f_{\min}^{\mathrm{stab}} = 38.3\ \mathrm{Hz},
+  \label{eq:fmin-stab}
+\end{equation}
+%
+which is $29\times$ the open-loop divergence rate
+$\lambda/2\pi = 1.31$\,Hz. The margin above this floor is large but the floor
+itself is not the design driver.
+
+The delay term matters more than the sampling. Without it the discretised
+loop remains stable down to well under 20\,Hz; with it the floor rises to
+38.3\,Hz. Sample-and-actuate latency, not sample rate as such, is what
+consumes phase.
+
+\paragraph{Lower bound 2: anti-aliasing.} The accelerometer sees structural
+and wheel-borne content well above the control bandwidth. Any of it above
+$f/2$ folds down into the estimator passband, where it is
+indistinguishable from tilt and cannot be removed by any subsequent
+filtering. Requiring the folding frequency to sit clear of the sensor's
+useful band gives
+%
+\begin{equation}
+  f_{\min}^{\mathrm{alias}} = 281\ \mathrm{Hz},
+  \label{eq:fmin-alias}
+\end{equation}
+%
+which exceeds \eqref{eq:fmin-stab} by a factor of $7.3$ and is therefore the
+binding constraint. \emph{The loop rate is set by the sensor, not by the
+controller.} This is worth stating explicitly because the stability floor is
+the quantity usually computed and it is, here, an order of magnitude too
+permissive.
+
+\paragraph{Upper bound: cycle budget and rate quantisation.} At 400\,Hz the
+cycle budget is 2.5\,ms, which must accommodate an IMU read over SPI, three
+encoder and torque exchanges over CAN-FD, and the control computation. The
+control computation is negligible --- roughly 60 multiply--accumulates
+(\S\ref{sec:architecture}) --- so the budget is dominated by bus traffic, and
+this is the constraint that closes the interval from above.
+
+Encoder quantisation contributes a second, weaker upper bound. Differencing a
+16-bit absolute encoder gives a rate noise floor of
+$\mathrm{LSB}\times f = 9.587\times10^{-5}\times400 = 0.038$\,rad\,s$^{-1}$,
+$0.10\,\%$ of the wheel-speed cap, and it scales linearly with $f$. At
+400\,Hz this is immaterial; it is recorded because it is the term that would
+eventually penalise a faster loop.
+
+\paragraph{What 400\,Hz buys.} Discretisation costs closed-loop damping, and
+the cost is a smooth function of rate rather than a threshold:
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}rccc@{}}
+\toprule
+$f$ [Hz] & $\max|z|$ & equivalent $\mathrm{Re}(s)$ [rad\,s$^{-1}$] &
+  \% of continuous\\
+\midrule
+ 40 & 0.97503 & $-1.01$ & 13\,\%\\
+ 50 & 0.88308 & $-6.22$ & 80\,\%\\
+100 & 0.93478 & $-6.74$ & 86\,\%\\
+200 & 0.96480 & $-7.17$ & 92\,\%\\
+281 & 0.97427 & $-7.33$ & 94\,\%\\
+\textbf{400} & \textbf{0.98153} & $\bm{-7.46}$ & \textbf{95\,\%}\\
+800 & 0.99051 & $-7.63$ & 98\,\%\\
+\bottomrule
+\end{tabular}
+\caption{Discrete closed-loop performance against loop rate, one-cycle
+computational delay included, marginal modes excluded. The continuous design
+places the slowest controlled mode at $-7.82$\,rad\,s$^{-1}$.}
+\label{tab:loop-rate}
+\end{table}
+
+At 400\,Hz the loop retains $95\,\%$ of the continuous design's damping.
+Doubling to 800\,Hz recovers a further three points and halves the cycle
+budget: a poor trade against the bus. Below 100\,Hz the loss becomes steep,
+and by 40\,Hz --- still nominally stable --- only $13\,\%$ of the damping
+survives, which is the practical rather than the nominal floor.
+
+\medskip
+\noindent
+400\,Hz therefore sits $1.4\times$ above the binding anti-aliasing bound,
+$10\times$ above the stability floor, and comfortably inside the CAN-FD
+budget, and it is verified against the discretised plant rather than assumed
+from the continuous design. \emph{The return-difference identity
+$M_s = 1$ of \S\ref{sec:validation} does not survive discretisation}, so the
+discrete poles are checked directly at the design rate and are not inferred
+from the continuous margin.
+
+\subsection{Plant model and linearisation}
+\label{sec:plant}
+
+\subsubsection{Modelling assumptions}
+\label{sec:assumptions}
+
+Four assumptions define the model. Each is stated with the reason it is
+admissible and the circumstance under which it would fail.
+
+\begin{enumerate}
+  \item \textbf{Fixed point contact, no slip and no bounce.} The cube rotates
+        about a stationary point at the balancing corner. The corner
+        truncation on this build was restored to a point, so the contact is
+        the exact geometric corner and no contact offset is required. Even
+        the original $0.45$\,mm edge cut amounted to only $0.26$\,mm along
+        the diagonal --- an angular contribution of $0.081^\circ$, below the
+        estimator noise floor. The assumption fails at jump-up, where contact
+        is impulsive and intermittent.
+
+  \item \textbf{Rigid bodies throughout.} Frame and wheels are rigid, with no
+        structural compliance. Admissible because the lowest structural mode
+        is well above the control bandwidth of \S\ref{sec:loop-rate}; it is
+        the assumption that would be challenged first if the printed frame
+        were made lighter.
+
+  \item \textbf{Wheels axisymmetric about their spin axes.} This is stronger
+        than it appears: it makes $\bm{\Theta}$ \emph{body-constant}. The
+        inertia tensor does not depend on wheel \emph{angle}, only on wheel
+        \emph{rate} through the momentum term. Without it the plant would be
+        time-varying in the wheel angles and no constant-gain design would be
+        available.
+
+  \item \textbf{Pivot friction neglected in the design plant.} Retained in
+        the nonlinear model of \S\ref{sec:nonlinearities} but dropped from the
+        linearisation, where it is second order about the equilibrium. The
+        coefficient is a placeholder pending a breakaway test.
+\end{enumerate}
+
+\subsubsection{Nonlinear equations of motion}
+\label{sec:nonlinear-eom}
+
+Let $O$ be the contact corner, $\bm{\omega}$ the body angular velocity about
+$O$, $\bm{\rho}$ the three wheel rates \emph{relative to the body},
+$\bm{A}_w$ the matrix whose columns are the wheel spin axes, $I_s$ the wheel
+inertia about its own spin axis, $\bm{\Theta}$ the inertia of the whole
+assembly about $O$ with all bodies rigid, $\bm{r}_c$ the vector from $O$ to
+the centre of mass, and $\hat{\bm{\gamma}}$ the gravity direction in body
+coordinates (\S\ref{sec:reduced-attitude}).
+
+The angular momentum about $O$, expressed in body axes, is
+%
+\begin{equation}
+  \bm{L} = \bm{\Theta}\bm{\omega} + \bm{A}_w I_s \bm{\rho}.
+  \label{eq:momentum}
+\end{equation}
+%
+The first term is the momentum the assembly would have if the wheels were
+locked; the second accounts for their relative spin. Euler's equation in the
+rotating body frame gives
+%
+\begin{equation}
+  \dot{\bm{L}} + \bm{\omega}\times\bm{L} = \bm{M}_{\mathrm{ext}},
+  \qquad
+  \bm{M}_{\mathrm{ext}} = m g\,(\bm{r}_c\times\hat{\bm{\gamma}})
+                          + \bm{\tau}_{\mathrm{pivot}}.
+  \label{eq:euler}
+\end{equation}
+%
+Each wheel obeys
+%
+\begin{equation}
+  I_s\!\left(\hat{\bm{a}}_k\cdot\dot{\bm{\omega}} + \dot\rho_k\right) = u_k,
+  \label{eq:wheel}
+\end{equation}
+%
+where $u_k$ is the motor torque applied to wheel $k$. Solving \eqref{eq:wheel}
+for $I_s\dot{\bm{\rho}}$ and substituting into the time derivative of
+\eqref{eq:momentum} eliminates $\dot{\bm{\rho}}$ from the body equation:
+%
+\begin{align}
+  \bm{\Theta}\dot{\bm{\omega}}
+    + \bm{A}_w\bm{u} - \bm{A}_w I_s \bm{A}_w^{\top}\dot{\bm{\omega}}
+    + \bm{\omega}\times\bm{L}
+  &= \bm{M}_{\mathrm{ext}},
+\end{align}
+%
+and defining the \emph{reduced inertia}
+%
+\begin{equation}
+  \bar{\bm{\Theta}} \;=\; \bm{\Theta} - \bm{A}_w I_s \bm{A}_w^{\top}
+  \label{eq:Tbar}
+\end{equation}
+%
+the equations of motion close as
+%
+\begin{empheq}[box=\fbox]{align}
+  \bar{\bm{\Theta}}\,\dot{\bm{\omega}}
+    &= m g\,(\bm{r}_c\times\hat{\bm{\gamma}}) \;-\; \bm{u}
+       \;-\; \bm{\omega}\times\bm{L}
+       \;-\; \bm{\tau}_{\mathrm{pivot}}
+       \label{eq:eom-body}\\[0.25em]
+  I_s\dot{\bm{\rho}} &= \bm{u} - I_s\bm{A}_w^{\top}\dot{\bm{\omega}}
+       \label{eq:eom-wheel}\\[0.25em]
+  \dot{\hat{\bm{\gamma}}} &= -\,\bm{\omega}\times\hat{\bm{\gamma}}
+       \label{eq:eom-gamma}
+\end{empheq}
+
+Three features of \eqref{eq:eom-body}--\eqref{eq:eom-gamma} govern everything
+that follows.
+
+\paragraph{The control enters both equations with opposite signs.} The wheels
+exchange momentum with the body; they do not generate it. Torque does not
+push against the world, and $\bm{L}$ is conserved under $\bm{u}$ alone. This
+is the origin of the momentum-limited envelope
+(\S\ref{sec:nonlinearities}).
+
+\paragraph{$\bar{\bm{\Theta}}$, not $\bm{\Theta}$.} The wheel inertia about
+its own axis is subtracted because that inertia is already accounted for in
+\eqref{eq:eom-wheel}; leaving it in $\bm{\Theta}$ would double-count it. On
+this build $\bar{\bm{\Theta}}$ differs from $\bm{\Theta}$ by
+$4.87\times10^{-4}$ on each diagonal entry, about $2.4\,\%$ --- small, but it
+shifts $\lambda$ by $1.2\,\%$ and it is not optional.
+
+\paragraph{The gyroscopic term is genuinely nonlinear.} $\bm{\omega}\times
+\bm{L}$ is quadratic and vanishes at the equilibrium, so it plays no part in
+the gain synthesis. It is retained in the nonlinear simulator used for the
+envelope work, and it is the reason the envelope results of
+\S\ref{sec:results} are simulated rather than computed in closed form.
+
+\subsubsection{The state vector}
+\label{sec:state-vector}
+
+Throughout the remainder of this chapter the state is
+%
+\begin{equation}
+  \boxed{\;
+  \bm{x} = \begin{bmatrix}\bm{\phi}\\[0.15em] \bm{\omega}\\[0.15em]
+                          \bm{\rho}\end{bmatrix}\in\mathbb{R}^{9},
+  \qquad
+  \bm{\phi} = -\,\hat{\bm{g}}_B\times\hat{\bm{\gamma}}
+  \;}
+  \label{eq:state}
+\end{equation}
+%
+--- reduced attitude, body rate, wheel rate, each in body axes $X,Y,Z$ in
+that order. $\bm{\phi}$ and $\bm{\omega}$ come from the estimator of
+\S\ref{sec:estimation}; $\bm{\rho}$ comes directly from the encoders and
+needs no estimation.
+
+The interpretation of $\bm{\phi}$ deserves a line, because it is what makes
+the projector $\bm{P}$ appear later. For a small rotation $\delta\bm{\theta}$
+away from the balanced attitude,
+$\hat{\bm{\gamma}} \approx \hat{\bm{g}}_B - \delta\bm{\theta}\times
+\hat{\bm{g}}_B$, and therefore
+%
+\begin{align}
+  \bm{\phi}
+   &= -\hat{\bm{g}}_B\times
+      \left(\hat{\bm{g}}_B - \delta\bm{\theta}\times\hat{\bm{g}}_B\right)
+    = \hat{\bm{g}}_B\times(\delta\bm{\theta}\times\hat{\bm{g}}_B)
+    \notag\\
+   &= \delta\bm{\theta}\,(\hat{\bm{g}}_B\!\cdot\!\hat{\bm{g}}_B)
+      - \hat{\bm{g}}_B\,(\hat{\bm{g}}_B\!\cdot\!\delta\bm{\theta})
+    = \bm{P}\,\delta\bm{\theta},
+  \qquad
+  \bm{P} = \bm{I} - \hat{\bm{g}}_B\hat{\bm{g}}_B^{\top}.
+  \label{eq:phi-is-projected-rotation}
+\end{align}
+%
+\emph{$\bm{\phi}$ is the rotation vector with its vertical component removed.}
+It is not an approximation of the attitude error; it is exactly the part of
+the attitude error that gravity can act on and that an accelerometer can see.
+
+\subsubsection{Linearisation}
+\label{sec:linearisation}
+
+\paragraph{The gravitational moment is exact, not linearised.} Because
+$\bm{r}_c = -\ell\,\hat{\bm{g}}_B$ is body-fixed,
+%
+\begin{equation}
+  m g\,(\bm{r}_c\times\hat{\bm{\gamma}})
+  = -m g \ell\,(\hat{\bm{g}}_B\times\hat{\bm{\gamma}})
+  = S_g\,\bm{\phi},
+  \qquad S_g = m g \ell,
+  \label{eq:grav-exact}
+\end{equation}
+%
+with no small-angle step anywhere. Substituting
+\eqref{eq:phi-is-projected-rotation} gives the form used in the design plant,
+$S_g\bm{P}\,\delta\bm{\theta}$, and since $\bm{P}$ is idempotent and
+$\bm{\phi}$ already lies in its range, $S_g\bm{\phi} = S_g\bm{P}\bm{\phi}$.
+
+This identity is the reason the linear plant used for gain synthesis and the
+nonlinear plant used for envelope work can be compared at all. It was checked
+numerically rather than assumed: the two agree to
+$9.9\times10^{-17}$\,N\,m (\S\ref{sec:reduced-attitude}). The controller is
+not approximating the plant's attitude behaviour --- the two are the same
+object.
+
+\paragraph{The design plant.} Dropping the gyroscopic and pivot-friction
+terms, which are second order about the equilibrium, and taking
+$\bm{A}_w = \bm{I}_3$ since the wheel axes are the cube axes:
+%
+\begin{equation}
+  \bar{\bm{\Theta}}\,\dot{\bm{\omega}} = S_g\bm{P}\bm{\phi} - \bm{u},
+  \qquad
+  I_s\dot{\bm{\rho}} = \bm{u} - I_s\dot{\bm{\omega}}.
+\end{equation}
+%
+In the ordering \eqref{eq:state} this is $\dot{\bm{x}} = \bm{A}\bm{x} +
+\bm{B}\bm{u}$ with
+%
+\begin{equation}
+  \bm{A} = \begin{bmatrix}
+      \bm{0} & \bm{I} & \bm{0}\\
+      \bm{G} & \bm{0} & \bm{0}\\
+     -\bm{G} & \bm{0} & \bm{0}
+    \end{bmatrix},
+  \qquad
+  \bm{B} = \begin{bmatrix}
+      \bm{0}\\
+      -\bar{\bm{\Theta}}^{-1}\\
+      I_s^{-1}\bm{I} + \bar{\bm{\Theta}}^{-1}
+    \end{bmatrix},
+  \qquad
+  \bm{G} = \bar{\bm{\Theta}}^{-1} S_g \bm{P}.
+  \label{eq:AB}
+\end{equation}
+
+Three structural remarks.
+
+\emph{First}, the third block row is $-\bm{G}$, an exact copy of the second
+with the sign reversed. That is momentum exchange written in state-space
+form: whatever angular acceleration gravity imparts to the body appears with
+opposite sign on the wheels.
+
+\emph{Second}, the first block row is $\dot{\bm{\phi}} = \bm{\omega}$, not
+$\bm{P}\bm{\omega}$. The component of $\bm{\phi}$ along $\hat{\bm{g}}_B$
+therefore accumulates with yaw rate. It is harmless, because $\bm{G}$
+annihilates it --- $\bm{P}\hat{\bm{g}}_B = \bm{0}$ exactly --- so it never
+feeds back into the dynamics. It is nevertheless removed from the control law
+by the projection of \S\ref{sec:structural}, because a state that drifts
+without bound should not multiply a gain.
+
+\emph{Third}, $\bm{P}$ has rank~2. That single fact generates both structural
+degeneracies of \S\ref{sec:structural} and is the reason the Riccati problem
+must be posed on eight states rather than nine.
+
+\paragraph{Numerical values.} With the measured parameters of
+\S\ref{sec:measured-plant}, in SI units:
+%
+\begin{equation}
+  \bar{\bm{\Theta}} = \begin{bmatrix}
+     0.020384 & -0.0076938 & -0.0074549\\
+    -0.0076938 & 0.019648 & -0.0077143\\
+    -0.0074549 & -0.0077143 & 0.020379
+  \end{bmatrix}\ \mathrm{kg\,m^2},
+\end{equation}
+%
+\begin{equation}
+  \hat{\bm{g}}_B = \begin{bmatrix}-0.571549\\ -0.588646\\ -0.571688\end{bmatrix},
+  \qquad
+  \bm{P} = \begin{bmatrix}
+     0.67333 & -0.33644 & -0.32675\\
+    -0.33644 & 0.65350 & -0.33652\\
+    -0.32675 & -0.33652 & 0.67317
+  \end{bmatrix},
+\end{equation}
+%
+\begin{equation}
+  \bm{G} = \begin{bmatrix}
+     45.202 & -22.008 & -22.530\\
+    -23.502 & 45.528 & -23.382\\
+    -22.623 & -21.984 & 45.254
+  \end{bmatrix}\ \mathrm{s^{-2}}.
+\end{equation}
+%
+$\bm{G}$ is not symmetric --- it is $\bar{\bm{\Theta}}^{-1}$ times a symmetric
+matrix --- and its eigenvalues are
+%
+\begin{equation}
+  \mathrm{eig}(\bm{G}) = \{68.1814,\; 67.8029,\; 0\}\ \mathrm{s^{-2}},
+\end{equation}
+%
+whose square roots are the unstable poles of \eqref{eq:lambda},
+%
+\begin{equation}
+  \lambda_{1,2} = \sqrt{68.1814},\ \sqrt{67.8029}
+                = 8.2572,\ 8.2343\ \mathrm{s^{-1}},
+\end{equation}
+%
+and whose third, exactly zero, eigenvalue is the degenerate vertical
+direction. The two unstable values differ by $0.28\,\%$: the cube is very
+nearly isotropic about its balancing diagonal, and for comparison a uniform
+cube of the same size gives $0.99\sqrt{g/a} = 8.01\ \mathrm{s^{-1}}$.
+
+The lower blocks of $\bm{B}$ are
+%
+\begin{equation}
+  -\bar{\bm{\Theta}}^{-1} = \begin{bmatrix}
+    -90.525 & -56.908 & -54.656\\
+    -56.908 & -95.556 & -56.988\\
+    -54.656 & -56.988 & -90.635
+  \end{bmatrix},
+  \quad
+  I_s^{-1}\bm{I} + \bar{\bm{\Theta}}^{-1} = \begin{bmatrix}
+    2144.4 & 56.908 & 54.656\\
+    56.908 & 2149.5 & 56.988\\
+    54.656 & 56.988 & 2144.5
+  \end{bmatrix}.
+\end{equation}
+%
+The ratio of the diagonal entries, $2144/90.5 \approx 24$, is the inertia
+ratio $\bar{\bm{\Theta}}/I_s$ and is the quantitative statement of why the
+envelope is momentum-limited: a torque that accelerates the body by
+$1\ \mathrm{rad\,s^{-2}}$ accelerates the wheel by $24$.
+
+\subsubsection{The measured plant}
+\label{sec:measured-plant}
+
+Every entry below is a measurement or an explicit arithmetic consequence of
+measurements. The two assumed quantities are named as such.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Quantity} & \textbf{Symbol} & \textbf{Value} & \textbf{Origin}\\
+\midrule
+Total mass          & $m$        & $1.5668$\,kg   & weighed; CAD $1.6185$, $-3.2\,\%$\\
+Wheel mass (each)   & --         & $0.216$\,kg    & weighed\\
+Ballast (each)      & --         & $0.130$\,kg    & weighed\\
+Centre of mass      & --         & $[-4.790,\,-2.690,\,-4.773]$\,mm & from weighed groups\\
+Balancing corner    & --         & $(-1,-1,-1)$   & \S\ref{sec:corner-choice}\\
+Lever arm           & $\ell$     & $122.84$\,mm   & $\lVert\bm{r}_{\mathrm{com}}-\bm{r}_{\mathrm{corner}}\rVert$\\
+Gravitational moment& $S_g$      & $1.8875$\,N\,m & $m g \ell$\\
+Wheel spin inertia  & $I_s$      & $4.8688\times10^{-4}$\,kg\,m$^2$ & CAD $-8.7\,\%$ after mass correction\\
+Wheel transverse    & $I_t$      & $2.4804\times10^{-4}$\,kg\,m$^2$ & \\
+Unstable poles      & $\lambda$  & $8.2572$, $8.2343$\,s$^{-1}$ & $\sqrt{\mathrm{eig}(\bm{G})}$\\
+Yaw inertia         & $\hat{\bm{g}}_B^{\top}\bm{\Theta}\hat{\bm{g}}_B$
+                                 & $5.374\times10^{-3}$\,kg\,m$^2$ & \\
+Tilt-plane inertia  & --         & $2.769$, $2.784\times10^{-2}$\,kg\,m$^2$ & eigenvalues of $\bar{\bm{\Theta}}$ on $\mathrm{range}(\bm{P})$\\
+Wheel axis offset   & --         & $(+7,+7)$\,mm from the cube axes & CAD, battery clearance\\
+Axial station       & $d_{ax}$   & $-61.6$\,mm    & CAD\\
+Momentum cap        & $h_{\mathrm{cap}}$ & $0.019475$\,N\,m\,s & $I_s\omega_{\mathrm{cap}}$ at $40$\,rad\,s$^{-1}$\\
+Mount rotation      & --         & $53.9390^\circ$ about $[-0.7072,\,0,\,+0.7070]$ & from $\hat{\bm{g}}_B$\\
+Equilibrium tilt    & --         & $0.797^\circ$  & COM offset $\perp$ the diagonal\\
+\midrule
+\multicolumn{4}{@{}l}{\emph{Assumed, not measured:}}\\
+Continuous torque   & $\tau_{\mathrm{cont}}$ & $0.12$\,N\,m & estimate; thermal test outstanding\\
+Print density split & $\rho_{\mathrm{scale}}$ & $0.84$ & assumed; $\lambda$ moves $0.5\,\%$ across the band\\
+\bottomrule
+\end{tabular}
+\caption{Measured cube plant, balancing corner $(-1,-1,-1)$.}
+\label{tab:cube-plant}
+\end{table}
+
+Two entries in \cref{tab:cube-plant} carry more weight than their size
+suggests.
+
+\paragraph{The wheel axes are not where the obvious model puts them.} Each
+wheel's spin axis is offset $(+7,+7)$\,mm from the corresponding cube axis
+--- battery clearance along the body diagonal. The axis position is
+\emph{not} $[d,0,0]$, and modelling it that way misplaces the joint. The
+parameter file keeps the axis location and the wheel centre of mass as
+separate named quantities even though they coincide numerically to
+$10^{-8}$\,mm, precisely so that an unbalanced wheel would move one and not
+the other rather than silently corrupting the joint position.
+
+\paragraph{The centre of mass matters through its perpendicular component,
+not its magnitude.} The offset from the geometric centre is $7.7$\,mm, but
+the quantity that sets the equilibrium tilt is its projection perpendicular to
+the balancing diagonal, $1.708$\,mm. That figure also sits below the
+${\sim}2$\,mm threshold at which the cube would cease to rest on its corner
+truncation, so multi-corner operation remains geometrically viable.
+
+\subsubsection{Choice of balancing corner}
+\label{sec:corner-choice}
+
+The two ends of the balancing diagonal are dynamically near-equivalent:
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Corner} & $\ell$ & $S_g$ & $\lambda$ & $\theta_{\mathrm{eq}}$\\
+\midrule
+$(-1,-1,-1)$ \textbf{(balancing)} & $122.84$\,mm & $1.8875$\,N\,m & $8.2572$\,s$^{-1}$ & $0.797^\circ$\\
+$(+1,+1,+1)$ & $136.99$\,mm & $2.1048$\,N\,m & $7.9341$\,s$^{-1}$ & $0.714^\circ$\\
+the other six & $126.1$--$134.0$\,mm & --- & --- & $2.61$--$3.17^\circ$\\
+\bottomrule
+\end{tabular}
+\caption{All eight corners. The six off-diagonal corners carry three to four
+times the equilibrium tilt because the centre-of-mass offset is not aligned
+with their diagonals.}
+\label{tab:corners}
+\end{table}
+
+$(-1,-1,-1)$ was selected on mechanical grounds: it is the corner
+\emph{between} the wheels, and its truncation has been restored to a point so
+that the contact is the exact geometric corner.
+
+The choice also happens to help, and the reason is worth stating because it
+runs opposite to intuition. $(-1,-1,-1)$ has the \emph{shorter} lever arm and
+therefore the \emph{smaller} destabilising moment $S_g$, which gives it the
+larger recoverable envelope --- $3.88^\circ$ against $3.42^\circ$ on
+$(+1,+1,+1)$ (\S\ref{sec:results}). The corner with the marginally lower
+equilibrium tilt is the corner with the smaller envelope, and the envelope is
+worth more.
+
+\subsubsection{From one degree of freedom to three}
+\label{sec:panel-to-cube}
+
+The Stage-1 planar panel is the same plant with every matrix collapsed to a
+scalar, and the correspondence is close enough to be useful as a check.
+
+\paragraph{What generalises.} The block structure of \eqref{eq:AB} survives
+intact with scalars promoted to matrices; the unstable-pole relation
+$\lambda = \sqrt{S_g/\bar\Theta}$ survives with $\bar{\bm{\Theta}}$ read on
+the tilt plane; the wheel remains a pure integrator, so a wheel-rate gain
+remains necessary; and the Bryson weights were carried from panel to cube
+\emph{unchanged}. That last was deliberate and is a debugging strategy rather
+than an economy --- same physics, same weights, so any surprise in the cube
+result is located in the plant and not in the tuning.
+
+\paragraph{What breaks.} Four things, in descending order of consequence.
+
+\begin{enumerate}
+  \item \textbf{Gravity acquires a projector.} The scalar $S_g$ becomes
+        $S_g\bm{P}$ of rank~2, and with it come the two structural
+        degeneracies of \S\ref{sec:structural}. There is no
+        one-dimensional analogue; it must be handled by an exact state-space
+        reduction, not by tuning.
+  \item \textbf{Attitude stops being a number}, with the consequences set out
+        in \S\ref{sec:attitude-representation}.
+  \item \textbf{The wheel axes acquire an offset} that the obvious model does
+        not have.
+  \item \textbf{One accelerometer error term stops cancelling.} The
+        centripetal term is quadratic in $\bm{\omega}$ and always directed
+        inward, so unlike the tangential term it has a DC component and does
+        not average away over a completed recovery
+        (\S\ref{sec:estimation}).
+\end{enumerate}
+
+\paragraph{And the envelope shrinks.} The panel recovers from roughly
+$11.5^\circ$, the cube from roughly $3.9^\circ$. The cube is the larger and
+more capable machine and has the smaller envelope, which invites the question
+if left unaddressed. Taking the momentum-limited bound
+$h_{\mathrm{cap}}^2/(2\bar\Theta S_g)$, which is approximately
+$1-\cos\theta_{\max}$ for a release from rest:
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+ & \textbf{Panel} & \textbf{Cube} & \textbf{Ratio}\\
+\midrule
+Stored momentum $h_{\mathrm{cap}}$ & $7.432\times10^{-3}$ & $1.9475\times10^{-2}$\,N\,m\,s & $\times 2.62$\\
+Gravitational moment $S_g$ & $0.2624$ & $1.8875$\,N\,m & $\times 7.19$\\
+Tilt inertia $\bar{\Theta}$ & $3.213\times10^{-3}$ & $2.776\times10^{-2}$\,kg\,m$^2$ & $\times 8.64$\\
+\midrule
+$h_{\mathrm{cap}}^2/(2\bar\Theta S_g)$ & $3.275\times10^{-2}$ & $3.618\times10^{-3}$ & $\div\,9.05$\\
+Implied bound $\theta_{\max}$ & $14.7^\circ$ & $4.88^\circ$ & \\
+\bottomrule
+\end{tabular}
+\caption{Momentum capacity grew by $2.6\times$ between the two stages while
+the load it must arrest grew by $7$ to $9\times$.}
+\label{tab:envelope-scaling}
+\end{table}
+
+The bound sits above both simulated figures, as it must, since it accounts
+for neither the torque limit nor friction. \textbf{The wheels did not scale
+with the machine}, and no amount of gain tuning recovers that.
+
+\subsection{Structural properties: what cannot be controlled and what cannot be seen}
+\label{sec:structural}
+
+The plant of \eqref{eq:AB} has nine states, but the control problem is
+eight-dimensional. One rotational degree of freedom --- rotation about the
+vertical --- is degenerate, and it is degenerate at \emph{both} ends: it
+cannot be driven, and it cannot be observed. The two facts have different
+causes and different consequences, and both must be handled explicitly.
+
+This is not a numerical near-degeneracy to be regularised away. Both
+statements hold exactly, to machine precision, and both follow from a single
+line of the model.
+
+\subsubsection{Yaw momentum is conserved: the uncontrollable direction}
+\label{sec:uncontrollable}
+
+\paragraph{The proof is one line.} Let $\bm{L} = \bm{\Theta}\bm{\omega} +
+I_s\bm{\rho}$ be the angular momentum about the contact point. Its component
+along the vertical evolves as
+%
+\begin{align}
+  \frac{\mathrm{d}}{\mathrm{d}t}\!\left(\hat{\bm{g}}_B\!\cdot\!\bm{L}\right)
+  &= \hat{\bm{g}}_B^{\top}
+     \left(\bm{\Theta}\dot{\bm{\omega}} + I_s\dot{\bm{\rho}}\right)
+   = \hat{\bm{g}}_B^{\top}
+     \left(\bm{\Theta}\dot{\bm{\omega}} + \bm{u} - I_s\dot{\bm{\omega}}\right)
+   \notag\\
+  &= \hat{\bm{g}}_B^{\top}
+     \left(\bar{\bm{\Theta}}\dot{\bm{\omega}} + \bm{u}\right)
+   = \hat{\bm{g}}_B^{\top}
+     \left(S_g\bm{P}\bm{\phi} - \bm{u} + \bm{u}\right)
+   = S_g\,\hat{\bm{g}}_B^{\top}\bm{P}\,\bm{\phi}
+   = 0,
+  \label{eq:momentum-conservation}
+\end{align}
+%
+because $\bm{P}\hat{\bm{g}}_B = \bm{0}$ by construction. The control $\bm{u}$
+cancels identically between the body and wheel equations --- which is exactly
+the statement that the wheels are internal. Verified numerically on random
+states and inputs: $\hat{\bm{g}}_B^{\top}(\bm{\Theta}\dot{\bm{\omega}} +
+I_s\dot{\bm{\rho}}) = 6.7\times10^{-16}$, and
+$\hat{\bm{g}}_B^{\top}S_g\bm{P} = 3.4\times10^{-16}$.
+
+Physically: gravity produces no moment about the vertical, and the wheels can
+only exchange momentum with the body, not with the world. Nothing in the
+plant can change $\hat{\bm{g}}_B\!\cdot\!\bm{L}$. A yaw kick therefore
+persists indefinitely in the frictionless model. On hardware, contact
+friction at the corner supplies an external yaw torque and it bleeds away, so
+the model is the pessimistic case.
+
+\paragraph{The numerical evidence.} The controllability matrix has
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lccccccccc@{}}
+\toprule
+$\sigma_i/\sigma_1$ & $1.00$ & $9.72\!\times\!10^{-1}$ & $1.04\!\times\!10^{-2}$
+& $1.01\!\times\!10^{-2}$ & $2.05\!\times\!10^{-6}$ & $1.31\!\times\!10^{-6}$
+& $1.31\!\times\!10^{-6}$ & $1.85\!\times\!10^{-7}$
+& $\bm{9.19\!\times\!10^{-17}}$\\
+\bottomrule
+\end{tabular}
+\caption{Normalised singular values of $\mathcal{C}(\bm{A},\bm{B})$. The gap
+between the eighth and ninth spans ten orders of magnitude.}
+\label{tab:ctrb-sv}
+\end{table}
+
+\noindent
+so $\mathrm{rank}\,\mathcal{C} = 8$ of $9$. The left singular vector of the
+vanishing direction aligns with the predicted conserved quantity to
+%
+\begin{equation}
+  \left|\cos\angle\!\left(\bm{v}_{\mathrm{unc}},\,
+  \begin{bmatrix}\bm{0}\\ \bm{\Theta}\hat{\bm{g}}_B\\ I_s\hat{\bm{g}}_B
+  \end{bmatrix}\right)\right| = 1.0000000000 ,
+  \label{eq:alignment}
+\end{equation}
+%
+which is what converts a rank deficiency into a physical statement. A rank
+count alone would only say that \emph{some} direction is uncontrollable;
+\eqref{eq:alignment} identifies it as the vertical component of angular
+momentum, and that identification is what licenses removing it rather than
+regularising it.
+
+The Popov--Belevitch--Hautus test gives the same result in the form ETH used
+\cite{gajamohan2013cubli}: $\mathrm{rank}\,[\bm{A} - s\bm{I},\ \bm{B}] = 8$
+at $s=0$, with the left null vector aligned with the same direction to ten
+figures, and $\bm{w}^{\top}\bm{A} = 1.9\times10^{-13}$,
+$\bm{w}^{\top}\bm{B} = 3.3\times10^{-13}$.
+
+\paragraph{Why this is acceptable.} The system is \emph{stabilisable}, not
+controllable, and stabilisability is sufficient here for a specific reason:
+the uncontrollable mode sits at exactly $s = 0$. It is marginally stable, it
+does not grow, and balancing requires only the two tilt directions. An
+uncontrollable mode in the right half-plane would end the project; one at the
+origin is a bookkeeping problem.
+
+\subsubsection{Yaw angle is unobservable: the second degeneracy}
+\label{sec:unobservable}
+
+The second degeneracy is independent of the first and has a different cause.
+An accelerometer measures the direction of gravity. One vector measurement
+determines two rotational degrees of freedom, not three: it tells you which
+way is down, and it never tells you which way you are facing.
+
+With the full state available, $\mathrm{rank}\,\mathcal{O} = 9$ of $9$. With
+the reduced-attitude measurement actually available on this machine,
+$\mathrm{rank}\,\mathcal{O} = 8$ of $9$, and the unobservable direction is
+%
+\begin{equation}
+  \bm{v}_{\mathrm{unobs}} =
+  \begin{bmatrix}-0.5715 & -0.5886 & -0.5717 & 0 & \cdots & 0\end{bmatrix}^{\top},
+\end{equation}
+%
+which is $[\hat{\bm{g}}_B;\,\bm{0};\,\bm{0}]$ to ten figures --- the yaw
+\emph{angle}, and nothing else. Yaw \emph{rate} is fully observable: the
+gyroscope measures it directly. It is the integral that cannot be recovered.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+ & \textbf{Uncontrollable} & \textbf{Unobservable}\\
+\midrule
+Quantity & $\hat{\bm{g}}_B\!\cdot\!\bm{L}$, yaw momentum & yaw angle\\
+Direction & $[\bm{0};\ \bm{\Theta}\hat{\bm{g}}_B;\ I_s\hat{\bm{g}}_B]$
+          & $[\hat{\bm{g}}_B;\ \bm{0};\ \bm{0}]$\\
+Cause & wheels internal, $\bm{P}\hat{\bm{g}}_B = \bm{0}$
+      & one vector measurement gives 2 DoF\\
+Remedy & 8-state reduction before the Riccati solve
+       & $\bm{K}_p = \bm{K}\,\mathrm{blkdiag}(\bm{P},\bm{I},\bm{I})$\\
+\bottomrule
+\end{tabular}
+\caption{The two degeneracies are distinct and require distinct treatment.}
+\label{tab:degeneracies}
+\end{table}
+
+\paragraph{A magnetometer would not help.} It would make yaw observable while
+leaving it uncontrollable. Removing one side of a two-sided degeneracy buys
+nothing, and it adds a sensor with a hard-iron calibration problem inside a
+cube containing three motors.
+
+\subsubsection{The exact eight-state reduction}
+\label{sec:reduction}
+
+Let $\bm{v} = [\bm{0};\ \bm{\Theta}\hat{\bm{g}}_B;\ I_s\hat{\bm{g}}_B]$ and
+let $\bm{V}_2 \in \mathbb{R}^{9\times8}$ be an orthonormal basis for
+$\bm{v}^{\perp}$. The design is performed on
+%
+\begin{equation}
+  \bm{A}_r = \bm{V}_2^{\top}\bm{A}\bm{V}_2, \quad
+  \bm{B}_r = \bm{V}_2^{\top}\bm{B}, \quad
+  \bm{Q}_r = \bm{V}_2^{\top}\bm{Q}\bm{V}_2,
+  \qquad
+  \bm{K} = \bm{K}_r\bm{V}_2^{\top}.
+  \label{eq:reduction}
+\end{equation}
+%
+The reduced pair is fully controllable, $\mathrm{rank}\,\mathcal{C}(\bm{A}_r,
+\bm{B}_r) = 8$ of $8$, and the resulting gain places no authority on the
+conserved direction: $\lVert\bm{K}\bm{v}\rVert/\lVert\bm{v}\rVert =
+5.5\times10^{-16}$.
+
+\paragraph{This is a necessity, not a refinement, and the evidence is
+unambiguous.} Posing the same problem on all nine states:
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lcc@{}}
+\toprule
+ & \textbf{9 states} & \textbf{8 states}\\
+\midrule
+\texttt{icare} report & $2$ --- returns \textbf{empty} & $0$ --- success\\
+Hamiltonian eigenvalues on the imaginary axis & $\bm{2}$ & $\bm{0}$\\
+$\lVert\bm{K}\bm{v}\rVert/\lVert\bm{v}\rVert$ & $1.68\times10^{-1}$ & $5.5\times10^{-16}$\\
+$\mathrm{cond}(\bm{X})$ & --- & $2.00\times10^{6}$\\
+\texttt{lqr} & \textbf{succeeds silently} & succeeds\\
+\bottomrule
+\end{tabular}
+\caption{The nine-state Riccati problem is ill-posed. \texttt{icare} says so;
+\texttt{lqr} does not.}
+\label{tab:riccati}
+\end{table}
+
+The Hamiltonian row is the diagnostic. A well-posed algebraic Riccati problem
+has no eigenvalues on the imaginary axis; each one is a mode the stable and
+anti-stable invariant subspaces cannot separate. At nine states there are two
+--- the conserved direction and its adjoint. At eight there are none.
+
+\paragraph{The failure mode is silence.} \texttt{lqr} returns a gain matrix
+without warning, and that gain places $\lVert\bm{K}\bm{v}\rVert = 0.168$ on a
+direction the actuators cannot move. The controller then reads a real,
+drifting, measurable quantity --- accumulated yaw momentum --- and commands
+torque in response to it. That torque cannot change the quantity it is
+responding to, so its entire effect is a disturbance to the two directions
+that \emph{do} respond. Authority is spent to no purpose, and the loss is
+invisible in any check that only asks whether the closed loop is stable.
+
+\emph{A design that runs without error is not the same as a design that is
+well posed.} This is the clearest instance in the project of a check
+mattering more than a result.
+
+\subsubsection{The yaw-angle projection}
+\label{sec:projection}
+
+The reduction of \eqref{eq:reduction} removes the uncontrollable direction.
+It does not remove the unobservable one, because the two are different
+directions --- compare the rows of \cref{tab:degeneracies}. A second,
+separate step is required.
+
+Recall from \S\ref{sec:linearisation} that the first block row of $\bm{A}$ is
+$\dot{\bm{\phi}} = \bm{\omega}$ rather than $\bm{P}\bm{\omega}$, so the
+component of $\bm{\phi}$ along $\hat{\bm{g}}_B$ accumulates with yaw rate
+without bound. It is harmless to the \emph{dynamics}, because $\bm{G}$
+annihilates it. It is not harmless in the \emph{control law}, because the
+reduced gain places $\lVert\bm{K}[\hat{\bm{g}}_B;\bm{0};\bm{0}]\rVert =
+0.346$ on it --- and that component of the estimate is not a measurement of
+anything. It is integrated gyro drift.
+
+The remedy is to project it out of the gain itself:
+%
+\begin{equation}
+  \boxed{\;\bm{K}_p = \bm{K}\,\mathrm{blkdiag}(\bm{P},\bm{I},\bm{I})\;}
+  \label{eq:Kp}
+\end{equation}
+%
+after which the gain on that direction is $4.97\times10^{-16}$. \textbf{Use
+$\bm{K}_p$ in firmware, not $\bm{K}$.}
+
+\paragraph{The mode counts confirm both steps, and they must differ.}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lccl@{}}
+\toprule
+\textbf{Gain} & \textbf{Marginal modes} & \textbf{Slowest controlled}
+& \textbf{Interpretation}\\
+\midrule
+$\bm{K}$   & $1$ & $-4.2594$\,s$^{-1}$ & conserved momentum only\\
+$\bm{K}_p$ & $2$ & $\bm{-7.8167}$\,s$^{-1}$
+  & momentum, plus yaw angle drifting to a constant\\
+\bottomrule
+\end{tabular}
+\caption{Both counts are physically correct. Two marginal modes under
+$\bm{K}_p$ is the expected and desired outcome.}
+\label{tab:marginal-modes}
+\end{table}
+
+The second column is the part worth pausing on. Under $\bm{K}$ the yaw angle
+is driven to zero at $4.26\,\mathrm{s^{-1}}$; under $\bm{K}_p$ it is left to
+drift. Removing that control action makes the \emph{slowest controlled mode
+faster}, from $-4.26$ to $-7.82\,\mathrm{s^{-1}}$ --- a factor of $1.8$. The
+projection is not a cosmetic tidying of a harmless term: authority previously
+spent chasing an unobservable state is returned to the states that matter,
+and the loop is measurably better for it.
+
+\subsubsection{A tolerance trap in the rank test}
+\label{sec:rank-trap}
+
+The entire argument above rests on a rank count, so it is worth recording how
+that count can be got wrong.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lc@{}}
+\toprule
+\textbf{Call} & \textbf{Result}\\
+\midrule
+\texttt{rank(Co)} \quad (default, relative tolerance) & $\bm{8}$ --- correct\\
+\texttt{rank(Co, 1e-9)} \quad (absolute tolerance) & $9$ --- \textbf{wrong}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+$\lVert\mathcal{C}\rVert = 1.105\times10^{9}$, so an absolute tolerance of
+$10^{-9}$ is $9\times10^{-19}$ of the matrix scale --- far below the double
+precision floor, and therefore no threshold at all. Every singular value,
+including the one at $9.19\times10^{-17}$ that \emph{is} numerically zero,
+counts as nonzero.
+
+The failure is silent and directional: it reports the system as fully
+controllable, which is the answer that requires no further work. Had it been
+believed, the reduction of \S\ref{sec:reduction} would never have been
+written, \texttt{lqr} would have returned a gain without complaint, and the
+first symptom would have appeared on hardware as authority quietly leaking
+into a direction that does not move.
+
+\emph{A tolerance must be chosen relative to the scale of the matrix it is
+applied to.} MATLAB's default does this; a hand-supplied absolute figure
+carried over from another problem does not.
