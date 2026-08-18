@@ -89,22 +89,15 @@ satellite --- design, structures, electronics, embedded coding and ADCS --- by
 having them build, program and fly one, and in doing so make space engineering
 an accessible, hands-on discipline rather than an abstract one.}
 
-The goal is deliberately stated as an outcome for the student rather than as a
-performance figure for the machine, because the machine is the teaching
-instrument and not the product. It decomposes into two sets of objectives that
-must both be met: \textbf{technical} objectives, which the hardware and
-controller must demonstrate, and \textbf{educational} objectives, which the
-platform and this document must deliver. The technical objectives are the
-demanding ones --- a cube that cannot balance teaches nothing --- and they are
-treated in the rest of this document with full engineering rigour, on the
-premise that the pedagogy is only as good as the hardware underneath it.
+The goal decomposes into two sets of objectives that must both be met:
+\textbf{technical} objectives, which the hardware and controller must
+demonstrate, and \textbf{educational} objectives, which the platform and this
+document must deliver.
 
-\paragraph{Technical objectives.} Each imposes a required capability, and each
-capability decomposes into verifiable requirements. The mapping below keeps
-every requirement traceable from motivation to capability; the requirements
-themselves, with their thresholds and verification methods, are stated in
-Section~\ref{sec:requirements}, and are what the sizing and control work below
-must be shown to satisfy.
+\paragraph{Technical objectives.} Table~\ref{tab:traceability} lists each
+technical objective, the capability it imposes and the requirements that verify
+it; thresholds and verification methods are given in
+Section~\ref{sec:requirements}.
 
 \begin{table}[htbp]
 \centering
@@ -126,19 +119,12 @@ Walking (stretch)   & The system must execute a sequential series of dynamic jum
 \end{tabular}
 \end{table}
 
-These map one-to-one onto the applications of Section~\ref{sec:application}: (1)–(2) demonstrate pointing regulation and disturbance rejection of increasing difficulty; (3) demonstrates slew/reference-tracking; (4)–(5) demonstrate momentum-exchange mobility of the kind flown on Hayabusa2, first as a single hop and then as a sequence of them. Milestones (1)–(3) are treated as committed deliverables for this design; jump-up (4) and walking (5) are scoped as stretch objectives, both contingent on the jump-up feasibility check (angular momentum required to tip the cube vs.\ available motor/wheel torque) and on hardware confirmation, to be resolved once final components are known. Walking additionally depends on (4) being achieved, since each step is a jump-up followed by a re-capture.
+Edge balance, corner balance and controlled rotation are committed deliverables;
+jump-up and walking are stretch objectives, contingent on the jump-up
+feasibility check and on final hardware selection.
 
-The technical progression is also the teaching progression. Edge balance is
-reachable by a student who has understood a single-axis model and can tune one
-feedback law; corner balance demands the coupled three-axis treatment, a real
-estimator and honest inertia values; controlled rotation adds trajectory
-tracking; jump-up adds near-impulsive momentum transfer and the braking load
-case; walking adds repeated impact and contact. A learner therefore enters at the
-level they can handle and is pulled upward by the next milestone, using the
-same hardware throughout.
-
-\paragraph{Educational objectives.} These state what the student is expected to
-be able to do, and what the platform must provide for that to be possible.
+\paragraph{Educational objectives.} Table~\ref{tab:edu_traceability} lists what
+the student must be able to do and what the platform must provide for it.
 
 \begin{table}[htbp]
 \centering
@@ -158,13 +144,9 @@ Reproduce it        & The design must be transferable: parametric CAD, a complet
 \end{tabular}
 \end{table}
 
-The educational objectives are not a separate workstream layered on top of the
-engineering; they are constraints \emph{on} it, and they have already changed
-design decisions. The commodity, crashable build of
-Section~\ref{sec:application}, the parametric CAD of Section~\ref{sec:cad}, the
-adjustable ballast of Section~\ref{sec:rw_sizing} that keeps the cube tunable
-after assembly, the staged 1-DoF-before-3-DoF validation of
-Section~\ref{sec:methodology} and the bill of materials of
-Appendix~\ref{app:bom} all exist in the form they do because the platform has to
-be rebuildable and survivable in a student's hands, not only because they are
-sound engineering.
+These provisions are constraints on the engineering, not an additional
+workstream: the commodity build, the parametric CAD
+(Section~\ref{sec:cad}), the adjustable ballast
+(Section~\ref{sec:rw_sizing}), the staged validation
+(Section~\ref{sec:methodology}) and the bill of materials
+(Appendix~\ref{app:bom}) all follow from them.
