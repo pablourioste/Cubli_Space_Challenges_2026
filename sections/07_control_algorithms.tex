@@ -2,392 +2,269 @@
 \section{Control Algorithms \& Approach}
 \label{sec:control_algorithms}
 
-This section derives the balancing controller from the linear models of
-Section~\ref{sec:methodology}, states the controller as executable logic rather
-than only as equations, describes the Simulink/Simscape environment used to
-exercise that logic against both prototypes' CAD geometry before it runs on
-hardware, and gives the onboard software architecture that carries it at
-\qty{1}{\kilo\hertz} in flight. Detailed pseudocode, the fixed gains and
-tuning parameters, the timing budget and the fault responses are collected in
-Appendix~\ref{app:control_algorithms}.
+\subsection{What has to be regulated}
+\label{sec:problem-statement}
 
-\subsection{LQR Baseline Control}
-\label{sec:control2d}
-
-Linearising about the upright equilibrium $(\theta_b,\dot\theta_b,\dot\theta_w)=(0,0,0)$ gives
+Balanced on a corner, the cube is an inverted pendulum in every direction
+perpendicular to the vertical. Linearised about the balancing attitude it has
+two unstable eigenvalues,
+%
 \begin{equation}
-\dot x(t) = Ax(t) + Bu(t), \qquad x := (\theta_b,\dot\theta_b,\dot\theta_w),
+  \lambda_{1,2} = 8.2572,\; 8.2343\ \mathrm{s^{-1}},
+  \qquad
+  \lambda = \sqrt{\frac{S_g}{\bar{\bm{\Theta}}}},
+  \label{eq:lambda}
 \end{equation}
-with $A, B$ built from the parameters in Table~\ref{tab:2d_vars}.
-Zero-order-hold discretization at a rate set by the open-loop unstable pole,
-with a safety margin, gives $x[k+1] = A_dx[k]+B_du[k]$. A discrete LQR gain
-$K_d=(K_{d1},K_{d2},K_{d3})$ minimises
-\begin{equation}
-J(u) = \sum_k x^{\mathrm T}[k]Qx[k] + u^{\mathrm T}[k]Ru[k],
-\end{equation}
-giving $u[k]=-K_d(\hat\theta_b[k],\hat{\dot\theta}_b[k],\hat{\dot\theta}_w[k])$.
-The same design generalises directly to the corner-balancing 9-state model of
-Section~\ref{sec:3dmodel}: $K_d$ becomes a $3\times9$ gain matrix, using the
-same discretization, cost function and offset filter below, with $Q, R$
-weighting all three tilt axes, body rates and wheel speeds.
+%
+a divergence time constant of 121\,ms. Nothing in the open-loop plant resists
+displacement: the gravitational moment grows with tilt rather than opposing
+it. The controller supplies all of the stability there is.
 
-The tilt estimate $\hat\theta_b$ is obtained from a gyroscope and
-accelerometer mounted at, or as close as mechanically feasible to, the pivot
-point rather than at the plate's centre. This placement is necessary because
-an accelerometer at radius $r$ from the pivot measures gravity plus the
-tangential ($r\ddot\theta_b$) and centripetal ($r\dot\theta_b^2$) acceleration
-components induced by the plate's rotation, which corrupt the naive estimate
-$\tan^{-1}(-a_x/a_y)$ during fast motion (e.g., jump-up or aggressive
-recovery); placing the sensor at $r\approx0$ makes both terms negligible.
-Tilt is estimated with a complementary filter combining gyro integration
-(drift-prone, unaffected by the terms above) with accelerometer inclination
-(drift-free, but unreliable during shocks):
-\begin{equation}
-\hat\theta_b[k] = (1-\gamma)\big(\hat\theta_b[k-1] + \dot\theta_{b,\text{gyro}}[k]\,\Delta t\big) + \gamma\,\theta_{b,\text{accel}}[k],
-\label{eq:complementary}
-\end{equation}
-where $\theta_{b,\text{accel}}[k] = \tan^{-1}(-a_x[k]/a_y[k])$ is the
-instantaneous accelerometer-only estimate and $\gamma\in(0,1)$ is a small
-weight favoring the gyro term between corrections.
-
-A constant tilt-sensor offset $d$, including residual bias from imperfect
-pivot placement or sensor misalignment, would otherwise appear as a nonzero
-steady-state wheel speed rather than a corrected angle. A low-pass filter
-state
-\begin{equation}
-x_f[k+1] = (1-\alpha)x_f[k] + \alpha\hat\theta_b[k]
-\label{eq:offset_filter}
-\end{equation}
-is subtracted from the tilt feedback,
-\begin{equation}
-u[k] = -K_d(\hat\theta_b[k]-x_f[k],\, \hat{\dot\theta}_b[k],\, \hat{\dot\theta}_w[k]),
-\end{equation}
-so $d$ is absorbed by $x_f$ at steady state, requiring no separate calibration
-stage. This fixed-gain design is the baseline balancing controller;
-Table~\ref{tab:control2d_vars} summarizes the control variables.
-
-\begin{table}[htbp]
-\centering
-\caption[Control-design variables]{Control-design variables (2D and corner-balancing 3D model).}
-\label{tab:control2d_vars}
-\begin{tabular}{ll}
-\toprule
-Symbol & Description \\
-\midrule
-$x$ & State vector \\
-$A, B$ & Continuous-time state/input matrices (linearised model) \\
-$A_d, B_d$ & Discrete-time (ZOH) counterparts of $A, B$ \\
-$K_d$ & LQR feedback gain \\
-$Q, R$ & LQR state/input weighting matrices \\
-$J(u)$ & LQR cost function \\
-$\hat\theta_b, \hat{\dot\theta}_b$ & Estimated tilt angle, rate (gyroscope/accelerometer) \\
-$\hat{\dot\theta}_w$ & Estimated wheel rate (encoder) \\
-$a_x, a_y$ & Raw accelerometer readings (tangential, radial axes) \\
-$\theta_{b,\text{accel}}$ & Instantaneous accelerometer-only tilt estimate \\
-$\dot\theta_{b,\text{gyro}}$ & Raw gyro rate measurement \\
-$\gamma$ & Complementary-filter weight (accelerometer term) \\
-$\Delta t$ & Control/estimation loop sample period \\
-$x_f, \alpha$ & Offset-correction filter state, filter coefficient \\
-$d$ & Constant tilt-sensor offset \\
-$\theta_{\text{th}}$ & Tilt threshold, jump-up $\to$ balancing switch \\
-$K_d^{(i)}$ & Scheduled gain at linearisation point $i$ (extension) \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{IMU-to-Body Frame Transformation}
-\label{sec:imu_mount}
-
-The BMI270 cannot be mounted with its own sensor axes aligned to the body
-frame $\{B\}$ of Figure~\ref{fig:cubli_3dof}: it sits on Perfboard~1 next to
-the flight computer, placed for wiring and packaging rather than axis
-alignment (Section~\ref{sec:layout}). Every raw gyro/accel sample is therefore
-rotated into $\{B\}$ by a fixed mounting matrix before it reaches the
-complementary filter of Equation~\eqref{eq:complementary} or the MEKF of
-Section~\ref{sec:software_pipeline}.
-
-Raw samples are first put in physical units in the sensor's own frame,
-\begin{equation}
-a_{s,i} = \frac{g_0\,\bar a_{\mathrm{raw},i} - a_{\mathrm{off},i}}{a_{\mathrm{scale},i}},
-\qquad
-\omega_{s,i} = \frac{\pi}{180}\,\bar\omega_{\mathrm{raw},i} - \omega_{\mathrm{bias},i},
-\qquad i=1,2,3,
-\label{eq:imu_calib}
-\end{equation}
-with $g_0=\qty{9.80665}{\metre\per\second\squared}$ and the bias/offset/scale
-constants of Table~\ref{tab:imu_calib}, fixed at calibration and not
-re-estimated online. The sensor-frame vectors are then rotated into the body
-frame by the fixed mounting matrix $C_{SB}$,
-\begin{equation}
-\omega_b = C_{SB}\,\omega_s, \qquad a_b = C_{SB}\,a_s,
-\label{eq:mount_rotation}
-\end{equation}
-where $C_{SB}$ is the classical Z-X-Z (3-1-3) proper Euler-angle rotation
-matrix built from three fixed mounting angles $(\theta_1,\theta_2,\theta_3)$,
-set once from the as-built mounting geometry:
-\begin{equation}
-C_{SB} =
-\begin{bmatrix}
-c_1c_3-c_2s_1s_3 & c_3s_1+c_1c_2s_3 & s_2s_3\\[2pt]
--c_1s_3-c_2c_3s_1 & c_1c_2c_3-s_1s_3 & c_3s_2\\[2pt]
-s_1s_2 & -c_1s_2 & c_2
-\end{bmatrix},
-\qquad c_i=\cos\theta_i,\ s_i=\sin\theta_i,
-\label{eq:mount_dcm}
-\end{equation}
-with $(\theta_1,\theta_2,\theta_3) = (\qty{-30}{\degree},\ \qty{54.7356}{\degree},\ \qty{45}{\degree})$.
-The middle angle is exactly $\arccos(1/\sqrt3)$, the angle between a cube edge
-and its space diagonal, consistent with a package mounted flush to a face
-while the axis the controller cares about at corner-up runs along the body
-diagonal from $O$. $C_{SB}$ is verified orthonormal (unit determinant, unit
-row norms) whenever the mounting angles are set, guarding against a
-transcription error in $(\theta_1,\theta_2,\theta_3)$.
-
-\begin{table}[htbp]
-\centering
-\caption[IMU calibration constants]{IMU calibration constants, applied per
-Equation~\eqref{eq:imu_calib} before the mounting rotation of
-Equation~\eqref{eq:mount_rotation}.}
-\label{tab:imu_calib}
-\small
-\begin{tabular}{lccc}
-\toprule
-Constant & Axis 1 & Axis 2 & Axis 3 \\
-\midrule
-Gyro bias $\omega_{\mathrm{bias}}$ (rad/s) & $+0.002348$ & $-0.001140$ & $-0.000762$ \\
-Accel offset $a_{\mathrm{off}}$ (m/s$^2$)   & $-0.092282$ & $-0.196510$ & $+0.050664$ \\
-Accel scale $a_{\mathrm{scale}}$ (--)        & $0.991085$  & $0.991035$  & $1.003787$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{Gain Scheduling and Mode Transitions}
-\label{sec:gain_scheduling}
-
-The controller switches from the open-loop jump-up sequence to the LQR law
-once $|\hat\theta_b| < \theta_{\text{th}}$, with hysteresis around
-$\theta_{\text{th}}$ to prevent mode chattering. The baseline uses a single
-fixed gain $K_d$ at the upright equilibrium. If recovery degrades near the
-edges of the operating range, where the small-angle linearisation weakens,
-gain scheduling will be added: additional gains $K_d^{(i)}$ computed at
-several linearisation points, with the controller interpolating between them
-based on $\hat\theta_b$, reusing the same discrete structure and offset
-filter. The mode-transition logic gains a third mode for the 3D cube,
-Edge-to-Corner jump-up, triggered once edge balancing is stable, followed by a
-second threshold switch into the corner LQR once estimated orientation nears
-corner-up; the full state machine is given in Table~\ref{tab:sw_modes}.
-
-\subsection{Pure LQR Control Logic}
-\label{sec:pure_lqr_logic}
-
-Section~\ref{sec:control2d} derives $K_d$ offline, once, from the linear model.
-What actually executes on the flight computer every control tick is the
-sequence below, stated independent of how $K_d$ was computed so that the
-running controller can be read, checked and re-implemented without
-re-deriving the gain. Table~\ref{tab:control2d_vars} (2D) and its 3D
-counterpart of Section~\ref{sec:3dmodel} define every symbol used; the fully
-detailed pseudocode, including the supervisory state machine, is in
-Appendix~\ref{app:control_algorithms}.
+Three properties of the plant set the shape of the control problem, and each
+is addressed by a specific part of what follows.
 
 \begin{enumerate}
-  \item \textbf{Sense.} Read raw gyro rate $\dot\theta_{b,\text{gyro}}$ and
-        accelerometer $(a_x,a_y)$ from the IMU over SPI; read wheel angle(s)
-        from the encoder(s) over the moteus CAN reply.
-  \item \textbf{Estimate tilt.} Form the accelerometer-only estimate
-        $\theta_{b,\text{accel}}[k] = \tan^{-1}(-a_x[k]/a_y[k])$ and fuse it
-        with gyro integration through the complementary filter of
-        Eq.~\eqref{eq:complementary} to obtain $\hat\theta_b[k]$.
-  \item \textbf{Remove offset.} Update the low-pass offset state $x_f[k]$
-        (Eq.~\eqref{eq:offset_filter}) and subtract it from $\hat\theta_b[k]$.
-  \item \textbf{Assemble the state.} Build
-        $\hat x[k] = (\hat\theta_b[k]-x_f[k],\ \hat{\dot\theta}_b[k],\ \hat{\dot\theta}_w[k])$
-        in 2D, or the 9-vector $(\theta,\omega_b,\omega_w)$ of
-        Section~\ref{sec:3dmodel} in 3D.
-  \item \textbf{Check the mode.} If the supervisory state machine
-        (Table~\ref{tab:sw_modes}) is not in a balancing mode, skip to
-        step~8 and issue that mode's own open-loop command instead of
-        $u[k]$ below.
-  \item \textbf{Compute the command.} $u[k] = -K_d\,\hat x[k]$.
-  \item \textbf{Saturate and manage momentum.} Clip $u[k]$ to the driver's
-        continuous current rating (Appendix~\ref{app:bom}); if a wheel speed
-        $\hat{\dot\theta}_w$ exceeds its desaturation threshold, add a small
-        bias torque directed to bleed the stored momentum without
-        materially perturbing $\hat\theta_b$.
-  \item \textbf{Actuate.} Issue $u[k]$ (or the mode's open-loop command) as a
-        CAN-FD torque request to each moteus driver.
-  \item \textbf{Advance.} $k \leftarrow k+1$; repeat at the next
-        \qty{1}{\kilo\hertz} tick (Section~\ref{sec:software_pipeline}).
+  \item \textbf{The attitude state is an element of $SO(3)$, not a vector.}
+        No three-parameter global parameterisation of $SO(3)$ exists without
+        a singularity, and the operating point sits $53.94^\circ$ from the
+        orientation in which the geometry was authored, so small-angle
+        reasoning about the parameterisation itself is not available
+        (\S\ref{sec:attitude-representation}).
+  \item \textbf{One rotational degree of freedom is degenerate at both ends.}
+        Gravity produces no moment about the vertical, and a single vector
+        measurement cannot observe rotation about it. The problem is
+        eight-dimensional, not nine (\S\ref{sec:structural}).
+  \item \textbf{Authority is bounded by stored momentum, not by torque.}
+        The wheels exchange momentum with the body rather than pushing
+        against the world, so recovery consumes wheel momentum and the
+        envelope is set by what the wheels can store before saturating
+        (\S\ref{sec:nonlinearities}).
 \end{enumerate}
 
-This is the loop exercised in simulation (Section~\ref{sec:sim_environment})
-before it is exercised on hardware, and it is the loop whose worst-case
-timing is bounded by construction in Section~\ref{sec:software_pipeline}.
+\subsection{Control architecture}
+\label{sec:architecture}
 
-\subsection{Simulation Environment: Simulink/Simscape Multibody}
-\label{sec:sim_environment}
-
-The control law of Sections~\ref{sec:control2d}--\ref{sec:pure_lqr_logic} is
-validated in simulation before any closed-loop hardware run, on a plant built
-from the same CAD geometry as the physical prototypes rather than from the
-lumped-parameter equations alone --- so that the simulation catches geometry
-effects (asymmetric mass distribution, off-axis clearances) the analytic model
-cannot represent.
-
-\paragraph{CAD-to-Simscape workflow.} Each CAD assembly --- the 1-DoF rig of
-Section~\ref{sec:cad_2d} and the 3D cube of Section~\ref{sec:mechanical} --- is
-exported as a STEP assembly and imported into Simscape Multibody, which
-converts each part and mate into a rigid body and joint in a multibody tree.
-The pivot bearing of the 1-DoF rig and the corner/edge contact features of the
-3D cube are modelled as the corresponding revolute/point-contact joints, so
-that the simulated degrees of freedom match Sections~\ref{sec:2dmodel}
-and~\ref{sec:3dmodel} exactly rather than approximating them. Per-part mass and
-inertia are taken directly from the CAD model, which is the same convention
-that makes the mass roll-up of Section~\ref{sec:cad_method} auditable: the
-simulation, the sizing, and the fabricated part all trace to one model.
-
-\paragraph{Actuation and sensing blocks.} Each motor is represented as a
-torque source at its joint, saturated and rate-limited to the envelope of
-Section~\ref{sec:electrical}; the brake is a discrete event that zeroes the
-relevant wheel-body relative velocity over the $\Delta t$ of
-Equation~\eqref{eq:tau_b_from_dt}. Simulated IMU and encoder blocks apply
-noise and bias models set from the sensors' characterised behaviour once
-measured on hardware, so that the same estimator and control logic of
-Section~\ref{sec:pure_lqr_logic} --- not a re-implementation of it --- runs
-against simulated sensor data in a controller-in-the-loop configuration
-before it runs against real sensors.
-
-\paragraph{Test cases.} Three cases are run against the LQR baseline: recovery
-from an initial tilt offset, which establishes the region of attraction;
-rejection of an impulse disturbance applied at the body, which is the
-simulated counterpart of the disturbance-recovery criterion the hardware is
-later judged against; and behaviour under wheel-speed saturation, which
-exercises the momentum-dumping step of Section~\ref{sec:pure_lqr_logic} and is
-the case most likely to be missed by a purely linear analysis, since
-saturation is precisely where the linear model ceases to describe the plant.
-Each case is re-run with the plant parameters perturbed about their nominal
-values, by a magnitude set once the identification tolerances of
-Section~\ref{sec:paramid} are measured, so that the gains are shown not to be
-knife-edge: a gain set that stabilises only the nominal plant is not a result,
-because the nominal plant is not the one that will be built.
-
-\paragraph{Direction of validation.} The measured parameters of
-Section~\ref{sec:paramid} are substituted into the plant and the gains
-re-derived before hardware balance is attempted; the simulation is validated
-against the measured plant, never the reverse. A discrepancy between
-simulated and measured closed-loop behaviour is treated as a finding about
-the model.
-
-No Simulink/Simscape model or CAD export exists yet at the time of writing;
-this subsection states the workflow and the intended test cases, and is
-populated with the model, the exported geometry and the resulting response
-plots once built.
-
-\subsection{System Integration}
-\label{sec:integration}
-
-\subsubsection{Onboard Software Pipeline}
-\label{sec:software_pipeline}
-
-The subsystems of Figure~\ref{fig:system_loop} are coordinated by a single
-deterministic task on the Teensy, whose structure is given in
-Figure~\ref{fig:software_pipeline}. Each \qty{1}{\milli\second} cycle executes
-the same fixed sequence: sensor ingest reads the BMI270 over SPI and the moteus
-replies over CAN; the MEKF propagates attitude on the gyro and corrects it
-against the accelerometer while estimating gyro bias; the state vector
-$x = [g_B, \omega, h]$ is assembled from the estimator output and the wheel
-speeds; the LQR law of Section~\ref{sec:control2d} evaluates $u = -Kx$ with a
-penalty on stored momentum $h$ to bleed off wheel saturation; and the resulting
-commands leave as CAN torque requests to the drivers and a PWM signal to the
-brake servos. Telemetry is tapped off the assembled state to SD and Wi-Fi outside
-the control path, so logging cannot perturb loop timing.
-
-The fixed ordering matters: with no dynamic allocation and no blocking calls, the
-worst-case cycle time is bounded by construction rather than measured after the
-fact, which is what makes the \qty{1}{\kilo\hertz} sample period of the discrete
-LQR design a design guarantee rather than an average.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.78\textwidth]{images/teensy_software_pipeline.png}
-\caption[Teensy 4.1 control-loop software pipeline]{Teensy 4.1 control-loop software pipeline. The estimator and controller
-stages implement the design of Section~\ref{sec:control2d}; telemetry is a
-side-branch off the control path.}
-\label{fig:software_pipeline}
-\end{figure}
-
-\subsubsection{Control Software Architecture}
-\label{sec:control_sw}
-
-Sections~\ref{sec:control2d}--\ref{sec:pure_lqr_logic} derive the control law
-and its executable logic; this subsection states how that law is realised as
-software, which is a separate set of decisions. The implementation detail ---
-the mode state machine, the estimator and controller in executable
-pseudocode, the fixed gains and tuning parameters, the timing budget and the
-fault responses --- is collected in Appendix~\ref{app:control_algorithms}, so
-that a re-tuned gain does not require an edit to the design sections.
-
-The software is organised in the four layers of
-Table~\ref{tab:sw_layers}. The division is not stylistic: each layer has a
-different failure mode and a different verification method, and the interfaces
-between them are what allow the controller validated in simulation
-(Section~\ref{sec:sim_environment}) to be the same code that runs on the cube.
+The loop runs at 400\,Hz in four layers. Each layer is separable, testable in
+isolation, and was brought up in the order listed.
 
 \begin{table}[htbp]
 \centering
-\caption[Control software layers]{Control software layers. Each is verified by a different method, which
-is why the boundaries are held.}
-\label{tab:sw_layers}
 \small
-\begin{tabular}{L{2.8cm} L{5.4cm} L{5.6cm}}
+\begin{tabular}{@{}llp{62mm}@{}}
 \toprule
-Layer & Responsibility & Verified by \\
+\textbf{Layer} & \textbf{Input $\rightarrow$ output} & \textbf{Function}\\
 \midrule
-Hardware abstraction & Sensor and driver I/O, timing, bus transactions & Bench read-back; loop-timing measurement \\
-Estimation           & Attitude and rate estimate from IMU and encoders (Sec.~\ref{sec:control2d}) & Static and dynamic bench tests against a known reference \\
-Control              & State feedback, momentum management, saturation handling & Simulation on the identified model, then hardware \\
-Supervision          & Mode transitions, arming, watchdog and fault response & Fault-injection tests on the rig \\
+1. Sensing &
+  IMU, encoders $\rightarrow$ calibrated body-frame quantities &
+  Accelerometer and gyro rotated into cube body axes by a
+  six-face-verified $\bm{R}_{IB}$; encoder rates from the three drivers over
+  CAN-FD\\[0.4em]
+2. Estimation &
+  $\bm{a},\bm{\omega} \rightarrow \hat{\bm{\gamma}},\bm{\omega}$ &
+  Explicit complementary filter with PI correction on the gravity direction;
+  the integral term estimates gyro bias online
+  (\S\ref{sec:estimation})\\[0.4em]
+3. Control &
+  $\bm{x} \rightarrow \bm{u}_{\mathrm{LQR}}$ &
+  Reduced attitude $\bm{\phi} = -\hat{\bm{g}}_B \times \hat{\bm{\gamma}}$,
+  then a constant $3\times9$ gain matrix
+  (\S\ref{sec:lqr})\\[0.4em]
+4. Actuation &
+  $\bm{u}_{\mathrm{LQR}} \rightarrow \bm{u}$ &
+  Friction feedforward, torque clamp, wheel-speed cap; torque-mode command
+  to three moteus drivers
+  (\S\ref{sec:nonlinearities})\\
 \bottomrule
 \end{tabular}
+\caption{The four layers of the control loop.}
+\label{tab:architecture}
 \end{table}
 
-\paragraph{Operating modes.} The supervisory layer sequences the modes of
-Table~\ref{tab:sw_modes}, with hysteresis on every threshold to prevent
-chattering at a boundary, and with a disarm transition available from every
-mode. The modes are specified as a state machine because the critical
-transitions are the descending ones: a fall detected during corner balance must
-reach a safe state with the wheels commanded down, not merely switch to a
-different gain.
+The complete per-cycle cost is three cross products, one $3\times9$
+matrix--vector product, one reciprocal square root and three \texttt{tanhf}
+calls --- roughly 60 multiply--accumulates, with no \texttt{atan2} and no
+trigonometric evaluation. On a 600\,MHz Teensy~4.1 the 2.5\,ms budget is
+consumed by CAN traffic, not by the control computation.
+
+% \begin{figure}[htbp]
+%   \centering
+%   \includegraphics[width=\textwidth]{figures/control_architecture.pdf}
+%   \caption{Control architecture, four layers.}
+%   \label{fig:architecture}
+% \end{figure}
+
+\subsection{Attitude representation}
+\label{sec:attitude-representation}
+
+This is the load-bearing decision of the control design. Three
+representations were implemented and instrumented before the loop closed; two
+failed in ways that resembled tuning problems and were not.
+
+\subsubsection{Euler angles: three measured failures}
+\label{sec:euler-failures}
+
+The first implementation used a $Z$--$Y$--$X$ Euler triple. It failed three
+times, in three distinct ways.
+
+\paragraph{Failure 1 --- the parameterisation went singular, after passing
+four gates.} The Simscape plant was built with a Gimbal joint on defensible
+grounds: it linearises to a clean $9\times9$ system comparable directly
+against the hand-derived $\bm{A}$ and $\bm{B}$, the equilibrium gimbal angles
+are $[0,0,0]$ because the mount transform pre-applies the corner tilt, and
+lock sits roughly $75^\circ$ away at corner-balance amplitudes. It passed
+validation gates~1 to~4 on that basis, including the linearisation gate at
+$\lVert\Delta\bm{A}\rVert = 1.742\times10^{-7}$,
+$\lVert\Delta\bm{B}\rVert = 2.157\times10^{-16}$ (measured on the
+$(+1,+1,+1)$ configuration; see \S\ref{sec:validation}).
+
+It failed later, in closed-loop simulation, with a diagnostic signature:
+$q_x$ and $q_z$ smooth throughout, while $q_y$ --- the middle gimbal
+primitive, the one carrying the singularity --- spiked to $\pm20000^\circ$
+and returned within milliseconds. A rigid body cannot rotate that far in that
+interval, and the confinement of the excursion to the middle primitive
+identifies the cause exactly: the Jacobian relating gimbal rates to body
+rates diverging, with the solver integrating the divergence.
+
+It also retrospectively explained a persistent $19.8\,\%$ error in the
+gravity block of $\bm{A}$ that never resolved while $\bm{B}$ stayed exact at
+$3\times10^{-16}$. That asymmetry is the tell: $\bm{B}$ does not involve the
+attitude parameterisation and $\bm{A}$ does, so a discrepancy appearing in
+one and not the other is a coordinates error rather than a mass-properties
+or wiring error.
+
+The remedy is a Spherical joint, which carries no chart at the cost of a
+rank-deficient linearisation.
+
+\paragraph{Failure 2 --- an Euler triple is not the reduced attitude.} Even
+far from lock, the triple $[q_1,q_2,q_3]$ is not a rotation vector, so
+projecting out the vertical component removes yaw only to first order.
+
+On this cube yaw is not small, for a mechanical reason. The inertia about the
+vertical is
+%
+\begin{equation}
+  \hat{\bm{g}}_B^{\top}\bm{\Theta}\,\hat{\bm{g}}_B
+  = 5.374\times10^{-3}\ \mathrm{kg\,m^2},
+\end{equation}
+%
+against a mean tilt inertia of $2.825\times10^{-2}\ \mathrm{kg\,m^2}$ in the
+plane perpendicular to $\hat{\bm{g}}_B$ --- the cube is $5.3\times$ lighter in
+yaw than in tilt. Wheel momentum along $\hat{\bm{g}}_B$ therefore spins the
+body at $I_s/(\hat{\bm{g}}_B^{\top}\bm{\Theta}\hat{\bm{g}}_B)
+= 0.0906\ \mathrm{rad\,s^{-1}}$ per $\mathrm{rad\,s^{-1}}$ of
+$\bm{\rho}\cdot\hat{\bm{g}}_B$. Released from $3.6^\circ$, yaw reaches
+$23.6^\circ$ within $0.3\,$s --- entirely physical and
+momentum-conserving, and far outside the range where a first-order yaw
+removal is valid. Feeding the Euler triple to the controller cost
+$19.5\,\%$ of the recovery angle, and the loop diverged.
+
+\paragraph{Failure 3 --- Euler rates are not body rates.} Found only after
+the first two were fixed. The Euler-rate vector
+$[\dot q_1,\dot q_2,\dot q_3]$ equals the body angular velocity $\bm{\omega}$
+only at $\bm{q}=\bm{0}$; over the recovery trajectory the discrepancy reached
+$73\,\%$. Correcting both the attitude and the rate feedback moved the
+Simscape recovery from $3.33^\circ$ to $4.14^\circ$, at which point it
+matched an independently written nonlinear simulator to $0.35\,\%$.
+
+\medskip
+\noindent
+All three are the same mistake in different clothes: a signal correct at the
+equilibrium was treated as correct everywhere. That is precisely the
+assumption a balancing controller is not entitled to make, because the
+controller only acts when the system is away from equilibrium.
+
+\subsubsection{The options}
 
 \begin{table}[htbp]
 \centering
-\caption[Operating modes and transitions]{Operating modes and transitions. Every mode has a disarm exit.}
-\label{tab:sw_modes}
 \small
-\begin{tabular}{L{2.6cm} L{5.2cm} L{6.0cm}}
+\begin{tabular}{@{}lccp{58mm}@{}}
 \toprule
-Mode & Behaviour & Exit condition \\
+\textbf{Representation} & \textbf{Params} & \textbf{DoF} & \textbf{Disposition}\\
 \midrule
-Idle / disarmed & Drivers de-energised; sensors and telemetry live & Explicit arm command \\
-Wheel spin-up   & Open-loop speed ramp to the jump-up momentum target & Target wheel speed reached \\
-Jump-up         & Brake actuation and momentum transfer (Sec.~\ref{sec:jumpup}) & Tilt inside the balancing capture band \\
-Edge balance    & Single-axis state feedback (Sec.~\ref{sec:control2d}) & Corner-transition command, or fall detected \\
-Corner balance  & Three-axis state feedback (Sec.~\ref{sec:3dmodel}) & Slew command, or fall detected \\
-Slew / rotation & Reference tracking between equilibria & Reference reached; revert to balance \\
-Fault / safe    & Wheels commanded down, drivers disarmed & Manual reset \\
+Euler angles & 3 & 3 &
+  Rejected. Singular; carries yaw; the triple is not a rotation vector and
+  its rates are not body rates\\[0.35em]
+Quaternion & $4\,(+1)$ & 3 &
+  Rejected for this stage. Global and singularity-free, but carries yaw
+  explicitly, and with one vector measurement that direction is
+  unobservable\\[0.35em]
+Rotation matrix & $9\,(+6)$ & 3 &
+  Rejected. Singularity-free, but three DoF where two are wanted, and nine
+  states to renormalise every cycle\\[0.35em]
+\textbf{Reduced attitude on $S^2$} & $\bm{3\,(+1)}$ & $\bm{2}$ &
+  \textbf{Adopted.} Exactly the observable and controllable subspace, and
+  nothing else\\
 \bottomrule
 \end{tabular}
+\caption{Attitude representations considered.}
+\label{tab:attitude-options}
 \end{table}
 
-\paragraph{Real-time guarantees.} The loop-rate claim of
-Section~\ref{sec:control2d} is a design guarantee only if the worst-case cycle
-is bounded by construction, which is why the pipeline of
-Figure~\ref{fig:software_pipeline} uses a fixed stage ordering with no dynamic
-allocation and no blocking calls, and why telemetry is a side-branch rather than
-a stage.
+\subsubsection{Reduced attitude}
+\label{sec:reduced-attitude}
 
-\paragraph{Fault handling.} The failure cases the software must survive are
-sensor dropout, bus error, wheel saturation and loss of the balancing
-equilibrium. The first three have defined responses that keep the machine
-controlled; the fourth is a controlled shutdown rather than a recovery attempt,
-since a cube that has left its capture region cannot be recovered by the
-linear law and continued actuation only adds energy to the fall.
+Let $\hat{\bm{\gamma}}$ be the unit vector along gravity expressed in the
+cube body frame, and $\hat{\bm{g}}_B$ its value at the balanced attitude --- a
+per-corner constant. Then
+%
+\begin{align}
+  \hat{\bm{\gamma}} &= \mathrm{normalise}(-\bm{a}_{\mathrm{cal}})
+    && \text{directly what the accelerometer gives}
+    \label{eq:gam-meas}\\[0.2em]
+  \dot{\hat{\bm{\gamma}}} &= -\,\bm{\omega}\times\hat{\bm{\gamma}}
+    && \text{kinematics, one line, no chart}
+    \label{eq:gam-kin}\\[0.2em]
+  \bm{\phi} &= -\,\hat{\bm{g}}_B\times\hat{\bm{\gamma}}
+    && \text{the entire attitude computation}
+    \label{eq:phi}
+\end{align}
+%
+Three numbers, one norm constraint, two degrees of freedom;
+$\hat{\bm{\gamma}}=\hat{\bm{g}}_B$ is balanced.
+
+The property that does the work is that $\bm{\phi}$ in \eqref{eq:phi} is
+perpendicular to $\hat{\bm{g}}_B$ \emph{by construction} --- a cross product
+with $\hat{\bm{g}}_B$ always is. Yaw therefore cannot enter the tilt channel.
+Not approximately, not to first order: exactly, at any attitude, at any tilt
+magnitude. This is the direct repair of Failure~2, where the projection had
+to be applied as a correction valid only near equilibrium.
+
+Each property was checked against the nonlinear model rather than assumed:
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Property} & \textbf{Test} & \textbf{Result}\\
+\midrule
+$\bm{\phi}\perp\hat{\bm{g}}_B$ exactly &
+  $\lVert\bm{P}\bm{\phi}-\bm{\phi}\rVert$ & $6.0\times10^{-18}$\\
+Yaw-immune &
+  $30^\circ$ pure yaw, motion of $\hat{\bm{\gamma}}$ & $1.6\times10^{-16}$\\
+Consistent with the nonlinear plant &
+  $mg(\bm{r}_c\times\hat{\bm{\gamma}})$ vs $S_g\bm{\phi}$ &
+  $9.9\times10^{-17}$\,N\,m\\
+\bottomrule
+\end{tabular}
+\caption{Verification of the reduced-attitude formulation, all at machine
+precision. Row~3 is the consistency check between the nonlinear plant used
+for envelope work and the linear plant used for gain synthesis.}
+\label{tab:gam-verification}
+\end{table}
+
+\subsubsection{The limits of this choice}
+
+Stating them is part of the argument. The correction term
+$\bm{e}=\hat{\bm{g}}\times\hat{\bm{\gamma}}$ has magnitude
+$\sin(\text{error})$: well conditioned below $90^\circ$, but zero again at
+$180^\circ$, so an inverted cube can lock onto the antipode. The mitigation
+is a reset when $\hat{\bm{g}}\cdot\hat{\bm{\gamma}}<0$ for $N$ consecutive
+cycles. Reduced attitude is also the right choice \emph{because} yaw is
+irrelevant to corner balancing; jump-up and corner-to-corner locomotion,
+where $\hat{\bm{g}}_B$ moves through $67$--$107^\circ$, require large-attitude
+tracking against a full reference and a quaternion MEKF becomes the
+appropriate structure. Finally, a magnetometer would not help: it would make
+yaw observable while leaving it uncontrollable, and the degeneracy is
+two-sided (\S\ref{sec:structural}).
