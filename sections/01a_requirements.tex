@@ -22,15 +22,15 @@ here. They constrain how the engineering is done and documented rather than
 what the hardware does, and the provisions meeting them are stated where they
 take effect. This section is technical throughout.
 
-Table~\ref{tab:req_key} defines the codes used in the two columns on the right
+Table~\ref{tab:req_key} defines the verification codes used in the last column
 of Table~\ref{tab:requirements}. The procedure and acceptance criterion behind
 each requirement are given in Appendix~\ref{app:verification}, which is also
 where evidence is recorded as testing proceeds.
 
 \begin{table}[htbp]
 \centering
-\caption[Verification methods and scope classes]{Verification methods and scope
-classes used in Table~\ref{tab:requirements}.}
+\caption[Verification methods]{Verification methods used in
+Table~\ref{tab:requirements}.}
 \label{tab:req_key}
 \small
 \setlength{\tabcolsep}{5pt}
@@ -38,84 +38,77 @@ classes used in Table~\ref{tab:requirements}.}
 \toprule
 Code & Name & Meaning \\
 \midrule
-\multicolumn{3}{@{}l}{\textbf{Verification method}} \\
 A & Analysis & Closure by calculation or simulation against a stated model. \\
 I & Inspection & Confirmation against drawings, a parts list, or a measurement of the built article. \\
 T & Test & Instrumented measurement against a numerical criterion. \\
 D & Demonstration & Observed execution of a behaviour, without instrumented measurement. \\
-\midrule
-\multicolumn{3}{@{}l}{\textbf{Scope class}} \\
-M & Mandatory & A committed deliverable. \\
-S & Stretch & Scoped but sacrificial: the jump-up yields first if the balancing demonstrations require the time (Section~\ref{sec:schedule}). \\
-U & Unscheduled & Retained so the scope boundary is explicit; no gate exists for it in Table~\ref{tab:gates}. \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \begin{small}
 \setlength{\tabcolsep}{4pt}
-\begin{longtable}{@{} l L{7.0cm} L{2.5cm} c c @{}}
-\caption[System requirements]{System requirements, with parent objective,
-verification method and current status. (D) marks a derived requirement.
-Methods: A analysis, I inspection, T test, D demonstration. Class: M mandatory,
-S stretch, U unscheduled.}
+\begin{longtable}{@{} l L{7.5cm} L{2.5cm} c @{}}
+\caption[System requirements]{System requirements, with parent objective and
+verification method. (D) marks a derived requirement. Methods: A analysis,
+I inspection, T test, D demonstration.}
 \label{tab:requirements}\\
 \toprule
-ID & Requirement & Parent objective & V & Cl. \\
+ID & Requirement & Parent objective & V \\
 \midrule
 \endfirsthead
-\multicolumn{5}{c}{\footnotesize\itshape \tablename~\thetable\ (continued)}\\
+\multicolumn{4}{c}{\footnotesize\itshape \tablename~\thetable\ (continued)}\\
 \toprule
-ID & Requirement & Parent objective & V & Cl. \\
+ID & Requirement & Parent objective & V \\
 \midrule
 \endhead
 \midrule
-\multicolumn{5}{r}{\footnotesize\itshape Continued on next page}\\
+\multicolumn{4}{r}{\footnotesize\itshape Continued on next page}\\
 \endfoot
 \bottomrule
 \endlastfoot
 
-\multicolumn{5}{@{}l}{\textbf{Functional}}\\
+\multicolumn{4}{@{}l}{\textbf{Functional}}\\
 \midrule
-FUN-01 & The cube shall maintain balance about an edge equilibrium using only internal reaction-wheel actuation. & Edge balance & T & M \\
-FUN-02 & The cube shall maintain balance about a corner equilibrium under three-axis feedback. & Corner balance & T & M \\
-FUN-03 & The cube shall execute a commanded slew between two specified attitudes and re-capture balance at the target. & Controlled rotation & T & M \\
-FUN-04 & The cube shall reject an impulse disturbance applied to the body and return to the balancing equilibrium. & Edge, corner balance & T & M \\
-FUN-05 & The system shall estimate body attitude and rate from onboard sensing alone, with no external reference. & All & T & M \\
-FUN-06 & The system shall bound stored wheel momentum by commanding a desaturation torque above a defined wheel-speed threshold. & All & T & M \\
-FUN-07 & The system shall sequence operating modes through a supervisory state machine with hysteresis on every threshold. & All & D & M \\
-FUN-08 & The system shall provide a disarm transition, reachable from every operating mode, that de-energises the drivers. & All & D & M \\
-FUN-09 & On loss of the balancing equilibrium the system shall enter a safe state with the wheels commanded down, rather than continuing to actuate. & All & D & M \\
-FUN-10 & The cube shall transfer stored wheel momentum through a braking event to tip from a face rest onto an edge, and capture the resulting attitude into balance. & Jump-up & T & S \\
-FUN-11 & The cube shall execute consecutive jump-up manoeuvres, re-stabilising after each landing. & Walking & T & U \\
-FUN-12 & The system shall record telemetry without perturbing control-loop timing. & All & D & M \\
-\midrule
-
-\multicolumn{5}{@{}l}{\textbf{Performance}}\\
-\midrule
-PER-01 & The 1-DoF rig shall balance for \qty{60}{\second} or more unassisted, with no operator contact and no evident wheel-speed drift. & Edge balance & T & M \\
-PER-02 & The cube shall maintain edge balance for \qty{60}{\second} or more unassisted, with no evident wheel-speed drift. & Edge balance & T & M \\
-PER-03 & The cube shall maintain corner balance for \qty{60}{\second} or more unassisted, with no evident wheel-speed drift. & Corner balance & T & M \\
-PER-04 & The 1-DoF rig shall recover to the balancing equilibrium from an initial tilt of \qty{12}{\degree} or more, released from rest, re-establishing PER-01. & Edge balance & T & M \\
-PER-05 & The cube shall recover to the balancing equilibrium from an initial tilt of \qty{5}{\degree} or more in any direction, re-establishing PER-02 or PER-03 as applicable. & Edge, corner balance & T & M \\
-PER-06 & The control and estimation loop shall execute at \qty{1}{\kilo\hertz} with a worst-case cycle time not exceeding \qty{1}{\milli\second}. & All & T & M \\
-PER-07 (D) & Each reaction wheel shall provide an inertia of at least \qty{4.0813e-4}{\kilogram\metre\squared} about its spin axis. & Jump-up & A, I & M \\
-PER-08 & The drive shall sustain the design wheel speed of \qty{5500}{\rpm} at end-of-discharge pack voltage. & Jump-up & A, T & M \\
-PER-09 & The design wheel speed shall not exceed \qty{80}{\percent} of the achievable maximum wheel speed at end-of-discharge pack voltage. & Jump-up & A & M \\
-PER-10 & Commanded motor current shall remain within the driver's \qty{9}{\ampere} continuous rating throughout balancing. & All & T & M \\
-PER-11 & The brake shall arrest a wheel from the design wheel speed within \qty{100}{\milli\second}. & Jump-up & T & S \\
-PER-12 & Telemetry shall record the state estimate, the control command and the wheel speeds at \qty{50}{\hertz} or faster. & All & T & M \\
+FUN-01 & The cube shall maintain balance about an edge equilibrium using only internal reaction-wheel actuation. & Edge balance & T \\
+FUN-02 & The cube shall maintain balance about a corner equilibrium under three-axis feedback. & Corner balance & T \\
+FUN-03 & The cube shall execute a commanded slew between two specified attitudes and re-capture balance at the target. & Controlled rotation & T \\
+FUN-04 & The cube shall reject an impulse disturbance applied to the body and return to the balancing equilibrium. & Edge, corner balance & T \\
+FUN-05 & The system shall estimate body attitude and rate from onboard sensing alone, with no external reference. & All & T \\
+FUN-06 & The system shall bound stored wheel momentum by commanding a desaturation torque above a defined wheel-speed threshold. & All & T \\
+FUN-07 & The system shall sequence operating modes through a supervisory state machine with hysteresis on every threshold. & All & D \\
+FUN-08 & The system shall provide a disarm transition, reachable from every operating mode, that de-energises the drivers. & All & D \\
+FUN-09 & On loss of the balancing equilibrium the system shall enter a safe state with the wheels commanded down, rather than continuing to actuate. & All & D \\
+FUN-10 & The cube shall transfer stored wheel momentum through a braking event to tip from a face rest onto an edge, and capture the resulting attitude into balance. & Jump-up & T \\
+FUN-11 & The cube shall execute consecutive jump-up manoeuvres, re-stabilising after each landing. & Walking & T \\
+FUN-12 & The system shall record telemetry without perturbing control-loop timing. & All & D \\
 \midrule
 
-\multicolumn{5}{@{}l}{\textbf{Design constraint}}\\
+\multicolumn{4}{@{}l}{\textbf{Performance}}\\
 \midrule
-CON-01 & The cube outer edge length shall be \qty{150}{\milli\metre}. & All & I & M \\
-CON-02 & Total cube mass shall not exceed \qty{1.7}{\kilo\gram}. & Jump-up & I & M \\
-CON-03 & The system shall be actuated by exactly three mutually orthogonal reaction wheels. & All & I & M \\
-CON-04 & The cube shall operate from a single onboard 6S lithium-polymer pack, with no tether or external power during a demonstration. & All & I, D & M \\
-CON-05 & Driver communication shall use a single linear CAN-FD chain, terminated at exactly the two physical ends. & All & I & M \\
-CON-06 & The \qty{5}{\volt} logic rail shall carry its coincident worst-case load within the regulator's derated rating. & All & A, T & M \\
-CON-07 & The electronics shall fit within the frozen board outline, mounting pattern and keep-out heights of the electronics-mount interface. & All & I & M \\
+PER-01 & The 1-DoF rig shall balance for \qty{60}{\second} or more unassisted, with no operator contact and no evident wheel-speed drift. & Edge balance & T \\
+PER-02 & The cube shall maintain edge balance for \qty{60}{\second} or more unassisted, with no evident wheel-speed drift. & Edge balance & T \\
+PER-03 & The cube shall maintain corner balance for \qty{60}{\second} or more unassisted, with no evident wheel-speed drift. & Corner balance & T \\
+PER-04 & The 1-DoF rig shall recover to the balancing equilibrium from an initial tilt of \qty{12}{\degree} or more, released from rest, re-establishing PER-01. & Edge balance & T \\
+PER-05 & The cube shall recover to the balancing equilibrium from an initial tilt of \qty{5}{\degree} or more in any direction, re-establishing PER-02 or PER-03 as applicable. & Edge, corner balance & T \\
+PER-06 & The control and estimation loop shall execute at \qty{1}{\kilo\hertz} with a worst-case cycle time not exceeding \qty{1}{\milli\second}. & All & T \\
+PER-07 (D) & Each reaction wheel shall provide an inertia of at least \qty{4.0813e-4}{\kilogram\metre\squared} about its spin axis. & Jump-up & A, I \\
+PER-08 & The drive shall sustain the design wheel speed of \qty{5500}{\rpm} at end-of-discharge pack voltage. & Jump-up & A, T \\
+PER-09 & The design wheel speed shall not exceed \qty{80}{\percent} of the achievable maximum wheel speed at end-of-discharge pack voltage. & Jump-up & A \\
+PER-10 & Commanded motor current shall remain within the driver's \qty{9}{\ampere} continuous rating throughout balancing. & All & T \\
+PER-11 & The brake shall arrest a wheel from the design wheel speed within \qty{100}{\milli\second}. & Jump-up & T \\
+PER-12 & Telemetry shall record the state estimate, the control command and the wheel speeds at \qty{50}{\hertz} or faster. & All & T \\
+\midrule
+
+\multicolumn{4}{@{}l}{\textbf{Design constraint}}\\
+\midrule
+CON-01 & The cube outer edge length shall be \qty{150}{\milli\metre}. & All & I \\
+CON-02 & Total cube mass shall not exceed \qty{1.7}{\kilo\gram}. & Jump-up & I \\
+CON-03 & The system shall be actuated by exactly three mutually orthogonal reaction wheels. & All & I \\
+CON-04 & The cube shall operate from a single onboard 6S lithium-polymer pack, with no tether or external power during a demonstration. & All & I, D \\
+CON-05 & Driver communication shall use a single linear CAN-FD chain, terminated at exactly the two physical ends. & All & I \\
+CON-06 & The \qty{5}{\volt} logic rail shall carry its coincident worst-case load within the regulator's derated rating. & All & A, T \\
+CON-07 & The electronics shall fit within the frozen board outline, mounting pattern and keep-out heights of the electronics-mount interface. & All & I \\
 \end{longtable}
 \end{small}
 
