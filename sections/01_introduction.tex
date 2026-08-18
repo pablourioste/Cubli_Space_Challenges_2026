@@ -99,23 +99,29 @@ demanding ones --- a cube that cannot balance teaches nothing --- and they are
 treated in the rest of this document with full engineering rigour, on the
 premise that the pedagogy is only as good as the hardware underneath it.
 
-\paragraph{Technical objectives.} Each imposes a required capability. The
-mapping below keeps every requirement traceable from motivation to capability,
-and is what the sizing and control work below must be shown to satisfy.
+\paragraph{Technical objectives.} Each imposes a required capability, and each
+capability decomposes into verifiable requirements. The mapping below keeps
+every requirement traceable from motivation to capability; the requirements
+themselves, with their thresholds and verification methods, are stated in
+Section~\ref{sec:requirements}, and are what the sizing and control work below
+must be shown to satisfy.
 
 \begin{table}[htbp]
 \centering
-\caption[Objective-to-requirement traceability]{Objective-to-requirement traceability.}
+\caption[Objective-to-requirement traceability]{Objective-to-requirement traceability. Requirement identifiers refer to
+Table~\ref{tab:requirements}.}
 \label{tab:traceability}
-\begin{tabular}{lp{0.65\textwidth}}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{} L{2.4cm} L{6.5cm} L{4.6cm} @{}}
 \toprule
-Objective & Required capability \\
+Objective & Required capability & Requirements \\
 \midrule
-Edge balance        & The system must actively maintain dynamic stability and regulate its posture about a single line-contact equilibrium position. \\[0.5em]
-Corner balance      & The system must maintain multi-axis closed-loop balance and attitude control around a highly unstable point-contact equilibrium. \\[0.5em]
-Controlled rotation & The controller must accurately track dynamic reference trajectories to execute smooth slew maneuvers between distinct equilibrium states. \\[0.5em]
-Jump-up (stretch)   & The system must store sufficient wheel angular momentum and shed it near-impulsively through a braking event to tip itself from a face rest onto an edge or corner, and then capture the resulting attitude into balance. \\[0.5em]
-Walking (stretch)   & The system must execute a sequential series of dynamic jump-up maneuvers and rapidly re-stabilize itself upon each landing impact. \\
+Edge balance        & The system must actively maintain dynamic stability and regulate its posture about a single line-contact equilibrium position. & FUN-01, FUN-04, PER-01, PER-02, PER-04, PER-05 \\[0.5em]
+Corner balance      & The system must maintain multi-axis closed-loop balance and attitude control around a highly unstable point-contact equilibrium. & FUN-02, FUN-04, PER-03, PER-05 \\[0.5em]
+Controlled rotation & The controller must accurately track dynamic reference trajectories to execute smooth slew maneuvers between distinct equilibrium states. & FUN-03 \\[0.5em]
+Jump-up (stretch)   & The system must store sufficient wheel angular momentum and shed it near-impulsively through a braking event to tip itself from a face rest onto an edge or corner, and then capture the resulting attitude into balance. & FUN-10, PER-07, PER-08, PER-09, PER-11, CON-02 \\[0.5em]
+Walking (stretch)   & The system must execute a sequential series of dynamic jump-up maneuvers and rapidly re-stabilize itself upon each landing impact. & FUN-11 \\
 \bottomrule
 \end{tabular}
 \end{table}

@@ -20,9 +20,9 @@
 \usepackage{lastpage}
 \usepackage{siunitx}    % SI units via \qty/\num for the BOM tables (App. A)
 \usepackage{xcolor}     % \textcolor for TODO placeholders + workstream colours
-\usepackage{pgfgantt}   % Gantt chart for the project schedule (Sec. 2)
-\usepackage{pdflscape}  % landscape sheets for the two-page Gantt chart (Sec. 2)
-\usepackage{algorithm}      % sizing closure algorithm (Sec. 4)
+\usepackage{pgfgantt}   % Gantt chart for the project schedule (Sec. 3)
+\usepackage{pdflscape}  % landscape sheets for the two-page Gantt chart (Sec. 3)
+\usepackage{algorithm}      % sizing closure algorithm (Sec. 5)
 \usepackage{algpseudocode}  % pseudocode environment for the above
 \usepackage{hyperref}
 \usepackage{caption}    % consistent, compact table/figure caption styling
@@ -51,7 +51,7 @@
 \DeclareSIUnit{\awg}{AWG}   % wire gauge
 \newcolumntype{L}[1]{>{\RaggedRight\arraybackslash}p{#1}}  % ragged fixed-width prose column (BOM + WBS tables)
 
-% ---------- Project-planning colours (WBS task tables & Gantt, Sec. 2) ----------
+% ---------- Project-planning colours (WBS task tables & Gantt, Sec. 3) ----------
 \definecolor{pfcol}{HTML}{70AD47} % formulation & documentation
 \definecolor{ctcol}{HTML}{2E75B6} % control & software
 \definecolor{cdcol}{HTML}{BF8F00} % CAD design
@@ -165,6 +165,8 @@
 
 \input{sections/01_introduction}
 \clearpage
+\input{sections/01a_requirements}
+\clearpage
 \input{sections/02_project_organization}
 \clearpage
 \input{sections/04_methodology}
@@ -186,7 +188,7 @@
 
 % ---------- Appendices ----------
 % A: Bill of Materials  B: CAD & construction  C: Electrical detail
-% D: Control algorithm detail
+% D: Control algorithm detail  E: Requirements verification matrix
 \appendix
 \input{sections/10_bom}
 \clearpage
@@ -195,5 +197,7 @@
 \input{sections/12_electrical_detail}
 \clearpage
 \input{sections/13_control_algorithm_detail}
+\clearpage
+\input{sections/14_requirements_verification}
 
 \end{document}

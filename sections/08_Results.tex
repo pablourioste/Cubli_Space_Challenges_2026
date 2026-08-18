@@ -3,9 +3,10 @@
 \label{sec:validation_results}
 
 This subsection reports evidence against the acceptance criteria of
-Table~\ref{tab:traceability}, in the order the stages are entered. Where no
+Table~\ref{tab:requirements}, in the order the stages are entered. Where no
 result exists yet, the criterion is stated so the gap is explicit rather than
-silent.
+silent. Appendix~\ref{app:verification} carries the per-requirement
+verification status that the results below close out.
 
 \subsubsection{1-DoF Control Validation}
 \label{sec:test_1dof}
@@ -78,7 +79,9 @@ The largest initial angle tested to date, again measured from the support, is
 demonstrated disturbance-rejection envelope currently extends at least this
 far beyond the three angles of Table~\ref{tab:recovery_angle}. This angle represents
 the physical hard stop of the experimental rig support as well as the maximum tilt
-evaluated in simulation, fully satisfying the requirements defined in the testing plan.
+evaluated in simulation, so requirement PER-04 (recovery from
+\qty{12}{\degree} or more) is satisfied with margin, and the demonstrated
+envelope is bounded by the rig rather than by the controller.
 
 \subsubsection{3-DoF Control Validation}
 \label{sec:test_3dof}
@@ -92,9 +95,9 @@ Section~\ref{sec:test_1dof} so the two are directly comparable, and
 Table~\ref{tab:recovery_angle_3dof_template} mirrors the recovery-angle
 protocol of Table~\ref{tab:recovery_angle} for the cube. \textcolor{red}{TODO:
 populate both tables from edge-balance testing on the final prototype, run the
-corner-balance case once edge balance is closed out, and compare against the
-acceptance criteria of Table~\ref{tab:traceability} and the 1-DoF bench
-results of Section~\ref{sec:test_1dof}.}
+corner-balance case once edge balance is closed out, and compare against
+requirements PER-02, PER-03 and PER-05 of Table~\ref{tab:requirements} and the
+1-DoF bench results of Section~\ref{sec:test_1dof}.}
 
 \begin{table}[htbp]
 \centering

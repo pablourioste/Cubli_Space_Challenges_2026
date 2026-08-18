@@ -1,0 +1,150 @@
+% ================= 2. SYSTEM REQUIREMENTS =================
+\section{System Requirements and Verification}
+\label{sec:requirements}
+
+Section~\ref{sec:objectives} states what this project must achieve. This
+section states what the \emph{system} must do for those objectives to be met,
+and how each statement will be shown to have been met.
+
+The distinction is one of abstraction and verifiability, not of subject matter.
+An objective is an outcome --- for the machine or for the student --- and is
+not directly testable: ``the system must maintain multi-axis closed-loop
+balance about a point-contact equilibrium'' names a capability but no threshold
+and no method. A requirement is a single \emph{shall} statement about the
+system, carrying a number or a binary condition, a parent objective, and a
+verification method, so that it can be shown to pass or fail. The rewriting of
+the objective above into requirements FUN-02 and PER-03 is what makes it
+something the design can be held to.
+
+Two conventions are worth stating because they are easy to violate. First, a
+requirement says \emph{what}, never \emph{how}: the choice of an LQR law, a
+complementary filter, a ballasted PET-CF ring or a particular driver is a
+design decision belonging to Sections~\ref{sec:sizing}--\ref{sec:control_algorithms},
+and writing it into a requirement would remove the freedom those sections spend
+their length exercising. Second, some requirements are \emph{derived} rather
+than imposed --- marked~(D) below --- because they are outputs of an analysis
+rather than inputs to it. PER-07 is the clearest case: the wheel-inertia figure
+is not a free choice but a consequence of the cube mass and edge length, which
+are themselves outputs of the closure procedure of
+Section~\ref{sec:massbudget}. Recording it as derived keeps that dependency
+visible instead of presenting a computed result as an external demand.
+
+\paragraph{Verification methods.} Each requirement carries one or more of:
+\textbf{A}nalysis, closure by calculation or simulation against a stated model;
+\textbf{I}nspection, confirmation against drawings, a parts list or a
+measurement of the built article; \textbf{T}est, instrumented measurement
+against a numerical criterion; and \textbf{D}emonstration, observed execution of
+a behaviour without instrumented measurement. The procedure and acceptance
+criterion behind each entry are given in Appendix~\ref{app:verification}, which
+is also where evidence is recorded as testing proceeds.
+
+\paragraph{Scope classes.} Requirements are marked \textbf{M} (mandatory, a
+committed deliverable), \textbf{S} (stretch, scoped but sacrificial --- the
+jump-up is designated sacrificial scope by standing decision,
+Section~\ref{sec:schedule}), or \textbf{U} (unscheduled, retained so the scope
+boundary is explicit; no gate exists for it in
+Table~\ref{tab:gates}).
+
+\paragraph{On the educational objectives.} The learning objectives of
+Table~\ref{tab:edu_traceability} are deliberately \emph{not} decomposed into
+requirements here. They are constraints on how the engineering is done and
+documented rather than properties of the delivered hardware, and the provisions
+that satisfy them are stated where they take effect --- the parametric CAD of
+Section~\ref{sec:cad}, the adjustable ballast of Section~\ref{sec:rw_sizing},
+the staged validation of Section~\ref{sec:methodology}, the bring-up protocol
+of Section~\ref{sec:electrical_safety} and the bill of materials of
+Appendix~\ref{app:bom}. This section is therefore technical throughout.
+
+\begin{small}
+\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{} l L{7.0cm} L{2.5cm} c c @{}}
+\caption[System requirements]{System requirements, with parent objective,
+verification method and current status. (D) marks a derived requirement.
+Methods: A analysis, I inspection, T test, D demonstration. Class: M mandatory,
+S stretch, U unscheduled.}
+\label{tab:requirements}\\
+\toprule
+ID & Requirement & Parent objective & V & Cl. \\
+\midrule
+\endfirsthead
+\multicolumn{5}{c}{\footnotesize\itshape \tablename~\thetable\ (continued)}\\
+\toprule
+ID & Requirement & Parent objective & V & Cl. \\
+\midrule
+\endhead
+\midrule
+\multicolumn{5}{r}{\footnotesize\itshape Continued on next page}\\
+\endfoot
+\bottomrule
+\endlastfoot
+
+\multicolumn{5}{@{}l}{\textbf{Functional}}\\
+\midrule
+FUN-01 & The cube shall maintain balance about an edge equilibrium using only internal reaction-wheel actuation. & Edge balance & T & M \\
+FUN-02 & The cube shall maintain balance about a corner equilibrium under three-axis feedback. & Corner balance & T & M \\
+FUN-03 & The cube shall execute a commanded slew between two specified attitudes and re-capture balance at the target. & Controlled rotation & T & M \\
+FUN-04 & The cube shall reject an impulse disturbance applied to the body and return to the balancing equilibrium. & Edge, corner balance & T & M \\
+FUN-05 & The system shall estimate body attitude and rate from onboard sensing alone, with no external reference. & All & T & M \\
+FUN-06 & The system shall bound stored wheel momentum by commanding a desaturation torque above a defined wheel-speed threshold. & All & T & M \\
+FUN-07 & The system shall sequence operating modes through a supervisory state machine with hysteresis on every threshold. & All & D & M \\
+FUN-08 & The system shall provide a disarm transition, reachable from every operating mode, that de-energises the drivers. & All & D & M \\
+FUN-09 & On loss of the balancing equilibrium the system shall enter a safe state with the wheels commanded down, rather than continuing to actuate. & All & D & M \\
+FUN-10 & The cube shall transfer stored wheel momentum through a braking event to tip from a face rest onto an edge, and capture the resulting attitude into balance. & Jump-up & T & S \\
+FUN-11 & The cube shall execute consecutive jump-up manoeuvres, re-stabilising after each landing. & Walking & T & U \\
+FUN-12 & The system shall record telemetry without perturbing control-loop timing. & All & D & M \\
+\midrule
+
+\multicolumn{5}{@{}l}{\textbf{Performance}}\\
+\midrule
+PER-01 & The 1-DoF rig shall balance for \qty{60}{\second} or more unassisted, with no operator contact and no evident wheel-speed drift. & Edge balance & T & M \\
+PER-02 & The cube shall maintain edge balance for \qty{60}{\second} or more unassisted, with no evident wheel-speed drift. & Edge balance & T & M \\
+PER-03 & The cube shall maintain corner balance for \qty{60}{\second} or more unassisted, with no evident wheel-speed drift. & Corner balance & T & M \\
+PER-04 & The 1-DoF rig shall recover to the balancing equilibrium from an initial tilt of \qty{12}{\degree} or more, released from rest, re-establishing PER-01. & Edge balance & T & M \\
+PER-05 & The cube shall recover to the balancing equilibrium from an initial tilt of \qty{5}{\degree} or more in any direction, re-establishing PER-02 or PER-03 as applicable. & Edge, corner balance & T & M \\
+PER-06 & The control and estimation loop shall execute at \qty{1}{\kilo\hertz} with a worst-case cycle time not exceeding \qty{1}{\milli\second}. & All & T & M \\
+PER-07 (D) & Each reaction wheel shall provide an inertia of at least \qty{4.0813e-4}{\kilogram\metre\squared} about its spin axis. & Jump-up & A, I & M \\
+PER-08 & The drive shall sustain the design wheel speed of \qty{5500}{\rpm} at end-of-discharge pack voltage. & Jump-up & A, T & M \\
+PER-09 & The design wheel speed shall not exceed \qty{80}{\percent} of the achievable maximum wheel speed at end-of-discharge pack voltage. & Jump-up & A & M \\
+PER-10 & Commanded motor current shall remain within the driver's \qty{9}{\ampere} continuous rating throughout balancing. & All & T & M \\
+PER-11 & The brake shall arrest a wheel from the design wheel speed within \qty{100}{\milli\second}. & Jump-up & T & S \\
+PER-12 & Telemetry shall record the state estimate, the control command and the wheel speeds at \qty{50}{\hertz} or faster. & All & T & M \\
+\midrule
+
+\multicolumn{5}{@{}l}{\textbf{Design constraint}}\\
+\midrule
+CON-01 & The cube outer edge length shall be \qty{150}{\milli\metre}. & All & I & M \\
+CON-02 & Total cube mass shall not exceed \qty{1.7}{\kilo\gram}. & Jump-up & I & M \\
+CON-03 & The system shall be actuated by exactly three mutually orthogonal reaction wheels. & All & I & M \\
+CON-04 & The cube shall operate from a single onboard 6S lithium-polymer pack, with no tether or external power during a demonstration. & All & I, D & M \\
+CON-05 & Driver communication shall use a single linear CAN-FD chain, terminated at exactly the two physical ends. & All & I & M \\
+CON-06 & The \qty{5}{\volt} logic rail shall carry its coincident worst-case load within the regulator's derated rating. & All & A, T & M \\
+CON-07 & The electronics shall fit within the frozen board outline, mounting pattern and keep-out heights of the electronics-mount interface. & All & I & M \\
+\end{longtable}
+\end{small}
+
+\paragraph{Status at the time of writing.} PER-01 and PER-04 are verified on
+the single-axis rig (Section~\ref{sec:test_1dof}); PER-04 is demonstrated to
+\qty{24}{\degree}, which is the rig's mechanical hard stop rather than a limit
+of the controller, so the requirement is stated at the largest angle for which
+a recovery time was recorded. PER-07 and PER-10 are closed by analysis and by
+rig measurement respectively, pending confirmation on the integrated cube.
+Every remaining requirement is open. Appendix~\ref{app:verification} carries
+the per-requirement status and is the record updated as testing proceeds.
+
+\paragraph{Relationship to the milestone gates.} The gates of
+Table~\ref{tab:gates} are scheduling events; the requirements above are
+properties of the system. They meet where a gate's pass criterion is a
+requirement: G3 closes on PER-01, G6 on PER-02 and PER-05, G7 on FUN-02,
+FUN-03 and PER-03, and G8 on FUN-10 and PER-11. A gate can slip without a
+requirement changing, and a requirement can fail at a gate that the schedule
+nonetheless passes; keeping the two separate is what allows the jump-up to be
+dropped as sacrificial scope without any other requirement being renegotiated.
+
+\paragraph{Open items.} Three requirements rest on figures not yet fixed.
+PER-08 and PER-09 depend on the achievable wheel speed at end-of-discharge
+voltage, currently derived rather than measured; the spin-up test of WBS
+task~E10 closes this. PER-11 has no measurement and is scoped with the jump-up.
+CON-01 is stated at \qty{150}{\milli\metre} to match the frame freeze of gate
+M2, while the sizing analysis of Section~\ref{sec:sizing} is currently run at
+\qty{149}{\milli\metre}; the discrepancy is small but not negligible at the
+present inertia margin, and is to be reconciled at CAD closure.
