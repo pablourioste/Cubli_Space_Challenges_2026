@@ -3,8 +3,14 @@
 % ---------- Packages ----------
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[a4paper,margin=2.5cm]{geometry}
+% headheight is enlarged from the LaTeX default so the header logo (see the
+% Header / Footer block below) fits in the head box. It is set here, as a
+% geometry option, so the page layout is computed once and consistently; the
+% header grows upward into the existing top margin and the text block does not
+% move.
+\usepackage[a4paper,margin=2.5cm,headheight=24pt]{geometry}
 \usepackage{graphicx}
+\usepackage[export]{adjustbox}  % relative trim= keys on \includegraphics (header logo)
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
 \usepackage{longtable}
@@ -96,23 +102,39 @@
 \setlength{\cftbeforetabskip}{2pt}
 
 % ---------- Header / Footer ----------
+% Team mark for the running header. The source PNG is the full cover logo: a
+% square canvas with the cube mark in the upper half, the "ARMONIA" wordmark
+% below it, and wide white padding on all sides. At header size the wordmark
+% would be a smudge, so the image is trimmed to the cube mark alone. The trim
+% is given in fractions of the natural image size (adjustbox relative units, in
+% the order left/bottom/right/top), so re-exporting the logo at a different
+% resolution does not break the crop -- only a change to the artwork's layout
+% would. To show the whole logo instead, drop the trim/clip keys and raise
+% \headlogoheight. \adjincludegraphics rather than \includegraphics: the
+% relative \width/\height trim units are an adjustbox feature.
+\newlength{\headlogoheight}
+\setlength{\headlogoheight}{16pt}
+\newcommand{\headlogo}{%
+    \raisebox{-5pt}{%
+        \adjincludegraphics[trim={0.29\width} {0.46\height} {0.30\width} {0.155\height}, clip, height=\headlogoheight]{images/armonia_logo.png}%
+    }%
+}
+
 \pagestyle{fancy}
 \fancyhf{}
-\setlength{\headheight}{14pt}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
 \fancyhead[L]{\textbf{Technical Design Document}}
-\fancyhead[R]{Cubli}
+\fancyhead[R]{Cubli\hspace{0.6em}\headlogo}
 \fancyfoot[L]{\leftmark}
 \fancyfoot[R]{Page \thepage\ of \pageref{LastPage}}
 
 \fancypagestyle{plain}{%
     \fancyhf{}%
-    \setlength{\headheight}{14pt}%
     \renewcommand{\headrulewidth}{0.4pt}%
     \renewcommand{\footrulewidth}{0.4pt}%
     \fancyhead[L]{\textbf{Technical Design Document}}%
-    \fancyhead[R]{Cubli \textbar\ Space Challenges 2026}%
+    \fancyhead[R]{Cubli \textbar\ Space Challenges 2026\hspace{0.6em}\headlogo}%
     \fancyfoot[R]{Page \thepage\ of \pageref{LastPage}}%
 }
 

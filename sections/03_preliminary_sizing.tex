@@ -10,6 +10,27 @@ a required wheel inertia (Section~\ref{sec:jumpup}); the packaging constraint
 linking cube size to wheel size (Section~\ref{sec:massbudget}); and the wheel
 design meeting that target (Section~\ref{sec:rw_sizing}).
 
+\paragraph{Provenance of the numbers in this section.} Every figure reported
+below --- the wheel-inertia target, the ballast station count, the wheel mass
+and inertia, and the cube mass budget --- is produced by a single preliminary
+sizing program, \texttt{analysis/SIZING.py}, rather than assembled by hand from
+separate calculations. The program implements the jump-up dynamics in full
+(the ideal momentum transfer of Equation~\eqref{eq:hw_ideal}, the contact-case
+geometry factors of Table~\ref{tab:contact_factors}, the brake-amplification
+factor $\beta$ and the resulting inertia target of
+Equation~\eqref{eq:Iw_target}), the wheel configuration (ring and spoke
+geometry, the radial M6 ballast stations with their parallel-axis and own-axis
+inertia terms, the axial-fit and edge-gap feasibility rules), and the cube mass
+budget itemised from the bill of materials with the structural allowance
+carried explicitly. Because the mass budget feeds back into the inertia target,
+the program is run to convergence rather than evaluated once, and the values
+quoted here are those of the converged pass. They are therefore reproducible:
+re-running the program with the inputs of Table~\ref{tab:jumpup_budget}
+regenerates every number in this section, and changing an input regenerates all
+of them consistently rather than leaving the tables to be reconciled by hand.
+The figures remain \emph{preliminary} in the sense that the structural line is
+still an allowance pending CAD closure, not in the sense of being approximate.
+
 Sizing and control are solved together, not sequentially. Wheel inertia sets
 the angular momentum and torque available to the controller for arresting a
 fall --- a wheel sized without the control law in mind can be mechanically
@@ -135,26 +156,31 @@ each iteration. Values are those of the converged iteration.}
 \toprule
 Symbol & Description & Value \\
 \midrule
-$M$                & Cube mass                    & \qty{1.4654}{\kilo\gram} \\
+$M$                & Cube mass                    & \qty{1.6638}{\kilo\gram} \\
 $L$                & Cube edge length             & \qty{149}{\milli\metre} \\
 $\eta$             & Energy margin                & \num{1.05} \\
 $\tau_b$           & Brake torque per wheel       & \qty{5}{\newton\metre} \\
-$\tau_g = MgL/2$   & Gravitational tip-over floor & \qty{1.071}{\newton\metre} \\
-$\beta$            & Brake-amplification factor   & \num{1.273} \\
-$\omega_{\max}$    & Max wheel speed (design)     & \qty{6000}{\rpm}\textsuperscript{*} \\
-$h_w$              & Required angular momentum    & \qty{0.1994}{\kilo\gram\metre\squared\per\second} \\
-$I_{w,\text{target}}$ & \textbf{Target wheel inertia} & \qty{3.1735e-4}{\kilogram\metre\squared} \\
+$\tau_g = MgL/2$   & Gravitational tip-over floor & \qty{1.216}{\newton\metre} \\
+$\beta$            & Brake-amplification factor   & \num{1.321} \\
+$\omega_{\max}$    & Max wheel speed (design)     & \qty{5500}{\rpm}\textsuperscript{*} \\
+$h_w$              & Required angular momentum    & \qty{0.2351}{\kilo\gram\metre\squared\per\second} \\
+$I_{w,\text{target}}$ & \textbf{Target wheel inertia} & \qty{4.0813e-4}{\kilogram\metre\squared} \\
 \bottomrule
 \end{tabular}
 
 \vspace{0.4em}
-{\footnotesize\RaggedRight\textsuperscript{*}\,The sizing has additionally been
-run at \qty{5000}{\rpm} as an over-dimensioning check. Since
-$I_{w,\text{target}} = h_w/\omega_{\max}$, the lower speed raises the inertia
-requirement by a factor $6/5$ and so demands more ballast; a wheel that closes
-at \qty{5000}{\rpm} therefore closes at \qty{6000}{\rpm} with margin in hand.
-\qty{6000}{\rpm} is the value the design claims, \qty{5000}{\rpm} the
-conservative case it was verified against.\par}
+{\footnotesize\RaggedRight\textsuperscript{*}\,Lowered from the
+\qty{6000}{\rpm} of the previous iteration. Since $I_{w,\text{target}} =
+h_w/\omega_{\max}$, a lower speed \emph{raises} the inertia requirement and so
+demands more ballast --- here six stations per wheel rather than three,
+costing \qty{63.8}{\gram} of cube mass. What is bought in exchange is
+\qty{500}{\rpm} of relief on the drive and, because the station count rounds
+to multiples of three, a design point that sits on a wider tolerance band:
+the six-station wheel holds across \qty{200.8}{\gram} of structure allowance
+(Section~\ref{sec:massbudget}) where the three-station wheel held across
+roughly \qty{46}{\gram}. No margin should be quoted at any other speed
+without re-running the closure, since the station count changes in steps
+rather than continuously.\par}
 \end{table}
 
 Two features of these relations govern how the iteration behaves:
@@ -211,7 +237,7 @@ entirely by how quickly angular momentum is destroyed,
 \end{equation}
 so quoting a brake torque is equivalent to asserting a stopping time: at the
 present operating point, $\tau_b=\qty{5}{\newton\metre}$ implies $\Delta t
-\approx \qty{40}{\milli\second}$, whereas a bolt head striking a printed
+\approx \qty{47}{\milli\second}$, whereas a bolt head striking a printed
 barrier should arrest the wheel in a few milliseconds. The design value is
 therefore expected to be conservative, which is the intended direction ---
 since $\beta=\tau_b/(\tau_b-\tau_g)$ falls toward unity as $\tau_b$ grows,
@@ -299,7 +325,7 @@ records both once the procedure closes.
 \begin{table}[htbp]
 \centering
 \caption[Required per-wheel inertia by contact case]{Required per-wheel inertia by contact case, evaluated at
-$\omega_{\max}=\qty{6000}{\rpm}$ for the converged $M=\qty{1.4654}{\kilo\gram}$.
+$\omega_{\max}=\qty{5500}{\rpm}$ for the converged $M=\qty{1.6638}{\kilo\gram}$.
 Only the geometry factor differs between the cases: $\tau_g$ and $\beta$ are
 properties of the cube and the brake, not of the feature it stands on.}
 \label{tab:inertia_cases}
@@ -307,16 +333,16 @@ properties of the cube and the brake, not of the feature it stands on.}
 \toprule
 Contact case & $h_w$ (kg\,m$^2$/s) & $I_{w,\text{target}}$ (kg\,m$^2$) & Relative \\
 \midrule
-Edge                       & \num{0.1809} & \num{2.8790e-4} & \qty{90.7}{\percent} \\
-\textbf{Corner (critical)} & \num{0.1994} & \num{3.1735e-4} & \qty{100}{\percent} \\
+Edge                       & \num{0.2133} & \num{3.7026e-4} & \qty{90.7}{\percent} \\
+\textbf{Corner (critical)} & \num{0.2351} & \num{4.0813e-4} & \qty{100}{\percent} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 The corner case demands \qty{9.3}{\percent} more inertia than the edge case,
 so sizing on it covers the edge case with margin. The selected wheel delivers
-\qty{3.6903e-4}{\kilogram\metre\squared} (Table~\ref{tab:rw_params}) ---
-\qty{116.3}{\percent} of the corner requirement and \qty{128.2}{\percent} of
+\qty{4.3356e-4}{\kilogram\metre\squared} (Table~\ref{tab:rw_params}) ---
+\qty{106.2}{\percent} of the corner requirement and \qty{117.1}{\percent} of
 the edge requirement.
 
 Table~\ref{tab:massbudget} is the bookkeeping side of steps 5 and 6:
@@ -336,30 +362,38 @@ $M$ assumed in Table~\ref{tab:jumpup_budget}.}
 \toprule
 Subsystem & Mass (g) & Share & Basis \\
 \midrule
-Reaction wheels ($3\times\qty{149.11}{\gram}$) & 447.3 & \qty{30.5}{\percent} & Sized (Sec.~\ref{sec:rw_sizing}) \\
-Motors and brake servos ($3\times$ each)      & 245.4 & \qty{16.7}{\percent} & Datasheet \\
-Power (battery, XT60, regulator)              & 279.0 & \qty{19.0}{\percent} & Drives envelope (step 1) \\
-Electronics (drivers, MCU, encoders, IMU)     &  74.2 & \qty{5.1}{\percent}  & Datasheet \\
-Wiring, perfboard and passives                &  45.5 & \qty{3.1}{\percent}  & Estimated \\
+Reaction wheels ($3\times\qty{170.37}{\gram}$) & 511.1 & \qty{30.7}{\percent} & Sized (Sec.~\ref{sec:rw_sizing}) \\
+Motors and brake servos ($3\times$ each)      & 245.4 & \qty{14.7}{\percent} & Datasheet \\
+Power (battery, XT60, regulator)              & 279.0 & \qty{16.8}{\percent} & Drives envelope (step 1) \\
+Electronics (drivers, MCU, encoders, IMU)     &  95.2 & \qty{5.7}{\percent}  & Datasheet, as-weighed \\
+Wiring, perfboard and passives                &  45.5 & \qty{2.7}{\percent}  & Estimated \\
 \midrule
-\textbf{Subtotal --- specified hardware}      & \textbf{1091.4} & \qty{74.5}{\percent} & Measured or datasheet \\
-Structure (subframe, frame, fasteners)        & 374.0 & \qty{25.5}{\percent} & \textbf{Allowance, pending CAD} \\
+\textbf{Subtotal --- specified hardware}      & \textbf{1176.2} & \qty{70.7}{\percent} & Measured or datasheet \\
+Structure (subframe, frame, fasteners)        & 487.6 & \qty{29.3}{\percent} & \textbf{Allowance, pending CAD} \\
 \midrule
-\textbf{Total $M$}                            & \textbf{1465.4} & & \textbf{Converged fixed point} \\
+\textbf{Total $M$}                            & \textbf{1663.8} & & \textbf{Converged fixed point} \\
 \bottomrule
 \end{tabular}
 
 \vspace{0.4em}
 {\footnotesize\RaggedRight The structure line is an \emph{allowance}, not a
-measurement, and at roughly \qty{26}{\percent} of the total it is still the
-dominant uncertainty in the budget, even after the \qty{610}{\gram} figure of
-the previous iteration was revised down to \qty{374}{\gram}
-(subframe \qty{153}{\gram}, frame \qty{184}{\gram}, fasteners/harness
-\qty{37}{\gram}, held at the same relative split). It is reported separately
-from the specified hardware for that reason: the subtotal is what the design
-currently knows, and the total is what it currently projects. Closing the CAD
-model replaces the allowance with a real figure and re-enters the loop at
-step~6.\par}
+measurement, and at roughly \qty{29}{\percent} of the total it remains the
+dominant uncertainty in the budget. It has been revised \emph{upward} from the
+\qty{374}{\gram} of the previous iteration to \qty{487.6}{\gram} (subframe
+\qty{199.5}{\gram}, frame \qty{239.9}{\gram}, fasteners/harness
+\qty{48.2}{\gram}, held at the same relative split), the earlier figure having
+proved optimistic against the frame and subframe now in CAD. The electronics
+line rises over the same revision, \qty{74.2}{\gram} to \qty{95.2}{\gram}, on
+as-weighed rather than bare-board figures --- the flight computer carries
+headers, each encoder breakout is quoted with its steel-backed ring magnet,
+and the telemetry radio with its antenna and pigtail. The allowance is
+reported separately from the specified hardware for that reason: the subtotal
+is what the design currently knows, and the total is what it currently
+projects. Closing the CAD model replaces the allowance with a real figure and
+re-enters the loop at step~6. The present design point tolerates that: the
+six-station wheel holds anywhere between \qty{364.1}{\gram} and
+\qty{564.9}{\gram} of structure allowance, so the budget can absorb an overrun
+of about \qty{77}{\gram} before the station count steps again.\par}
 \end{table}
 
 \subsection{Reaction-Wheel Sizing}
@@ -423,10 +457,10 @@ $R_{\text{mean}}$ & Ballast centroid radius (forced, $=(D_w{+}D_i)/4$) & \qty{55
 $m_{\text{hw}}$ & Hardware mass per station (bolt $+$ nut) & \qty{7.5}{\gram} \\
 $m_b$      & \emph{Net} mass added per station          & \qty{7.085}{\gram} \\
 $\Delta I_b$ & \emph{Net} inertia added per station     & \qty{2.151e-5}{\kilogram\metre\squared} \\
-$N$        & Station count reaching $I_{w,\text{target}}$ (of $N_{\max}=37$) & \num{3} \\
-$m_w$      & Resulting wheel mass                      & \qty{149.11}{\gram} \\
-$I_w$      & Resulting wheel inertia                   & \qty{3.6903e-4}{\kilogram\metre\squared} \\
-           & \quad as a fraction of $I_{w,\text{target}}$ & \qty{116.3}{\percent} \\
+$N$        & Station count reaching $I_{w,\text{target}}$ (of $N_{\max}=37$) & \num{6} \\
+$m_w$      & Resulting wheel mass                      & \qty{170.37}{\gram} \\
+$I_w$      & Resulting wheel inertia                   & \qty{4.3356e-4}{\kilogram\metre\squared} \\
+           & \quad as a fraction of $I_{w,\text{target}}$ & \qty{106.2}{\percent} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -458,12 +492,13 @@ envelope, since three orthogonal wheel modules and the battery must fit within
 $L$ --- so the sweep is retained for what it reveals, not what it selects.
 Left free to minimise wheel mass, the calculator prefers a larger ring, since
 $I_{zz}\sim mR^2$ makes mass at large radius buy inertia more cheaply: the
-unconstrained optimum at the present target is \qty{130}{\milli\metre}
-(\qty{139.83}{\gram}/wheel, no ballast needed), so the envelope constraint at
-\qty{120}{\milli\metre} costs about \qty{9.3}{\gram} per wheel
-(\qty{27.8}{\gram} over three) --- a modest penalty at this design point. This
-is the price of a wheel that fits, and a wheel that does not fit is not a
-candidate.
+unconstrained optimum at the present target is \qty{140}{\milli\metre}
+(\qty{151.81}{\gram}/wheel, no ballast needed), so the envelope constraint at
+\qty{120}{\milli\metre} costs about \qty{18.6}{\gram} per wheel
+(\qty{55.7}{\gram} over three). The penalty has roughly doubled since the
+previous iteration, because the higher inertia target now has to be met with
+steel at $R_{\text{mean}}$ rather than with ring diameter. This is the price
+of a wheel that fits, and a wheel that does not fit is not a candidate.
 
 The procedure followed is the fixed-point iteration of
 Table~\ref{tab:sizing_procedure}, run by hand: a cube mass is estimated and a

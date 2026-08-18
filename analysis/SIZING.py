@@ -63,16 +63,19 @@ cube is not a candidate, so the envelope outranks the mass objective.
 The sweep is still computed and printed in full, as context for what the
 constraint costs.
 
-omega_max is 6000 rpm per electrical/MOTOR_SPEED.md and the TDD. The
-sizing has also been run at 5000 rpm as an OVER-DIMENSIONING check:
-I_w_target = h_w/omega_max, so the lower speed raises the requirement by
-6/5 and demands more ballast. A wheel closing at 5000 closes at 6000 with
-margin in hand.
+omega_max is 5500 rpm per electrical/MOTOR_SPEED.md and the TDD, lowered
+from 6000 rpm. I_w_target = h_w/omega_max, so a lower speed RAISES the
+requirement and demands more ballast: 6 stations per wheel instead of 3.
+Quote no margin at any other speed without re-running -- the 3-station
+wheel this file previously described reached only 96.9% of target at
+5000 rpm, contradicting an over-dimensioning claim made in an earlier
+revision of this docstring.
 
 M IS A FIXED POINT, NOT AN ASSUMPTION: M sets I_w_target (Stage 1), which
 sets the ballast count, which sets the wheel mass, which feeds back into
-M via Stage 6. Iterating from 1.700 kg converged in three passes to
-M = 1.7716 kg, where Stage 6's roll-up reproduces the assumed value.
+M via Stage 6. The current point converges at M = 1.6638 kg with 6
+stations per wheel, where Stage 6's roll-up reproduces the assumed value
+to within 0.0 g.
 
 Flow:
   STAGE 1  jump-up dynamics         -> required per-wheel inertia I_w_target
@@ -91,46 +94,65 @@ import math
 # FIXED INPUT VARIABLES  (edit here)
 # =================================================================
 # --- cube / jump-up ---
-M          = 1.4654       # [kg]   total cube mass -- CONVERGED FIXED POINT (374 g allowance)
-                          #        Verified stable across 3 convergence passes from two
-                          #        different starting points (1.700 kg cold start and the
-                          #        1.4652 kg working guess); Stage 6 reproduces this value
-                          #        to within 0.0 g.
+M          = 1.6638       # [kg]   total cube mass -- CONVERGED FIXED POINT
+                          #        (487.6 g structure allowance, 6 ballast
+                          #        stations per wheel, 5500 rpm).
                           #        PROVISIONAL, and a CONVERGED FIXED POINT:
-                          #        Stage 6 totals 1155.2 g known hardware +
-                          #        610 g structure allowance = 1765.2 g against
-                          #        this 1771.6 g assumption, a -6.4 g (-0.4%)
-                          #        delta -- under budget, so step 6 of the
-                          #        closure procedure still closes (it only
-                          #        flags re-iteration when the build comes in
-                          #        HEAVIER than assumed).
+                          #        Stage 6 totals 1176.2 g known hardware +
+                          #        487.6 g structure allowance = 1663.8 g,
+                          #        reproducing this assumption to within 0.0 g.
                           #        The loop is real, not decorative: M sets
                           #        I_w_target (Stage 1), which sets the ballast
                           #        count, which sets the wheel mass, which
-                          #        feeds back into M. Iterating from 1.700 kg
-                          #        converged in 3 passes
-                          #        (1.700 -> 1.851 -> 1.772 -> 1.772) before
-                          #        the bolt holes were turned radial; that
-                          #        change trimmed ~6.4 g/cube (radial holes
-                          #        need fewer, larger-grip stations), leaving
-                          #        the same M a valid (slightly conservative)
-                          #        fixed point.
-                          #        ~35% is still allowance -- revisit at CAD.
+                          #        feeds back into M via Stage 6.
+                          #        Revised from the previous 1.4654 kg /
+                          #        6000 rpm / 3-station point on two changes:
+                          #          - the structure allowance was raised
+                          #            374.0 -> 487.6 g (the 374 g figure was
+                          #            optimistic against the frame and
+                          #            subframe now in CAD);
+                          #          - the electronics estimate was raised
+                          #            74.2 -> 95.2 g on as-weighed figures
+                          #            (Teensy with headers, MA600 breakout
+                          #            plus its steel-backed ring magnet, and
+                          #            the ESP32 antenna and pigtail).
+                          #        omega_max was then dropped 6000 -> 5500 rpm.
+                          #        Because the station count rounds to
+                          #        multiples of 3, that lands the design on
+                          #        the N=6 step, which carries MORE inertia
+                          #        margin (106.2%) than the N=3 step did at
+                          #        6000 rpm (103.8%), at a cost of +63.8 g of
+                          #        cube mass. The N=6 step holds across a
+                          #        200.8 g band of structure allowance
+                          #        (364.1 - 564.9 g), against roughly 46 g of
+                          #        headroom at the old point -- so this design
+                          #        point absorbs a CAD overrun that the
+                          #        previous one did not.
+                          #        ~29% is still allowance -- revisit at CAD.
 L          = 0.149         # [m]    cube edge length
 g          = 9.81         # [m/s^2]
 eta        = 1.05         # [-]    energy margin (1.02-1.05 recommended)
 tau_b      = 5.0          # [N*m]  brake torque per wheel
-rpm_max    = 6000         # [rpm]  max wheel speed -- DESIGN VALUE, matches the
+rpm_max    = 5500         # [rpm]  max wheel speed -- DESIGN VALUE, matches the
                           #        TDD (tab:jumpup_budget and the dashed ceiling
                           #        on the motor curve) and electrical/MOTOR_SPEED.md.
-                          #        * The sizing has ALSO been run at 5000 rpm as
-                          #        an over-dimensioning check: since
-                          #        I_w_target = h_w/omega_max, the lower speed
-                          #        raises the inertia requirement by 6/5 and so
-                          #        demands MORE ballast. A wheel that closes at
-                          #        5000 therefore closes at 6000 with margin in
-                          #        hand. 6000 is what the design claims; 5000 is
-                          #        the conservative case it was checked against.
+                          #        Lowered from 6000 rpm. Since
+                          #        I_w_target = h_w/omega_max, a lower speed
+                          #        RAISES the inertia requirement and so demands
+                          #        more ballast -- here 6 stations per wheel
+                          #        instead of 3, +63.8 g of cube mass, in
+                          #        exchange for 500 rpm of relief on the drive
+                          #        and a wider tolerance band on the structure
+                          #        allowance (see the note on M above).
+                          #        NOTE: an earlier revision of this file
+                          #        claimed the design had been checked at
+                          #        5000 rpm as an over-dimensioning case. That
+                          #        claim did not survive the reduction to 3
+                          #        stations: the 3-station wheel closes at 6000
+                          #        but reaches only 96.9% of target at 5000. The
+                          #        6-station wheel set here closes at 5500 with
+                          #        106.2%. Re-run before quoting any margin at a
+                          #        speed other than the one set here.
 case       = "corner"     # "edge" or "corner" -- corner sizes the design
 
 # --- wheel geometry ---
@@ -908,16 +930,17 @@ BOM = [
     # three orthogonal wheel modules plus the battery have to fit the
     # 150 mm cube, so the diameter is imposed and the sweep is consulted
     # only for what that diameter costs. At 120 mm the bare PET-CF ring
-    # falls short of I_w_target (3.0451 vs 4.0683 x1e-4), so this wheel IS
+    # falls short of I_w_target (3.0450 vs 4.0813 x1e-4), so this wheel IS
     # ballasted: 6 RADIAL M6 bolt+nut stations (ID-to-OD through-holes, one
-    # per station, on R_mean = 55.0 mm) bring it to 112.5% of target.
+    # per station, on R_mean = 55.0 mm) bring it to 4.3356e-4, i.e. 106.2%
+    # of target at 5500 rpm.
     #   170.37 g = 125.37 g PET-CF (ring + 3 spokes, t = 20 mm, 10 mm width,
     #              already net of the 6 drilled holes)
     #            + 45.00 g steel (6 x 7.50 g bolt + nut)
     # Net per station is +7.085 g (7.50 g hardware - 0.415 g displaced
-    # plastic). Kept as a literal so this stage stays decoupled from
-    # stages 1-5; update it if the wheel design changes.
-    ("Reaction wheel (PET-CF, 120 mm, 3x M6 radial)", 149.11, 3, "Wheels"),
+    # plastic). 18 bolts and 18 nuts on the cube. Kept as a literal so this
+    # stage stays decoupled from stages 1-5; update it if the wheel changes.
+    ("Reaction wheel (PET-CF, 120 mm, 6x M6 radial)", 170.37, 3, "Wheels"),
 
     # --- power -----------------------------------------------------
     ("Tattu R-Line V5.0 6S 1550 mAh LiPo, 22.2 V", 254.0, 1, "Power"),
@@ -925,12 +948,16 @@ BOM = [
     ("LM2596 step-down regulator",         10.0,  1, "Power"),
 
     # --- control & sensing -----------------------------------------
+    # Revised upward from the first-pass estimate (74.2 -> 95.2 g total) on
+    # as-weighed rather than bare-board figures: the Teensy carries headers,
+    # the MA600 breakout is quoted with its steel-backed ring magnet, and the
+    # ESP32 figure now includes the antenna and its pigtail.
     ("mjbots moteus-n1 driver",            14.6,  3, "Electronics"),
-    ("mjbots MA600 breakout + magnet",      3.0,  3, "Electronics"),
-    ("Teensy 4.1",                          5.0,  1, "Electronics"),
-    ("CAN-FD adapter for Teensy 4.1",       5.0,  1, "Electronics"),
+    ("mjbots MA600 breakout + magnet",      6.0,  3, "Electronics"),
+    ("Teensy 4.1",                         11.0,  1, "Electronics"),
+    ("CAN-FD adapter for Teensy 4.1",       6.0,  1, "Electronics"),
     ("mjcanfd-usb-1x",                      3.4,  1, "Electronics"),
-    ("Seeed XIAO ESP32-C6 + antenna",       3.0,  1, "Electronics"),
+    ("Seeed XIAO ESP32-C6 + antenna",       8.0,  1, "Electronics"),
     ("SparkFun BMI270 IMU (Qwiic)",         5.0,  1, "Electronics"),
 
     # --- interconnect & passives -----------------------------------
@@ -953,10 +980,12 @@ BOM = [
 # Allowances for items above whose unit mass is still None. These are
 # ESTIMATES, flagged as such in the output and totalled separately, so
 # the known-hardware figure and the projected figure never get confused.
+# Raised 374.0 -> 487.6 g total, holding the same relative split, after the
+# 374 g figure proved optimistic against the frame and subframe now in CAD.
 ALLOWANCE_g = {
-    "Inner structure / motor subframe": 153.0,
-    "Outer frame / contact features":   184.0,
-    "Fasteners / wiring harness":        37.0,
+    "Inner structure / motor subframe": 199.5,
+    "Outer frame / contact features":   239.9,
+    "Fasteners / wiring harness":        48.2,
 }
 
 CATEGORY_ORDER = ["Motors", "Wheels", "Power", "Electronics", "Wiring",
