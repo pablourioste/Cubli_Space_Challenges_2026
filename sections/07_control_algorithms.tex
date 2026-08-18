@@ -1554,9 +1554,9 @@ implemented configuration. The $0.67^\circ$ of envelope identified in
         in the tangent plane at the balanced attitude, already linear in the
         plant (\S\ref{sec:linearisation}). Possessing the model, the filter
         reconstructs the lever-arm term analytically rather than rejecting
-        it, removing the phase lag at source. Runtime cost is a constant gain
+        it, removing the phase lag at source. The runtime cost is a constant gain
         matrix, identical to the complementary filter, and the separation
-        principle permits composition with $\bm{K}_p$ unchanged. This stage
+ principle allows composition with $\bm{K}_p$ unchanged. This stage
         accounts for the outstanding $0.67^\circ$.
   \item Augmentation with a disturbance-torque state, providing integral
         action against COM offset and constant friction without additional
@@ -1569,3 +1569,306 @@ implemented configuration. The $0.67^\circ$ of envelope identified in
         (\S\ref{sec:attitude-representation}).
 \end{enumerate}
 
+\subsection{Control design}
+\label{sec:lqr}
+
+\subsubsection{Choice of method}
+\label{sec:why-lqr}
+
+The plant of \eqref{eq:AB} is linear, time-invariant after the reduction of
+\S\ref{sec:reduction}, fully actuated in the two tilt directions, and
+equipped with a full state estimate. Under these conditions linear quadratic
+regulation is the natural formulation, for three reasons specific to this
+machine.
+
+\paragraph{Multivariable coupling.} The two unstable tilt directions are not
+aligned with any wheel axis, so each wheel contributes to both. Three
+independent single-axis loops would require the coupling terms to be tuned by
+hand against each other. LQR produces the coupled gain matrix directly, and
+the resulting structure is visible in $\bm{K}_p$ below: negative diagonal
+terms opposing each wheel's own tilt component, positive off-diagonal terms
+assisting the other two.
+
+\paragraph{Momentum regulation as a stated objective.} The wheel-rate state
+enters the cost function on equal footing with attitude. Wheel speed is not a
+secondary quantity to be limited after the fact; it is the constraint that
+determines whether the machine balances indefinitely or for several seconds
+(\S\ref{sec:bryson}).
+
+\paragraph{Verifiable correctness.} Full-state LQR satisfies the
+return-difference identity of Kalman \cite{kalman1964optimal}, which forces
+$M_s = 1$ exactly. This provides an independent check on the implementation
+that no manually tuned design offers (\S\ref{sec:validation}).
+
+\subsubsection{Weight selection}
+\label{sec:bryson}
+
+Weights are assigned by Bryson's rule \cite{bryson1969applied}: each state is
+weighted by the inverse square of its maximum acceptable excursion,
+%
+\begin{equation}
+  \bm{Q} = \mathrm{diag}\!\left(
+    \tfrac{1}{\theta_{\max}^2}\bm{I}_3,\;
+    \tfrac{1}{\dot\theta_{\max}^2}\bm{I}_3,\;
+    \tfrac{1}{\omega_{\mathrm{des}}^2}\bm{I}_3 \right),
+  \qquad
+  \bm{R} = \frac{\rho}{\tau_{\mathrm{ref}}^2}\,\bm{I}_3 .
+  \label{eq:bryson}
+\end{equation}
+
+The advantage of this parameterisation is that every entry is a physical
+commitment rather than a tuning constant, and each can be checked against an
+independently computed quantity.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lllc@{}}
+\toprule
+\textbf{Parameter} & \textbf{Value} & \textbf{Physical quantity it is checked against} & \textbf{Ratio}\\
+\midrule
+$\theta_{\max}$ & $0.20$\,rad ($11.5^\circ$)
+  & recoverable envelope, $3.88^\circ$ & $3.0\times$\\
+$\dot\theta_{\max}$ & $2.0$\,rad\,s$^{-1}$
+  & peak body rate from the envelope edge, $0.558$\,rad\,s$^{-1}$ & $3.6\times$\\
+$\omega_{\mathrm{des}}$ & $10$\,rad\,s$^{-1}$
+  & firmware wheel cap, $40$\,rad\,s$^{-1}$ & $0.25\times$\\
+$\tau_{\mathrm{ref}}$ & $0.24$\,N\,m
+  & continuous torque rating, $0.12$\,N\,m & $2.0\times$\\
+$\rho$ & $12$ & --- & ---\\
+\bottomrule
+\end{tabular}
+\caption{Bryson weights and the measured quantities against which they are
+checked. Peak body rate is computed as
+$\dot\theta = \sqrt{2 S_g (1-\cos\theta)/\bar\Theta}$.}
+\label{tab:bryson}
+\end{table}
+
+Three of the four entries carry margin above the physical quantity, which is
+intentional: a weight set at the exact envelope produces a controller that
+treats the boundary as acceptable rather than as a limit to be avoided.
+
+\paragraph{Wheel-speed weight.} The entry $\omega_{\mathrm{des}}$ requires
+justification because it is the one weight that materially affects the
+outcome. A recovery from the full $3.88^\circ$ envelope requires
+%
+\begin{equation}
+  h = \sqrt{2\,\bar\Theta\,S_g\,(1-\cos\theta)} = 0.0155\ \mathrm{N\,m\,s}
+    = 31.8\ \mathrm{rad\,s^{-1}} \text{ of wheel speed},
+\end{equation}
+%
+which is $80\,\%$ of the available cap. There is no margin to spend on
+standing wheel speed, so $\omega_{\mathrm{des}}$ is set to
+$0.25\,\omega_{\mathrm{cap}}$ rather than to the motor's free-run speed. The
+consequence of the alternative is quantified in \S\ref{sec:weight-sensitivity}.
+
+\paragraph{Torque scale and control cost.} Only the ratio $\rho/\tau_{\mathrm{ref}}^2$
+enters $\bm{R}$, so $\rho$ and $\tau_{\mathrm{ref}}$ are not independent
+parameters. The effective control weight is $R = 208.3$.
+
+\paragraph{Weight transfer from Stage 1.} The weights were carried unchanged
+from the planar panel to the cube. Retaining them isolates the source of any
+discrepancy between predicted and measured cube behaviour in the plant model
+rather than in the tuning.
+
+\subsubsection{Gain matrix}
+\label{sec:gains}
+
+Solving the reduced Riccati problem of \eqref{eq:reduction} and applying the
+projection \eqref{eq:Kp}:
+
+\begin{equation}
+\bm{K}_p =
+\left[\begin{array}{rrr|rrr|rrr}
+ -6.9157 &  3.3923 &  3.4212 & -0.8348 &  0.4207 &  0.4270 & -0.000700 &  0.006235 &  0.006218\\
+  3.5194 & -6.8296 &  3.5136 &  0.4121 & -0.8481 &  0.4117 &  0.003826 & -0.003165 &  0.003816\\
+  3.4291 &  3.3947 & -6.9237 &  0.4265 &  0.4198 & -0.8377 &  0.006068 &  0.006070 & -0.000870
+\end{array}\right]
+\label{eq:Kp-numeric}
+\end{equation}
+
+\noindent
+with blocks acting on $\bm{\phi}$, $\bm{\omega}$ and $\bm{\rho}$
+respectively, and rows corresponding to wheels $X$, $Y$, $Z$. The control law
+is $\bm{u} = -\bm{K}_p\bm{x}$.
+
+Three properties of \eqref{eq:Kp-numeric} serve as structural checks.
+
+\paragraph{Sign pattern.} Attitude and rate blocks have negative diagonal and
+positive off-diagonal entries: each wheel opposes its own tilt component and
+assists the other two. A row deviating from this pattern indicates an error
+in the contact point or in the gravity direction.
+
+\paragraph{Diagonal uniformity.} The attitude diagonal is
+$6.9157$, $6.8296$, $6.9237$, a spread of $1.4\,\%$, consistent with a mass
+distribution near-isotropic about the balancing diagonal. A spread beyond
+approximately $30\,\%$ indicates that the plant is not balancing on a corner.
+
+\paragraph{Wheel-rate block.} The entries are three orders of magnitude below
+the attitude entries. This is the ratio that governs bias sensitivity
+(\S\ref{sec:bias-sensitivity}): $|K_1|/|K_3| = 4365$, giving a standing tilt
+tolerance of $0.105^\circ$ for one fifth of the momentum budget.
+
+\subsubsection{Closed-loop response}
+\label{sec:closed-loop}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Pole} [s$^{-1}$] & $\omega_n$ [rad\,s$^{-1}$] & $\zeta$ & $\tau$ [ms]\\
+\midrule
+$0$ (double) & --- & --- & marginal\\
+$-7.8167$ & $7.817$ & $1.000$ & $127.9$\\
+$-7.8352$ & $7.835$ & $1.000$ & $127.6$\\
+$-8.4230$ & $8.423$ & $1.000$ & $118.7$\\
+$-8.4513$ & $8.451$ & $1.000$ & $118.3$\\
+$-14.654$ & $14.654$ & $1.000$ & $68.2$\\
+$-14.658$ & $14.658$ & $1.000$ & $68.2$\\
+$-20.898$ & $20.898$ & $1.000$ & $47.9$\\
+\bottomrule
+\end{tabular}
+\caption{Closed-loop eigenvalues under $\bm{K}_p$. All controlled modes are
+real; the slowest has a time constant of $127.9$\,ms against an open-loop
+divergence constant of $121$\,ms.}
+\label{tab:closed-loop}
+\end{table}
+
+All controlled modes are real and non-oscillatory. The design is not
+attempting to place poles far into the left half-plane: the slowest
+controlled mode at $-7.82$\,s$^{-1}$ sits close to the open-loop instability
+at $+8.26$\,s$^{-1}$, which is the appropriate scale. Faster closed-loop
+poles would demand torque the actuators cannot supply and bandwidth the
+estimator cannot support (\S\ref{sec:kp-edge}).
+
+The two marginal modes are the conserved yaw momentum and the drifting yaw
+angle, both expected under $\bm{K}_p$ and both physically correct
+(\S\ref{sec:projection}).
+
+\paragraph{Discretisation.} At the $400$\,Hz loop rate, including the
+one-cycle computational delay, the discrete closed loop retains $95\,\%$ of
+the continuous damping with $\max|z| = 0.98153$. The full loop-rate analysis
+is given in \S\ref{sec:loop-rate}.
+
+\subsubsection{Margins and robustness}
+\label{sec:margins}
+
+\paragraph{Return-difference identity.} The reduced-order design gives
+$M_s = 1.000000$, the value forced exactly by the identity of
+\cite{kalman1964optimal} for full-state LQR. Any deviation indicates an
+implementation fault rather than a marginal design. The identity does not
+survive discretisation or the introduction of an estimator
+\cite{doyle1978guaranteed}, so the discrete poles are verified directly at
+the design rate and are not inferred from this figure.
+
+\paragraph{Parametric robustness.} The three plant parameters carrying the
+largest uncertainty are $\bar{\bm{\Theta}}$, $I_s$ and $S_g$. Evaluating the
+closed loop over a $\pm 30\,\%$ grid on all three, $27$ combinations:
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}cccr@{}}
+\toprule
+$\delta\bar{\bm{\Theta}}$ & $\delta I_s$ & $\delta S_g$ & $\max\mathrm{Re}$ [s$^{-1}$]\\
+\midrule
+$0.7$ & $0.7$ & $0.7$ & $-5.5006$\\
+$0.7$ & $1.0$ & $1.0$ & $-4.9590$\\
+$1.0$ & $1.0$ & $1.0$ & $-7.8167$\\
+$1.3$ & $1.0$ & $1.0$ & $-4.6291$\\
+$1.3$ & $1.3$ & $1.3$ & $-7.7715$\\
+$1.3$ & $1.3$ & $0.7$ & $\bm{-1.9283}$ \emph{(worst)}\\
+\bottomrule
+\end{tabular}
+\caption{Closed-loop stability under parameter perturbation, marginal modes
+excluded. All $27$ combinations remain stable.}
+\label{tab:robustness}
+\end{table}
+
+The worst case is $\delta\bar{\bm{\Theta}} = 1.3$, $\delta I_s = 1.3$,
+$\delta S_g = 0.7$: heavier than modelled with a weaker restoring moment.
+Stability is retained with a slowest mode at $-1.93$\,s$^{-1}$. The
+$\pm 30\,\%$ range substantially exceeds the residual uncertainty in
+\cref{tab:cube-plant}, where the largest open item moves $\lambda$ by
+$0.5\,\%$.
+
+\subsubsection{Weight sensitivity}
+\label{sec:weight-sensitivity}
+
+Each weight was varied across an approximately eight-fold span with the
+others held at nominal.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+\textbf{Varied} & $\theta_{\max}$ & $\dot\theta_{\max}$ & $\omega_{\mathrm{des}}$ & $R$
+& \textbf{Slowest} [ms] & \textbf{Standing wheel} [\% cap]\\
+\midrule
+--- (nominal) & $0.20$ & $2.0$ & $10$ & $208$ & $127.9$ & $13$\\
+$\theta_{\max}$ & $0.05$ & $2.0$ & $10$ & $208$ & $154.6$ & $22$\\
+$\theta_{\max}$ & $0.40$ & $2.0$ & $10$ & $208$ & $123.5$ & $11$\\
+$\dot\theta_{\max}$ & $0.20$ & $0.5$ & $10$ & $208$ & $130.9$ & $18$\\
+$\dot\theta_{\max}$ & $0.20$ & $8.0$ & $10$ & $208$ & $130.7$ & $11$\\
+$\omega_{\mathrm{des}}$ & $0.20$ & $2.0$ & $5$ & $208$ & $124.6$ & $5$\\
+$\omega_{\mathrm{des}}$ & $0.20$ & $2.0$ & $20$ & $208$ & $154.2$ & $28$\\
+$\omega_{\mathrm{des}}$ & $0.20$ & $2.0$ & $40$ & $208$ & $288.3$ & $21$\\
+$R$ & $0.20$ & $2.0$ & $10$ & $26$ & $126.7$ & $4$\\
+$R$ & $0.20$ & $2.0$ & $10$ & $1667$ & $201.6$ & $39$\\
+\bottomrule
+\end{tabular}
+\caption{Closed-loop response to weight variation. Standing wheel speed is
+evaluated at the placeholder $\tau_{cw} = 8$\,mN\,m.}
+\label{tab:weight-sensitivity}
+\end{table}
+
+$M_s = 1.000000$ throughout, confirming that every entry represents a
+well-posed design rather than a numerical artefact.
+
+The attitude and rate weights have limited effect: an eight-fold variation in
+$\theta_{\max}$ moves the slowest mode by $25\,\%$, and $\dot\theta_{\max}$
+by $2\,\%$. The wheel-speed weight and the control weight dominate, and both
+act principally on standing wheel speed rather than on speed of response.
+
+Raising $\omega_{\mathrm{des}}$ from $10$ to $40$\,rad\,s$^{-1}$ more than
+doubles the slowest time constant and leaves the machine consuming a fifth of
+its momentum budget at rest. Weighting against the motor's free-run speed of
+$441$\,rad\,s$^{-1}$ rather than the firmware cap reduces the wheel-rate
+gains by approximately two orders of magnitude and removes momentum
+regulation altogether, producing the failure mode in which the rig balances
+for several seconds and then saturates.
+
+Gain tuning is therefore not a route to improved envelope. Across the
+variation above the recoverable envelope moves by approximately $2\,\%$; the
+envelope is set by the hardware limits of \S\ref{sec:nonlinearities}.
+
+\subsubsection{Firmware interface}
+\label{sec:firmware-interface}
+
+The control law reduces to one matrix--vector product per cycle:
+%
+\begin{equation}
+  \bm{u}_{\mathrm{LQR}} = -\bm{K}_p
+  \begin{bmatrix}\bm{\phi}\\ \bm{\omega}\\ \bm{\rho}\end{bmatrix},
+  \qquad
+  \bm{\phi} = -\hat{\bm{g}}_B\times\hat{\bm{g}} .
+\end{equation}
+
+\begin{itemize}
+  \item State order is $[\bm{\phi}(3);\,\bm{\omega}(3);\,\bm{\rho}(3)]$ in
+        body axes $X$, $Y$, $Z$.
+  \item $\bm{\phi}$ and $\bm{\omega}$ are expressed in the cube body frame.
+        IMU output is rotated by $\bm{R}_{IB}$, verified by a six-face test.
+  \item $\rho_k > 0$ denotes rotation about the positive body axis $k$,
+        verified per wheel on the bench.
+  \item $\bm{K}_p$ is used, not $\bm{K}$ (\S\ref{sec:projection}).
+  \item $\bm{K}_p$ is a per-corner constant. Changing balancing corner
+        requires regenerating $\hat{\bm{g}}_B$, $\bm{P}$ and $\bm{K}_p$; no
+        structural change is required.
+  \item The output of this section is $\bm{u}_{\mathrm{LQR}}$, not the
+        commanded torque. Friction feedforward, torque clamping and
+        wheel-speed capping are applied afterwards
+        (\S\ref{sec:nonlinearities}).
+\end{itemize}
