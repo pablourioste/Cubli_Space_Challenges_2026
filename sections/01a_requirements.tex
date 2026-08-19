@@ -2,31 +2,9 @@
 \section{System Requirements and Verification}
 \label{sec:requirements}
 
-Section~\ref{sec:objectives} states what the project must achieve. This section
-states what the \emph{system} must do for that to happen, and how each
-statement is shown to have been met.
+Based on the objectives established in Section~\ref{sec:objectives}, a set of technical requirements has been developed to ensure the final design aligns with overall project goals. While a portion of these requirements flows directly from top-level objectives, others were derived during preliminary sizing to accommodate constraints identified during modeling and trade studies.
 
-An objective is an outcome, and is not directly testable. A requirement is a
-single \emph{shall} statement about the system, carrying a threshold, a parent
-objective and a verification method, so that it passes or fails. Requirements
-state \emph{what}, never \emph{how}: the control law, the wheel architecture
-and the choice of driver are design decisions, and belong to
-Sections~\ref{sec:sizing}--\ref{sec:control_algorithms}. Those marked~(D) are
-\emph{derived} --- outputs of an analysis rather than inputs to it. PER-06 is
-the case in point: the wheel-inertia figure follows from the cube mass and edge
-length settled in Section~\ref{sec:massbudget}, rather than being imposed on
-them.
-
-The learning objectives of Table~\ref{tab:edu_traceability} are not decomposed
-here. They constrain how the engineering is done and documented rather than
-what the hardware does, and the provisions meeting them are stated where they
-take effect. This section is technical throughout.
-
-Table~\ref{tab:req_key} defines the verification codes used in the last column
-of Table~\ref{tab:requirements}. The procedure and acceptance criterion behind
-each requirement are given in Appendix~\ref{app:verification}, which is also
-where evidence is recorded as testing proceeds.
-
+The complete requirement set is summarized in Table~\ref{tab:requirements}. To parse this matrix, Table~\ref{tab:req_key} defines the verification codes used to demonstrate compliance, while full testing procedures, acceptance criteria, and evidence are detailed in Appendix~\ref{app:verification}.
 \begin{table}[htbp]
 \centering
 \caption[Verification methods]{Verification methods used in
