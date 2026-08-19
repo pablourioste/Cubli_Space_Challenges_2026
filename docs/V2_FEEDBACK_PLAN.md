@@ -33,10 +33,10 @@ findings are genuinely closed and which are still open behind changed wording.
 | 017 | Three `??` cross-references | **CLOSED** | No undefined references in `build/main.log` |
 | 018 | K_m: three values, model form mismatch | **PARTIAL** | Good reasoning at `06_electronics.tex:139-155`; `tab:params` still says "Motor datasheet" (`04_methodology.tex:178`) |
 | 019 | Personal mobile numbers and emails published | **OPEN — unchanged** | `02_project_organization.tex:23-62`, all six members |
-| 020 | Name / acronym inconsistency | **PARTIAL** | ACDS→ADCS fixed; cover "Armonia" (`00_cover.tex:30`) vs headers "Cubli" (`main.tex:105,115`), still alternating; Figure title still "Measured…" (`06:168`) |
+| 020 | Name / acronym inconsistency | **CLOSED** (19 Aug) | ACDS→ADCS gone; identity block `main.tex` feeds cover, header and PDF metadata; one running head via `\tddheadfoot` in both `fancy` and `plain`; blank page 2 removed (`00_cover.tex`); Figure title now "Manufacturer bench data: …" (`06_electronics.tex`); Armonia/Cubli convention stated at `01_introduction.tex` §1.1 and applied |
 | 021 | Overall: fix the four arithmetic gaps | **1 of 4 closed** | Eq. (4) grouping closed; 5000 rpm, ballast load and the h_w/Δt-class checks still outstanding |
 
-**Score: 5 closed, 4 partial, 12 open.** The two the reviewer called structural
+**Score: 6 closed, 3 partial, 12 open.** The two the reviewer called structural
 (001/008 requirements, 009 risk register) are both untouched, and the one with
 real-world consequence (019, personal contact details) is untouched.
 

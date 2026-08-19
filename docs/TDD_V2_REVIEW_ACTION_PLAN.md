@@ -36,7 +36,7 @@ the two structural items has been started.** That is the whole job.
 
 | | Count | IDs |
 |---|---|---|
-| **Closed** | 5 | 004, 006, 007, 017, 020 (partial) |
+| **Closed** | 5 | 004, 006, 007, 017, 020 |
 | **Partial** | 4 | 003, 010, 012, 018 |
 | **Open** | 12 | 001, 002, 005, 008, 009, 011, 013, 014, 015, 016, 019, 021 |
 

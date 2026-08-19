@@ -22,7 +22,7 @@ That second pass never happened. Schedule pressure and the setbacks recorded in 
 
 \subsubsection{Motivation: Limitations of a Fixed Gain}
 
-The balancing controller of Section~\ref{sec:control2d} computes a single
+The balancing controller of Section~\ref{sec:lqr} computes a single
 gain $K_d$ offline, from an $(A,B)$ pair built from the parameters of
 Tables~\ref{tab:2d_vars} and \ref{tab:3d_vars}. That gain is optimal for
 exactly one plant: the one those numbers describe. It is retained here as the
@@ -52,7 +52,7 @@ violate.
 \end{itemize}
 
 The standard remedy within the existing design is gain scheduling on
-$\hat\theta_b$ (Section~\ref{sec:control2d}), but scheduling interpolates
+$\hat\theta_b$ (Section~\ref{sec:lqr}), but scheduling interpolates
 between gains that were themselves computed from the same assumed parameters.
 It addresses the weakening of the small-angle linearisation; it does not
 address a plant that differs from the model. The proposal here is to keep the
@@ -70,7 +70,7 @@ u[k] = -K_d(\phi[k])\,\hat x[k],
 \phi[k+1] = \phi[k] + \Delta\phi\big(\hat x[k],\, \hat x[k-1], \dots\big),
 \label{eq:hybrid_arch}
 \end{equation}
-where $\hat x$ is the estimated state of Section~\ref{sec:control2d} and
+where $\hat x$ is the estimated state of Section~\ref{sec:lqr} and
 $\Delta\phi$ is produced by the tuner. Two properties of
 \eqref{eq:hybrid_arch} matter more than the choice of learning algorithm.
 First, the inner loop remains a linear state feedback at every instant, so
@@ -106,7 +106,7 @@ and the failure mode of an online tuner on an open-loop-unstable plant is a
 fall, not a degraded score. Any deployment on this cube should therefore be
 gated behind: a projection of $\phi$ onto a set for which the frozen-gain
 closed loop is verified stable across the parameter uncertainty; a fallback to
-the fixed $K_d$ of Section~\ref{sec:control2d} on any estimator fault or
+the fixed $K_d$ of Section~\ref{sec:lqr} on any estimator fault or
 divergence; and bench trials with the cube tethered. This is future work in
 the literal sense --- none of it is a committed deliverable of the present
 design, and the baseline controller is not contingent on any of it.
@@ -148,7 +148,7 @@ c[k] = \hat x^{\mathrm T}[k]\,W_x\,\hat x[k] + \rho\,\|u[k]\|^2 + \sigma\,\|\ome
 \label{eq:tuner_cost}
 \end{equation}
 Equation~\eqref{eq:tuner_cost} adds an explicit penalty on stored wheel momentum, which the nominal LQR cost
-$J(u)$ of Section~\ref{sec:control2d} does not distinguish from any other
+$J(u)$ of Section~\ref{sec:lqr} does not distinguish from any other
 state deviation. This term is the one directly relevant to the saturation
 problem raised in Section~\ref{sec:application}: it expresses a preference for
 holding attitude with the wheels near zero speed, leaving momentum headroom
@@ -247,7 +247,7 @@ For \textbf{CubeSat attitude control}, the relevant fact is that a
 spacecraft's inertia tensor is known imprecisely at integration and changes in
 flight --- propellant depletion, deployable appendages, thermal distortion ---
 while reaction-wheel friction rises with bearing age. These are the orbital
-analogues of the parametric drift of Section~\ref{sec:control2d}, and they are
+analogues of the parametric drift of Section~\ref{sec:lqr}, and they are
 conventionally handled by conservative fixed gains with margin, at a cost in
 pointing performance. A tuner that adapts $Q$ and $R$ against measured
 performance addresses exactly this gap. The qualification barrier for flying

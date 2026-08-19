@@ -103,6 +103,16 @@
   \end{tikzpicture}%
 }
 
+% ---------- Author flags (unsettled points in the text) ----------
+% The prose counterpart of \phfig: an inline, deliberately loud note recording
+% a question the text has not yet settled, so that no open point survives into
+% a delivered issue unnoticed. To silence every flag for a release build
+% without touching the section files, redefine this as
+% \renewcommand{\FLAG}[1]{}.
+%   \FLAG{<the question, and what changes depending on the answer>}
+\newcommand{\FLAG}[1]{%
+  \par\noindent\textcolor{red}{\textbf{[FLAG]}~\textit{#1}}\par}
+
 % ---------- Single-sourced design values ----------
 % One definition per recurring number of the converged design point. Tables and
 % prose reference these macros rather than repeating the figures, so a value

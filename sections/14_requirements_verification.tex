@@ -45,7 +45,7 @@ FUN-03 & T & Command a slew between two defined attitudes from a stable balance.
 FUN-04 & T & Apply a repeatable impulse to the body during balance. & Return to the equilibrium without a fall. & Partial (rig) \\
 FUN-05 & T & Compare the estimator output against a known reference attitude, statically and while moving. & Estimate tracks the reference within the band recorded in Sec.~\ref{sec:test_1dof}; no external reference used in flight. & Open \\
 FUN-06 & T & Balance until a wheel reaches the desaturation threshold; log the commanded bias torque. & Desaturation torque commanded; wheel speed bounded without loss of balance. & Open \\
-FUN-07 & D & Exercise every transition of Table~\ref{tab:sw_modes}, including at each threshold boundary. & All transitions taken as specified; no chattering at any boundary. & Open \\
+FUN-07 & D & Exercise every transition of the supervisory state machine required by FUN-07 (Table~\ref{tab:requirements}), including at each threshold boundary. & All transitions taken as specified; no chattering at any boundary. & Open \\
 FUN-08 & D & Issue a disarm command from each operating mode in turn. & Drivers de-energised from every mode without exception. & Open \\
 FUN-09 & D & Induce a fall from balance and observe the response. & Safe state entered with wheels commanded down; no continued actuation. & Open \\
 FUN-10 & T & Spin up to the design speed from a face rest; actuate the brake; attempt capture. & Cube reaches an edge or corner and captures into balance. & Open \\

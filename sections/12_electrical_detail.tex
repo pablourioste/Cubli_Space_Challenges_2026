@@ -71,7 +71,7 @@ BMI270 IMU & \qty{5}{\volt} & ${\approx}\,\qty{0.7}{\milli\ampere}$ & Typical, f
 MG92B brake servo (each, $3\times$) & \qty{5}{\volt} & \textcolor{red}{Not published} & TowerPro does not publish a stall-current figure; measure during bring-up \\
 MA600 encoder (each, $3\times$) & \qty{5}{\volt} & \textcolor{red}{Not published} & MPS datasheet does not state supply current in the accessible electrical table; measure during bring-up \\
 moteus-n1 driver (each, $3\times$) & Pack & \qty{100}{\ampere} peak / \qty{9}{\ampere} cont. & Datasheet (Table~\ref{tab:bom-supplied}) \\
-MN4006 motor (each, $3\times$, via driver) & Pack & \qty{16}{\ampere} peak, thermally limited & Manufacturer bench data (Sec.~\ref{sec:architecture}) \\
+MN4006 motor (each, $3\times$, via driver) & Pack & \qty{16}{\ampere} peak, thermally limited & Manufacturer bench data (Sec.~\ref{sec:elec_architecture}) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -239,7 +239,7 @@ Quantity & Measured & Replaces / feeds \\
 Motor torque constant $K_m$    & \textcolor{red}{TBD} & Replaces \qty{\ktMotor}{\newton\metre\per\ampere} from datasheet $K_V$; Table~\ref{tab:params} \\
 Wheel inertia $I_w$ (spin-down)& \textcolor{red}{TBD} & Table~\ref{tab:params}, CAD value \\
 Viscous and Coulomb friction   & \textcolor{red}{TBD} & $C_b$, $C_w$ estimates \\
-Command-to-encoder latency     & \textcolor{red}{TBD} & Loop timing, Sec.~\ref{sec:control_sw} \\
+Command-to-encoder latency     & \textcolor{red}{TBD} & Loop timing, Sec.~\ref{sec:loop-rate} \\
 Achievable wheel speed on bus  & \textcolor{red}{TBD} & $\omega_{\max}$, Sec.~\ref{sec:jumpup_target} \\
 Logic rail load, worst case    & \textcolor{red}{TBD} & Table~\ref{tab:electrical_ratings} \\
 MG92B servo stall current      & \textcolor{red}{TBD} & Table~\ref{tab:electrical_ratings}, not published \\

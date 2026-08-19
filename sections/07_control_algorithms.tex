@@ -42,7 +42,7 @@ is addressed by a specific part of what follows.
 \end{enumerate}
 
 \subsection{Control architecture}
-\label{sec:architecture}
+\label{sec:control_architecture}
 
 The loop runs at 400\,Hz in four layers. Each layer is separable, testable in
 isolation, and was brought up in the order listed.
@@ -1520,6 +1520,8 @@ plane a differential error appears as a gain change and is largely absorbed;
 in three dimensions it appears as a direction-dependent tilt bias, against
 the $0.105^\circ$ total budget of \cref{tab:bias-budget}.
 
+\phantomsection
+\label{sec:imu_mount}
 \paragraph{Mounting rotation.} $\bm{R}_{IB}$, the rotation from IMU axes to
 cube body axes, is verified by a six-face test rather than taken from the
 datasheet drawing. A mounting misalignment produces a constant tilt offset
