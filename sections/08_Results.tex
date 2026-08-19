@@ -293,33 +293,7 @@ unexplained and pulls the RMS up; it is under investigation.}
 \label{fig:edge_quiet_phi}
 \end{figure}
 
-\begin{table}[htbp]
-\centering
-\caption[Edge recovery-angle results]{Recovery from a defined initial angle
-on the cube, edge equilibrium, measured from release, against PER-04.}
-\label{tab:recovery_angle_3dof_template}
-\begin{tabular}{lccc}
-\toprule
-Initial angle & Recovered? & Recovery time & Peak commanded torque \\
-\midrule
-\qty{6.18}{\degree} & Yes & \qty{9.64}{\second} & \textcolor{red}{TBD} \\
-\qty{7}{\degree}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\qty{8}{\degree}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\qty{12}{\degree} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\qty{24}{\degree} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\bottomrule
-\end{tabular}
-\begin{minipage}{\linewidth}
-\vspace{4pt}
-\footnotesize
-Note: the \qty{6.18}{\degree} row already exceeds the PER-04 threshold of
-\qty{5}{\degree}; its recovery time is time to settle under
-\qty{0.5}{\degree} and never re-exceed it, not time to first cross that
-band -- see the ring-down discussion below. The \qty{7}{\degree}--\qty{24}{\degree}
-rows mirror the 1-DoF protocol of Table~\ref{tab:recovery_angle} and have
-not yet been repeated on the cube's edge equilibrium.
-\end{minipage}
-\end{table}
+
 
 \paragraph{Edge recovery from a released tilt.} Released from
 \qty{-6.18}{\degree}, the edge equilibrium does not recover cleanly; it
@@ -364,9 +338,4 @@ release magnitude before ringing down.}
 \label{fig:edge_recovery_6deg}
 \end{figure}
 
-\textcolor{red}{TODO: repeat the corner quiet-hold comparison as a
-same-session $f$/$k_a$ toggle rather than two separate sessions; extend the
-corner armed window past the \qty{60}{\second} PER-02 threshold;
-re-run the 7--24\textdegree{} edge release matrix to complete
-Table~\ref{tab:recovery_angle_3dof_template}; and repeat the edge quiet
-hold to confirm whether the unexplained excursion recurs.} 
+
