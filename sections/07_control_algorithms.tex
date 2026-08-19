@@ -28,42 +28,155 @@ J(u) = \sum_k x^{\mathrm T}[k]Qx[k] + u^{\mathrm T}[k]Ru[k],
 giving $u[k]=-K_d(\hat\theta_b[k],\hat{\dot\theta}_b[k],\hat{\dot\theta}_w[k])$.
 The same design generalises directly to the corner-balancing 9-state model of
 Section~\ref{sec:3dmodel}: $K_d$ becomes a $3\times9$ gain matrix, using the
-same discretization, cost function and offset filter below, with $Q, R$
-weighting all three tilt axes, body rates and wheel speeds.
+same discretization and cost function, with $Q, R$ weighting all three tilt
+axes, body rates and wheel speeds, and $\hat\theta_b$ replaced by the
+reduced-attitude estimate $\phi$ derived below.
 
-The tilt estimate $\hat\theta_b$ is obtained from a gyroscope and
-accelerometer mounted at, or as close as mechanically feasible to, the pivot
-point rather than at the plate's centre. This placement is necessary because
-an accelerometer at radius $r$ from the pivot measures gravity plus the
-tangential ($r\ddot\theta_b$) and centripetal ($r\dot\theta_b^2$) acceleration
-components induced by the plate's rotation, which corrupt the naive estimate
-$\tan^{-1}(-a_x/a_y)$ during fast motion (e.g., jump-up or aggressive
-recovery); placing the sensor at $r\approx0$ makes both terms negligible.
-Tilt is estimated with a complementary filter combining gyro integration
-(drift-prone, unaffected by the terms above) with accelerometer inclination
-(drift-free, but unreliable during shocks):
-\begin{equation}
-\hat\theta_b[k] = (1-\gamma)\big(\hat\theta_b[k-1] + \dot\theta_{b,\text{gyro}}[k]\,\Delta t\big) + \gamma\,\theta_{b,\text{accel}}[k],
-\label{eq:complementary}
-\end{equation}
-where $\theta_{b,\text{accel}}[k] = \tan^{-1}(-a_x[k]/a_y[k])$ is the
-instantaneous accelerometer-only estimate and $\gamma\in(0,1)$ is a small
-weight favoring the gyro term between corrections.
+\paragraph{The estimate the controller actually needs.} $\theta_b$ is not
+measured directly. What the IMU gives is a gyroscope rate and an
+accelerometer reading, and the accelerometer measures \emph{specific force},
+not gravity: at radius $r$ from the pivot it also picks up the tangential
+($r\ddot\theta_b$) and centripetal ($r\dot\theta_b^2$) acceleration induced by
+the plate's own rotation, both largest during exactly the fast recoveries the
+controller most needs a good estimate for. Two more properties of the raw
+signal matter once the estimate is built:
+\begin{itemize}
+  \item a fixed instrument angle such as $\tan^{-1}(-a_x/a_y)$ is only a
+        correct measure of tilt \emph{at} the equilibrium the arctangent was
+        set up around; away from it, on the cube, it mixes the unobservable
+        yaw direction into the tilt estimate the moment the body rotates
+        about more than one axis;
+  \item any such angle, on the cube, is one instance of a three-parameter
+        chart of $SO(3)$, and no such chart is free of a singularity
+        \cite{stuelpnagel1964parametrization}. A representation that is well behaved
+        near one equilibrium is not guaranteed to stay well behaved 50--125\textdegree{}
+        away from it, which is the range spanned by the eight corner
+        equilibria of the cube.
+\end{itemize}
+Both problems are structural, not tuning problems, and both are removed by
+building the estimate as a vector quantity rather than an angle.
 
-A constant tilt-sensor offset $d$, including residual bias from imperfect
-pivot placement or sensor misalignment, would otherwise appear as a nonzero
-steady-state wheel speed rather than a corrected angle. A low-pass filter
-state
+\paragraph{Reduced-attitude estimate.} Let $\hat\gamma\in\mathbb{R}^3$ be the
+filter's running estimate of the body-frame gravity direction --- the sensor
+realisation of $R^{\mathrm T}\hat g$ in the gravity-torque term $\tau_g$ of
+Table~\ref{tab:3d_vars} --- and let $\hat g_B$ be its value at the balanced
+attitude, a constant fixed once by the corner (or edge) geometry and distinct
+from the world-frame $\hat g$ of Table~\ref{tab:3d_vars}. With the calibrated,
+mounting-rotated accelerometer reading $a_b$ of Equation~\eqref{eq:mount_rotation}:
+\begin{align}
+\gamma_a[k] &= \mathrm{normalize}(-a_b[k]) &&\text{instantaneous, accelerometer-only} \label{eq:gamma_a}\\
+e[k] &= \hat\gamma[k]\times\gamma_a[k] &&\text{correction vector} \label{eq:cf_error}\\
+\hat\gamma[k+1] &= \mathrm{normalize}\Big(\hat\gamma[k] + \Delta t\big({-}\,\omega_c[k]\times\hat\gamma[k] + k_P\,e[k]\times\hat\gamma[k]\big)\Big) &&\text{propagate + correct} \label{eq:complementary}\\
+\hat b[k+1] &= \hat b[k] + k_I\,e[k]\,\Delta t &&\text{gyro-bias integral} \label{eq:bias_integral}\\
+\omega_c[k] &= \omega_b[k] - \hat b[k] &&\text{bias-corrected body rate}
+\end{align}
+with $\hat\gamma[0]=\hat g_B$, $\hat b[0]=\mathbf 0$, and fixed gains
+$k_P=5$, $k_I=0.5$ (the $\omega_c$ used in Equation~\eqref{eq:complementary}
+is the previous cycle's estimate; both update simultaneously each tick). The
+entire attitude computation the controller feeds on is then one cross
+product,
 \begin{equation}
-x_f[k+1] = (1-\alpha)x_f[k] + \alpha\hat\theta_b[k]
-\label{eq:offset_filter}
+\phi[k] = -\hat g_B\times\hat\gamma[k],
+\label{eq:reduced_attitude}
 \end{equation}
-is subtracted from the tilt feedback,
+which is, by construction, exact and singularity-free at any attitude short
+of the antipode $\hat\gamma=-\hat g_B$ -- a configuration reached only by
+picking the cube up and inverting it, well outside the range over which the
+controller is armed (fault handling, Section~\ref{sec:control_sw}). On the
+2D rig, motion is confined to the plane spanned by the pivot axis, so
+$\theta_b$ is recovered as a single component,
 \begin{equation}
-u[k] = -K_d(\hat\theta_b[k]-x_f[k],\, \hat{\dot\theta}_b[k],\, \hat{\dot\theta}_w[k]),
+\theta_b[k] := \phi[k]\cdot e_{\text{pivot}},
 \end{equation}
-so $d$ is absorbed by $x_f$ at steady state, requiring no separate calibration
-stage. This fixed-gain design is the baseline balancing controller;
+rather than by a separate estimator; the 2D and 3D cases share one
+construction, not two.
+
+\paragraph{Why this is the estimate to use, not $\tan^{-1}(\cdot)$ corrected
+after the fact.} Equation~\eqref{eq:reduced_attitude} is a cross product with
+$\hat g_B$, which is orthogonal to $\hat g_B$ by construction at every
+attitude and every tilt magnitude -- not only to first order. It therefore
+cannot represent the unobservable yaw component of the estimate at all, which
+is the property a raw Euler-style angle does not have and cannot be given by
+a correction applied after the fact. The construction is the passive form of
+the complementary filter of \citet{mahony2008nonlinear}, specialised to a
+single vector measurement.
+
+\paragraph{Mounting position.} An accelerometer away from the pivot reads the
+lever-arm terms above as a transient during a recovery, not as a
+mounting-dependent bias: the low-pass action of
+Equations~\eqref{eq:complementary}--\eqref{eq:cf_error} is approximately an
+integral, and $\int \ddot\theta_b\,\mathrm dt$ across a completed recovery is
+the change in $\dot\theta_b$, which is zero once the rig is at rest again. On
+the 2D rig this cancellation is measured to hold from $r=0$ to
+\qty{106}{\milli\metre}, with the residual error floor set by gyro bias
+($k_I$-scaled) rather than by $r$: mounting position is not the constraint on
+the panel that it first appears to be, and the BMI270 is placed by wiring and
+packaging convenience (Section~\ref{sec:imu_mount}), not by a lever-arm
+requirement.
+
+The same cancellation does not transfer unchanged to the cube. One
+accelerometer term the panel can neglect -- the centripetal component
+$\omega\times(\omega\times r)$, quadratic in $\omega$ and always directed
+inward -- has a DC component in three dimensions and does not average out,
+so it is corrected explicitly rather than relied on to cancel. More
+consequentially, the cancellation itself has a measured range: mounted at
+the primary balancing corner, recovery holds; mounted past roughly
+\qty{150}{\milli\metre} from a given corner, the antipodal corner (at
+\qty{260}{\milli\metre} on this cube) falls outside the range over which
+Equation~\eqref{eq:complementary} still rejects the lever-arm term, and the
+estimate for that corner degrades sharply rather than gracefully. The design
+rule that follows is geometric, not electrical: keep the IMU within
+approximately \qty{150}{\milli\metre} of every corner the cube is meant to
+balance on -- satisfied by a near-geometric-centre placement, and the reason
+balancing on more than one corner stays compatible with a single,
+once-calibrated IMU rather than a per-corner sensor recalibration.
+
+\paragraph{The estimator ladder.} $k_P=5$, $k_I=0.5$, gyro-integration-only
+between corrections is the estimator flown for corner balancing, chosen
+because it is the simplest structure that removes both problems above and
+its recovery cost is small once the sensor is calibrated at startup. It is
+the first rung of a ladder, not a final answer:
+\begin{enumerate}
+  \item \textbf{Reduced-attitude complementary filter with bias}
+        (Equations~\eqref{eq:gamma_a}--\eqref{eq:reduced_attitude}) -- flown now.
+  \item \textbf{Steady-state linear Kalman filter} on $[\phi;\,\omega;\,\hat b_{\text{gyro}}]$
+        -- the model-based upgrade: $\phi$ is already a tangent-plane vector,
+        not an $SO(3)$ chart, so the usual objection to a linear filter on
+        attitude does not apply here. A constant gain matrix keeps the
+        runtime cost identical to Equation~\eqref{eq:complementary}, and the
+        filter reconstructs the lever-arm term from the model rather than
+        relying on it cancelling, which removes most of the residual phase
+        lag between the true and filtered tilt.
+  \item \textbf{Disturbance-torque state augmentation} on top of the KF,
+        giving integral action against unmodelled torques for free.
+  \item \textbf{Multiplicative EKF}, with the gyro bias estimated online --
+        deferred to Stage~3, and adopted only if bench data shows thermal
+        drift inside the closed cube (three motors, one enclosure) that the
+        once-at-startup calibration below does not cover.
+\end{enumerate}
+Startup calibration already removes most of the available headroom before
+any of rungs 2--4 are needed: an uncalibrated gyro bias of
+\qty{1}{\degree\per\second} costs roughly \qty{27}{\percent} of the wheel
+momentum cap as a standing offset (Section~\ref{sec:3dmodel}), a
+once-at-startup calibration reduces that to \qty{1.4}{\percent}, and rung 4
+would buy roughly another factor of five on top of a number that is already
+small. Rung 2 is the next step taken on this project, not because rung 1 is
+inadequate for the pass criterion, but because it is the cheapest remaining
+reduction in the residual phase lag noted below.
+
+\paragraph{Cube versus panel: the cancellation is smaller, not absent.}
+Section~\ref{sec:3dmodel}'s corner-balance case shows a real, but smaller,
+version of the same effect: raw-accelerometer tilt error against the
+reduced-attitude filter of Equation~\eqref{eq:complementary} falls from
+\qty{3.42}{\degree} to \qty{2.75}{\degree}, a \qty{20}{\percent} penalty,
+against \qty{0.5}{\percent} on the 2D rig. The gap is not lever-arm error --
+mounting inside the \qty{150}{\milli\metre} radius above removes that -- and
+not measurement noise; it is phase lag, because
+Equation~\eqref{eq:complementary} is model-free and can only integrate the
+gyro between corrections, and closing that gap is exactly what rung 2 of the
+ladder is for.
+
+This fixed-gain design is the baseline balancing controller;
 Table~\ref{tab:control2d_vars} summarizes the control variables.
 
 \begin{table}[htbp]
@@ -80,15 +193,17 @@ $A_d, B_d$ & Discrete-time (ZOH) counterparts of $A, B$ \\
 $K_d$ & LQR feedback gain \\
 $Q, R$ & LQR state/input weighting matrices \\
 $J(u)$ & LQR cost function \\
-$\hat\theta_b, \hat{\dot\theta}_b$ & Estimated tilt angle, rate (gyroscope/accelerometer) \\
+$\hat\gamma$ & Filter estimate of the body-frame gravity direction \\
+$\gamma_a$ & Instantaneous accelerometer-only gravity direction \\
+$\hat g_B$ & Body-frame gravity direction at the balanced equilibrium (per-corner constant) \\
+$e$ & Complementary-filter correction vector, $\hat\gamma\times\gamma_a$ \\
+$\hat b$ & Estimated gyroscope bias \\
+$\omega_c$ & Bias-corrected body rate, $\omega_b-\hat b$ \\
+$\phi$ & Reduced attitude, $-\hat g_B\times\hat\gamma$ (the fed-back tilt state) \\
+$\theta_b$ & 2D tilt from upright, $\phi\cdot e_{\text{pivot}}$ \\
+$k_P, k_I$ & Complementary-filter proportional, integral gains \\
 $\hat{\dot\theta}_w$ & Estimated wheel rate (encoder) \\
-$a_x, a_y$ & Raw accelerometer readings (tangential, radial axes) \\
-$\theta_{b,\text{accel}}$ & Instantaneous accelerometer-only tilt estimate \\
-$\dot\theta_{b,\text{gyro}}$ & Raw gyro rate measurement \\
-$\gamma$ & Complementary-filter weight (accelerometer term) \\
 $\Delta t$ & Control/estimation loop sample period \\
-$x_f, \alpha$ & Offset-correction filter state, filter coefficient \\
-$d$ & Constant tilt-sensor offset \\
 $\theta_{\text{th}}$ & Tilt threshold, jump-up $\to$ balancing switch \\
 $K_d^{(i)}$ & Scheduled gain at linearisation point $i$ (extension) \\
 \bottomrule
@@ -101,10 +216,12 @@ $K_d^{(i)}$ & Scheduled gain at linearisation point $i$ (extension) \\
 The BMI270 cannot be mounted with its own sensor axes aligned to the body
 frame $\{B\}$ of Figure~\ref{fig:cubli_3dof}: it sits on Perfboard~1 next to
 the flight computer, placed for wiring and packaging rather than axis
-alignment (Section~\ref{sec:layout}). Every raw gyro/accel sample is therefore
+alignment (Section~\ref{sec:layout}) -- a placement Section~\ref{sec:control2d}
+shows is not constrained by the lever-arm concern that would otherwise argue
+for mounting at the pivot. Every raw gyro/accel sample is therefore
 rotated into $\{B\}$ by a fixed mounting matrix before it reaches the
-complementary filter of Equation~\eqref{eq:complementary} or the MEKF of
-Section~\ref{sec:software_pipeline}.
+complementary filter of Equation~\eqref{eq:complementary} or the estimator
+ladder of Section~\ref{sec:control2d}.
 
 Raw samples are first put in physical units in the sensor's own frame,
 \begin{equation}
@@ -139,8 +256,13 @@ with $(\theta_1,\theta_2,\theta_3) = (\qty{-30}{\degree},\ \qty{54.7356}{\degree
 The middle angle is exactly $\arccos(1/\sqrt3)$, the angle between a cube edge
 and its space diagonal, consistent with a package mounted flush to a face
 while the axis the controller cares about at corner-up runs along the body
-diagonal from $O$. $C_{SB}$ is verified orthonormal (unit determinant, unit
-row norms) whenever the mounting angles are set, guarding against a
+diagonal from $O$. Unlike the attitude \emph{estimate} of
+Section~\ref{sec:control2d}, $C_{SB}$ is a single, fixed rotation computed
+once from as-built geometry rather than tracked over a trajectory, so the
+usual objection to a three-angle parameterisation (Section~\ref{sec:control2d})
+does not apply to it: there is no trajectory here to encounter a singularity
+on. $C_{SB}$ is nonetheless verified orthonormal (unit determinant, unit row
+norms) whenever the mounting angles are set, guarding against a
 transcription error in $(\theta_1,\theta_2,\theta_3)$.
 
 \begin{table}[htbp]
@@ -165,17 +287,18 @@ Accel scale $a_{\mathrm{scale}}$ (--)        & $0.991085$  & $0.991035$  & $1.00
 \label{sec:gain_scheduling}
 
 The controller switches from the open-loop jump-up sequence to the LQR law
-once $|\hat\theta_b| < \theta_{\text{th}}$, with hysteresis around
-$\theta_{\text{th}}$ to prevent mode chattering. The baseline uses a single
-fixed gain $K_d$ at the upright equilibrium. If recovery degrades near the
-edges of the operating range, where the small-angle linearisation weakens,
-gain scheduling will be added: additional gains $K_d^{(i)}$ computed at
-several linearisation points, with the controller interpolating between them
-based on $\hat\theta_b$, reusing the same discrete structure and offset
-filter. The mode-transition logic gains a third mode for the 3D cube,
-Edge-to-Corner jump-up, triggered once edge balancing is stable, followed by a
-second threshold switch into the corner LQR once estimated orientation nears
-corner-up; the full state machine is given in Table~\ref{tab:sw_modes}.
+once $\|\hat\phi\| < \theta_{\text{th}}$ ($|\hat\theta_b|<\theta_{\text{th}}$
+on the 2D rig), with hysteresis around $\theta_{\text{th}}$ to prevent mode
+chattering. The baseline uses a single fixed gain $K_d$ at the upright
+equilibrium. If recovery degrades near the edges of the operating range,
+where the small-angle linearisation weakens, gain scheduling will be added:
+additional gains $K_d^{(i)}$ computed at several linearisation points, with
+the controller interpolating between them based on $\hat\phi$, reusing the
+same discrete structure. The mode-transition logic gains a third mode for the
+3D cube, Edge-to-Corner jump-up, triggered once edge balancing is stable,
+followed by a second threshold switch into the corner LQR once the estimated
+orientation nears corner-up; the full state machine is given in
+Table~\ref{tab:sw_modes}.
 
 \subsection{Pure LQR Control Logic}
 \label{sec:pure_lqr_logic}
@@ -190,18 +313,20 @@ detailed pseudocode, including the supervisory state machine, is in
 Appendix~\ref{app:control_algorithms}.
 
 \begin{enumerate}
-  \item \textbf{Sense.} Read raw gyro rate $\dot\theta_{b,\text{gyro}}$ and
-        accelerometer $(a_x,a_y)$ from the IMU over SPI; read wheel angle(s)
-        from the encoder(s) over the moteus CAN reply.
-  \item \textbf{Estimate tilt.} Form the accelerometer-only estimate
-        $\theta_{b,\text{accel}}[k] = \tan^{-1}(-a_x[k]/a_y[k])$ and fuse it
-        with gyro integration through the complementary filter of
-        Eq.~\eqref{eq:complementary} to obtain $\hat\theta_b[k]$.
-  \item \textbf{Remove offset.} Update the low-pass offset state $x_f[k]$
-        (Eq.~\eqref{eq:offset_filter}) and subtract it from $\hat\theta_b[k]$.
+  \item \textbf{Sense.} Read raw gyro rate and accelerometer $a_s$ from the
+        IMU over SPI; read wheel angle(s) from the encoder(s) over the
+        moteus CAN reply.
+  \item \textbf{Rotate into body axes.} Apply the calibration of
+        Eq.~\eqref{eq:imu_calib} and the mounting rotation
+        Eq.~\eqref{eq:mount_rotation} to obtain $\omega_b[k],\,a_b[k]$.
+  \item \textbf{Estimate attitude.} Update the complementary filter,
+        Eqs.~\eqref{eq:gamma_a}--\eqref{eq:bias_integral}, to obtain
+        $\hat\gamma[k]$ and $\hat b[k]$, then form $\phi[k]$
+        (Eq.~\eqref{eq:reduced_attitude}) and the bias-corrected rate
+        $\omega_c[k]$.
   \item \textbf{Assemble the state.} Build
-        $\hat x[k] = (\hat\theta_b[k]-x_f[k],\ \hat{\dot\theta}_b[k],\ \hat{\dot\theta}_w[k])$
-        in 2D, or the 9-vector $(\theta,\omega_b,\omega_w)$ of
+        $\hat x[k] = (\theta_b[k],\ \hat{\dot\theta}_b[k],\ \hat{\dot\theta}_w[k])$
+        in 2D, or the 9-vector $(\phi[k],\omega_c[k],\omega_w[k])$ of
         Section~\ref{sec:3dmodel} in 3D.
   \item \textbf{Check the mode.} If the supervisory state machine
         (Table~\ref{tab:sw_modes}) is not in a balancing mode, skip to
@@ -212,7 +337,7 @@ Appendix~\ref{app:control_algorithms}.
         continuous current rating (Appendix~\ref{app:bom}); if a wheel speed
         $\hat{\dot\theta}_w$ exceeds its desaturation threshold, add a small
         bias torque directed to bleed the stored momentum without
-        materially perturbing $\hat\theta_b$.
+        materially perturbing $\phi$.
   \item \textbf{Actuate.} Issue $u[k]$ (or the mode's open-loop command) as a
         CAN-FD torque request to each moteus driver.
   \item \textbf{Advance.} $k \leftarrow k+1$; repeat at the next
@@ -277,10 +402,20 @@ against the measured plant, never the reverse. A discrepancy between
 simulated and measured closed-loop behaviour is treated as a finding about
 the model.
 
-No Simulink/Simscape model or CAD export exists yet at the time of writing;
-this subsection states the workflow and the intended test cases, and is
-populated with the model, the exported geometry and the resulting response
-plots once built.
+\paragraph{Status.} The 2D rig's Simscape model, plant and gains are validated
+on hardware. On the 3D cube, the plant is measured and the gains are
+validated against a set of independent numerical gates run before any result
+built on the model is trusted -- linearisation against the hand-derived $A,B$
+chief among them -- with the corner-contact geometry modelled as a Gimbal
+joint. That joint passed every equilibrium and linearisation gate and then
+failed in closed-loop simulation, away from the equilibrium the gates check:
+the middle gimbal primitive diverged numerically during a fast recovery, the
+signature of the joint's own parameterisation going singular rather than of
+the plant. Gate coverage at the equilibrium is therefore not coverage of
+every failure mode the estimator or the plant model can exhibit, and a
+Spherical-joint rebuild, which carries no such chart, is in progress for the
+final validated model. Hardware bring-up on the 3D cube is under way in
+parallel.
 
 \subsection{System Integration}
 \label{sec:integration}
@@ -292,13 +427,14 @@ The subsystems of Figure~\ref{fig:system_loop} are coordinated by a single
 deterministic task on the Teensy, whose structure is given in
 Figure~\ref{fig:software_pipeline}. Each \qty{1}{\milli\second} cycle executes
 the same fixed sequence: sensor ingest reads the BMI270 over SPI and the moteus
-replies over CAN; the MEKF propagates attitude on the gyro and corrects it
-against the accelerometer while estimating gyro bias; the state vector
-$x = [g_B, \omega, h]$ is assembled from the estimator output and the wheel
-speeds; the LQR law of Section~\ref{sec:control2d} evaluates $u = -Kx$ with a
-penalty on stored momentum $h$ to bleed off wheel saturation; and the resulting
-commands leave as CAN torque requests to the drivers and a PWM signal to the
-brake servos. Telemetry is tapped off the assembled state to SD and Wi-Fi outside
+replies over CAN; the estimator of Section~\ref{sec:control2d} propagates
+$\hat\gamma$ on the gyro and corrects it against the accelerometer while
+integrating gyro bias; the state vector $x = [\phi,\ \omega_c,\ \omega_w]$
+is assembled from the estimator output and the wheel speeds; the LQR law of
+Section~\ref{sec:control2d} evaluates $u = -Kx$ with a penalty on stored
+wheel momentum to bleed off wheel saturation; and the resulting commands
+leave as CAN torque requests to the drivers and a PWM signal to the brake
+servos. Telemetry is tapped off the assembled state to SD and Wi-Fi outside
 the control path, so logging cannot perturb loop timing.
 
 The fixed ordering matters: with no dynamic allocation and no blocking calls, the
@@ -343,7 +479,7 @@ is why the boundaries are held.}
 Layer & Responsibility & Verified by \\
 \midrule
 Hardware abstraction & Sensor and driver I/O, timing, bus transactions & Bench read-back; loop-timing measurement \\
-Estimation           & Attitude and rate estimate from IMU and encoders (Sec.~\ref{sec:control2d}) & Static and dynamic bench tests against a known reference \\
+Estimation           & Reduced-attitude complementary filter with bias, rung~1 of the estimator ladder (Sec.~\ref{sec:control2d}) & Static and dynamic bench tests against a known reference \\
 Control              & State feedback, momentum management, saturation handling & Simulation on the identified model, then hardware \\
 Supervision          & Mode transitions, arming, watchdog and fault response & Fault-injection tests on the rig \\
 \bottomrule
@@ -386,8 +522,11 @@ allocation and no blocking calls, and why telemetry is a side-branch rather than
 a stage.
 
 \paragraph{Fault handling.} The failure cases the software must survive are
-sensor dropout, bus error, wheel saturation and loss of the balancing
-equilibrium. The first three have defined responses that keep the machine
-controlled; the fourth is a controlled shutdown rather than a recovery attempt,
-since a cube that has left its capture region cannot be recovered by the
-linear law and continued actuation only adds energy to the fall.
+sensor dropout, bus error, wheel saturation, loss of the balancing
+equilibrium, and the attitude estimate approaching the antipode noted in
+Section~\ref{sec:control2d}. The first three, and the antipode case, have
+defined responses that keep the machine controlled or bring it to a
+controlled disarm; loss of the balancing equilibrium is a controlled shutdown
+rather than a recovery attempt, since a cube that has left its capture region
+cannot be recovered by the linear law and continued actuation only adds
+energy to the fall.
