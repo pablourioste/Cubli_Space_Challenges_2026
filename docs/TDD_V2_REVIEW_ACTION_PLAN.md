@@ -37,8 +37,13 @@ the two structural items has been started.** That is the whole job.
 | | Count | IDs |
 |---|---|---|
 | **Closed** | 5 | 004, 006, 007, 017, 020 |
-| **Partial** | 4 | 003, 010, 012, 018 |
-| **Open** | 12 | 001, 002, 005, 008, 009, 011, 013, 014, 015, 016, 019, 021 |
+| **Partial** | 5 | 003, 010, 012, 015, 018 |
+| **Open** | 11 | 001, 002, 005, 008, 009, 011, 013, 014, 016, 019, 021 |
+
+> **Stale beyond 015 (19 Aug).** Written before `01a_requirements.tex`,
+> `14_requirements_verification.tex` and `15_risk_register.tex` entered
+> `main.tex`; the 001/008 and 009 rows need re-auditing against the current
+> build.
 
 **What is genuinely fixed** — verified, not taken on trust:
 
@@ -64,7 +69,7 @@ the two structural items has been started.** That is the whole job.
 | **019** | **Personal mobile numbers and private email addresses for all six of us are still in the document.** Unchanged since v1.0. This gets circulated to reviewers and mentors and may be published as a programme output. | `sections/02_project_organization.tex:23-62` |
 | 001 / 008 | No requirements table. No IDs, no acceptance values, no verification methods. WBS task A3 still shows this closed on 25 Jul, and `docs/electrical/STATUS.md:45` marks "A3 requirements table support — done". | `01_introduction.tex:106-121` |
 | 009 | No risk register. WBS task A5 still shows it closed 28–29 Jul. | `02_..._tasks.tex:29` |
-| 015 | Gate M2 (frame freeze, "mass, inertia and CoM budget closed against the sizing analysis") is recorded as passing on 2 Aug, but the structure line is still an allowance and 6 of 10 driving CAD dimensions are TBD. Every WBS and gate date is now in the past. Cover still reads `v1.0`. | `02_project_organization.tex:140`, `11_cad_detail.tex:35-40`, `00_cover.tex:32` |
+| 015 | **PARTIAL (19 Aug).** Gate M2 is split into M2a (geometry freeze — closed in CAD, CON-01 inspection open) and M2b (mass/inertia/CoM budget closure — **open**, because the structure line is still an allowance and the CoM offset has no value). `tab:gates` gained a *Status at issue* column, per-gate notes for M2a/M2b/M4/M5/M6/G6 and a *Schedule as run* paragraph, so past-dated gates now state whether they were met. Cover is `v2.0` on a fixed `\docdate`. **Remaining:** the six CAD dimensions still have no values — they are recorded as identified open items with their closure condition, but the numbers must be exported from the model. | `02_project_organization.tex` (gates + notes), `11_cad_detail.tex` (`tab:cad_params`), `main.tex` (`\docversion`, `\docdate`) |
 | 020 | Cover says "Armonia", every running header says "Cubli", and the header alternates between two forms. Figure title in the List of Figures still reads "Measured MN4006 shaft torque…" although the caption correctly says manufacturer bench data. | `00_cover.tex:30`, `main.tex:104-116`, `06_electronics.tex:168` |
 
 **019 is ten minutes of work and it is the only item on this list with a
@@ -444,7 +449,7 @@ underlying engineering.
 | # | Action | Owner |
 |---|---|---|
 | 14 | Populate Appendix D or mark it explicitly to-be-issued (§5.4) | Niccolo |
-| 15 | Re-baseline the schedule and gates; record M2 honestly; update cover to v2 (015, 020) | Pablo |
+| 15 | ~~Re-baseline the schedule and gates; record M2 honestly; update cover to v2 (015, 020)~~ **DONE (19 Aug)**, except: export the six open CAD dimensions into `tab:cad_params`, which is what actually closes M2b | Pablo |
 | 16 | Analyse overshoot recovery and give θ_th a number (002) | Niccolo + Andrea |
 | 17 | Decouple the brake measurement from the jump-up demo, or state that β ships unmeasured and what that means structurally (013) | Suvanna + Niccolo |
 | 18 | Reconcile L = 149 vs 150 mm (§5.3) | Deyan + Nasia |

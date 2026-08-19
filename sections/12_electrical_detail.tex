@@ -3,9 +3,8 @@
 \label{app:electrical}
 
 This appendix holds the electrical detail kept out of
-Section~\ref{sec:electrical}: the full schematic capture, the connector and pin
-assignments, the harness drawings, the board layout and the bring-up
-checklists. The architectural decisions --- two rails behind one E-stop, linear
+Section~\ref{sec:electrical}: the full schematic capture, the harness drawings,
+the board layout and the bring-up checklists. The architectural decisions --- two rails behind one E-stop, linear
 bus topology, perfboard rather than fabricated board --- remain in
 Section~\ref{sec:electrical}. The part specifications are in
 Appendix~\ref{app:bom} and are not repeated.
@@ -51,13 +50,13 @@ transmit burst, servo stall and full sensor load at once --- and not the sum
 of typical values. Two entries are marked as unavailable rather than
 estimated: neither manufacturer publishes a stall or supply-current figure for
 that part, and a fabricated number would be worse than an honest gap. Both are
-closed by the bench measurement of Table~\ref{tab:electrical_measured} during
-electrical bring-up (Section~\ref{sec:electrical_safety}).
+closed by bench measurement during electrical bring-up
+(Section~\ref{sec:electrical_safety}).
 
 \begin{table}[htbp]
 \centering
 \caption[Component current ratings]{Component current ratings, by rail. Datasheet figures where
-published; measured values replace these per Table~\ref{tab:electrical_measured}.}
+published.}
 \label{tab:electrical_ratings}
 \small
 \setlength{\tabcolsep}{4pt}
@@ -112,40 +111,6 @@ and the three brake servos.}
 \end{landscape}
 \pagestyle{fancy}
 
-\subsection{Connector and Pin Assignments}
-\label{app:pinout}
-
-Table~\ref{tab:connectors} is the connector schedule. It exists so that a
-harness can be built and re-built from this document alone, and so that a
-mis-mate is a documented impossibility rather than a discovered one: no two
-connectors carrying different voltages share a housing type on this machine.
-
-\begin{table}[htbp]
-\centering
-\caption[Connector schedule]{Connector schedule. Keying and housing types are chosen so that two
-connectors carrying different voltages cannot be mated. Note: values have not been finalized at this preliminary stage. }
-\label{tab:connectors}
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{c L{3.0cm} L{3.0cm} L{2.4cm} L{3.2cm}}
-\toprule
-Ref & From & To & Signals \\
-\midrule
-J1 & Battery pack        & Protection / E-stop   & \textcolor{red}{TBD} & Pack $+$, pack $-$ \\
-J2 & Protection          & Distribution board    & \textcolor{red}{TBD} & Motor bus \\
-J3 & Distribution board  & Driver, axis 1        & \textcolor{red}{TBD} & Motor bus \\
-J4 & Distribution board  & Driver, axis 2        & \textcolor{red}{TBD} & Motor bus \\
-J5 & Distribution board  & Driver, axis 3        & \textcolor{red}{TBD} & Motor bus \\
-J6 & Board               & CAN chain, end A      & \textcolor{red}{TBD} & CAN-H, CAN-L, GND \\
-J7 & CAN chain, end B    & Termination network   & \textcolor{red}{TBD} & CAN-H, CAN-L, GND \\
-J8 & Driver, axis $i$    & Encoder, axis $i$     & \textcolor{red}{TBD} & SPI, \qty{3.3}{\volt}, GND \\
-J9 & Board               & IMU                   & \textcolor{red}{TBD} & Serial bus, supply, GND \\
-J10 & Board              & Telemetry module      & \textcolor{red}{TBD} & UART, supply, GND \\
-J11 & Board              & Brake servo, axis $i$ & \textcolor{red}{TBD} & PWM, \qty{5}{\volt}, GND \\
-\bottomrule
-\end{tabular}
-\end{table}
-
 \subsection{Harness Drawings and Wire Schedule}
 \label{app:harness}
 
@@ -193,8 +158,7 @@ disturbs.
         ground.
   \item Capacitor voltage ratings confirmed by position --- no low-voltage part
         on the pack bus.
-  \item Polarity of every fabricated connector verified against
-        Table~\ref{tab:connectors}.
+  \item Polarity of every fabricated connector verified.
   \item Protection element in circuit: E-stop functional, fuse fitted and rated,
         anti-spark path intact.
   \item Encoder air gaps re-measured after mechanical assembly.
@@ -217,34 +181,3 @@ passes in full, with the pack protection verified, cell monitoring active and
 the assembly in a fire-safe area. Inrush is measured against the bulk
 capacitance on connection.
 
-\subsection{As-Built Measurements}
-\label{app:electrical_measured}
-
-Table~\ref{tab:electrical_measured} records the measured electrical figures that
-replace the estimates used during design. These are the numbers reported back to
-the modelling and control work, and they are the reason the parameter
-identification of Section~\ref{sec:paramid} runs on measured rather than assumed
-values.
-
-\begin{table}[htbp]
-\centering
-\caption[As-built electrical measurements]{As-built electrical measurements. Each replaces an estimate used
-earlier in the design. Note: values have not been finalized at this preliminary stage. }
-\label{tab:electrical_measured}
-\small
-\begin{tabular}{L{5.0cm} c L{5.4cm}}
-\toprule
-Quantity & Measured & Replaces / feeds \\
-\midrule
-Motor torque constant $K_m$    & \textcolor{red}{TBD} & Replaces \qty{\ktMotor}{\newton\metre\per\ampere} from datasheet $K_V$; Table~\ref{tab:params} \\
-Wheel inertia $I_w$ (spin-down)& \textcolor{red}{TBD} & Table~\ref{tab:params}, CAD value \\
-Viscous and Coulomb friction   & \textcolor{red}{TBD} & $C_b$, $C_w$ estimates \\
-Command-to-encoder latency     & \textcolor{red}{TBD} & Loop timing, Sec.~\ref{sec:loop-rate} \\
-Achievable wheel speed on bus  & \textcolor{red}{TBD} & $\omega_{\max}$, Sec.~\ref{sec:jumpup_target} \\
-Logic rail load, worst case    & \textcolor{red}{TBD} & Table~\ref{tab:electrical_ratings} \\
-MG92B servo stall current      & \textcolor{red}{TBD} & Table~\ref{tab:electrical_ratings}, not published \\
-MA600 encoder supply current   & \textcolor{red}{TBD} & Table~\ref{tab:electrical_ratings}, not published \\
-Runtime per charge under balance load & \textcolor{red}{TBD} & Demonstration planning \\
-\bottomrule
-\end{tabular}
-\end{table}

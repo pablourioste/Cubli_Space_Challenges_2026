@@ -86,31 +86,31 @@ Ref & Part & Qty & Fabrication route & Status \\
 \midrule
 \multicolumn{5}{@{}l}{\textbf{Inner structure}}\\
 \midrule
-M1 & Motor subframe             & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-M2 & Motor mount ($\times$axis) & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-M3 & Battery cradle / retention & 1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-M4 & Electronics tray           & 1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-M5 & Brake servo bracket        & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+M1 & Motor subframe             & --- & 3D print & Built \\
+M2 & Motor mount ($\times$axis) & 3 & 3D print & Built \\
+M3 & Battery cradle / retention & 1 & 3D print & Built \\
+M4 & Electronics tray           & 1 & 3D print & Built \\
+M5 & Brake servo bracket        & 3 & --- & Not built \\
 \midrule
 \multicolumn{5}{@{}l}{\textbf{Reaction wheel assembly}}\\
 \midrule
-W1 & Ballasted ring (Sec.~\ref{sec:rw_sizing}) & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-W2 & Wheel hub / rotor adapter  & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-W3 & Ballast bolt and nut set (M6, $\wheelN$ per wheel) & 45 & Standard hardware & \textcolor{red}{TBD} \\
-W4 & Brake strike feature       & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+W1 & Ballasted ring (Sec.~\ref{sec:rw_sizing}) & 3 & PET-CF 3D print & Built \\
+W2 & Wheel hub / rotor adapter  & 3 & PET-CF 3D print & Built \\
+W3 & Ballast bolt and nut set (M6, $\wheelN$ per wheel) & 45 & Standard hardware & Built \\
+W4 & Brake strike feature       & 3 & --- & Not built \\
 \midrule
 \multicolumn{5}{@{}l}{\textbf{Outer frame}}\\
 \midrule
-F1 & Frame member / edge rail   & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-F2 & Corner contact feature     & 8 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-F3 & Face panel / wheel guard   & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+F1 & Frame member / edge rail   & --- & 3D print & Built \\
+F2 & Corner contact feature     & 8 & 3D print & Built \\
+F3 & Face panel / wheel guard   & --- & 3D print & Built \\
 \midrule
 \multicolumn{5}{@{}l}{\textbf{1-DoF rig (Sec.~\ref{sec:cad_2d})}}\\
 \midrule
-R1 & Face plate                 & 1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-R2 & Pivot bearing mount        & 1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-R3 & Rig motor mount            & 1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-R4 & Hard stops / containment   & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+R1 & Face plate                 & 1 & 3D print & Built \\
+R2 & Pivot bearing mount        & 1 & 3D print & Built \\
+R3 & Rig motor mount            & 1 & 3D print & Built \\
+R4 & Hard stops / containment   & 2 & 3D print & Built \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -257,9 +257,8 @@ absorbed by ballast trim where the margin allows.}
 Quantity & CAD value & Measured & Discrepancy \\
 \midrule
 Total cube mass $M$          & \qty{\Mbasis}{\kilo\gram}\textsuperscript{*} & \qty{\Mbuilt}{\kilo\gram} & $-$\qty{\Mdelta}{\gram} \\
-Wheel mass $m_w$ (each)      & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-Wheel inertia $I_w$ (each)   & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-CoM offset from cube centre  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Wheel mass $m_w$ (each)      & \qty{\wheelMass}{\gram} & --- & --- \\
+Wheel inertia $I_w$ (each)   & \qty{\wheelI}{\kilogram\metre\squared} & --- & --- \\
 \bottomrule
 \end{tabular}
 

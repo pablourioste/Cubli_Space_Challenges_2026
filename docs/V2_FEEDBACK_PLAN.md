@@ -28,7 +28,7 @@ findings are genuinely closed and which are still open behind changed wording.
 | 012 | 5 V rail undersized; load table missing | **PARTIAL** | Table now exists (`12_electrical_detail.tex:56-76`) and the `??` is gone, but the two dominant loads are "Not published" and the worst case is unevaluated |
 | 013 | τ_b validated only by sacrificial scope | **OPEN** | E10 still "Sacrificial with C14/B13" (`..._tasks.tex:97`); cross-reference fixed (`03:227`), programme risk unchanged |
 | 014 | Ballast station load never evaluated | **OPEN in document** | `03:392-397` states the load path, gives no value — but `SIZING.py` already computes it (§3.3) |
-| 015 | Gate M2 dated day of issue, criterion unmet | **OPEN, now worse** | Whole schedule is in the past; cover still `v1.0` (`00_cover.tex:32`); 6 of 10 driving CAD dimensions still TBD (`11_cad_detail.tex:35-40`) |
+| 015 | Gate M2 dated day of issue, criterion unmet | **PARTIAL** (19 Aug) | Gate M2 split into M2a (geometry freeze, closed) and M2b (budget closure, **open**); `tab:gates` now carries a *Status at issue* column plus per-gate notes for M2a/M2b/M4/M5/M6/G6, and a *Schedule as run* paragraph; WBS caption states the dates are the locked baseline. Cover is `v2.0` with a fixed `\docdate` (`main.tex`) instead of `\today`. **Still open:** the 6 CAD dimensions have no values — `tab:cad_params` now records each as an identified open item with what closes it, but $d_m, h_m, c_w, c_o, V_{\min}, r_c$ must be exported from the CAD before M2b closes |
 | 016 | Two jump-up analyses never cross-checked | **OPEN** | Eq. (1) at `03:42-45` still never evaluated numerically |
 | 017 | Three `??` cross-references | **CLOSED** | No undefined references in `build/main.log` |
 | 018 | K_m: three values, model form mismatch | **PARTIAL** | Good reasoning at `06_electronics.tex:139-155`; `tab:params` still says "Motor datasheet" (`04_methodology.tex:178`) |
@@ -36,9 +36,17 @@ findings are genuinely closed and which are still open behind changed wording.
 | 020 | Name / acronym inconsistency | **CLOSED** (19 Aug) | ACDS→ADCS gone; identity block `main.tex` feeds cover, header and PDF metadata; one running head via `\tddheadfoot` in both `fancy` and `plain`; blank page 2 removed (`00_cover.tex`); Figure title now "Manufacturer bench data: …" (`06_electronics.tex`); Armonia/Cubli convention stated at `01_introduction.tex` §1.1 and applied |
 | 021 | Overall: fix the four arithmetic gaps | **1 of 4 closed** | Eq. (4) grouping closed; 5000 rpm, ballast load and the h_w/Δt-class checks still outstanding |
 
-**Score: 6 closed, 3 partial, 12 open.** The two the reviewer called structural
-(001/008 requirements, 009 risk register) are both untouched, and the one with
-real-world consequence (019, personal contact details) is untouched.
+**Score: 6 closed, 4 partial, 11 open** (015 moved open → partial, 19 Aug).
+
+> **This table is stale beyond 015.** It was written before
+> `sections/01a_requirements.tex`, `sections/14_requirements_verification.tex`
+> and `sections/15_risk_register.tex` were added to `main.tex`, so the rows for
+> 001/008 (requirements table) and 009 (risk register) — the two the reviewer
+> called structural — no longer describe the document. Re-audit the whole table
+> against the current build before quoting the score.
+
+The one with real-world consequence (019, personal contact details) is
+untouched.
 
 ---
 
@@ -243,9 +251,9 @@ was, because the parameters are measurable rather than assumed.
 
 ### 3.10 Document identity and status are stale
 
-- Cover: `\coverVersion{v1.0}` (`00_cover.tex:32`), subtitle "Armonia", date `\today`
+- ~~Cover: `\coverVersion{v1.0}` (`00_cover.tex:32`), subtitle "Armonia", date `\today`~~ — **done (19 Aug):** `\docversion` is `v2.0` and the cover date is a fixed `\docdate` (`main.tex`), not `\today`, so the gate statuses have a stable date to be "as at"
 - Headers: "Technical Design Document" / "Cubli", alternating with and without "Space Challenges 2026" (`main.tex:104-116`)
-- Every WBS date and every gate date is in the past; gate M2 (frame freeze, "mass, inertia and CoM budget closed against the sizing analysis") is still open in fact, since the structure line is still an allowance
+- ~~Every WBS date and every gate date is in the past; gate M2 (frame freeze, "mass, inertia and CoM budget closed against the sizing analysis") is still open in fact, since the structure line is still an allowance~~ — **done (19 Aug):** past dates are fine once the document says whether they were met, so `tab:gates` now carries a *Status at issue* column; M2 is split into M2a (closed) and M2b (**open** — structure line still an allowance, CoM offset unmeasured), and M4/M5/M6/G6 are recorded as partly met or open with reasons
 - Figure title in the List of Figures still reads "Measured MN4006 shaft torque…" (`06:168`) although both the caption and the body now correctly say manufacturer bench data
 
 ---
@@ -264,7 +272,7 @@ the underlying engineering.
 | 3 | **Fix or drop the 5000 rpm claim** (005). Decide option 1 or 2 in §3.4 — this is a design call, not an edit | `03:151-157`, `SIZING.py:56-75,123-133` | 15 min or a re-convergence |
 | 4 | **Resolve wheel thickness 20 vs 5 mm** (§3.1) and the station count 3/15/16/45 (§3.2) | `11_cad_detail.tex:34,76,181`, `SIZING.py` docstring | 20 min |
 | 5 | **Resolve the encoder magnet and air gap** (011): which magnet is supplied, what gap the 20–80 mT window implies, then correct all five places including gate M1 and task E2 | `10_bom.tex:70`, `12_electrical_detail.tex:29-32`, `02_project_organization.tex:139`, `..._tasks.tex:88`, `06_electronics.tex:107` | 30 min after the bench answer |
-| 6 | **Update cover version, project name and running headers** (020, 015) | `00_cover.tex:30-32`, `main.tex:104-116`, `06:168` | 15 min |
+| 6 | ~~**Update cover version, project name and running headers** (020, 015)~~ **DONE (19 Aug)** — `\docversion` = `v2.0`, `\docdate` fixed, cover reads from both | `main.tex`, `00_cover.tex` | — |
 
 ### P1 — The two structural gaps
 
@@ -289,7 +297,7 @@ the underlying engineering.
 | # | Action | Notes |
 |---|---|---|
 | 15 | **Populate Appendix D or mark it to-be-issued** (§3.7) — five sections currently promise content that is not there | `13_control_algorithm_detail.tex`; consider `sections/code.cpp` |
-| 16 | **Re-baseline the schedule** (015): record M2 as closed or open with a real date, update the Gantt to the as-run calendar, and reconcile L = 149 vs 150 mm (§3.6) | `02_*` + `11_cad_detail.tex:31` |
+| 16 | **Re-baseline the schedule** (015): ~~record M2 as closed or open~~ **DONE (19 Aug)** — M2 split into M2a/M2b, `tab:gates` has a *Status at issue* column, per-gate notes and a *Schedule as run* paragraph; Gantt diamonds relabelled as baseline dates only. **Still to do:** export the six open CAD dimensions into `tab:cad_params` (that is what closes M2b), and reconcile L = 149 vs 150 mm (§3.6) | `02_*` + `11_cad_detail.tex` |
 | 17 | **Decouple the brake measurement from the jump-up demo** (013), or state that β ships unmeasured and what that means for the structural case | `..._tasks.tex:97`, `03:221-231` |
 | 18 | **Close the 5 V worst-case rail load** (012): measure MG92B stall and MA600 supply, evaluate the coincident case, and write the servo-concurrency assumption into the mode table rather than leaving it implicit | `12_electrical_detail.tex:56-76`, `07:361-379` |
 
