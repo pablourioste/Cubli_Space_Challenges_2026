@@ -50,47 +50,7 @@ fabrication route and current status. It is the mechanical counterpart to the
 electronics bill of materials of Appendix~\ref{app:bom}: the parts here are the
 team's design responsibility and are not supplied.
 
-\begin{table}[htbp]
-\centering
-\caption[CAD model tree and part list]{CAD model tree and part list. Quantities are per assembled cube unless
-noted; the 1-DoF rig parts are listed separately.}
-\label{tab:cad_parts}
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{c L{4.0cm} c L{3.4cm} L{3.0cm}}
-\toprule
-Ref & Part & Qty & Fabrication route & Status \\
-\midrule
-\multicolumn{5}{@{}l}{\textbf{Inner structure}}\\
-\midrule
-M1 & Motor subframe             & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-M2 & Motor mount ($\times$axis) & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-M3 & Battery cradle / retention & 1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-M4 & Electronics tray           & 1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-M5 & Brake servo bracket        & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\midrule
-\multicolumn{5}{@{}l}{\textbf{Reaction wheel assembly}}\\
-\midrule
-W1 & Ballasted ring (Sec.~\ref{sec:rw_sizing}) & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-W2 & Wheel hub / rotor adapter  & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-W3 & Ballast bolt and nut set (M6, $3\times6$) & 18 & Standard hardware & \textcolor{red}{TBD} \\
-W4 & Brake strike feature       & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\midrule
-\multicolumn{5}{@{}l}{\textbf{Outer frame}}\\
-\midrule
-F1 & Frame member / edge rail   & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-F2 & Corner contact feature     & 8 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-F3 & Face panel / wheel guard   & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\midrule
-\multicolumn{5}{@{}l}{\textbf{1-DoF rig (Sec.~\ref{sec:cad_2d})}}\\
-\midrule
-R1 & Face plate                 & 1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-R2 & Pivot bearing mount        & 1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-R3 & Rig motor mount            & 1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-R4 & Hard stops / containment   & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\bottomrule
-\end{tabular}
-\end{table}
+
 
 \subsection{1-DoF Prototype Construction}
 \label{app:cad_2d}
@@ -183,36 +143,6 @@ Section~\ref{sec:imu_mount}.
 
 \subsection{Fabrication and Assembly}
 \label{app:cad_fab}
-
-\subsubsection{Print and Manufacturing Settings}
-
-The printed parts are structural, not cosmetic: the wheel ring carries
-centrifugal load at the ballast holes and the motor mounts carry the brake
-impulse, which is the design load case identified in
-Section~\ref{sec:background}. Settings are therefore recorded per part in
-Table~\ref{tab:print_settings} and treated as part of the design, since a part
-reprinted at a different orientation or infill is not the part that was
-analysed.
-
-\begin{table}[htbp]
-\centering
-\caption[Fabrication settings for the structural printed parts]{Fabrication settings for the structural printed parts. Layer
-orientation is specified relative to the principal load direction.}
-\label{tab:print_settings}
-\small
-\begin{tabular}{l L{2.8cm} L{3.0cm} L{3.6cm}}
-\toprule
-Ref & Material & Infill / walls & Orientation and rationale \\
-\midrule
-W1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-W2 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-M1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-M2 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-F1 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-F2 & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 \subsubsection{Assembly Sequence}
 
