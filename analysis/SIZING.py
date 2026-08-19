@@ -68,20 +68,20 @@ than the sizing assumed. The two masses are now different numbers and
 both are real:
 
     M          = 1.800 kg   the sizing basis (Stage 1). Historical.
-    M_ACTUAL_g = 1600.0 g   what the cube weighs (Stage 6 rolls up to it).
+    M_ACTUAL_g = 1626.0 g   what the cube weighs (Stage 6 rolls up to it).
 
-The 200 g gap is not an unclosed loop or an error to be driven to zero.
+The 174 g gap is not an unclosed loop or an error to be driven to zero.
 It is REALISED MARGIN: the inner and outer frames came in lighter than
 the allowance carried at design time, and because h_w scales with M, a
 lighter cube needs LESS wheel than the one already built. Stage 6
 reports the delta as negative and says Stage 1 stands, which is correct.
-Do not "fix" it by setting M = 1.6: that would re-solve to 12 stations
+Do not "fix" it by setting M = 1.626: that would re-solve to 12 stations
 and no longer describe the wheel in the workshop.
 
-WHAT THE MARGIN IS WORTH, at the actual 1.600 kg:
-  - the same wheel reaches 117.6% of target instead of 100.6%
-  - it still closes all the way down to 3400 rpm, which covers the whole
-    3500-4000 rpm operating band the drive is aimed at
+WHAT THE MARGIN IS WORTH, at the actual 1.626 kg:
+  - the same wheel reaches 115.2% of target instead of 100.6%
+  - it still closes all the way down to about 3470 rpm, which covers the
+    whole 3500-4000 rpm operating band the drive is aimed at
 Both numbers are computed and printed by the run rather than asserted
 here, so they cannot drift out of date silently.
 
@@ -132,26 +132,30 @@ M          = 1.800        # [kg]   THE SIZING BASIS -- the cube mass the wheels
                           #        were designed against. NOT a converged fixed
                           #        point and NOT the current best estimate of
                           #        the cube's mass; see M_ACTUAL_g in Stage 6
-                          #        for that (1600.0 g).
+                          #        for that (1626.0 g).
                           #        This value is HISTORICAL: it is what was on
                           #        the table when the wheel was dimensioned, and
                           #        changing it changes which wheel the file
                           #        describes. At 1.800 kg the solver asks for
                           #        14.83 stations and rounds to the 15 the part
-                          #        actually has. At the as-built 1.600 kg it
-                          #        would ask for 10.63 and round to 12, which is
+                          #        actually has. At the as-built 1.626 kg it
+                          #        would ask for 11.16 and round to 12, which is
                           #        a different, lighter wheel that was never
                           #        made.
-                          #        The 200 g by which the build undershot this
+                          #        The 174 g by which the build undershot this
                           #        number is REALISED MARGIN, not an open loop:
                           #        h_w scales with M, so a lighter cube needs
                           #        less wheel than the one already built. Stage 6
                           #        quantifies it.
-M_ACTUAL_g = 1600.0       # [g]    WHAT THE CUBE ACTUALLY WEIGHS. Stage 6 rolls
+M_ACTUAL_g = 1626.0       # [g]    WHAT THE CUBE ACTUALLY WEIGHS. Stage 6 rolls
                           #        the BOM up against this, not against M.
                           #        The inner and outer frames came in lighter
                           #        than the allowance carried at design time,
-                          #        which is the whole source of the 200 g gap.
+                          #        which is the whole source of the 174 g gap.
+                          #        Reported in the TDD at app:cad_mass
+                          #        (Modelled vs measured mass properties), NOT
+                          #        in the preliminary sizing section, which
+                          #        stays at the 1.800 kg basis throughout.
 L          = 0.149        # [m]    cube edge length
 g          = 9.81         # [m/s^2]
 eta        = 1.05         # [-]    energy margin (1.02-1.05 recommended)
@@ -178,14 +182,12 @@ rpm_max    = 4000         # [rpm]  max wheel speed -- the SIZING BASIS, and the
                           #        so 4000 is the LEAST demanding point in that
                           #        band and the band's lower end is the case to
                           #        check. The run does check it: at the actual
-                          #        1.600 kg this wheel still closes down to
-                          #        3400 rpm, so the whole band is covered.
-                          #        NOTE: the TDD (tab:jumpup_budget, the dashed
-                          #        ceiling on the motor curve), PER-07 in
-                          #        sections/01a_requirements.tex, and
-                          #        sections/03 and /06 all still assert
-                          #        5500 rpm. They are inconsistent with this
-                          #        file and must be updated together.
+                          #        1.626 kg this wheel still closes down to
+                          #        about 3470 rpm, so the whole band is covered.
+                          #        The TDD now states 4000 rpm throughout
+                          #        (tab:jumpup_budget, the dashed ceiling on the
+                          #        motor curve, PER-07, sections/03 and /06), so
+                          #        this file and the document agree.
 case       = "corner"     # "edge" or "corner" -- corner sizes the design
 
 # --- wheel geometry ---
@@ -1132,7 +1134,7 @@ print("     and the bearing-area figure above assumes a flat seat.")
 
 # --- the two masses this stage reconciles ---
 M_SIZED_g = M * 1e3          # [g] the basis Stage 1 was run with (1800.0)
-# M_ACTUAL_g is set at the top of the file (1600.0).
+# M_ACTUAL_g is set at the top of the file (1626.0).
 
 # Bill of materials.
 #   (label, unit_mass_g, qty, category)
@@ -1211,8 +1213,8 @@ BOM = [
 # 4000 rpm takes each wheel from 170.37 g to 234.14 g, so specified hardware
 # now dominates the budget in a way it did not before.
 #
-# SEPARATELY, the built cube weighed M_ACTUAL_g = 1600.0 g, which implies a
-# realised structure mass of 1600.0 - 1367.5 = 232.5 g -- 200 g under this
+# SEPARATELY, the built cube weighed M_ACTUAL_g = 1626.0 g, which implies a
+# realised structure mass of 1626.0 - 1367.5 = 258.5 g -- 174 g under this
 # allowance. That is reported at the end of Stage 6 as realised margin. It is
 # deliberately NOT folded back into the allowance here: doing so would
 # re-solve the wheel to 12 stations and stop describing the part that exists.

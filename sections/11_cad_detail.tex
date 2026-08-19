@@ -263,10 +263,42 @@ absorbed by ballast trim where the margin allows.}
 \toprule
 Quantity & CAD value & Measured & Discrepancy \\
 \midrule
-Total cube mass $M$          & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Total cube mass $M$          & \qty{1.800}{\kilo\gram}\textsuperscript{*} & \qty{1.626}{\kilo\gram} & \qty{-174}{\gram} \\
 Wheel mass $m_w$ (each)      & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
 Wheel inertia $I_w$ (each)   & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
 CoM offset from cube centre  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
 \bottomrule
 \end{tabular}
+
+\vspace{0.4em}
+{\footnotesize\RaggedRight\textsuperscript{*}\,Not a closed CAD roll-up: the
+\qty{1.800}{\kilo\gram} is the budget of Table~\ref{tab:massbudget}, whose
+structural line is still an allowance. It is quoted here as the value the
+measurement is compared against.\par}
 \end{table}
+
+\paragraph{As-built mass, and what the underrun is worth.} The integrated cube
+weighs \qty{1.626}{\kilo\gram} --- \qty{174}{\gram} below the
+\qty{1.800}{\kilo\gram} sizing basis of Table~\ref{tab:jumpup_budget}, and
+inside the \qty{1.8}{\kilo\gram} cap of CON-02. The difference is entirely
+structural: the specified hardware of Table~\ref{tab:massbudget} totals
+\qty{1367.5}{\gram} and is measured or taken from datasheets, so the realised
+structure comes to \qty{258.5}{\gram} against the \qty{432.5}{\gram} allowance
+the budget carries.
+
+The sizing basis is deliberately \emph{not} revised to match.
+Section~\ref{sec:sizing} sizes against the heaviest mass the design admits
+rather than the lightest it achieves, so \qty{1.800}{\kilo\gram} remains the
+figure PER-06 is derived at and the wheel is built to. What the underrun
+changes is margin, not requirement. Re-evaluating
+Equations~\eqref{eq:hw_ideal}--\eqref{eq:Iw_target} at \qty{1.626}{\kilo\gram}
+gives $\tau_g = \qty{1.1884}{\newton\metre}$, $\beta = \num{1.3118}$ and $h_w
+= \qty{0.2281}{\kilo\gram\metre\squared\per\second}$, hence
+$I_{w,\text{target}} = \qty{5.4452e-4}{\kilogram\metre\squared}$: the
+fifteen-station wheel delivers \qty{115.2}{\percent} of what the built cube
+actually demands, against the \qty{100.6}{\percent} it delivers against the
+basis it was sized on. Equivalently, the same wheel closes the corner jump-up
+at any speed down to about \qty{3470}{\rpm}, so the \qty{4000}{\rpm} design
+point carries some \qty{530}{\rpm} of speed margin on the article as built.
+That margin is realised, and is not to be spent by relaxing the sizing basis
+or by allowing the structure to grow back into its allowance.
