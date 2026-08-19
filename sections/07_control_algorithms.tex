@@ -1949,8 +1949,9 @@ the design should target, and is listed accordingly in \S\ref{sec:open}.
 
 \paragraph{Torque clamp.} Commanded torque is clamped to
 $\pm\tau_{\mathrm{peak}} = \pm 0.40$\,N\,m. This figure derives from the
-MN4006 rated current of $16$\,A at $K_t = 0.02513$\,N\,m/A, giving
-$0.4021$\,N\,m. Two qualifications apply to its use as a clamp.
+MN4006 rated current of $16$\,A at $K_t = \ktMotor$\,N\,m/A --- the machine
+constant implied by the $\motorKV$\,rpm/V rating, \S\ref{sec:electrical} ---
+giving $0.4021$\,N\,m. Two qualifications apply to its use as a clamp.
 
 First, $16$\,A is the datasheet's \emph{maximum continuous current over
 180\,s}, not an instantaneous rating. Second, and more significantly, that
@@ -1982,7 +1983,8 @@ moteus-n1, cooled & $0.653$\,N\,m & $26.00$\,A & requires fan or heat spreader\\
 moteus-n1, peak & $2.513$\,N\,m & $100.00$\,A & instantaneous\\
 \bottomrule
 \end{tabular}
-\caption{Torque limits and their sources. $K_t = 0.02513$\,N\,m/A throughout.}
+\caption{Torque limits and their sources. $K_t = \ktMotor$\,N\,m/A throughout
+(datasheet $K_V$, \S\ref{sec:electrical}).}
 \label{tab:torque-limits}
 \end{table}
 
