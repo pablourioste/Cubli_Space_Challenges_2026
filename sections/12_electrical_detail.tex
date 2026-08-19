@@ -216,35 +216,3 @@ disturbs.
 passes in full, with the pack protection verified, cell monitoring active and
 the assembly in a fire-safe area. Inrush is measured against the bulk
 capacitance on connection.
-
-\subsection{As-Built Measurements}
-\label{app:electrical_measured}
-
-Table~\ref{tab:electrical_measured} records the measured electrical figures that
-replace the estimates used during design. These are the numbers reported back to
-the modelling and control work, and they are the reason the parameter
-identification of Section~\ref{sec:paramid} runs on measured rather than assumed
-values.
-
-\begin{table}[htbp]
-\centering
-\caption[As-built electrical measurements]{As-built electrical measurements. Each replaces an estimate used
-earlier in the design. Note: values have not been finalized at this preliminary stage. }
-\label{tab:electrical_measured}
-\small
-\begin{tabular}{L{5.0cm} c L{5.4cm}}
-\toprule
-Quantity & Measured & Replaces / feeds \\
-\midrule
-Motor torque constant $K_m$    & \textcolor{red}{TBD} & Replaces \qty{\ktMotor}{\newton\metre\per\ampere} from datasheet $K_V$; Table~\ref{tab:params} \\
-Wheel inertia $I_w$ (spin-down)& \textcolor{red}{TBD} & Table~\ref{tab:params}, CAD value \\
-Viscous and Coulomb friction   & \textcolor{red}{TBD} & $C_b$, $C_w$ estimates \\
-Command-to-encoder latency     & \textcolor{red}{TBD} & Loop timing, Sec.~\ref{sec:control_sw} \\
-Achievable wheel speed on bus  & \textcolor{red}{TBD} & $\omega_{\max}$, Sec.~\ref{sec:jumpup_target} \\
-Logic rail load, worst case    & \textcolor{red}{TBD} & Table~\ref{tab:electrical_ratings} \\
-MG92B servo stall current      & \textcolor{red}{TBD} & Table~\ref{tab:electrical_ratings}, not published \\
-MA600 encoder supply current   & \textcolor{red}{TBD} & Table~\ref{tab:electrical_ratings}, not published \\
-Runtime per charge under balance load & \textcolor{red}{TBD} & Demonstration planning \\
-\bottomrule
-\end{tabular}
-\end{table}
