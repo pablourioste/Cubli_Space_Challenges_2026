@@ -86,6 +86,287 @@ envelope is bounded by the rig rather than by the controller.
 \subsubsection{3-DoF Control Validation}
 \label{sec:test_3dof}
 
-For the 3D model, control-loop validation to date has achieved edge balance on
-the final prototype using the 1-DoF control law; corner balance has not yet
-been demonstrated.
+Both cube equilibria have now been exercised on hardware: corner balance,
+under quiet hold and under repeated pushes to failure, and edge balance,
+under quiet hold and recovery from a released tilt. Two firmware
+configurations were run on the corner: the autotrim baseline
+(\texttt{Stage4\_AutoTrim.ino}) and the same law with a body-rate low-pass
+filter added (\texttt{Stage4\_AutoTrim\_RateFilter.ino}, discussed further
+against the vibration source it targets in \S\ref{sec:vibration}).
+Table~\ref{tab:balance_3dof_template} updates the result template with these
+runs against the Gate~G3 threshold of \qty{60}{\second} underlying PER-01 and
+PER-02, and Table~\ref{tab:recovery_angle_3dof_template} carries the edge
+release test mirroring Table~\ref{tab:recovery_angle} against PER-04; the
+corner disturbance-rejection data uses a different protocol (repeated live
+pushes of unmeasured magnitude, not a single release from a set angle) and is
+reported separately in Table~\ref{tab:corner_pushes}. Driver current was not
+logged in these runs -- effort is reported as the commanded torque
+$|\tau_{\text{cmd}}|$ actually measured, not converted from it.
+
+\begin{table}[htbp]
+\centering
+\caption[3-DoF unassisted balance results]{Unassisted balance on the cube,
+edge and corner equilibria, against the Gate~G3 threshold of
+\qty{60}{\second} (PER-01, PER-02).}
+\label{tab:balance_3dof_template}
+\begin{tabular}{lccc}
+\toprule
+Equilibrium & Balance duration & Steady-state wheel-speed & Peak commanded torque \\
+\midrule
+Edge (quiet hold) & \qty{196.96}{\second} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Corner, autotrim   & \qty{46.7}{\second} & still climbing, $\approx\qty{8}{\radian\per\second}$ at window end & $\approx\qty{0.12}{\newton\metre}$ ceiling \\
+Corner, rate filter & \qty{50.4}{\second} & climbs then decays, \qtyrange{9}{5}{\radian\per\second} & $\approx\qty{0.12}{\newton\metre}$ ceiling \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{\linewidth}
+\vspace{4pt}
+\footnotesize
+Note: edge quiet hold satisfies PER-01 with over three times the required
+duration; both corner configurations fall short of the PER-02 threshold in
+the runs to date (\qty{46.7}{\second}, \qty{50.4}{\second}) and are reported
+as the longest continuous armed window achieved, not as a demonstrated 60~s
+hold. Neither corner configuration's wheel speed has settled within its
+window (Figure~\ref{fig:corner_quiet_wheel_effort}), so the drift figure is
+not yet a steady state in the sense Table~\ref{tab:balance_examples} reports
+for the 1-DoF rig.
+\end{minipage}
+\end{table}
+
+\paragraph{Corner quiet hold.} Figure~\ref{fig:corner_quiet_phi} compares
+tilt magnitude between the two configurations over their respective armed
+windows. Read at face value it favours autotrim (RMS \qty{0.39}{\degree}
+vs \qty{0.46}{\degree}), but the comparison is confounded on two axes and
+should not be read as a verdict on the filter: the rate-filter session's
+own \emph{raw}, pre-filter gyro RMS is more than double the autotrim
+session's (\qty{18.6}{\degree\per\second} vs \qty{8.8}{\degree\per\second}),
+which is a difference in bench conditions before either firmware touches
+the signal, not a filter effect; and the rate-filter build also ships a
+faster trim-adaptation gain ($k_a$: \num{2.922e-6} to \num{1e-4}, a
+\qty{10}{\second} time constant against the baseline's \qty{60}{\second}),
+so the wheel-speed roll-over visible only in the rate-filter trace of
+Figure~\ref{fig:corner_quiet_wheel_effort} is at least as plausibly $k_a$
+converging faster as it is the filter removing noise from the control law.
+Both changes ship in the same build; this data cannot separate them.
+Since $f$ (filter corner) and $k_a$ are both live-settable on the same
+firmware, the controlled version of this test -- one bench session,
+toggling each independently -- is the next run, not a repeat of the
+two-session comparison.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\linewidth]{images/corner_quiet_phi.png}
+\caption[Corner quiet hold, tilt magnitude]{Corner quiet hold, tilt
+magnitude: autotrim vs rate filter. The gap is confounded, not attributable
+to the filter alone (see text).}
+\label{fig:corner_quiet_phi}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\linewidth]{images/corner_quiet_wheel_effort.png}
+\caption[Corner quiet hold, standing wheel speed]{Corner quiet hold,
+smoothed standing wheel speed. Only the rate-filter run's speed turns over
+within the window, consistent with its faster $k_a$ time constant rather
+than necessarily the filter.}
+\label{fig:corner_quiet_wheel_effort}
+\end{figure}
+
+\paragraph{Rate-filter frequency response.} One comparison within this data
+\emph{is} clean: raw versus filtered body rate within the rate-filter
+session alone, same samples, only the filter differing.
+Figure~\ref{fig:corner_quiet_om_filter_effect} shows overall
+$|\omega|$ RMS dropping from \qty{18.6}{\degree\per\second} raw to
+\qty{10.3}{\degree\per\second} filtered, a real \qty{45}{\percent}
+reduction. The PSD in Figure~\ref{fig:corner_quiet_psd} shows why that
+headline number is not the whole story: there is a sharp structural mode
+at \qtyrange{29.7}{30.5}{\hertz} on all three axes -- the same mode
+\S\ref{sec:vibration} places inside the control passband rather than above
+the $200$\,Hz previously assumed -- and the \qty{20}{\hertz} first-order
+filter attenuates it by only $\approx$6~dB (a factor of $\approx 2$), not
+the 20--30~dB claimed in the header comments of
+\texttt{Stage4\_AutoTrim\_RateFilter.ino} and
+\texttt{Stage5\_AutoTrim\_RateFilter.ino}, a documentation error flagged
+for correction there. The filter is doing something real, just not what
+the comment claims (\S\ref{sec:vibration} gives the full frequency-response
+argument).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\linewidth]{images/corner_quiet_om_filter_effect.png}
+\caption[Rate filter, time domain]{Raw vs filtered body rate, same
+run: a real \qty{45}{\percent} RMS reduction.}
+\label{fig:corner_quiet_om_filter_effect}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\linewidth]{images/corner_quiet_psd.png}
+\caption[Rate filter, frequency domain]{Body-rate PSD, raw vs filtered: the
+$\approx\qty{30}{\hertz}$ structural mode is attenuated by only
+$\approx$6~dB, against a firmware-comment claim of
+20--30~dB -- flagged as a documentation error, not a
+measurement disagreement.}
+\label{fig:corner_quiet_psd}
+\end{figure}
+
+\paragraph{Corner disturbance rejection.} Table~\ref{tab:corner_pushes} and
+Figure~\ref{fig:corner_pushes_timeline} report repeated pushes applied by
+hand until the controller trips; no load cell measured push force
+directly, so severity is read from the peak tilt reached, all below the
+\qty{5}{\degree} PER-04 threshold. Both configurations recover pushes of
+essentially the same size and fail at essentially the same severity --
+\qty{24.0}{\degree} (autotrim) and \qty{23.8}{\degree} (rate filter)
+immediately before hitting the same \qty{25}{\degree} tilt trip
+(\texttt{kMaxTilt}) that disarms the drivers in both builds, which is a
+property of that shared firmware threshold, not of the rate filter.
+Recovery time to under \qty{1}{\degree} is statistically indistinguishable
+between configurations (\qtyrange{0.08}{0.20}{\second} across all recovered
+pushes). This test does not show either configuration tolerating a larger
+disturbance than the other, and PER-04 (recovery from \qty{5}{\degree} or
+more) has not yet been exercised on the cube by either configuration.
+
+\begin{table}[htbp]
+\centering
+\caption[Corner push-recovery results]{Corner disturbance rejection:
+repeated pushes to failure, both firmware configurations.}
+\label{tab:corner_pushes}
+\begin{tabular}{lcc}
+\toprule
+ & Autotrim & Rate filter \\
+\midrule
+Recovered pushes before failure & 5 & 4 \\
+Peak tilt, recovered pushes & \qtylist{1.78;2.28;3.34;2.20;2.70}{\degree} & \qtylist{2.17;2.94;3.69;2.18}{\degree} \\
+Recovery time to $<\qty{1}{\degree}$ & \qtyrange{0.09}{0.20}{\second} & \qtyrange{0.08}{0.20}{\second} \\
+Final push, peak tilt before trip & \qty{24.0}{\degree} & \qty{23.8}{\degree} \\
+Post-trip peak (wheels cut) & \qty{34.6}{\degree} & \qtyrange{33.4}{33.9}{\degree} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\linewidth]{images/corner_pushes_timeline.png}
+\caption[Push sequence to failure]{Push sequence to failure, both
+configurations: gray bands are disarmed; the trip is the shared
+\qty{25}{\degree} threshold, not a property of the rate filter.}
+\label{fig:corner_pushes_timeline}
+\end{figure}
+
+A matched pair close in size (autotrim \qty{3.34}{\degree}, rate filter
+\qty{2.94}{\degree}, chosen so neither response is contaminated by the
+following push) isolates the shape of the recovery in
+Figure~\ref{fig:corner_pushes_zoom}: autotrim rises and settles back under
+\qty{1}{\degree} faster; the rate-filter response carries a marginally
+longer tail before settling. That is consistent with the
+attenuation/phase-lag trade-off of \S\ref{sec:vibration} -- a small
+responsiveness cost, but one that does not show up as a lower failure
+threshold in this data. The commanded-torque trace is already bouncing
+against the $\approx\qty{0.12}{\newton\metre}$ ceiling during quiet hold in
+both configurations, well before either push.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\linewidth]{images/corner_pushes_zoom.png}
+\caption[Matched push, time-aligned]{A comparable single push, time-aligned:
+response shape and commanded torque.}
+\label{fig:corner_pushes_zoom}
+\end{figure}
+
+\paragraph{Edge quiet hold.} Figure~\ref{fig:edge_quiet_phi} shows
+\qty{196.96}{\second} of armed edge balance, RMS \qty{0.58}{\degree} --
+clearing the PER-01 threshold with over three times the required duration.
+That RMS is not, however, representative of an undisturbed hold throughout:
+a $\approx\qty{3.5}{\degree}$ excursion between roughly
+$t=\qty{100}{\second}$ and $t=\qty{135}{\second}$ self-recovers with no
+armed dropout and no logged marker to explain it. Outside that window the
+trace is consistent with plain sensor/torque noise near zero, similar in
+character to the corner quiet-hold runs above. The excursion should be
+repeated and identified before \qty{0.58}{\degree} is quoted elsewhere as
+the undisturbed edge noise floor.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\linewidth]{images/edge_quiet_phi.png}
+\caption[Edge quiet hold]{Edge quiet hold, \qty{196.96}{\second} armed,
+RMS \qty{0.58}{\degree}. The excursion near $t=\qty{110}{\second}$ is
+unexplained and pulls the RMS up; it is under investigation.}
+\label{fig:edge_quiet_phi}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\caption[Edge recovery-angle results]{Recovery from a defined initial angle
+on the cube, edge equilibrium, measured from release, against PER-04.}
+\label{tab:recovery_angle_3dof_template}
+\begin{tabular}{lccc}
+\toprule
+Initial angle & Recovered? & Recovery time & Peak commanded torque \\
+\midrule
+\qty{6.18}{\degree} & Yes & \qty{9.64}{\second} & \textcolor{red}{TBD} \\
+\qty{7}{\degree}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\qty{8}{\degree}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\qty{12}{\degree} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\qty{24}{\degree} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{\linewidth}
+\vspace{4pt}
+\footnotesize
+Note: the \qty{6.18}{\degree} row already exceeds the PER-04 threshold of
+\qty{5}{\degree}; its recovery time is time to settle under
+\qty{0.5}{\degree} and never re-exceed it, not time to first cross that
+band -- see the ring-down discussion below. The \qty{7}{\degree}--\qty{24}{\degree}
+rows mirror the 1-DoF protocol of Table~\ref{tab:recovery_angle} and have
+not yet been repeated on the cube's edge equilibrium.
+\end{minipage}
+\end{table}
+
+\paragraph{Edge recovery from a released tilt.} Released from
+\qty{-6.18}{\degree}, the edge equilibrium does not recover cleanly; it
+rings down (Figure~\ref{fig:edge_recovery_6deg}). Tilt overshoots to
+\qty{+5.05}{\degree} at $t=\qty{0.70}{\second}$ -- within \qty{1}{\degree}
+of the release magnitude, on the opposite side -- before damping wins.
+Table~\ref{tab:edge_ringdown} gives the full sequence of threshold
+crossings: a naive "first time under \qty{1}{\degree}"
+($t=\qty{1.89}{\second}$) reads as a fast recovery and is misleading, since
+the trace keeps ringing (visible bumps back to $\approx\qty{0.9}{\degree}$
+as late as $t=\qty{8}{\second}$) for several seconds afterward. An
+overshoot this close to 1:1 from a 6\textdegree{} release suggests the
+closed-loop edge poles are lightly damped rather than merely slow, and is
+worth checking directly against the edge control law's pole placement
+(\S\ref{sec:lqr}).
+
+\begin{table}[htbp]
+\centering
+\caption[Edge recovery ring-down milestones]{Edge recovery from
+\qty{-6.18}{\degree}: threshold-crossing milestones.}
+\label{tab:edge_ringdown}
+\begin{tabular}{lc}
+\toprule
+Milestone & Time \\
+\midrule
+Release, $\phi=\qty{-6.18}{\degree}$ & $t=0$ \\
+Overshoot peak, $\phi=\qty{+5.05}{\degree}$ & \qty{0.70}{\second} \\
+First crosses under \qty{2}{\degree} (transiently) & \qty{0.97}{\second} \\
+First crosses under \qty{1}{\degree} (transiently) & \qty{1.89}{\second} \\
+Settles under \qty{0.5}{\degree}, never re-exceeds & \qty{9.64}{\second} \\
+Settles under \qty{0.3}{\degree}, never re-exceeds & \qty{10.71}{\second} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\linewidth]{images/edge_recovery_6deg.png}
+\caption[Edge recovery from 6 degrees]{Edge recovery from a
+\qty{-6.18}{\degree} release: overshoot to within \qty{1}{\degree} of the
+release magnitude before ringing down.}
+\label{fig:edge_recovery_6deg}
+\end{figure}
+
+\textcolor{red}{TODO: repeat the corner quiet-hold comparison as a
+same-session $f$/$k_a$ toggle rather than two separate sessions; extend the
+corner armed window past the \qty{60}{\second} PER-02 threshold;
+re-run the 7--24\textdegree{} edge release matrix to complete
+Table~\ref{tab:recovery_angle_3dof_template}; and repeat the edge quiet
+hold to confirm whether the unexplained excursion recurs.} 

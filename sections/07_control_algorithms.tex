@@ -2130,6 +2130,27 @@ Three sources of high-frequency content reach the accelerometer.
         eccentricity at $40$\,rad\,s$^{-1}$, scaling as $\omega^2$.
 \end{enumerate}
 
+\paragraph{Measured structural mode, and a first attempt to filter it.}
+Item 1's frequency is no longer unmeasured. Corner-hold telemetry places a
+sharp mode at $29.7$--$30.5$\,Hz on all three body-rate axes (Welch PSD) ---
+inside the control passband, not above $200$\,Hz as assumed. A first-order
+low-pass on the gyro rate at a $20$\,Hz corner
+(\texttt{Stage4\_AutoTrim\_RateFilter.ino}, evaluated against the unfiltered
+\texttt{Stage4\_AutoTrim.ino} baseline) gives a real $45\%$ reduction in
+overall $|\bm\omega|$ RMS, but only $\approx 6$\,dB of attenuation at the
+mode itself, against $20$--$30$\,dB claimed in that file's header comment ---
+a documentation error, not a second measurement disagreeing with the first.
+The two figures cannot both be true of a first-order filter: reaching
+$20$--$30$\,dB at $30$\,Hz needs a corner frequency of order $1$--$3$\,Hz,
+which puts on the order of $40$--$60^\circ$ of phase lag at the closed-loop
+bandwidth \S\ref{sec:loop-rate}'s $400$\,Hz figure exists to protect ---
+under five octaves separate the two frequencies, and a first order only
+gives $6$\,dB per octave. Push-recovery tests to failure show the same
+disturbance envelope with the filter on or off, so at its present corner
+frequency the filter is a real but partial noise reduction, not a
+structural fix, and the header comment needs correcting before it is read
+as a design margin that does not exist.
+
 Content above $f/2 = 200$\,Hz folds into the estimator passband and is
 indistinguishable from tilt. The complementary filter provides some
 attenuation but is not designed as an anti-aliasing filter, and its rejection
