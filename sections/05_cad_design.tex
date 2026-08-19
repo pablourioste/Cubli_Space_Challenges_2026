@@ -47,6 +47,21 @@ Convention 3 makes the iteration auditable: the mass budget and the inertia
 requirement are read from the same model, so a design that closes analytically
 cannot fail to close in the CAD without the discrepancy being detected.
 
+\paragraph{Where the final numbers are.} The three conventions above say how
+the model is driven; they do not say what it is driven \emph{to}. Those values
+--- edge length and wall thickness, wheel diameter, thickness and ballast
+count, the mass of every item on board, the operating point the wheels were
+sized for --- are collected in one place, Appendix~\ref{app:specs}, and are
+not restated here or anywhere else. That appendix is a reference sheet rather
+than an argument: each row quotes a value and names the table or the analysis
+that derives it, so the reasoning stays in Sections~\ref{sec:sizing}
+and~\ref{sec:mechanical} while the numbers themselves have a single address.
+Table~\ref{tab:cad_params} is the model-side view of the same figures, listing
+only the subset the CAD skeleton drives, and it is subordinate to the
+specification sheet: where the two differ, the sheet is right and the CAD
+parameter table is stale. A reader who wants to know what was built, rather
+than why, should go to Appendix~\ref{app:specs} first.
+
 \subsubsection{1-DoF Prototype Build}
 \label{sec:cad_2d}
 

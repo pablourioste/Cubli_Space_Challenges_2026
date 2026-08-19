@@ -156,15 +156,15 @@ each iteration. Values are those of the converged iteration.}
 \toprule
 Symbol & Description & Value \\
 \midrule
-$M$                & Cube mass                    & \qty{1.8000}{\kilo\gram} \\
-$L$                & Cube edge length             & \qty{149}{\milli\metre} \\
+$M$                & Cube mass                    & \qty{\Mbasis}{\kilo\gram} \\
+$L$                & Cube edge length             & \qty{\cubeLan}{\milli\metre} \\
 $\eta$             & Energy margin                & \num{1.05} \\
-$\tau_b$           & Brake torque per wheel       & \qty{5}{\newton\metre} \\
-$\tau_g = MgL/2$   & Gravitational tip-over floor & \qty{1.3155}{\newton\metre} \\
-$\beta$            & Brake-amplification factor   & \num{1.3570} \\
-$\omega_{\max}$    & Max wheel speed (design)     & \qty{4000}{\rpm}\textsuperscript{*} \\
-$h_w$              & Required angular momentum    & \qty{0.2612}{\kilo\gram\metre\squared\per\second} \\
-$I_{w,\text{target}}$ & \textbf{Target wheel inertia} & \qty{6.2352e-4}{\kilogram\metre\squared} \\
+$\tau_b$           & Brake torque per wheel       & \qty{\tauBrake}{\newton\metre} \\
+$\tau_g = MgL/2$   & Gravitational tip-over floor & \qty{\tauGrav}{\newton\metre} \\
+$\beta$            & Brake-amplification factor   & \num{\betaBrake} \\
+$\omega_{\max}$    & Max wheel speed (design)     & \qty{\rpmDesign}{\rpm}\textsuperscript{*} \\
+$h_w$              & Required angular momentum    & \qty{\hwDesign}{\kilo\gram\metre\squared\per\second} \\
+$I_{w,\text{target}}$ & \textbf{Target wheel inertia} & \qty{\Itarget}{\kilogram\metre\squared} \\
 \bottomrule
 \end{tabular}
 
@@ -271,13 +271,15 @@ rather than the brake torque,
 t_{\text{spin}} = \frac{h_w}{\tau_m} = \frac{I_w\,\omega_{\max}}{k_t\,i},
 \label{eq:t_spin}
 \end{equation}
-with $k_t$ the incremental torque constant and $i$ the phase current. At the
-measured $k_t = \qty{0.023}{\newton\metre\per\ampere}$
-(Section~\ref{sec:electrical}) and the driver's \qty{9}{\ampere} continuous
-rating (PER-09), $\tau_m = \qty{0.207}{\newton\metre}$, and the selected wheel
+with $k_t$ the motor torque constant and $i$ the phase current. At
+$k_t = \qty{\ktMotor}{\newton\metre\per\ampere}$, the machine constant implied
+by the motor's \qty{\motorKV}{\rpm\per\volt} rating
+(Section~\ref{sec:electrical}), and the driver's \qty{9}{\ampere} continuous
+rating (PER-09), $\tau_m = \qty{\tauDriveCont}{\newton\metre}$, and the selected wheel
 --- which stores $I_w\omega_{\max} = \qty{0.2627}{\kilo\gram\metre\squared\per\second}$
---- reaches design speed in \qty{1.3}{\second}. At the motor's
-\qty{16}{\ampere} peak rating the same wheel takes \qty{0.7}{\second}, so the
+--- reaches design speed in \qty{\tspin}{\second}. At the motor's
+\qty{16}{\ampere} short-duration rating the same relation gives
+$\tau_m = \qty{\tauDrivePeak}{\newton\metre}$ and \qty{0.65}{\second}, so the
 figure is set by how the drive is operated rather than by what the motor can
 do. PER-12 is stated at \qty{2}{\second} to leave room for bearing and
 aerodynamic drag, for current derating as the winding warms, and for a shaped
@@ -293,11 +295,11 @@ floor
 t_{\text{spin}} > \frac{h_w}{\tau_g} = \qty{0.20}{\second},
 \]
 below which the manoeuvre cannot be run at all, however capable the drive.
-The drive is nowhere near it: \qty{0.207}{\newton\metre} is
-\qty{15.7}{\percent} of the \qty{1.3155}{\newton\metre} floor of
-Table~\ref{tab:jumpup_budget}, and even the motor's absolute measured maximum
-of \qty{0.45}{\newton\metre} (Section~\ref{sec:electrical}) reaches only
-\qty{34}{\percent} of it. The cube therefore cannot tip itself with the motors
+The drive is nowhere near it: \qty{\tauDriveCont}{\newton\metre} is
+\qty{\pcDriveGrav}{\percent} of the \qty{\tauGrav}{\newton\metre} floor of
+Table~\ref{tab:jumpup_budget}, and even at the \qty{16}{\ampere}
+short-duration rating the \qty{\tauDrivePeak}{\newton\metre} it produces
+reaches under a third of it. The cube therefore cannot tip itself with the motors
 alone at any current the drive can deliver --- which is the quantitative form
 of the claim that the impulse comes from the collision and not from the drive,
 and the reason the brake is a separate mechanism. PER-13 fixes the margin at a
@@ -423,16 +425,16 @@ $M$ assumed in Table~\ref{tab:jumpup_budget}.}
 \toprule
 Subsystem & Mass (g) & Share & Basis \\
 \midrule
-Reaction wheels ($3\times\qty{234.14}{\gram}$) & 702.4 & \qty{39.0}{\percent} & Sized (Sec.~\ref{sec:rw_sizing}) \\
+Reaction wheels ($3\times\qty{\wheelMass}{\gram}$) & \massWheelsThree & \qty{39.0}{\percent} & Sized (Sec.~\ref{sec:rw_sizing}) \\
 Motors and brake servos ($3\times$ each)      & 245.4 & \qty{13.6}{\percent} & Datasheet \\
 Power (battery, XT60, regulator)              & 279.0 & \qty{15.5}{\percent} & Drives envelope (step 1) \\
 Electronics (drivers, MCU, encoders, IMU)     &  95.2 & \qty{5.3}{\percent}  & Datasheet, as-weighed \\
 Wiring, perfboard and passives                &  45.5 & \qty{2.5}{\percent}  & Estimated \\
 \midrule
-\textbf{Subtotal --- specified hardware}      & \textbf{1367.5} & \qty{76.0}{\percent} & Measured or datasheet \\
-Structure (subframe, frame, fasteners)        & 432.5 & \qty{24.0}{\percent} & \textbf{Allowance, pending CAD} \\
+\textbf{Subtotal --- specified hardware}      & \textbf{\massKnown} & \qty{76.0}{\percent} & Measured or datasheet \\
+Structure (subframe, frame, fasteners)        & \massStructAllow & \qty{24.0}{\percent} & \textbf{Allowance, pending CAD} \\
 \midrule
-\textbf{Total $M$}                            & \textbf{1800.0} & & \textbf{Converged fixed point} \\
+\textbf{Total $M$}                            & \textbf{\MbasisG} & & \textbf{Converged fixed point} \\
 \bottomrule
 \end{tabular}
 
@@ -516,21 +518,21 @@ Table~\ref{tab:massbudget} remains an allowance.}
 \toprule
 Symbol & Parameter & Value \\
 \midrule
-$D_w$      & Ring outer diameter (fixed by envelope)   & \qty{120}{\milli\metre} \\
-$D_i$      & Ring inner diameter ($D_w - 2w_r$)        & \qty{100}{\milli\metre} \\
-$w_r$      & Ring radial width (= ballast hole depth)  & \qty{10}{\milli\metre} \\
-$t$        & Wheel axial thickness (caps hole diameter) & \qty{20}{\milli\metre} \\
-$n_s, w_s$ & Spoke count and width                     & $3$, \qty{10}{\milli\metre} \\
+$D_w$      & Ring outer diameter (fixed by envelope)   & \qty{\wheelOD}{\milli\metre} \\
+$D_i$      & Ring inner diameter ($D_w - 2w_r$)        & \qty{\wheelID}{\milli\metre} \\
+$w_r$      & Ring radial width (= ballast hole depth)  & \qty{\wheelWr}{\milli\metre} \\
+$t$        & Wheel axial thickness (caps hole diameter) & \qty{\wheelT}{\milli\metre} \\
+$n_s, w_s$ & Spoke count and width                     & $\wheelSpokes$, \qty{\wheelSpokeW}{\milli\metre} \\
 $\rho_p$   & Printed-material density (PET-CF)          & \qty{1290}{\kilo\gram\per\metre\cubed} \\
-$d_h$      & Ballast hole diameter (M6 clearance)      & \qty{6.4}{\milli\metre} \\
-$R_{\text{mean}}$ & Ballast centroid radius (forced, $=(D_w{+}D_i)/4$) & \qty{55.0}{\milli\metre} \\
+$d_h$      & Ballast hole diameter (M6 clearance)      & \qty{\wheelHole}{\milli\metre} \\
+$R_{\text{mean}}$ & Ballast centroid radius (forced, $=(D_w{+}D_i)/4$) & \qty{\wheelRmean}{\milli\metre} \\
 $m_{\text{hw}}$ & Hardware mass per station (bolt $+$ nut) & \qty{7.5}{\gram} \\
-$m_b$      & \emph{Net} mass added per station          & \qty{7.085}{\gram} \\
-$\Delta I_b$ & \emph{Net} inertia added per station     & \qty{2.151e-5}{\kilogram\metre\squared} \\
-$N$        & Station count reaching $I_{w,\text{target}}$ (of $N_{\max}=37$) & \num{15} \\
-$m_w$      & Resulting wheel mass                      & \qty{234.14}{\gram} \\
-$I_w$      & Resulting wheel inertia                   & \qty{6.2715e-4}{\kilogram\metre\squared} \\
-           & \quad as a fraction of $I_{w,\text{target}}$ & \qty{100.6}{\percent} \\
+$m_b$      & \emph{Net} mass added per station          & \qty{\wheelMstation}{\gram} \\
+$\Delta I_b$ & \emph{Net} inertia added per station     & \qty{\wheelIstation}{\kilogram\metre\squared} \\
+$N$        & Station count reaching $I_{w,\text{target}}$ (of $N_{\max}=\wheelNmax$) & \num{\wheelN} \\
+$m_w$      & Resulting wheel mass                      & \qty{\wheelMass}{\gram} \\
+$I_w$      & Resulting wheel inertia                   & \qty{\wheelI}{\kilogram\metre\squared} \\
+           & \quad as a fraction of $I_{w,\text{target}}$ & \qty{\marginSized}{\percent} \\
 \bottomrule
 \end{tabular}
 \end{table}

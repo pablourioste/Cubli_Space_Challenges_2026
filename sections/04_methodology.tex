@@ -124,6 +124,19 @@ The nonlinear equations of motion are
 with motor current-torque relation $T_m = K_m u$. Symbols are defined in
 Table~\ref{tab:2d_vars} and used throughout this section.
 
+The input $u$ here is a \emph{current}, so $K_m$ enters $B$ directly. The
+corner-balancing design of Section~\ref{sec:control_algorithms} takes the wheel
+\emph{torque} itself as its input instead, and its $B$
+(Equation~\eqref{eq:AB}) accordingly carries no torque constant at all: there
+$K_m$ is the conversion applied at the actuator boundary, between the commanded
+torque and the current handed to the driver, and it sets the torque--current
+pairs of Table~\ref{tab:torque-limits} rather than any entry of the plant
+matrices. Both forms use one figure,
+$K_m = \qty{\ktMotor}{\newton\metre\per\ampere}$, the machine constant implied
+by the motor's \qty{\motorKV}{\rpm\per\volt} rating
+($K_m = 60/2\pi K_V$); Section~\ref{sec:electrical} gives the bench
+cross-check and the reason the fitted slope there is not used in its place.
+
 \begin{table}[htbp]
 \centering
 \caption[2D pendulum model variables]{2D pendulum model variables.}
@@ -175,7 +188,7 @@ $I_b$ & CAD mass properties \\
 $I_w$ & CAD mass properties \\
 $C_b$ & Estimated (measured on the 1-DoF rig, below) \\
 $C_w$ & Estimated (measured on the 1-DoF rig, below) \\
-$K_m$ & Motor datasheet \\
+$K_m$ & Datasheet $K_V$ (bench cross-check, Sec.~\ref{sec:electrical}) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -301,6 +314,9 @@ orientation error, gives the same state-space form as the 2D case:
 \end{equation}
 with $A \in \mathbb{R}^{9\times9}$ and $B \in \mathbb{R}^{9\times3}$ built
 from $I$, $r_{cm}$, and the per-wheel parameters $I_{w,i}, C_{w,i}, K_{m,i}$
-(Table~\ref{tab:3d_vars}). This linear model, together with its 2D counterpart
-of Section~\ref{sec:2deom}, is the plant the balancing controller of
-Section~\ref{sec:control_algorithms} is designed on.
+(Table~\ref{tab:3d_vars}), $u$ again being the vector of wheel currents. This
+linear model, together with its 2D counterpart of Section~\ref{sec:2deom}, is
+the plant the balancing controller of
+Section~\ref{sec:control_algorithms} is designed on --- there in the
+torque-input form noted above, so that $K_{m,i}$ leaves $B$ and appears only in
+the command conversion.

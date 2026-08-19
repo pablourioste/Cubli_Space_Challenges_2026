@@ -16,22 +16,25 @@ Section~\ref{sec:mechanical} may not.
 Table~\ref{tab:cad_params} is the single source of the driving dimensions
 referenced by every part in the model, per convention~1 of
 Section~\ref{sec:cad_method}. It is the CAD-side mirror of the envelope closure
-of Section~\ref{sec:massbudget} and is updated on each iteration.
+of Section~\ref{sec:massbudget} and is updated on each iteration. It lists only
+what the CAD skeleton drives; the complete set of final values is
+Appendix~\ref{app:specs}, and this table is subordinate to it.
 
 \begin{table}[htbp]
 \centering
 \caption[Driving CAD parameters]{Driving CAD parameters. Every dependent feature references these; no
-part carries a duplicated hard-coded value.}
+part carries a duplicated hard-coded value. Values are drawn from the
+specification sheet of Appendix~\ref{app:specs}.}
 \label{tab:cad_params}
 \small
 \begin{tabular}{l L{6.6cm} c}
 \toprule
 Symbol & Parameter & Value \\
 \midrule
-$L$         & Cube edge length (outer)                & \qty{15}{\centi\metre} \\
-$t_w$       & Frame wall thickness                    & \qty{5}{\milli\metre} \\
-$D_w$       & Wheel outer diameter (Sec.~\ref{sec:rw_sizing}) & \qty{120}{\milli\metre} \\
-$t_r$       & Wheel axial thickness (Sec.~\ref{sec:rw_sizing}) & \qty{5}{\milli\metre} \\
+$L$         & Cube edge length (outer)                & \qty{\cubeL}{\milli\metre} \\
+$t_w$       & Frame wall thickness                    & \qty{\cubeWall}{\milli\metre} \\
+$D_w$       & Wheel outer diameter (Sec.~\ref{sec:rw_sizing}) & \qty{\wheelOD}{\milli\metre} \\
+$t_r$       & Wheel axial thickness (Sec.~\ref{sec:rw_sizing}) & \qty{\wheelT}{\milli\metre} \\
 $d_m$       & Motor axis offset from cube centre      & \textcolor{red}{TBD} \\
 $h_m$       & Motor mounting face height on its axis  & \textcolor{red}{TBD} \\
 $c_w$       & Wheel-to-subframe axial clearance       & \textcolor{red}{TBD} \\
@@ -73,7 +76,7 @@ M5 & Brake servo bracket        & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD
 \midrule
 W1 & Ballasted ring (Sec.~\ref{sec:rw_sizing}) & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
 W2 & Wheel hub / rotor adapter  & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-W3 & Ballast bolt and nut set (M6, $3\times6$) & 18 & Standard hardware & \textcolor{red}{TBD} \\
+W3 & Ballast bolt and nut set (M6, $\wheelN$ per wheel) & 45 & Standard hardware & \textcolor{red}{TBD} \\
 W4 & Brake strike feature       & 3 & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
 \midrule
 \multicolumn{5}{@{}l}{\textbf{Outer frame}}\\
@@ -263,7 +266,7 @@ absorbed by ballast trim where the margin allows.}
 \toprule
 Quantity & CAD value & Measured & Discrepancy \\
 \midrule
-Total cube mass $M$          & \qty{1.800}{\kilo\gram}\textsuperscript{*} & \qty{1.626}{\kilo\gram} & \qty{-174}{\gram} \\
+Total cube mass $M$          & \qty{\Mbasis}{\kilo\gram}\textsuperscript{*} & \qty{\Mbuilt}{\kilo\gram} & $-$\qty{\Mdelta}{\gram} \\
 Wheel mass $m_w$ (each)      & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
 Wheel inertia $I_w$ (each)   & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
 CoM offset from cube centre  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
@@ -294,7 +297,7 @@ changes is margin, not requirement. Re-evaluating
 Equations~\eqref{eq:hw_ideal}--\eqref{eq:Iw_target} at \qty{1.626}{\kilo\gram}
 gives $\tau_g = \qty{1.1884}{\newton\metre}$, $\beta = \num{1.3118}$ and $h_w
 = \qty{0.2281}{\kilo\gram\metre\squared\per\second}$, hence
-$I_{w,\text{target}} = \qty{5.4452e-4}{\kilogram\metre\squared}$: the
+$I_{w,\text{target}} = \qty{5.4445e-4}{\kilogram\metre\squared}$: the
 fifteen-station wheel delivers \qty{115.2}{\percent} of what the built cube
 actually demands, against the \qty{100.6}{\percent} it delivers against the
 basis it was sized on. Equivalently, the same wheel closes the corner jump-up

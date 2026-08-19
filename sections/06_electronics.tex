@@ -137,15 +137,44 @@ attached to. The curves are used here only in that sense: to bound the torque
 and current the actuator can be expected to deliver.
 
 Three figures relevant to the design follow from the data. First, the
-torque--current relation in Figure~\ref{fig:mn4006_curves}(a) is close to
-linear ($r = 0.97$) with an incremental slope of
-\qty{0.023}{\newton\metre\per\ampere} and a positive torque-axis intercept of
-about \qty{0.08}{\newton\metre}. The intercept is the expected signature of
-losses that do not reach the shaft --- magnetising and iron losses plus
-bearing friction --- so the useful torque per ampere is the slope, and a
-constant inferred by simply dividing torque by current at a single point
-would overstate it (that ratio runs to \qty{0.031}{\newton\metre\per\ampere}
-through the origin). Either way the motor produces at most
+torque--current relation in Figure~\ref{fig:mn4006_curves}(a) admits a
+straight-line fit ($r = 0.97$) of slope
+\qty{0.0227}{\newton\metre\per\ampere} with a torque-axis intercept of
+$+\qty{0.078}{\newton\metre}$ --- but that intercept is an artefact of fitting
+a line to a curve rather than the signature of a physical offset, and the slope
+is correspondingly not the machine constant. A positive torque-axis intercept
+would assert shaft torque at zero current. What the points actually show is a
+torque per ampere that \emph{falls} with current, monotonically within every
+load block, from about \qty{0.050}{\newton\metre\per\ampere} at the lowest
+measured currents (\qty{2}{\ampere}) to \qty{0.026}{\newton\metre\per\ampere}
+at the highest (\qty{17.5}{\ampere}): resistive loss grows as $I^2$ while
+torque grows as $I$, so the characteristic is concave, and any straight line
+through it must return a positive intercept together with a slope that is a
+chord across the whole \qtyrange{2}{17.5}{\ampere} span rather than a tangent
+anywhere inside it.
+
+The design therefore takes the torque constant from the motor's
+\qty{\motorKV}{\rpm\per\volt} rating,
+$k_t = 60/2\pi K_V = \qty{\ktMotor}{\newton\metre\per\ampere}$, a property of
+the machine rather than of a fit, and uses that one figure throughout ---
+Table~\ref{tab:params}, the spin-up estimate of
+Section~\ref{sec:jumpup_target}, and the torque limits of
+Table~\ref{tab:torque-limits}. The bench data then serve as the cross-check
+they can support, and they pass it in the conservative direction: every
+measured point returns more torque per ampere than \num{\ktMotor}, the closest
+being the \qty{17.5}{\ampere} point just quoted, and across the
+\qty{9}{\ampere} continuous band of the driver the margin is at least
+\qty{20}{\percent}. Two cautions stay attached to the torque column whatever
+constant is adopted --- it is not mutually consistent with the published
+electrical power, and the load is a propeller --- so a residual error in $k_t$
+should be expected rather than assumed away. Its constant part reaches the
+controller as a torque bias at the plant input, which is the same class of
+disturbance as the centre-of-mass offset and the constant friction term of
+Section~\ref{sec:estimation}, and the disturbance-torque augmentation described
+there removes it through integral action: the balancing design needs $k_t$
+bounded, not exact.
+
+In absolute terms the motor produces at most
 \qty{0.45}{\newton\metre}, an order of magnitude below the
 \qty{5}{\newton\metre} brake torque assumed in
 Section~\ref{sec:jumpup_target}. The two are not

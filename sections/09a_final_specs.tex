@@ -1,0 +1,278 @@
+% ================= APPENDIX: FINAL SPECIFICATION SHEET =================
+% \appendix is declared in main.tex, before the first appendix input.
+\section{Final Specification Sheet}
+\label{app:specs}
+
+This appendix is the single place where the finished design is stated as a set
+of numbers: what the cube is, what it weighs, what the wheel is, and what
+operating point it was designed to. Every figure below is \emph{quoted}, never
+derived --- the last column of each table names where it comes from, and the
+derivation stays in the section that owns it. Nothing here is new work, and
+nothing here may disagree with its source: all recurring values are drawn from
+the single definition file \texttt{sections/00\_values.tex}, which in turn
+mirrors the run of \texttt{analysis/SIZING.py}, so a value cannot be updated in
+one table and left stale in another.
+
+Two distinct masses appear throughout and are not interchangeable. The
+\emph{sizing basis}, \qty{\Mbasis}{\kilo\gram}, is the mass the reaction wheels
+were designed against and the mass at which PER-06 is derived; it is the
+heaviest case the design admits. The \emph{as-built} mass,
+\qty{\Mbuilt}{\kilo\gram}, is what the integrated article weighs. The
+\qty{\Mdelta}{\gram} between them is realised margin, quantified in
+Appendix~\ref{app:cad_mass}, and is deliberately not folded back into the
+sizing.
+
+\begin{figure}[htbp]
+\centering
+\adjincludegraphics[trim={0.34\width} {0.06\height} {0.34\width} {0.06\height},
+                    clip, width=0.38\textwidth]{images/armonia_assembly_s1.jpg}
+\caption[Configuration of the integrated cube]{Configuration the tables below
+describe: an outer frame of edge rails and corner contact features enclosing
+the inner structure, the three orthogonal reaction-wheel modules and the
+electronics. The dimensioned general-assembly drawing is
+Figure~\ref{fig:dwg_3d}.}
+\label{fig:spec_config}
+\end{figure}
+
+\subsection{Configuration and Principal Dimensions}
+\label{app:specs_dims}
+
+\begin{table}[htbp]
+\centering
+\caption[Principal dimensions and configuration]{Principal dimensions and
+configuration of the three-axis cube.}
+\label{tab:spec_dims}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{} l L{5.4cm} c L{3.0cm} @{}}
+\toprule
+Symbol & Quantity & Value & Source \\
+\midrule
+\multicolumn{4}{@{}l}{\textbf{Body}}\\
+\midrule
+$L$        & Outer edge length (frozen)            & \qty{\cubeL}{\milli\metre}\textsuperscript{*} & CON-01, gate M2 \\
+$t_w$      & Frame wall thickness                  & \qty{\cubeWall}{\milli\metre} & Tab.~\ref{tab:cad_params} \\
+$M$        & Total mass, sizing basis              & \qty{\Mbasis}{\kilo\gram} & Tab.~\ref{tab:jumpup_budget} \\
+$M$        & Total mass, as built                  & \qty{\Mbuilt}{\kilo\gram} & Tab.~\ref{tab:mass_verification} \\
+           & Architecture                          & Two-part: outer frame $+$ inner structure & Sec.~\ref{sec:mechanical} \\
+           & Corner contact features               & 8 & Tab.~\ref{tab:cad_parts} \\
+\midrule
+\multicolumn{4}{@{}l}{\textbf{Reaction wheel} ($\times3$, mutually orthogonal)}\\
+\midrule
+$D_w$      & Ring outer diameter                   & \qty{\wheelOD}{\milli\metre} & Tab.~\ref{tab:rw_params} \\
+$D_i$      & Ring inner diameter                   & \qty{\wheelID}{\milli\metre} & Tab.~\ref{tab:rw_params} \\
+$w_r$      & Ring radial width (= hole depth)      & \qty{\wheelWr}{\milli\metre} & Tab.~\ref{tab:rw_params} \\
+$t$        & Wheel axial thickness                 & \qty{\wheelT}{\milli\metre} & Tab.~\ref{tab:rw_params} \\
+$n_s, w_s$ & Spoke count and width                 & $\wheelSpokes$, \qty{\wheelSpokeW}{\milli\metre} & Tab.~\ref{tab:rw_params} \\
+$N$        & Ballast stations populated (of $\wheelNmax$) & \num{\wheelN} & Tab.~\ref{tab:rw_params} \\
+$d_h$      & Ballast hole diameter (M6 clearance)  & \qty{\wheelHole}{\milli\metre} & Tab.~\ref{tab:rw_params} \\
+$R_{\text{mean}}$ & Ballast centroid radius        & \qty{\wheelRmean}{\milli\metre} & Tab.~\ref{tab:rw_params} \\
+\midrule
+\multicolumn{4}{@{}l}{\textbf{Actuation and power}}\\
+\midrule
+           & Motor ($\times3$)                     & T-Motor MN4006 KV380 & Tab.~\ref{tab:bom-supplied} \\
+           & Driver ($\times3$)                    & mjbots moteus-n1 & Tab.~\ref{tab:bom-supplied} \\
+           & Brake servo ($\times3$)               & TowerPro MG92B & Tab.~\ref{tab:bom-supplied} \\
+           & Battery                               & 6S LiPo, \qty{22.2}{\volt}, \qty{1550}{\milli\ampere\hour} & Tab.~\ref{tab:bom-supplied} \\
+           & Flight computer                       & Teensy 4.1 & Tab.~\ref{tab:bom-supplied} \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.4em}
+{\footnotesize\RaggedRight\textsuperscript{*}\,The sizing analysis of
+Section~\ref{sec:sizing} is run at \qty{\cubeLan}{\milli\metre}, one millimetre
+under the frozen value. The discrepancy is material at the present design
+point: since $h_w \propto ML^{3/2}$, closing at \qty{\cubeL}{\milli\metre}
+raises $I_{w,\text{target}}$ by \qty{1.22}{\percent} and leaves the selected
+wheel at \qty{99.3}{\percent} of its own requirement rather than
+\qty{\marginSized}{\percent}. The reconciliation is an open decision, recorded
+in Section~\ref{sec:requirements}, and is to be taken before the wheel is
+committed to manufacture.\par}
+\end{table}
+
+\subsection{Mass Decomposition}
+\label{app:specs_mass}
+
+Table~\ref{tab:spec_mass} is the itemised roll-up behind the six-line summary
+of Table~\ref{tab:massbudget}. It is grouped by the same categories, so the two
+reconcile line for line. The \emph{basis} column is the important one: it
+separates what the design knows (weighed parts and datasheet figures) from what
+it still projects (the structural allowance), which is \qty{24.0}{\percent} of
+the projected total and the dominant uncertainty in the budget.
+
+\begin{small}
+\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{} L{6.2cm} r c r L{2.6cm} @{}}
+\caption[Itemised mass decomposition]{Itemised mass decomposition at the
+converged design point, rolled up by \texttt{analysis/SIZING.py} (Stage~6).
+Quantities are per assembled cube.}
+\label{tab:spec_mass}\\
+\toprule
+Item & Unit (g) & Qty & Total (g) & Basis \\
+\midrule
+\endfirsthead
+\multicolumn{5}{c}{\footnotesize\itshape \tablename~\thetable\ (continued)}\\
+\toprule
+Item & Unit (g) & Qty & Total (g) & Basis \\
+\midrule
+\endhead
+\midrule
+\multicolumn{5}{r}{\footnotesize\itshape Continued on next page}\\
+\endfoot
+\bottomrule
+\endlastfoot
+
+\multicolumn{5}{@{}l}{\textbf{Wheels} --- \qty{702.4}{\gram}, \qty{39.0}{\percent}}\\
+\midrule
+Reaction wheel (PET-CF, \qty{\wheelOD}{\milli\metre}, $\wheelN\times$ M6 radial) & \wheelMass & 3 & 702.42 & Sized, Sec.~\ref{sec:rw_sizing} \\
+\midrule
+
+\multicolumn{5}{@{}l}{\textbf{Motors and brake servos} --- \qty{245.4}{\gram}, \qty{13.6}{\percent}}\\
+\midrule
+T-Motor MN4006 KV380        & 68.00 & 3 & 204.00 & Datasheet \\
+TowerPro MG92B brake servo  & 13.80 & 3 &  41.40 & Datasheet \\
+\midrule
+
+\multicolumn{5}{@{}l}{\textbf{Power} --- \qty{279.0}{\gram}, \qty{15.5}{\percent}}\\
+\midrule
+Tattu R-Line V5.0 6S \qty{1550}{\milli\ampere\hour} LiPo & 254.00 & 1 & 254.00 & As weighed \\
+XT60 connector pair         & 15.00 & 1 &  15.00 & As weighed \\
+LM2596 step-down regulator  & 10.00 & 1 &  10.00 & As weighed \\
+\midrule
+
+\multicolumn{5}{@{}l}{\textbf{Electronics} --- \qty{95.2}{\gram}, \qty{5.3}{\percent}}\\
+\midrule
+mjbots moteus-n1 driver     & 14.60 & 3 &  43.80 & Datasheet \\
+mjbots MA600 breakout $+$ magnet & 6.00 & 3 & 18.00 & Datasheet \\
+Teensy 4.1                  & 11.00 & 1 &  11.00 & Datasheet \\
+CAN-FD adapter for Teensy 4.1 &  6.00 & 1 &  6.00 & Datasheet \\
+mjcanfd-usb-1x              &  3.40 & 1 &   3.40 & Datasheet \\
+Seeed XIAO ESP32-C6 $+$ antenna & 8.00 & 1 & 8.00 & Datasheet \\
+SparkFun BMI270 IMU (Qwiic) &  5.00 & 1 &   5.00 & Datasheet \\
+\midrule
+
+\multicolumn{5}{@{}l}{\textbf{Wiring, perfboard and passives} --- \qty{45.5}{\gram}, \qty{2.5}{\percent}}\\
+\midrule
+Protoboard \qtyproduct{15 x 9}{\centi\metre} double-sided & 25.00 & 1 & 25.00 & As weighed \\
+JST PH3 cable               &  3.00 & 3 &   9.00 & Estimated \\
+100\,\unit{\micro\farad} \qty{16}{\volt} electrolytic cap & 1.00 & 3 & 3.00 & Estimated \\
+100\,\unit{\nano\farad} \qty{50}{\volt} cap & 1.00 & 3 & 3.00 & Estimated \\
+1N5819 Schottky diode       &  3.00 & 1 &   3.00 & Estimated \\
+4.7\,\unit{\nano\farad} cap (CAN) & 1.00 & 2 & 2.00 & Estimated \\
+\qty{60.4}{\ohm} 1/2\,W resistor (CAN) & 0.25 & 2 & 0.51 & Estimated \\
+\midrule
+
+\multicolumn{5}{@{}l}{\textbf{Structure} --- \qty{\massStructAllow}{\gram}, \qty{24.0}{\percent}}\\
+\midrule
+Outer frame / contact features & 212.80 & 1 & 212.80 & \textbf{Allowance} \\
+Inner structure / motor subframe & 176.90 & 1 & 176.90 & \textbf{Allowance} \\
+Fasteners / wiring harness  & 42.80 & 1 &  42.80 & \textbf{Allowance} \\
+\end{longtable}
+\end{small}
+
+\begin{table}[htbp]
+\centering
+\caption[Mass reconciliation]{Mass reconciliation. The budget closes on the
+sizing basis by construction; the weighed article is lighter, and the
+difference is realised margin rather than an unclosed loop.}
+\label{tab:spec_mass_rollup}
+\small
+\begin{tabular}{@{} L{7.2cm} r l @{}}
+\toprule
+Line & Mass & Status \\
+\midrule
+Specified hardware (wheels, motors, power, electronics, wiring) & \qty{\massKnown}{\gram} & Measured or datasheet \\
+Structure allowance                          & \qty{\massStructAllow}{\gram} & Pending CAD closure \\
+\midrule
+\textbf{Budget total} $=$ sizing basis        & \textbf{\qty{\Mbasis}{\kilo\gram}} & Converged, $\delta=\qty{0.0}{\gram}$ \\
+\textbf{As built, weighed}                    & \textbf{\qty{\Mbuilt}{\kilo\gram}} & App.~\ref{app:cad_mass} \\
+\quad implied structure mass                  & \qty{\massStructBuilt}{\gram} & Outcome, to be confirmed by CAD \\
+\quad realised margin                         & $-$\qty{\Mdelta}{\gram} & Not spent \\
+\midrule
+CON-02 cap                                    & \qty{\Mcap}{\kilo\gram} & Met with \qty{\Mdelta}{\gram} to spare \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Reaction Wheel}
+\label{app:specs_wheel}
+
+\begin{table}[htbp]
+\centering
+\caption[Reaction-wheel specification]{Reaction-wheel specification, per wheel.
+The wheel is a printed ring on three spokes, tuned to its inertia target by M6
+bolt-and-nut sets in radial ID-to-OD through-holes.}
+\label{tab:spec_wheel}
+\small
+\begin{tabular}{@{} L{6.4cm} r L{3.2cm} @{}}
+\toprule
+Quantity & Value & Source \\
+\midrule
+Ring material                        & PET-CF, \qty{1290}{\kilo\gram\per\metre\cubed} & Tab.~\ref{tab:rw_params} \\
+Mass, unballasted ring $+$ spokes    & \qty{\wheelMassSolid}{\gram} & \texttt{SIZING.py} \\
+\quad $+$ M6 steel, $\wheelN$ stations & \qty{\wheelSteel}{\gram} & \texttt{SIZING.py} \\
+\quad $-$ plastic displaced, net PET-CF & \qty{\wheelPlastic}{\gram} & \texttt{SIZING.py} \\
+\textbf{Mass as ballasted}           & \textbf{\qty{\wheelMass}{\gram}} & Tab.~\ref{tab:rw_params} \\
+Inertia, unballasted                 & \qty{\wheelIsolid}{\kilogram\metre\squared} & \texttt{SIZING.py} \\
+Net inertia per station              & \qty{\wheelIstation}{\kilogram\metre\squared} & Tab.~\ref{tab:rw_params} \\
+\textbf{Inertia as ballasted} $I_w$  & \textbf{\qty{\wheelI}{\kilogram\metre\squared}} & Tab.~\ref{tab:rw_params} \\
+\midrule
+Requirement $I_{w,\text{target}}$ at the sizing basis & \qty{\Itarget}{\kilogram\metre\squared} & PER-06 \\
+\quad margin delivered               & \qty{\marginSized}{\percent} & Tab.~\ref{tab:inertia_cases} \\
+Requirement at the as-built mass     & \qty{\ItargetBuilt}{\kilogram\metre\squared} & App.~\ref{app:cad_mass} \\
+\quad margin delivered               & \qty{\marginBuilt}{\percent} & App.~\ref{app:cad_mass} \\
+Speed at which the built wheel still closes & \qty{\rpmFloor}{\rpm} & App.~\ref{app:cad_mass} \\
+\midrule
+Centrifugal load per station at \qty{\rpmDesign}{\rpm} & \qty{\wheelForce}{\newton} & \texttt{SIZING.py} \\
+\quad against M6 class 8.8 proof load & \qty{0.57}{\percent} & \texttt{SIZING.py} \\
+Edge-to-edge gap between stations    & \qty{14.39}{\milli\metre} & \texttt{SIZING.py} \\
+Axial wall, each face                & \qty{6.80}{\milli\metre} & \texttt{SIZING.py} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Operating Point}
+\label{app:specs_ops}
+
+\begin{table}[htbp]
+\centering
+\caption[Design operating point]{Design operating point and the derived
+performance figures that follow from it. Values at the sizing basis unless
+noted.}
+\label{tab:spec_ops}
+\small
+\begin{tabular}{@{} L{6.4cm} r L{3.2cm} @{}}
+\toprule
+Quantity & Value & Source \\
+\midrule
+Design wheel speed $\omega_{\max}$   & \qty{\rpmDesign}{\rpm} & Tab.~\ref{tab:jumpup_budget} \\
+\quad as a fraction of the derived ceiling & \qty{\rpmCeilPc}{\percent} & PER-08 \\
+Stored momentum per wheel $h_w$      & \qty{\hwDesign}{\kilo\gram\metre\squared\per\second} & Tab.~\ref{tab:jumpup_budget} \\
+Stored energy per wheel              & \qty{\wheelKE}{\joule} & Sec.~\ref{sec:jumpup_target} \\
+Brake torque $\tau_b$ (sizing value) & \qty{\tauBrake}{\newton\metre} & Tab.~\ref{tab:jumpup_budget} \\
+Tip-over torque $\tau_g = MgL/2$     & \qty{\tauGrav}{\newton\metre} & Tab.~\ref{tab:jumpup_budget} \\
+\quad at the as-built mass           & \qty{\tauGravBuilt}{\newton\metre} & App.~\ref{app:cad_mass} \\
+Brake amplification $\beta$          & \num{\betaBrake} & Tab.~\ref{tab:jumpup_budget} \\
+\midrule
+Spin-up to design speed at \qty{9}{\ampere} & \qty{\tspin}{\second} & PER-12 \\
+\quad floor set by $\tau_g$          & \qty{\tspinFloor}{\second} & Sec.~\ref{sec:jumpup_target} \\
+Brake arrest time (requirement)      & $\leq$ \qty{100}{\milli\second} & PER-10 \\
+Control and estimation loop rate     & \qty{1}{\kilo\hertz} & PER-05 \\
+Driver continuous current            & \qty{9}{\ampere} & PER-09 \\
+Motor peak current (short duration)  & \qty{16}{\ampere} & Tab.~\ref{tab:bom-supplied} \\
+Motor torque constant $k_t = 60/(2\pi K_v)$ & \qty{\ktMotor}{\newton\metre\per\ampere} & $K_v$, Tab.~\ref{tab:bom-supplied} \\
+Drive torque at \qty{9}{\ampere} continuous & \qty{\tauDriveCont}{\newton\metre} & Sec.~\ref{sec:jumpup_target} \\
+Pack energy                          & ${\approx}\,\qty{35}{\watt\hour}$ & Tab.~\ref{tab:bom-supplied} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{What this sheet does not yet carry.} The plant parameters of
+Table~\ref{tab:params} --- the body inertia $I_b$ about the pivot, the
+centre-of-mass distances $l$ and $l_b$, the damping coefficients $C_b$ and
+$C_w$ --- have determination methods assigned but no measured values, and are
+recorded here as outstanding rather than estimated. They close on the CAD mass
+properties and the 1-DoF identification run of Section~\ref{sec:paramid}, and
+belong in this sheet once measured. The same applies to the modelled-versus-
+measured wheel mass and inertia rows of Table~\ref{tab:mass_verification},
+which are the check that the built wheel is the wheel specified above.

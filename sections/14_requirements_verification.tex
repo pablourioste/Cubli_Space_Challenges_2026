@@ -66,8 +66,8 @@ PER-08 & A & Derive the achievable ceiling from $K_v$, winding resistance, modul
 PER-09 & T & Log driver current throughout balancing and disturbance recovery. & Peak within the \qty{9}{\ampere} continuous rating. & Partial (rig) \\
 PER-10 & T & Spin-down test: brake from the design speed with the event logged at a rate resolving a few-millisecond transient. & Arrest within \qty{100}{\milli\second}. & Open \\
 PER-11 & T & Record a telemetry session; count logged samples per second of each field. & $\geq$ \qty{50}{\hertz} for state, command and wheel speed. & Open \\
-PER-12 & A, T & Compute $t_{\text{spin}} = I_w\omega_{\max}/k_ti$ from the measured torque constant; confirm on the built wheel by logging speed against time through a spin-up at the continuous current limit (WBS E10). & Design speed reached within \qty{2}{\second} without exceeding \qty{9}{\ampere}. & Open (analysis: \qty{1.3}{\second}) \\
-PER-13 & A, T & Compare the commanded spin-up torque against $\tau_g=MgL/2$ at the as-built mass; observe the body on a face rest through a full spin-up. & Reaction torque $\leq 0.5\,\tau_g$; no body motion before the brake event. & Open (analysis: \qty{15.7}{\percent}) \\
+PER-12 & A, T & Compute $t_{\text{spin}} = I_w\omega_{\max}/k_ti$ from the $K_v$-derived torque constant; confirm on the built wheel by logging speed against time through a spin-up at the continuous current limit (WBS E10). & Design speed reached within \qty{2}{\second} without exceeding \qty{9}{\ampere}. & Open (analysis: \qty{\tspin}{\second}) \\
+PER-13 & A, T & Compare the commanded spin-up torque against $\tau_g=MgL/2$ at the as-built mass; observe the body on a face rest through a full spin-up. & Reaction torque $\leq 0.5\,\tau_g$; no body motion before the brake event. & Open (analysis: \qty{\pcDriveGrav}{\percent}) \\
 \midrule
 
 \multicolumn{5}{@{}l}{\textbf{Design constraint}}\\
