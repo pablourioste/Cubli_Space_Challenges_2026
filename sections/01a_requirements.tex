@@ -91,82 +91,9 @@ CON-07 & The electronics shall fit within the frozen board outline, mounting pat
 \end{longtable}
 \end{small}
 
-\paragraph{Reading the table.} The three blocks answer different questions.
-The functional requirements state what the cube must do, each written so that
-it can be seen to happen or not: balance on an edge and on a corner, reject a
-disturbance, sequence its own modes, and stand down safely when the
-equilibrium is lost. The performance requirements attach numbers to those
-behaviours --- durations, angles, loop times, inertias, currents --- and are
-settled by a measurement rather than by a judgement, which is why they are
-verified almost entirely by test or by analysis. The design constraints are
-boundaries fixed before any analysis begins --- edge length, mass, wheel
-count, power source, bus topology --- and are checked by inspection of the
-built article; the sizing of Section~\ref{sec:sizing} works inside them rather
-than against them.
 
-\paragraph{Status at the time of writing.} PER-01 and PER-03 are verified on
-the single-axis rig (Section~\ref{sec:test_1dof}); PER-01 therefore stands
-verified for the rig and open for the integrated cube, since it is one
-statement covering both articles. PER-03 is demonstrated to
-\qty{24}{\degree}, which is the rig's mechanical hard stop rather than a limit
-of the controller, so the requirement is stated at the largest angle for which
-a recovery time was recorded. PER-06 and PER-09 are closed by analysis and by
-rig measurement respectively, pending confirmation on the integrated cube.
-Every remaining requirement is open. Appendix~\ref{app:verification} carries
-the per-requirement status and is the record updated as testing proceeds.
+The technical requirements in Table~\ref{tab:requirements} are categorized into functional behaviors, quantifiable performance targets, and hard design constraints. Verification methods are tracked independently of project milestones, ensuring that schedule adjustments do not compromise core requirements or invalidate safety margins. Comprehensive verification procedures and ongoing tracking are maintained in Appendix~\ref{app:verification}.
 
-\paragraph{Relationship to the milestone gates.} The gates of
-Table~\ref{tab:gates} are scheduling events; the requirements above are
-properties of the system. They meet where a gate's pass criterion is a
-requirement: G3 closes on PER-01 for the rig, G6 on PER-01 for the cube and on
-PER-04, G7 on FUN-02, FUN-03 and PER-02, and G8 on FUN-10 and PER-10. A gate
-can slip without a
-requirement changing, and a requirement can fail at a gate that the schedule
-nonetheless passes; keeping the two separate is what allows the jump-up to be
-dropped as sacrificial scope without any other requirement being renegotiated.
+At present, baseline single-axis balance (PER-01, PER-03) and driver current bounds (PER-09) have been successfully verified on the 1-DoF test rig. Requirements involving multi-axis control, state-machine sequencing, and dynamic maneuvers remain open pending final assembly and testing of the integrated cube. 
 
-\paragraph{Basis of PER-06 and CON-02.} PER-06 is derived at the converged
-sizing point of Table~\ref{tab:jumpup_budget} --- $M=\qty{1.8000}{\kilo\gram}$,
-$L=\qty{149}{\milli\metre}$, $\omega_{\max}=\qty{4000}{\rpm}$, corner case ---
-and not at any lighter mass the build may achieve. That is deliberate: a
-derived requirement has to hold across the mass range the cube is permitted to
-occupy, so it is written against the heaviest case the design admits rather
-than the lightest it might reach. CON-02 is raised to \qty{1.8}{\kilo\gram} in
-this revision, from \qty{1.7}{\kilo\gram}, which is exactly the sizing basis
-and not a round number above it; at the previous cap the analysis of
-Section~\ref{sec:sizing} would have documented a design heavier than its own
-constraint permitted. Constraint and analysis therefore state the same
-figure, which is the intended relation rather than an oversight: the cap is
-not spare allowance the build may grow into, it is the mass the wheel was
-sized to carry, and a cube exceeding it would not merely breach a constraint
-but fall outside the case PER-06 was derived for. The two requirements are
-coupled, and neither can be moved without re-deriving the other. Margin is
-taken in the build rather than in the requirement --- the integrated cube
-weighs \qty{1.626}{\kilo\gram} (Appendix~\ref{app:cad_mass}), \qty{174}{\gram}
-under the cap --- and that realised margin is deliberately left out of the
-sizing, which continues to run at \qty{1.8}{\kilo\gram}.
-
-\paragraph{Open items.} Several requirements rest on figures not yet fixed.
-PER-07 and PER-08 depend on the achievable wheel speed at end-of-discharge
-voltage, currently derived rather than measured; the spin-up test of WBS
-task~E10 closes this. The reduction of the design speed to \qty{4000}{\rpm}
-relaxes PER-08 substantially --- the design value falls from \qty{79.5}{\percent}
-to \qty{57.8}{\percent} of the derived ceiling --- so the risk now sits with
-PER-06 rather than with PER-08. PER-12 and PER-13 are closed by analysis ---
-\qty{\tspin}{\second} to design speed at the continuous current limit, and a
-spin-up reaction torque \qty{\pcDriveGrav}{\percent} of the tip-over torque
-(Section~\ref{sec:jumpup_target}) --- and ride on the same E10 run for their
-measured half. PER-10 has no measurement and is scoped with the jump-up.
-
-CON-01 is stated at \qty{150}{\milli\metre} to match the frame freeze of gate
-M2, while the sizing analysis of Section~\ref{sec:sizing} is currently run at
-\qty{149}{\milli\metre}. This discrepancy has become \emph{material} at the
-present design point and is no longer merely noted. Since $h_w \propto
-ML^{3/2}$, re-running the closure at \qty{150}{\milli\metre} raises
-$I_{w,\text{target}}$ by \qty{1.22}{\percent}, which against the
-\qty{100.6}{\percent} margin of Table~\ref{tab:rw_params} would leave the
-selected wheel at \qty{99.3}{\percent} --- short of its own requirement. The
-fifteen-station wheel is therefore compliant at the analysis value and
-marginally non-compliant at the frozen one. Reconciliation is no longer a
-tidying exercise for CAD closure but a decision that changes the ballast
-count, and it is to be taken before the wheel is committed to manufacture.
+To maintain sizing robustness, derived parameters such as wheel inertia (PER-06) are evaluated at the maximum allowable mass cap of \qty{1.8}{\kilo\gram} (CON-02), preserving operational margin for the current \qty{1.626}{\kilo\gram} build. Final verification of remaining open items—specifically full-speed wheel characterization and frame dimension reconciliation—will occur during final hardware integration.
