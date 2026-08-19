@@ -25,12 +25,16 @@
 \definecolor{coverrule}{HTML}{2E75B6}  % divider rules (matches ctcol accent)
 \definecolor{covermeta}{HTML}{404040}  % metadata label grey
 
-% ---------- Editable cover fields ----------
-\newcommand{\coverTitle}{Technical Design Document}
-\newcommand{\coverSubtitle}{Armonia}
-\newcommand{\coverTagline}{A Three-Axis Reaction-Wheel Balancing Cube}
-\newcommand{\coverVersion}{v1.0}
-\newcommand{\coverOrganization}{Space Challenges Program 2026}
+% ---------- Cover fields ----------
+% These are aliases, not values: the project name, document type, programme and
+% version come from the document-identity block in main.tex, which the running
+% header and the PDF metadata read from as well. Edit them there, not here, so
+% the cover and the header always agree (review comment CUBLI1-020).
+\newcommand{\coverTitle}{\doctypename}
+\newcommand{\coverSubtitle}{\projectname}
+\newcommand{\coverTagline}{\doctagline}
+\newcommand{\coverVersion}{\docversion}
+\newcommand{\coverOrganization}{\programname}
 
 % Team list, laid out as an explicit three-column grid: names separated by & and
 % rows by \\. Keeping it explicit means the columns line up exactly; to add a
@@ -125,7 +129,7 @@
     \vspace{1.5cm}
 
     % ---------- Title block ----------
-    \coverspaced{Space Challenges Program 2026}
+    \coverspaced{\coverOrganization}
 
     \vspace{0.4cm}
     \coverrule{1.1pt}
@@ -175,6 +179,10 @@
 
     \vspace{0.9cm}
     \coverrule{1.1pt}
-    \vspace*{0.2cm}
 
+    % Nothing follows the closing rule. A trailing \vspace* here is
+    % unremovable, so once the cover filled the text block it migrated to the
+    % next page and produced the empty sheet the review flagged as "page 2 is
+    % effectively blank" (CUBLI1-020). The bottom margin already supplies the
+    % white space it was adding.
 \end{titlepage}
