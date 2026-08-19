@@ -64,7 +64,7 @@ the 3 Aug buffer is for.
 | [ ] | E1.3 Incoming inspection, 3 motor sets | Pablo | 2 Aug | â€” | todo | phase R vs 194 mOhm |
 | [ ] | **E1.7 5 V rail soldered + trimmed to 5.00 V** | Pablo | **2 Aug** | E1.1 | todo | **primary Sunday target**; characterise under load |
 | [ ] | E1.4 moteus-n1 #1 bring-up, CAN ID, FOC cal | Pablo+Nicc | 2 Aug | E1.1, E1.3 | todo | on PSU only |
-| [ ] | E1.5 MA600 mounted, gap fixture, record shim | Pablo | 2 Aug | E1.3 | todo | <= 0.5 mm, centred on 4 mm magnet |
+| [ ] | E1.5 MA600 mounted, gap fixture, record shim | Pablo | 2 Aug | E1.3 | todo | <= 1.5 mm, centred on 4 mm magnet |
 | [ ] | E1.6 Open-loop spin, log no-load current + max RPM | Pablo | 2 Aug | E1.4, E1.5 | todo | containment required |
 | [ ] | **Gate M1** rail trimmed, driver commutates, encoder reads | Pablo | **2 Aug** | all E1 | todo | buffer: 3 Aug |
 | [ ] | **E1.B Recovery buffer** â€” finish anything E1 that did not close | Pablo | **3 Aug** | â€” | todo | protects all downstream dates |
@@ -111,7 +111,7 @@ week of 3-9 Aug. **G3 (rig balances) moves from 2 Aug to 12 Aug.**
 
 | # | Task | Owner | Due | Blocked by | State | Notes |
 |---|---|---|---|---|---|---|
-| [ ] | Electrical risk rows -> Dejan | Pablo | 3 Aug | RISKS.md | todo | see electrical/RISKS.md |
+| [x] | Electrical risk rows -> Dejan | Pablo | 3 Aug | RISKS.md | done | ported into sections/15_risk_register.tex (Appendix F) |
 
 ## E4 â€” Perfboard + harness, C12 (3-6 Aug, days 12-15)
 

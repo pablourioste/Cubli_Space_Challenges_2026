@@ -75,6 +75,8 @@ PER-08 & The design wheel speed shall not exceed \qty{80}{\percent} of the achie
 PER-09 & Commanded motor current shall remain within the driver's \qty{9}{\ampere} continuous rating throughout balancing. & All & T \\
 PER-10 & The brake shall arrest a wheel from the design wheel speed within \qty{100}{\milli\second}. & Jump-up & T \\
 PER-11 & Telemetry shall record the state estimate, the control command and the wheel speeds at \qty{50}{\hertz} or faster. & All & T \\
+PER-12 (D) & The drive shall accelerate a reaction wheel from rest to the design wheel speed within \qty{2}{\second} while operating within the driver's continuous current rating. & Jump-up, walking & A, T \\
+PER-13 (D) & The reaction torque applied to the body during wheel spin-up shall not exceed half the gravitational tip-over torque $MgL/2$, so that the cube cannot leave its face rest before the brake event. & Jump-up & A, T \\
 \midrule
 
 \multicolumn{4}{@{}l}{\textbf{Design constraint}}\\
@@ -137,14 +139,17 @@ design heavier than its own constraint permitted. The two requirements are
 therefore coupled, and CON-02 cannot be tightened again without re-deriving
 PER-06.
 
-\paragraph{Open items.} Three requirements rest on figures not yet fixed.
+\paragraph{Open items.} Several requirements rest on figures not yet fixed.
 PER-07 and PER-08 depend on the achievable wheel speed at end-of-discharge
 voltage, currently derived rather than measured; the spin-up test of WBS
 task~E10 closes this. The reduction of the design speed to \qty{4000}{\rpm}
 relaxes PER-08 substantially --- the design value falls from \qty{79.5}{\percent}
 to \qty{57.8}{\percent} of the derived ceiling --- so the risk now sits with
-PER-06 rather than with PER-08. PER-10 has no measurement and is scoped with
-the jump-up.
+PER-06 rather than with PER-08. PER-12 and PER-13 are closed by analysis ---
+\qty{1.3}{\second} to design speed at the continuous current limit, and a
+spin-up reaction torque \qty{15.7}{\percent} of the tip-over torque
+(Section~\ref{sec:jumpup_target}) --- and ride on the same E10 run for their
+measured half. PER-10 has no measurement and is scoped with the jump-up.
 
 CON-01 is stated at \qty{150}{\milli\metre} to match the frame freeze of gate
 M2, while the sizing analysis of Section~\ref{sec:sizing} is currently run at

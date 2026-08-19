@@ -1,0 +1,78 @@
+% ================= APPENDIX: RISK REGISTER AND CONTINGENCY PLAN =================
+\section{Risk Register and Contingency Plan}
+\label{app:risks}
+
+Table~\ref{tab:risk_register} lists the risks judged material to the project,
+with the trigger that realises each one, its impact, severity (S) and
+likelihood (L) on an H/M/L scale, the accountable owner, and the mitigation.
+Table~\ref{tab:cascade} fixes, in advance, the order scope is cut if the
+schedule runs short, and the note that follows covers how the team backs up
+whoever is stuck on a critical-path task.
+
+\begin{footnotesize}
+\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{}L{0.8cm} L{2.0cm} L{2.3cm} L{2.3cm} c c L{1.2cm} L{3.5cm}@{}}
+\caption[Risk register]{Risk register: trigger, impact, severity (S),
+likelihood (L), owner and mitigation.}
+\label{tab:risk_register}\\
+\toprule
+\textbf{ID} & \textbf{Risk} & \textbf{Trigger} & \textbf{Impact} & \textbf{S} & \textbf{L} & \textbf{Owner} & \textbf{Mitigation} \\
+\midrule\endfirsthead
+\toprule
+\textbf{ID} & \textbf{Risk} & \textbf{Trigger} & \textbf{Impact} & \textbf{S} & \textbf{L} & \textbf{Owner} & \textbf{Mitigation} \\
+\midrule\endhead
+\bottomrule\endfoot
+\multicolumn{8}{@{}l}{\textbf{Electrical and Power}} \\
+\midrule
+RE1 & \qty{16}{\volt} capacitor on the \qty{25}{\volt} bus & Build error: the BOM \qty{100}{\micro\farad} parts are \qty{16}{\volt} and fit the bus rail & Capacitor vents; board destroyed and bus shorted; ${\ge}\,3$~day recovery through the 9~Aug gate & H & M & Pablo & \qty{16}{\volt} parts segregated at build, \qty{5}{\volt} rail only; bulk cap is a separate \qtyrange{470}{1000}{\micro\farad}, ${\ge}\,\qty{50}{\volt}$ item; checked before any power \\
+RE2 & No bulk capacitance at regenerative braking & Hard wheel deceleration returns ${\approx}\,\qty{72.8}{\joule}$ per wheel (\qty{218}{\joule} across three) to the bus & Bus overvoltage damages a moteus-n1; loses one axis and the bench-rig spare & H & M & Pablo & Fit and verify the \qty{50}{\volt} bulk capacitor before any commanded deceleration; driver bus-overvoltage fault limit \\
+RE3 & MA600 air gap out of specification & Gap ${>}\,\qty{0.5}{\milli\metre}$ or chip off-centre, at build or disturbed later at assembly & Angle dropout and degraded commutation; presents as a control fault and misdirects debugging & H & H & Pablo & Shim value fixed on the bench and re-verified per axis at every assembly step; encoder error flags logged in every balance run \\
+RE4 & SPI run exceeds \qty{20}{\centi\metre} & Repackaging moves a driver away from its encoder & Encoder corruption at \qty{6}{\mega\hertz}; same signature as RE3 & H & M & Pablo & Driver positions derived from encoder positions and frozen in the board outline; later moves are electrical change requests \\
+RE5 & CAN-FD unreliable at \qty{5}{\mega\bit\per\second} & Stub ${>}\,\qty{10}{\centi\metre}$, mis-placed termination, or star topology at integration & Error frames and dropped commands under vibration; intermittent and hard to diagnose & H & M & Pablo & Linear topology; split termination at the two physical bus ends only; scope and soak test before integration \\
+RE6 & Board outline late to CAD & Layout slips past 1~Aug & Mass freeze and frame print slip, cascading to the 9~Aug integration gate & H & M & Pablo & Two days of float; if bring-up slips, issue the outline with conservative keep-outs rather than delay it \\
+RE7 & Rig parameters late to control & Wheel balance or rig assembly slips past 2~Aug & Blocks the sequential control chain; propagates to 20~Aug with no recovery & H & M & Pablo & Escalate if off track; fallback delivers $K_t$ and loop latency from bench measurement without the wheel \\
+RE8 & \qty{5}{\volt} rail undersized & Teensy, XIAO, IMU and servo stall draw together & Rail sag and MCU brown-out mid-balance; misread as a control failure & M & M & Pablo & Sum the load budget before build; heatsink the regulator; bulk cap plus back-feed diode; measure sag under worst-case load \\
+RE9 & Battery bring-up incident & Battery connected before the bench sequence completes, or without anti-spark switch and fuse & Arc or LiPo fire; injury and total project loss & H & L & Pablo & All bring-up on a current-limited supply; battery introduced only at the final power-on, with anti-spark switch, fuse, cell alarm and a second person present \\
+RE10 & Power harness fails under load & Cold joint or under-gauge wire on a high-current bus & Voltage drop, connector melt, or open circuit mid-demonstration & M & M & Pablo & \qty{14}{\awg} minimum, pull-tested and thermally imaged; spare harness in the demonstration kit \\
+RE11 & No spare actuation set & Any motor, driver or encoder fails after cube integration & Loses an axis with no resupply lead time before 20~Aug; demonstration cut short & H & M & Pablo & All three sets treated as flight hardware from integration on; no cannibalising for bench tests afterward; reseat and inspect at every touch \\
+RE12 & Brake work displaces edge balance & Brake build runs concurrently with the edge-balance gate & Missing the gate cuts the jump-up stretch goal, which the brake exists to serve & M & M & Pablo & Brake support is the designated sacrificial task; conflicts resolve to edge balance by standing decision \\
+RE13 & Vibration loosens connectors & Sustained running at high wheel speed & Intermittent axis dropout; cube falls and damages structure & M & H & Pablo & Strain relief, labelling and connector retention; reseat check as the first action of every support call \\
+RE14 & Perfboard rework consumes its float & Wiring error found at bus test; the build step has no slack & Board late to integration, cascading to the 9~Aug gate & M & M & Pablo & Wiring checked against the floorplan before power; rails brought up incrementally so faults localise \\
+\multicolumn{8}{@{}l}{\textbf{Programme and Technical}} \\
+\midrule
+PR1 & Final week has almost no slack & Any slip after 8~Aug & No days left to recover before the 20~Aug presentation & H & M & Pablo & Go/no-go on the jump-up called at end of day 11~Aug; nothing new started after that date, only debugging what already runs \\
+PR2 & Structure heavier than the mass allowance & Printed frame and fasteners weigh in over the \qty{374}{\gram} allowance & Wheel undersized against the jump-up sizing; momentum budget missed & M & M & Nasia & \qty{181}{\gram} of headroom before re-ballasting is needed; weigh at frame print and re-run the sizing script if over \\
+PR3 & Brake torque never measured on the bench & Brake work stays sacrificial through the final week & The inertia-requirement safety margin ships unverified & M & H & Niccolo & Run a standalone spin-down test in any open window; otherwise state explicitly that the figure is unmeasured \\
+PR4 & Programme lead is a single point of failure & Pablo unavailable during a critical-path week & Schedule, most electrical tasks and several software tasks stall together & H & L & All & Deyan holds the document and schedule state; Niccolo and Andrea can act on the electrical notes directly; no single day depends on one person \\
+\end{longtable}
+\end{footnotesize}
+
+\begin{table}[htbp]
+\centering
+\caption[Contingency: order of cuts]{Contingency: order in which scope is cut
+if the schedule runs short.}
+\label{tab:cascade}
+\small
+\begin{tabular}{@{}c L{9.5cm}@{}}
+\toprule
+\textbf{Order} & \textbf{Scope cut} \\
+\midrule
+1 & Jump-up demonstration (S3) --- cut first; standing decision, see \S\ref{sec:schedule} \\
+2 & Brake mechanism build and its bench test --- cut with the jump-up, since it exists only to serve it \\
+3 & Corner balance and commanded slew (S2b/c) --- cut only if edge balance is not solid by 17~Aug \\
+4 & Edge balance (S2a) and the 1-DoF rig result --- never cut; the protected demonstration and the document's primary evidence \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Parallel work and backup coverage.} The five workstreams
+(documentation, control/software, hardware build, 3D design, electrical) run
+in parallel by design, so a stall in one does not by default stall the
+others --- but only if someone is deliberately free to help. The practice
+already applies twice in this plan: Nasia's fallback on any day the sizing
+numbers are late is CAD review and tolerance work rather than idle waiting,
+and Andrea's fallback if the rig is not ready on time is bench measurement of
+$K_t$ and loop latency, so she is never simply blocked (RE7). The same rule
+holds for the rest of the schedule: whoever is not the bottleneck on a given
+day supports whoever is, rather than working ahead alone on their own next
+task.

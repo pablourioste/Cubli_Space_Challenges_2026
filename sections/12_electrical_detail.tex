@@ -26,10 +26,11 @@ the two physical ends only; the per-axis encoder SPI interfaces; the Teensy 4.1
 flight computer with the BMI270 IMU; the ESP32 telemetry link; and the three
 brake servo drives.
 
-Note: for the provided N35 $1/4" \times 1/8"$ diametric disk magnet, the optimal
-distance in order to achieve the \qty{20}{\milli\tesla} --
-\qty{80}{\milli\tesla} nominal magnetic field for the MA600 encoder is
-\qty{3.3}{\milli\metre}.
+Note: the MA600 breakout is paired with a diametric ring magnet
+(\qty{4}{\milli\metre} thick; Appendix~\ref{app:bom}). The datasheet-recommended
+air gap for the \qty{20}{\milli\tesla}--\qty{80}{\milli\tesla} nominal magnetic
+field window is \qty{2}{\milli\metre}; the gap set on the build, and used
+throughout this document, is \qty{1.5}{\milli\metre}.
 
 Each block of the capture is checked against its own layout, mounting and
 connection constraint before bring-up. That constraint table

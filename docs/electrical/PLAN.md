@@ -33,7 +33,7 @@ Brake work (C14) must never cannibalise the 13 Aug edge-balance gate.
 
 - 4 complete motor/driver/encoder sets, not 3. The fourth stays on the 1-DoF
   bench rig permanently as a development bench.
-- MA600: air gap <= 0.5 mm, chip centred on the 4 mm magnet thickness, SPI
+- MA600: air gap <= 1.5 mm, chip centred on the 4 mm magnet thickness, SPI
   cable < 20 cm. This dictates driver physical placement, not the reverse.
 - CAN-FD 5 Mbps: linear topology only, stubs < 10 cm, split termination
   (2x 60.4 ohm + 4.7 nF) at exactly the two physical bus ends.
@@ -69,7 +69,7 @@ If any is not, it is a blocker and belongs in STATUS.md as such.
 | E1.2 | LiPo safety kit staged: charger, safe bag, cell alarm. Battery stays out of the loop until E4.3 | C6 delivery | 27 Jul |
 | E1.3 | Incoming inspection of 4 motor sets: continuity, phase resistance vs 194 mOhm datasheet, driver boot, encoder SPI read-back | C6 delivery | 27-28 Jul |
 | E1.4 | moteus-n1 #1 bring-up on bench PSU: firmware, CAN-FD ID assignment, FOC calibration against MA600 | E1.1, E1.3 | 28 Jul |
-| E1.5 | MA600 gap fixture: shim stack to set <= 0.5 mm and centre the chip on the 4 mm magnet. Record the shim value; it becomes the C10 and C13 assembly spec | E1.3 | 28-29 Jul |
+| E1.5 | MA600 gap fixture: shim stack to set <= 1.5 mm and centre the chip on the 4 mm magnet. Record the shim value; it becomes the C10 and C13 assembly spec | E1.3 | 28-29 Jul |
 | E1.6 | Open-loop wheel spin on a clamped motor, current-limited, containment in place. Log no-load current and max RPM against the 6000 rpm design speed and the ~6900 rpm realistic ceiling (`MOTOR_SPEED.md`) | E1.4, E1.5 | 29 Jul |
 
 **Exit gate E1:** one driver commutates a wheel closed-loop on current, MA600

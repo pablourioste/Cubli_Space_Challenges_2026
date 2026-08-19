@@ -71,10 +71,10 @@ LM2596 buck trimmed to 5.00 V. Characterise the rail under load to 1.5 A: output
 
 **EL-14 MA600 off-axis encoder installation and calibration**
 
-Bond the ring magnet to the wheel hub. Set the air gap with a shim stack to <= 0.5 mm with the chip centred on the 4 mm magnet thickness - record the shim value, it becomes the assembly spec for every axis at EL-21. SPI cable run kept under 20 cm. Bias trim and encoder recalibration after bonding.
+Bond the ring magnet to the wheel hub. Set the air gap with a shim stack to <= 1.5 mm with the chip centred on the 4 mm magnet thickness - record the shim value, it becomes the assembly spec for every axis at EL-21. SPI cable run kept under 20 cm. Bias trim and encoder recalibration after bonding.
 
 - Materials: scrap-sourceable (shim stock); ring magnet from BOM
-- **Exit:** Measured air gap <= 0.5 mm recorded as a numeric shim value, SPI run < 20 cm, and the encoder returns monotonic absolute angle over a full revolution with zero error flags across a 10-minute spin.
+- **Exit:** Measured air gap <= 1.5 mm recorded as a numeric shim value, SPI run < 20 cm, and the encoder returns monotonic absolute angle over a full revolution with zero error flags across a 10-minute spin.
 
 **EL-16 Rig harness and 2-node CAN-FD bus**
 
@@ -127,7 +127,7 @@ Every task is classified as a DELTA on Phase 1: CARRIED (identical hardware/conf
 Identical to EL-13 and EL-14, replicated on the remaining two sets: phase wiring, FOC calibration, CAN ID, magnet bonding and gap to the EL-14 shim spec. No new engineering - the procedure is fixed and the numbers are known. INCLUDES STRIPPING THE 1-DoF RIG: with three sets and no spare, the rig's set becomes the third cube axis. The bench rig ceases to exist at this point.
 
 - Materials: scrap-sourceable (BOM hardware, already triaged at EL-12)
-- **Exit:** 3 of 3 sets FOC-calibrated with unique CAN IDs, each encoder at <= 0.5 mm gap matching the recorded EL-14 shim value, each returning monotonic angle with no error flags.
+- **Exit:** 3 of 3 sets FOC-calibrated with unique CAN IDs, each encoder at <= 1.5 mm gap matching the recorded EL-14 shim value, each returning monotonic angle with no error flags.
 
 **EL-23 Battery power chain** *[NEW]*
 
@@ -181,7 +181,7 @@ The rig ran one driver in free air on a bench. The cube encloses three drivers p
 
 Same bring-up sequence as EL-19, replicated across three axes on the integrated cube. Continuity and isolation before power, PSU smoke test with wheels removed, PSU test with wheels at a low current limit, then battery. Every MA600 re-checked at the EL-14 gap spec after mechanical assembly - the gap drifts during integration.
 
-- **Exit:** All 3 axes addressable from the flight computer on battery power, all 3 encoders reading within the <= 0.5 mm gap spec after assembly, IMU live, telemetry up. Zero CAN error frames during a full three-axis open-loop spin.
+- **Exit:** All 3 axes addressable from the flight computer on battery power, all 3 encoders reading within the <= 1.5 mm gap spec after assembly, IMU live, telemetry up. Zero CAN error frames during a full three-axis open-loop spin.
 
 ## Phase 3 - Brake actuation electrical -> G8
 

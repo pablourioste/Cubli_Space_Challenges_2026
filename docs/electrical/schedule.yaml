@@ -96,7 +96,7 @@ constants:
   bus_charged_V: 25.2
   design_wheel_speed_rad_s: 733
   motor_phase_resistance_mohm: 194
-  encoder_max_gap_mm: 0.5
+  encoder_max_gap_mm: 1.5
   encoder_magnet_thickness_mm: 4
   encoder_max_spi_cable_cm: 20
   can_bitrate_Mbps: 5
@@ -215,7 +215,7 @@ tasks:
     name: MA600 off-axis encoder installation and calibration
     scope: >
       Bond the ring magnet to the wheel hub. Set the air gap with a shim stack
-      to <= 0.5 mm with the chip centred on the 4 mm magnet thickness - record
+      to <= 1.5 mm with the chip centred on the 4 mm magnet thickness - record
       the shim value, it becomes the assembly spec for every axis at EL-21.
       SPI cable run kept under 20 cm. Bias trim and encoder recalibration after
       bonding.
@@ -226,7 +226,7 @@ tasks:
     depends_on: [EL-13]
     gate: G3
     exit_criterion: >
-      Measured air gap <= 0.5 mm recorded as a numeric shim value, SPI run
+      Measured air gap <= 1.5 mm recorded as a numeric shim value, SPI run
       < 20 cm, and the encoder returns monotonic absolute angle over a full
       revolution with zero error flags across a 10-minute spin.
     materials: scrap-sourceable (shim stock); ring magnet from BOM
@@ -363,7 +363,7 @@ tasks:
     gate: G5
     exit_criterion: >
       3 of 3 sets FOC-calibrated with unique CAN IDs, each encoder at
-      <= 0.5 mm gap matching the recorded EL-14 shim value, each returning
+      <= 1.5 mm gap matching the recorded EL-14 shim value, each returning
       monotonic angle with no error flags.
     materials: scrap-sourceable (BOM hardware, already triaged at EL-12)
 
@@ -542,7 +542,7 @@ tasks:
     gate: G5
     exit_criterion: >
       All 3 axes addressable from the flight computer on battery power, all 3
-      encoders reading within the <= 0.5 mm gap spec after assembly, IMU live,
+      encoders reading within the <= 1.5 mm gap spec after assembly, IMU live,
       telemetry up. Zero CAN error frames during a full three-axis open-loop
       spin.
 

@@ -251,6 +251,63 @@ peak torque (the structural one); the two may differ several-fold, and the
 logging rate must resolve a few-millisecond event without smoothing the peak
 away.
 
+\paragraph{Spin-up time, and why it is bounded from both sides.} The manoeuvre
+has a second time scale, longer than the braking event and less visible in the
+equations above: the wheel has to be brought to $\omega_{\max}$ before the
+brake can do anything, and nothing in
+Equations~\eqref{eq:hw_ideal}--\eqref{eq:Iw_target} says how long that takes.
+It follows from the same momentum figure divided by the \emph{drive} torque
+rather than the brake torque,
+\begin{equation}
+t_{\text{spin}} = \frac{h_w}{\tau_m} = \frac{I_w\,\omega_{\max}}{k_t\,i},
+\label{eq:t_spin}
+\end{equation}
+with $k_t$ the incremental torque constant and $i$ the phase current. At the
+measured $k_t = \qty{0.023}{\newton\metre\per\ampere}$
+(Section~\ref{sec:electrical}) and the driver's \qty{9}{\ampere} continuous
+rating (PER-09), $\tau_m = \qty{0.207}{\newton\metre}$, and the selected wheel
+--- which stores $I_w\omega_{\max} = \qty{0.2627}{\kilo\gram\metre\squared\per\second}$
+--- reaches design speed in \qty{1.3}{\second}. At the motor's
+\qty{16}{\ampere} peak rating the same wheel takes \qty{0.7}{\second}, so the
+figure is set by how the drive is operated rather than by what the motor can
+do. PER-12 is stated at \qty{2}{\second} to leave room for bearing and
+aerodynamic drag, for current derating as the winding warms, and for a shaped
+current ramp rather than a step to full current.
+
+The lower bound is the more interesting one, because it is physical rather
+than electrical. Spin-up torque is reacted by the body, which at that moment
+is resting on a face: were it to exceed the tip-over torque $\tau_g = MgL/2$,
+the cube would begin to rotate during spin-up rather than at the brake event,
+and would arrive at the edge with no stored impulse behind it. That fixes a
+floor
+\[
+t_{\text{spin}} > \frac{h_w}{\tau_g} = \qty{0.20}{\second},
+\]
+below which the manoeuvre cannot be run at all, however capable the drive.
+The drive is nowhere near it: \qty{0.207}{\newton\metre} is
+\qty{15.7}{\percent} of the \qty{1.3155}{\newton\metre} floor of
+Table~\ref{tab:jumpup_budget}, and even the motor's absolute measured maximum
+of \qty{0.45}{\newton\metre} (Section~\ref{sec:electrical}) reaches only
+\qty{34}{\percent} of it. The cube therefore cannot tip itself with the motors
+alone at any current the drive can deliver --- which is the quantitative form
+of the claim that the impulse comes from the collision and not from the drive,
+and the reason the brake is a separate mechanism. PER-13 fixes the margin at a
+factor of two, which the actuator meets with the current limit removed.
+
+Neither bound is set by energy. One wheel at design speed holds
+$\tfrac12 I_w\omega_{\max}^2 = \qty{55}{\joule}$, so all three together draw
+\qty{165}{\joule} from a pack carrying about \qty{35}{\watt\hour} --- roughly
+\qty{0.13}{\percent} per jump-up, negligible even across a walking sequence.
+What the spin-up does cost is \emph{current}: at the end of a three-axis
+spin-up the bus supplies of order \qty{300}{\watt}, some \qty{14}{\ampere} at
+pack voltage, which is the transient the XT60 and the anti-spark path of
+Section~\ref{sec:power_arch} have to carry. That figure is an estimate from
+$\tau\omega$ plus copper loss, and is an acceptance measurement at first
+power-on rather than a closed analysis. For the walking objective the same
+number sets the cadence: with \qty{2}{\second} of spin-up, consecutive
+jump-ups (FUN-11) cannot follow each other faster than roughly one every three
+seconds once the landing transient is allowed to settle.
+
 \subsection{Sizing Constraints and Closure Procedure}
 \label{sec:massbudget}
 
