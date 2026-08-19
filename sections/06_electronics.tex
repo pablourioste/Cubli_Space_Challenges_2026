@@ -232,9 +232,9 @@ regenerative braking transients---which are not incidental here, since the
 jump-up manoeuvre of Section~\ref{sec:jumpup} dumps the full wheel kinetic energy
 back into the bus. The \emph{logic rail} is derived by an LM2596 buck converter
 stepping \qty{22}{\volt} down to \qty{5}{\volt} for the Teensy, the ESP32
-telemetry link, the three brake servos and the IMU. Keeping the two rails separate
+telemetry link, and the three brake servos. Keeping the two rails separate
 downstream of the E-stop means motor-current ripple does not reach the sensing
-and processing electronics.
+and processing electronics. While the IMU runs at \qty{3.3}{\volt} from the Teensy.
 
 \begin{figure}[htbp]
 \centering
