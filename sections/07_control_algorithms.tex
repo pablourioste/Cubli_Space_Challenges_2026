@@ -317,7 +317,7 @@ permissive.
 cycle budget is 2.5\,ms, which must accommodate an IMU read over SPI, three
 encoder and torque exchanges over CAN-FD, and the control computation. The
 control computation is negligible --- roughly 60 multiply--accumulates
-(\S\ref{sec:architecture}) --- so the budget is dominated by bus traffic, and
+(\S\ref{sec:control_architecture}) --- so the budget is dominated by bus traffic, and
 this is the constraint that closes the interval from above.
 
 Encoder quantisation contributes a second, weaker upper bound. Differencing a
@@ -1947,7 +1947,8 @@ The two bounds cross at $\tau_{\mathrm{cont}} = 0.113$\,N\,m. The current
 estimate of $0.12$\,N\,m places the machine $6\,\%$ above that crossover, so
 the classification as momentum-limited rests on an unmeasured parameter. A
 thermal test confirming $\tau_{\mathrm{cont}}$ determines which constraint
-the design should target, and is listed accordingly in \S\ref{sec:open}.
+the design should target, and is listed accordingly in
+Appendix~\ref{app:verification}.
 
 \paragraph{Torque clamp.} Commanded torque is clamped to
 $\pm\tau_{\mathrm{peak}} = \pm 0.40$\,N\,m. This figure derives from the
@@ -2090,7 +2091,7 @@ $\tau_{cp} = 0$ is a placeholder pending a breakaway test. No friction
 measurement has been made on either stage. The sensitivity study establishing
 the thresholds above was conducted against these placeholders, so it bounds
 the tolerance rather than predicting the behaviour. The measurements are
-listed in \S\ref{sec:open}.
+listed in Appendix~\ref{app:verification}.
 
 \subsubsection{Cogging torque}
 \label{sec:cogging}
@@ -2233,7 +2234,7 @@ gate invalidates everything downstream.
 configuration, before the corner change of \S\ref{sec:corner-choice}. The
 qualitative conclusions are unaffected; the affected numbers ($\lambda$,
 $\ell$, mount angle) differ by the amounts tabulated in \cref{tab:corners}.}
-\label{tab:gates}
+\label{tab:validation-gates}
 \end{table}
 
 Gate~3 is the definitive one. Passing it establishes that the Simscape model
@@ -2340,7 +2341,7 @@ well-posed, and not on the full nine-state system, where it is not
 \end{enumerate}
 
 \subsubsection{Tolerance in rank computations}
-\label{sec:rank-trap}
+\label{sec:rank-tolerance}
 
 The controllability argument of \S\ref{sec:structural} rests on a rank count.
 An incorrect tolerance can invert the conclusion silently.
