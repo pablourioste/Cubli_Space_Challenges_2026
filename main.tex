@@ -70,7 +70,9 @@
 }
 
 % ---------- siunitx & table column type (used by the BOM tables, App. A) ----------
-\sisetup{range-phrase={--}, range-units=single, per-mode=symbol, group-separator={,}, detect-weight=true}
+% group-digits=integer: keep the thousands separator on integers (65,536 counts)
+% but never group the decimal part, which would print k_t as 0.025,13.
+\sisetup{range-phrase={--}, range-units=single, per-mode=symbol, group-separator={,}, group-digits=integer, detect-weight=true}
 \DeclareSIUnit{\rpm}{rpm}   % motor speed
 \DeclareSIUnit{\bit}{bit}   % data-rate unit (Mbit/s)
 \DeclareSIUnit{\awg}{AWG}   % wire gauge
