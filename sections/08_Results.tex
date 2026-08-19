@@ -30,7 +30,7 @@ demonstration.
 reports representative runs against Gate~G3, each initialised from rest at the
 upright equilibrium with no applied disturbance.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption[1-DoF unassisted balance examples]{Representative unassisted balance
 runs on the single-axis rig, against the Gate~G3 threshold of
@@ -58,7 +58,7 @@ support, and released to test whether the controller recovers to upright
 rather than merely holding a small perturbation. Table~\ref{tab:recovery_angle}
 reports the three angles used to characterise this margin.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption[Recovery from a defined initial angle]{Recovery outcome versus the
 initial displacement angle, measured from the support.}
@@ -89,10 +89,9 @@ envelope is bounded by the rig rather than by the controller.
 Both cube equilibria have now been exercised on hardware: corner balance,
 under quiet hold and under repeated pushes to failure, and edge balance,
 under quiet hold and recovery from a released tilt. Two firmware
-configurations were run on the corner: the autotrim baseline
-(\texttt{Stage4\_AutoTrim.ino}) and the same law with a body-rate low-pass
-filter added (\texttt{Stage4\_AutoTrim\_RateFilter.ino}, discussed further
-against the vibration source it targets in \S\ref{sec:vibration}).
+configurations were run on the corner: the autotrim baseline and the same
+law with a body-rate low-pass filter added, discussed further against the
+vibration source it targets in \S\ref{sec:vibration}.
 Table~\ref{tab:balance_3dof_template} updates the result template with these
 runs against the Gate~G3 threshold of \qty{60}{\second} underlying PER-01 and
 PER-02, and Table~\ref{tab:recovery_angle_3dof_template} carries the edge
@@ -103,17 +102,17 @@ reported separately in Table~\ref{tab:corner_pushes}. Driver current was not
 logged in these runs -- effort is reported as the commanded torque
 $|\tau_{\text{cmd}}|$ actually measured, not converted from it.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption[3-DoF unassisted balance results]{Unassisted balance on the cube,
 edge and corner equilibria, against the Gate~G3 threshold of
 \qty{60}{\second} (PER-01, PER-02).}
 \label{tab:balance_3dof_template}
-\begin{tabular}{lccc}
+\begin{tabular}{L{2.6cm} c L{4.3cm} L{3.0cm}}
 \toprule
 Equilibrium & Balance duration & Steady-state wheel-speed & Peak commanded torque \\
 \midrule
-Edge (quiet hold) & \qty{196.96}{\second} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+Edge (quiet hold) & \qty{196.96}{\second} & -- & -- \\
 Corner, autotrim   & \qty{46.7}{\second} & still climbing, $\approx\qty{8}{\radian\per\second}$ at window end & $\approx\qty{0.12}{\newton\metre}$ ceiling \\
 Corner, rate filter & \qty{50.4}{\second} & climbs then decays, \qtyrange{9}{5}{\radian\per\second} & $\approx\qty{0.12}{\newton\metre}$ ceiling \\
 \bottomrule
@@ -125,10 +124,11 @@ Note: edge quiet hold satisfies PER-01 with over three times the required
 duration; both corner configurations fall short of the PER-02 threshold in
 the runs to date (\qty{46.7}{\second}, \qty{50.4}{\second}) and are reported
 as the longest continuous armed window achieved, not as a demonstrated 60~s
-hold. Neither corner configuration's wheel speed has settled within its
-window (Figure~\ref{fig:corner_quiet_wheel_effort}), so the drift figure is
-not yet a steady state in the sense Table~\ref{tab:balance_examples} reports
-for the 1-DoF rig.
+hold. Wheel speed and commanded torque were not logged for the edge run.
+Neither corner configuration's wheel speed has settled within its window
+(Figure~\ref{fig:corner_quiet_wheel_effort}), so the drift figure is not yet
+a steady state in the sense Table~\ref{tab:balance_examples} reports for the
+1-DoF rig.
 \end{minipage}
 \end{table}
 
@@ -183,12 +183,10 @@ at \qtyrange{29.7}{30.5}{\hertz} on all three axes -- the same mode
 \S\ref{sec:vibration} places inside the control passband rather than above
 the $200$\,Hz previously assumed -- and the \qty{20}{\hertz} first-order
 filter attenuates it by only $\approx$6~dB (a factor of $\approx 2$), not
-the 20--30~dB claimed in the header comments of
-\texttt{Stage4\_AutoTrim\_RateFilter.ino} and
-\texttt{Stage5\_AutoTrim\_RateFilter.ino}, a documentation error flagged
-for correction there. The filter is doing something real, just not what
-the comment claims (\S\ref{sec:vibration} gives the full frequency-response
-argument).
+the 20--30~dB claimed in the rate-filter firmware's header comments, a
+documentation error flagged for correction there. The filter is doing
+something real, just not what the comment claims (\S\ref{sec:vibration}
+gives the full frequency-response argument).
 
 \begin{figure}[htbp]
 \centering
@@ -216,21 +214,21 @@ directly, so severity is read from the peak tilt reached, all below the
 \qty{5}{\degree} PER-04 threshold. Both configurations recover pushes of
 essentially the same size and fail at essentially the same severity --
 \qty{24.0}{\degree} (autotrim) and \qty{23.8}{\degree} (rate filter)
-immediately before hitting the same \qty{25}{\degree} tilt trip
-(\texttt{kMaxTilt}) that disarms the drivers in both builds, which is a
-property of that shared firmware threshold, not of the rate filter.
-Recovery time to under \qty{1}{\degree} is statistically indistinguishable
-between configurations (\qtyrange{0.08}{0.20}{\second} across all recovered
-pushes). This test does not show either configuration tolerating a larger
-disturbance than the other, and PER-04 (recovery from \qty{5}{\degree} or
-more) has not yet been exercised on the cube by either configuration.
+immediately before hitting the same \qty{25}{\degree} tilt-trip threshold
+that disarms the drivers in both builds, which is a property of that
+shared firmware threshold, not of the rate filter. Recovery time to under
+\qty{1}{\degree} is statistically indistinguishable between configurations
+(\qtyrange{0.08}{0.20}{\second} across all recovered pushes). This test
+does not show either configuration tolerating a larger disturbance than
+the other, and PER-04 (recovery from \qty{5}{\degree} or more) has not yet
+been exercised on the cube by either configuration.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption[Corner push-recovery results]{Corner disturbance rejection:
 repeated pushes to failure, both firmware configurations.}
 \label{tab:corner_pushes}
-\begin{tabular}{lcc}
+\begin{tabular}{L{4.2cm} c c}
 \toprule
  & Autotrim & Rate filter \\
 \midrule
@@ -293,7 +291,7 @@ unexplained and pulls the RMS up; it is under investigation.}
 \label{fig:edge_quiet_phi}
 \end{figure}
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption[Edge recovery-angle results]{Recovery from a defined initial angle
 on the cube, edge equilibrium, measured from release, against PER-04.}
@@ -302,22 +300,15 @@ on the cube, edge equilibrium, measured from release, against PER-04.}
 \toprule
 Initial angle & Recovered? & Recovery time & Peak commanded torque \\
 \midrule
-\qty{6.18}{\degree} & Yes & \qty{9.64}{\second} & \textcolor{red}{TBD} \\
-\qty{7}{\degree}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\qty{8}{\degree}  & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\qty{12}{\degree} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
-\qty{24}{\degree} & \textcolor{red}{TBD} & \textcolor{red}{TBD} & \textcolor{red}{TBD} \\
+\qty{6.18}{\degree} & Yes & \qty{9.64}{\second} & -- \\
 \bottomrule
 \end{tabular}
 \begin{minipage}{\linewidth}
 \vspace{4pt}
 \footnotesize
-Note: the \qty{6.18}{\degree} row already exceeds the PER-04 threshold of
-\qty{5}{\degree}; its recovery time is time to settle under
-\qty{0.5}{\degree} and never re-exceed it, not time to first cross that
-band -- see the ring-down discussion below. The \qty{7}{\degree}--\qty{24}{\degree}
-rows mirror the 1-DoF protocol of Table~\ref{tab:recovery_angle} and have
-not yet been repeated on the cube's edge equilibrium.
+Note: recovery time is time to settle under \qty{0.5}{\degree} and never
+re-exceed it, not time to first cross that band -- see the ring-down
+discussion below. Commanded torque was not logged for this run.
 \end{minipage}
 \end{table}
 
@@ -336,7 +327,7 @@ closed-loop edge poles are lightly damped rather than merely slow, and is
 worth checking directly against the edge control law's pole placement
 (\S\ref{sec:lqr}).
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \caption[Edge recovery ring-down milestones]{Edge recovery from
 \qty{-6.18}{\degree}: threshold-crossing milestones.}
@@ -363,10 +354,3 @@ Settles under \qty{0.3}{\degree}, never re-exceeds & \qty{10.71}{\second} \\
 release magnitude before ringing down.}
 \label{fig:edge_recovery_6deg}
 \end{figure}
-
-\textcolor{red}{TODO: repeat the corner quiet-hold comparison as a
-same-session $f$/$k_a$ toggle rather than two separate sessions; extend the
-corner armed window past the \qty{60}{\second} PER-02 threshold;
-re-run the 7--24\textdegree{} edge release matrix to complete
-Table~\ref{tab:recovery_angle_3dof_template}; and repeat the edge quiet
-hold to confirm whether the unexplained excursion recurs.} 

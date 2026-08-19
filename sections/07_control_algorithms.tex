@@ -2134,9 +2134,8 @@ Three sources of high-frequency content reach the accelerometer.
 Item 1's frequency is no longer unmeasured. Corner-hold telemetry places a
 sharp mode at $29.7$--$30.5$\,Hz on all three body-rate axes (Welch PSD) ---
 inside the control passband, not above $200$\,Hz as assumed. A first-order
-low-pass on the gyro rate at a $20$\,Hz corner
-(\texttt{Stage4\_AutoTrim\_RateFilter.ino}, evaluated against the unfiltered
-\texttt{Stage4\_AutoTrim.ino} baseline) gives a real $45\%$ reduction in
+low-pass on the gyro rate at a $20$\,Hz corner, evaluated against the
+unfiltered autotrim baseline, gives a real $45\%$ reduction in
 overall $|\bm\omega|$ RMS, but only $\approx 6$\,dB of attenuation at the
 mode itself, against $20$--$30$\,dB claimed in that file's header comment ---
 a documentation error, not a second measurement disagreeing with the first.
