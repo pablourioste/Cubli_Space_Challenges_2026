@@ -1872,3 +1872,789 @@ The control law reduces to one matrix--vector product per cycle:
         wheel-speed capping are applied afterwards
         (\S\ref{sec:nonlinearities}).
 \end{itemize}
+
+\subsection{Nonlinearities}
+\label{sec:nonlinearities}
+
+The design plant of \S\ref{sec:linearisation} drops every term that vanishes
+at the equilibrium. The real machine retains them, and each imposes a
+constraint on the recoverable envelope or introduces a signal the control law
+must handle without amplifying.
+
+\subsubsection{Torque saturation and the recoverable envelope}
+\label{sec:saturation}
+
+Two independent bounds limit the tilt from which the cube can recover, and
+which one binds depends on a single hardware parameter.
+
+\paragraph{Momentum bound.} Recovery from a tilt $\theta$ at rest requires
+angular momentum
+%
+\begin{equation}
+  h = \sqrt{2\,\bar\Theta\,S_g\,(1-\cos\theta)}\,,
+\end{equation}
+%
+which must not exceed the stored capacity
+$h_{\mathrm{cap}} = I_s\,\omega_{\mathrm{cap}} = 0.019475$\,N\,m\,s.
+Inverting,
+%
+\begin{equation}
+  \theta_{\max}^{\mathrm{mom}} =
+  \arccos\!\left(1 - \frac{h_{\mathrm{cap}}^2}{2\,\bar\Theta\,S_g}\right)
+  = 4.88^\circ .
+  \label{eq:mom-bound}
+\end{equation}
+
+\paragraph{Torque bound.} The controller can hold a static tilt only while
+the gravitational moment does not exceed the available torque. At a corner
+the worst-case actuator projection is $\sqrt{2}\,\tau_{\mathrm{cont}}$,
+giving
+%
+\begin{equation}
+  \theta_{\max}^{\mathrm{torq}} =
+  \arcsin\!\left(\frac{\sqrt{2}\,\tau_{\mathrm{cont}}}{S_g}\right)
+  = 5.16^\circ \quad \text{at } \tau_{\mathrm{cont}} = 0.12\ \mathrm{N\,m}.
+  \label{eq:torq-bound}
+\end{equation}
+
+The recoverable envelope is the smaller of the two. At the current hardware
+point this is the momentum bound, but the margin is narrow.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}ccccl@{}}
+\toprule
+$\omega_{\mathrm{cap}}$ & $\tau_{\mathrm{cont}}$
+& Momentum bound & Torque bound & Limiting\\
+\midrule
+$40$ & $0.08$ & $4.88^\circ$ & $3.44^\circ$ & torque\\
+$40$ & $0.10$ & $4.88^\circ$ & $4.30^\circ$ & torque\\
+$\bm{40}$ & $\bm{0.12}$ & $\bm{4.88^\circ}$ & $\bm{5.16^\circ}$ & \textbf{momentum}\\
+$40$ & $0.20$ & $4.88^\circ$ & $8.62^\circ$ & momentum\\
+$60$ & $0.12$ & $7.32^\circ$ & $5.16^\circ$ & torque\\
+$80$ & $0.12$ & $9.76^\circ$ & $5.16^\circ$ & torque\\
+$80$ & $0.20$ & $9.76^\circ$ & $8.62^\circ$ & torque\\
+\bottomrule
+\end{tabular}
+\caption{Recoverable envelope against wheel cap and continuous torque.}
+\label{tab:envelope-grid}
+\end{table}
+
+The two bounds cross at $\tau_{\mathrm{cont}} = 0.113$\,N\,m. The current
+estimate of $0.12$\,N\,m places the machine $6\,\%$ above that crossover, so
+the classification as momentum-limited rests on an unmeasured parameter. A
+thermal test confirming $\tau_{\mathrm{cont}}$ determines which constraint
+the design should target, and is listed accordingly in \S\ref{sec:open}.
+
+\paragraph{Torque clamp.} Commanded torque is clamped to
+$\pm\tau_{\mathrm{peak}} = \pm 0.40$\,N\,m. This figure derives from the
+MN4006 rated current of $16$\,A at $K_t = 0.02513$\,N\,m/A, giving
+$0.4021$\,N\,m. Two qualifications apply to its use as a clamp.
+
+First, $16$\,A is the datasheet's \emph{maximum continuous current over
+180\,s}, not an instantaneous rating. Second, and more significantly, that
+figure is specified for the motor in its intended application, driving a
+propeller which forces air through the ventilation channels. The reaction
+wheels operate at up to $40$\,rad\,s$^{-1}$ inside a sealed enclosure with no
+forced airflow, so the datasheet's thermal assumptions do not hold. At $16$\,A
+the ohmic dissipation is $1.5 I^2 R_\phi = 74.5$\,W per motor with
+$R_\phi = 194$\,m$\Omega$, or $223$\,W across three motors, into a closed
+volume.
+
+The binding continuous constraint is therefore neither of these but the
+driver: the moteus-n1 is rated at $9$\,A continuous phase current without
+thermal management, corresponding to $0.226$\,N\,m. Its $26$\,A rating
+requires a fan or heat spreader, which this build does not carry.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Limit} & \textbf{Torque} & \textbf{Current} & \textbf{Basis}\\
+\midrule
+$\tau_{\mathrm{cont}}$ (design) & $0.120$\,N\,m & $4.78$\,A & thermal estimate, this enclosure\\
+MN4006 efficiency band & $0.126$\,N\,m & $5.00$\,A & ${>}92\,\%$ efficiency at $2$--$5$\,A\\
+\textbf{moteus-n1, uncooled} & $\bm{0.226}$\,N\,m & $\bm{9.00}$\,A & \textbf{binding continuous limit}\\
+$\tau_{\mathrm{peak}}$ (clamp) & $0.400$\,N\,m & $15.92$\,A & MN4006 $180$\,s rating\\
+moteus-n1, cooled & $0.653$\,N\,m & $26.00$\,A & requires fan or heat spreader\\
+moteus-n1, peak & $2.513$\,N\,m & $100.00$\,A & instantaneous\\
+\bottomrule
+\end{tabular}
+\caption{Torque limits and their sources. $K_t = 0.02513$\,N\,m/A throughout.}
+\label{tab:torque-limits}
+\end{table}
+
+The clamp at $0.40$\,N\,m is retained as a firmware backstop against a
+runaway command rather than as a thermal limit, since a $0.40$\,N\,m command
+sustained for more than a few seconds would exceed the driver's continuous
+rating by a factor of $1.8$. Thermal protection is the driver's own
+temperature fault, not the clamp. The design envelope is set by
+$\tau_{\mathrm{cont}}$ (\cref{tab:envelope-grid}), and the gap between
+$0.120$ and the driver's $0.226$\,N\,m indicates available headroom should the
+thermal test support it.
+
+\subsubsection{Wheel-speed cap}
+\label{sec:wheel-cap}
+
+Each wheel is capped at $\omega_{\mathrm{cap}} = 40$\,rad\,s$^{-1}$, which is
+$4.5\,\%$ of the motor no-load speed of $883$\,rad\,s$^{-1}$. The cap is a
+firmware policy rather than a hardware limit. Its purpose is to make the
+momentum-limited failure mode reachable and testable during bring-up, rather
+than a rare event occurring only at the envelope edge under a particular
+disturbance sequence.
+
+Implementation is a one-sided clamp:
+%
+\begin{equation}
+  \text{if } (\rho_k \ge +\omega_{\mathrm{cap}} \text{ and } u_k > 0)
+  \text{ or }
+  (\rho_k \le -\omega_{\mathrm{cap}} \text{ and } u_k < 0):
+  \quad u_k = 0.
+  \label{eq:wheel-cap}
+\end{equation}
+%
+Torque that would accelerate the wheel further is zeroed; torque decelerating
+it back toward the cap is permitted. A symmetric clamp would hold the wheel
+at the cap and remove the actuator from the system.
+
+\paragraph{Budget.} A full-envelope recovery consumes
+$0.0155$\,N\,m\,s, equivalent to $31.8$\,rad\,s$^{-1}$ of wheel speed, or
+$80\,\%$ of the cap. The remaining $20\,\%$ covers standing wheel speed from
+estimator bias (\S\ref{sec:bias-sensitivity}) and from friction feedforward
+error (\S\ref{sec:friction}) combined. Exceeding it at rest means the machine
+saturates before reaching the envelope edge.
+
+\subsubsection{Friction feedforward}
+\label{sec:friction}
+
+Coulomb friction at the wheel bearings applies a constant retarding torque
+whose sign depends on the direction of rotation. Uncompensated, it enters the
+plant as a constant disturbance and the regulator responds by holding a
+standing wheel speed, consuming momentum budget continuously.
+
+\paragraph{Structure.} The compensation is a smooth approximation of the sign
+function applied per wheel:
+%
+\begin{equation}
+  u_k = u_{\mathrm{LQR},k}
+        + \tau_{cw}\tanh\!\left(\frac{\rho_k}{\varepsilon}\right)
+        + b_w\,\rho_k ,
+  \label{eq:feedforward}
+\end{equation}
+%
+with $\varepsilon = 0.05$\,rad\,s$^{-1}$ setting the transition width. The
+$\tanh$ reaches $0.9987$ of its asymptote at $3\varepsilon =
+0.15$\,rad\,s$^{-1}$.
+
+\paragraph{$\tanh$ rather than $\mathrm{sign}$.} All three wheels sit near
+zero at equilibrium, so a $\mathrm{sign}$ function chatters between
+$\pm\tau_{cw}$ at every crossing, injecting a square wave into the torque
+command at the loop rate. The smooth form removes the discontinuity while
+recovering $\mathrm{sign}$ behaviour within three transition widths.
+
+\paragraph{Sensitivity.} Without feedforward the standing wheel speed is
+$\tau_{cw}/|K_3|$:
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lcc@{}}
+\toprule
+$\tau_{cw}$ & Standing wheel speed & Fraction of cap\\
+\midrule
+$4$\,mN\,m & $2.5$\,rad\,s$^{-1}$ & $6\,\%$\\
+$8$\,mN\,m (placeholder) & $5.1$\,rad\,s$^{-1}$ & $13\,\%$\\
+$12$\,mN\,m & $7.6$\,rad\,s$^{-1}$ & $19\,\%$\\
+$20$\,mN\,m & $12.7$\,rad\,s$^{-1}$ & $32\,\%$\\
+\bottomrule
+\end{tabular}
+\caption{Standing wheel speed without feedforward, evaluated at the
+placeholder friction values.}
+\label{tab:friction-cost}
+\end{table}
+
+Over-compensation is worse than under-compensation: excess feedforward drives
+the wheel rather than retarding it, and the regulator must then oppose its own
+feedforward term. The starting value is $70\,\%$ of the measured friction,
+adjusted upward against the standing wheel speed observed on the bench.
+
+\paragraph{Parameter status.} $\tau_{cw} = 8$\,mN\,m and $b_w = 0$ are
+placeholders pending a spin-down test; the pivot Coulomb torque
+$\tau_{cp} = 0$ is a placeholder pending a breakaway test. No friction
+measurement has been made on either stage. The sensitivity study establishing
+the thresholds above was conducted against these placeholders, so it bounds
+the tolerance rather than predicting the behaviour. The measurements are
+listed in \S\ref{sec:open}.
+
+\subsubsection{Cogging torque}
+\label{sec:cogging}
+
+The MN4006 motors have 12 pole pairs, producing torque ripple at $12\times$
+the mechanical frequency. At the wheel cap this is $76$\,Hz, below the
+Nyquist frequency of the $400$\,Hz loop and therefore representable in the
+control signal.
+
+No explicit cogging compensation is applied. The moteus field-oriented
+control loop runs well above any cogging harmonic and absorbs most of the
+ripple internally; the residual is a periodic disturbance to the body,
+attenuated by the body inertia. The cogging frequency reaches
+$f/2 = 200$\,Hz at a wheel speed of $105$\,rad\,s$^{-1}$, which is the
+threshold above which raising $\omega_{\mathrm{cap}}$ would require the
+residual amplitude to be characterised first. At the present cap of
+$40$\,rad\,s$^{-1}$ there is a factor of $2.6$ in hand.
+
+\subsubsection{Vibration and anti-aliasing}
+\label{sec:vibration}
+
+Three sources of high-frequency content reach the accelerometer.
+
+\begin{enumerate}
+  \item \textbf{Structural resonance} of the printed frame. Frequency
+        unmeasured; expected above $200$\,Hz given the stiffness of PETG-CF
+        at the $150$\,mm scale, but this has not been confirmed and is the
+        assumption most likely to be challenged if the frame is lightened.
+  \item \textbf{Cogging torque} at $12\times$ the wheel frequency
+        (\S\ref{sec:cogging}).
+  \item \textbf{Wheel unbalance}, producing a once-per-revolution forced
+        vibration at $6.4$\,Hz at the cap. CAD places each wheel centre of
+        mass on its spin axis to within $10^{-8}$\,mm, so the wheels are
+        balanced by design; the as-built residual has not been measured. The
+        sensitivity is $0.035$\,N of radial force per $0.1$\,mm of
+        eccentricity at $40$\,rad\,s$^{-1}$, scaling as $\omega^2$.
+\end{enumerate}
+
+Content above $f/2 = 200$\,Hz folds into the estimator passband and is
+indistinguishable from tilt. The complementary filter provides some
+attenuation but is not designed as an anti-aliasing filter, and its rejection
+above $200$\,Hz is finite.
+
+This mechanism, not discrete stability, sets the binding lower bound on loop
+rate: the anti-aliasing floor is $281$\,Hz against a stability floor of
+$38.3$\,Hz (\S\ref{sec:loop-rate}).
+
+\subsubsection{Per-cycle torque computation}
+\label{sec:torque-computation}
+
+Collecting \S\ref{sec:lqr} and the preceding subsections, the torque applied
+to wheel $k$ on each cycle is
+%
+\begin{equation}
+  \boxed{\;
+  u_k = \mathrm{clamp}\!\Big(
+    \underbrace{-\sum_{j=1}^{9} K_{p,kj}\,x_j}_{\text{LQR}}
+    + \underbrace{\tau_{cw}\tanh\!\left(\frac{\rho_k}{\varepsilon}\right)
+                  + b_w\rho_k}_{\text{friction feedforward}}\,,
+    \;\pm\tau_{\mathrm{peak}}\Big)
+  \;}
+  \label{eq:torque-full}
+\end{equation}
+%
+followed by the one-sided wheel cap of \eqref{eq:wheel-cap}. The ordering is
+fixed: feedforward is added before the clamp, and the wheel cap is applied
+after it. Reversing either produces a different controller.
+
+\begin{lstlisting}[language=C,caption={Per-cycle actuation, applied after the
+estimator of \S\ref{sec:estimation} and the control law of
+\S\ref{sec:lqr}.}]
+for (int k = 0; k < 3; k++) {
+    u[k] = 0.0f;
+    for (int j = 0; j < 9; j++)
+        u[k] -= Kp[k][j] * x[j];                // LQR
+
+    u[k] += tau_cw * tanhf(rho[k] / eps_ff);     // Coulomb
+    u[k] += b_w * rho[k];                        // viscous
+
+    u[k] = clampf(u[k], -tau_peak, tau_peak);    // torque clamp
+
+    if ((rho[k] >= +omega_cap && u[k] > 0.0f)    // wheel cap,
+     || (rho[k] <= -omega_cap && u[k] < 0.0f))   // one-sided
+        u[k] = 0.0f;
+}
+\end{lstlisting}
+
+\subsection{Validation}
+\label{sec:validation}
+
+\subsubsection{Gate methodology}
+\label{sec:gates}
+
+Each stage of the model was accepted only after passing an independent
+numerical check with a pre-declared tolerance. The gates are ordered so that
+each one depends on the results of the previous ones, and a failure at any
+gate invalidates everything downstream.
+
+\begin{table}[htbp]
+\centering
+\small
+\renewcommand{\arraystretch}{1.15}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}clp{62mm}cc@{}}
+\toprule
+\textbf{Gate} & \textbf{Tests} & \textbf{Criterion}
+& \textbf{Panel} & \textbf{Cube}$^*$\\
+\midrule
+1 & Hang test &
+  Gravity direction and mount rotation: released from the balanced
+  attitude, the model falls along $\hat{\bm{g}}_B$ &
+  pass & pass\\[0.35em]
+2 & Swing periods &
+  Small-amplitude period about the pivot matches $2\pi/\lambda$,
+  confirming $\Theta$ and $S_g$ &
+  ${<}\,0.1\,\%$ & $0.11$, $0.70$, $0.77\,\%$\\[0.35em]
+3 & Linearisation &
+  $\bm{A}$, $\bm{B}$ from the Simscape linearisation command match the
+  hand-derived matrices of \eqref{eq:AB} &
+  \makecell[l]{$\lVert\Delta\bm{A}\rVert{=}1.667\!\times\!10^{-7}$\\
+               $\lVert\Delta\bm{B}\rVert{=}0$}
+  & \makecell[l]{$1.742\!\times\!10^{-7}$\\ $2.157\!\times\!10^{-16}$}\\[0.6em]
+4 & Poles &
+  Unstable eigenvalues of the linearised plant match
+  $\sqrt{S_g/\bar\Theta}$ &
+  $\pm 9.037$, $0$ & $+7.9341$, $+7.9152$\\[0.35em]
+5 & Energy &
+  Open-loop simulation, no damping: total energy drift quantifies solver
+  dissipation &
+  $0.0000\,\%$ & ---\\[0.35em]
+6 & Momentum &
+  One torque pulse per wheel: $\lVert\bm{L}\rVert$ constant confirms sign
+  conventions and axis assignment &
+  $|\bm{L}| = 1.09\!\times\!10^{-13}$ & subsumed by Gate~3\\
+\bottomrule
+\end{tabular}%
+}
+\caption{Validation gates. 
+\\ $^*$Cube results are from the $(+1,+1,+1)$
+configuration, before the corner change of \S\ref{sec:corner-choice}. The
+qualitative conclusions are unaffected; the affected numbers ($\lambda$,
+$\ell$, mount angle) differ by the amounts tabulated in \cref{tab:corners}.}
+\label{tab:gates}
+\end{table}
+
+Gate~3 is the definitive one. Passing it establishes that the Simscape model
+and the analytic state-space matrices describe the same plant to
+$1.7\times10^{-7}$, so every subsequent analysis --- the LQR design, the
+structural properties of \S\ref{sec:structural}, the discrete-loop check of
+\S\ref{sec:loop-rate} --- is a statement about the Simscape model rather than
+a parallel calculation that might or might not correspond to it.
+
+Gate~2 has a methodological subtlety that cost time on the panel and is
+recorded here for that reason.
+
+\subsubsection{Amplitude correction in swing tests}
+\label{sec:swing-amplitude}
+
+The period of a pendulum is amplitude-dependent. For a swing of half-angle
+$\theta_0$ the exact period is
+%
+\begin{equation}
+  T(\theta_0) = T_0 \cdot \frac{2}{\pi}\,K\!\left(\sin^2\!\frac{\theta_0}{2}\right),
+  \qquad T_0 = 2\pi\sqrt{\frac{\bar\Theta}{S_g}}\,,
+  \label{eq:elliptic}
+\end{equation}
+%
+where $K$ is the complete elliptic integral of the first kind. Since
+$\bar\Theta$ enters the small-amplitude period as $T_0 \propto
+\sqrt{\bar\Theta}$, an uncorrected period measurement overstates $\bar\Theta$
+as $T^2/T_0^2$:
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Swing amplitude} & $T/T_0$ & $\bar\Theta$ \textbf{overstatement}\\
+\midrule
+$5^\circ$ & $1.000476$ & $0.10\,\%$\\
+$10^\circ$ & $1.001907$ & $0.38\,\%$\\
+$20^\circ$ & $1.007669$ & $1.54\,\%$\\
+$30^\circ$ & $1.017409$ & $3.51\,\%$\\
+$50^\circ$ & $1.049783$ & $10.20\,\%$\\
+\bottomrule
+\end{tabular}
+\caption{Apparent inertia error from an uncorrected period measurement. A
+$50^\circ$ swing overstates $\bar\Theta$ by $10.2\,\%$, which propagates
+directly into $\lambda$.}
+\label{tab:amplitude}
+\end{table}
+
+The error scales as $\theta_0^2$ to leading order, so period errors roughly
+double the inertia error. On the panel this was caught because the
+small-amplitude formula was validated against a finite-amplitude simulation
+and the two disagreed by more than Gate~2's tolerance until the correction
+was applied. The remedy is either to keep swings below $10^\circ$ (where the
+error is under $0.4\,\%$) or to apply \eqref{eq:elliptic} and extract
+$\bar\Theta$ from the corrected period.
+
+\subsubsection{The return-difference identity}
+\label{sec:return-difference}
+
+For full-state linear quadratic regulation with the cost
+$J = \int(\bm{x}^{\top}\bm{Q}\bm{x} + \bm{u}^{\top}\bm{R}\bm{u})\,
+\mathrm{d}t$, the return-difference matrix satisfies
+%
+\begin{equation}
+  M_s = \bar\sigma\!\left[(\bm{I} + \bm{L})^{-1}\right] = 1.000000000\,,
+  \label{eq:Ms}
+\end{equation}
+%
+where $\bm{L} = \bm{K}_r(s\bm{I} - \bm{A}_r)^{-1}\bm{B}_r$ is the loop
+transfer of the reduced system. This is not a computed margin; it is the
+identity of Kalman \cite{kalman1964optimal}, forced to hold exactly by the
+algebraic structure of the Riccati equation. Any deviation from $1$ is an
+implementation fault --- a wrong matrix, a non-positive-semidefinite $\bm{Q}$,
+or a Riccati solution that did not converge --- rather than a property of the
+design.
+
+The identity serves as a single-number acceptance test on the gain
+computation, catching classes of error that would otherwise require
+inspecting a $3\times 9$ matrix entry by entry. It is evaluated on the
+reduced system of \S\ref{sec:reduction}, where the Riccati problem is
+well-posed, and not on the full nine-state system, where it is not
+(\cref{tab:riccati}).
+
+\paragraph{Scope.} Three things the identity does not cover.
+
+\begin{enumerate}
+  \item \textbf{Discretisation.} Discretising the reduced-order LQR at
+        $400$\,Hz gives $M_s = 1.039$, a $3.9\,\%$ deviation. The guarantee
+        does not survive the zero-order hold \cite{doyle1978guaranteed}, and
+        discrete margins must be verified directly against the $z$-plane
+        eigenvalues (\S\ref{sec:loop-rate}).
+  \item \textbf{An estimator in the loop.} Replacing the full state with the
+        output of \S\ref{sec:estimation} breaks the loop transfer on which
+        the identity is defined, and Doyle's counter-example
+        \cite{doyle1978guaranteed} shows that LQG can have arbitrarily small
+        margins. The return-difference identity is a statement about the
+        \emph{controller}, not about the closed loop with the estimator
+        included.
+  \item \textbf{Gain structure.} $M_s = 1$ confirms that the gain is optimal
+        for the stated cost, but the cost may be wrong. The sign-pattern and
+        uniformity checks of \S\ref{sec:gains} test the gain's physical
+        plausibility independently of the cost function.
+\end{enumerate}
+
+\subsubsection{Tolerance in rank computations}
+\label{sec:rank-trap}
+
+The controllability argument of \S\ref{sec:structural} rests on a rank count.
+An incorrect tolerance can invert the conclusion silently.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Call} & \textbf{Result}\\
+\midrule
+\texttt{rank(Co)} (default, relative tolerance) & $8$ --- correct\\
+\texttt{rank(Co, 1e-9)} (absolute tolerance) & $9$ --- incorrect\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+$\lVert\mathcal{C}\rVert = 1.105\times10^{9}$, so an absolute tolerance of
+$10^{-9}$ is $9\times10^{-19}$ of the matrix scale --- below the
+double-precision floor. Every singular value, including the one at
+$9.19\times10^{-17}$ that is numerically zero, exceeds that threshold.
+
+The failure reports the system as fully controllable, which requires no
+further action. Had the result been accepted, the eight-state reduction
+(\S\ref{sec:reduction}) would not have been written, \texttt{lqr} would have
+returned a gain without complaint (\cref{tab:riccati}), and the first
+indication of a problem would have arrived on hardware as unexplained
+authority loss in a direction that cannot be identified from the symptoms.
+
+A tolerance must be chosen relative to the scale of the matrix it is applied
+to. MATLAB's default does this; a hand-supplied absolute figure carried from
+another problem does not. The general form: tolerances that are safe for one
+matrix may be orders of magnitude too loose or too tight for the next one,
+and the failure mode in both cases is silence.
+
+\subsection{Results}
+\label{sec:results}
+
+\subsubsection{Simulation methodology}
+\label{sec:sim-method}
+
+Three models serve different roles. The linear design plant
+(\S\ref{sec:plant}) is used for gain synthesis and structural analysis; a
+Simscape Multibody model with imported STEP geometry provides independent
+verification; and a nonlinear MATLAB simulator (`cubli\_nlsim`) carries the
+full sensor and actuator budget and is fast enough for the thousands of runs a
+bisection sweep requires (${\sim}50$\,ms per run against ${\sim}20$\,s for
+Simscape). The Simscape model is the reference; the MATLAB simulator's only
+job is to agree with it.
+
+Agreement was verified at a $2^\circ$ recovery with ideal sensors:
+
+\begin{center}
+\small
+\captionof{table}{Nonlinear simulator against Simscape, $2^\circ$ release.}
+\label{tab:nlsim-vs-simscape}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+$t$ [s] & \texttt{cubli\_nlsim} & Simscape\\
+\midrule
+$0.0$ & $1.6254^\circ$ & $1.6254^\circ$\\
+$0.1$ & $1.0766^\circ$ & $1.0854^\circ$\\
+$0.3$ & $0.1135^\circ$ & $0.1108^\circ$\\
+$0.6$ & $0.3369^\circ$ & $0.3389^\circ$\\
+$1.0$ & $0.1224^\circ$ & $0.1285^\circ$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Agreement is within $1\,\%$ through the transient; late-time divergence is
+Simscape solver tolerance, not a modelling difference.
+
+\paragraph{Recovery metric.} The largest initial tilt, released from rest with
+wheels stationary, from which the cube returns to upright, minimised over tilt
+azimuth in the plane perpendicular to $\hat{\bm{g}}_B$. Four to eight
+azimuths are tested per bisection, with $12$ bisection steps per azimuth.
+Best and worst azimuths differ by approximately $6\,\%$, so a single-axis
+number overstates capability.
+
+\paragraph{Shipping configuration.} Unless otherwise noted, all results below
+use: $\tau_{\max} = 0.12$\,N\,m, $\omega_{\mathrm{cap}} = 40$\,rad\,s$^{-1}$,
+bearing friction at $\tau_{cw} = 8$\,mN\,m with feedforward, pivot friction at
+$5$\,mN\,m, $5$\,ms loop delay, BMI270-grade sensor noise (accelerometer
+$3.2$\,mrad, gyro $2.4$\,mrad\,s$^{-1}$), gyro bias
+$[0.3,\,-0.2,\,0.15]^\circ$\,s$^{-1}$, IMU at the geometric centre, and the
+reduced-attitude complementary filter with bias states at $k_P = 4$,
+$k_I = 0.5$.
+
+% --- FIGURE SLOT: cube recovery at the envelope edge ---
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\textwidth]{images/cube_recovery.pdf}
+  \caption{Simulated cube recovery from $3.14^\circ$ (best corner), shipping
+  configuration. Top: tilt magnitude, true and estimated --- the divergence
+  during the first $0.2$\,s is the estimator phase lag of \S\ref{sec:1d-to-3d}.
+  Middle: the three wheel speeds against the $40$\,rad\,s$^{-1}$ cap. Bottom:
+  commanded torques against the $0.12$\,N\,m clamp.}
+  \label{fig:cube-recovery}
+\end{figure}
+
+\FloatBarrier
+
+\subsubsection{Per-corner recovery envelope}
+\label{sec:per-corner}
+
+Each corner is designed with its own gain set at the same Bryson weights
+(\S\ref{sec:bryson}).
+
+\begin{table}[!t]
+\centering
+\small
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+\textbf{Corner} & $\ell$ [mm] & $S_g$ [N\,m] & $\lambda$ [s$^{-1}$]
+& $\theta_{\mathrm{eq}}$ & \textbf{Recovery} & Wheel peak\\
+\midrule
+$(-1,-1,-1)$ \textbf{(primary)} & $122.84$ & $1.8875$ & $8.257$
+  & $0.797^\circ$ & $\bm{3.14^\circ}$ & $41.7$\,rad\,s$^{-1}$\\
+$(-1,+1,-1)$ & $126.08$ & $1.9373$ & $8.159$ & $2.773^\circ$ & $3.03^\circ$ & $41.7$\\
+$(-1,-1,+1)$ & $128.54$ & $1.9750$ & $8.121$ & $3.170^\circ$ & $2.93^\circ$ & $41.3$\\
+$(+1,-1,-1)$ & $128.56$ & $1.9753$ & $8.118$ & $3.171^\circ$ & $2.92^\circ$ & $41.7$\\
+$(-1,+1,+1)$ & $131.64$ & $2.0226$ & $8.048$ & $3.097^\circ$ & $2.89^\circ$ & $41.3$\\
+$(+1,+1,-1)$ & $131.66$ & $2.0229$ & $8.050$ & $3.095^\circ$ & $2.83^\circ$ & $41.7$\\
+$(+1,-1,+1)$ & $134.01$ & $2.0591$ & $7.980$ & $2.609^\circ$ & $2.77^\circ$ & $41.7$\\
+$(+1,+1,+1)$ & $136.99$ & $2.1048$ & $7.934$ & $0.714^\circ$ & $2.76^\circ$ & $41.7$\\
+\bottomrule
+\end{tabular}
+\caption{All eight corners, shipping configuration, own gains. Wheel peak
+exceeds the $40$\,rad\,s$^{-1}$ cap by $4\,\%$ because the cap zeroes
+torque rather than braking.}
+\label{tab:per-corner}
+\end{table}
+
+All eight corners balance. The spread is $14\,\%$, and recovery tracks
+$1/S_g$ exactly: the longest lever arm produces the largest destabilising
+moment and therefore the smallest envelope. The primary corner $(-1,-1,-1)$
+is the best of the eight.
+
+Every corner is momentum-limited. This is confirmed by the wheel peak:
+$41.7$\,rad\,s$^{-1}$ against the cap at every corner, while the torque stays
+inside its clamp.
+
+\paragraph{One gain set does not work.} With the primary corner's gains
+applied to all eight, six corners diverge at the open-loop rate ($\max
+\mathrm{Re}$ from $+7.7$ to $+7.9$\,s$^{-1}$): the controller pushes the
+wrong way because $\hat{\bm{g}}_B$ rotates $67$--$107^\circ$ between
+corners, and both $\bm{P}$ and $\bm{\Theta}$ follow it. Firmware carries
+eight gain matrices (216 floats).
+
+\paragraph{The antipodal trap.} $\bm{P} = \bm{I} -
+\hat{\bm{g}}_B\hat{\bm{g}}_B^{\top}$ is invariant under $\hat{\bm{g}}_B \to
+-\hat{\bm{g}}_B$, so the primary gains \emph{almost} work at the antipodal
+corner: $\max\mathrm{Re} = +0.149$, a divergence time of $6.7$\,s. A
+$2.5$\,s scoring window marks this as a pass; it is not. Runs must exceed
+$15$\,s or check the eigenvalues directly.
+
+% --- FIGURE SLOT: multi-corner bar chart ---
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.8\textwidth]{images/multi_corner.pdf}
+  \caption{Recoverable envelope and equilibrium tilt for all eight corners.
+  The shaded region is the margin available for a corner-to-corner transition.}
+  \label{fig:multi-corner}
+\end{figure}
+
+\FloatBarrier
+
+\subsubsection{Nonlinearity budget}
+\label{sec:nonlinearity-budget}
+
+Each effect was isolated against a $1^\circ$ tilt, $8$\,s run, steady state
+over the last $2$\,s.
+
+\begin{table}[!t]
+\centering
+\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Effect} & \textbf{Recovery} & \textbf{Tilt rms} & \textbf{Wheel drift}
+& $\tau$ \textbf{rms}\\
+\midrule
+Ideal & $3.42^\circ$ & $0.000^\circ$ & $0.0$\,rad\,s$^{-1}$ & $0.0000$\,N\,m\\
+Wheel Coulomb $8$\,mN\,m, no FF & $3.29^\circ$ & $0.001^\circ$ & $1.8$\,rad\,s$^{-1}$ & $0.0080$\\
+Same, with feedforward & $3.29^\circ$ & $0.000^\circ$ & $0.0$ & $0.0000$\\
+Pivot friction $5$\,mN\,m & $3.36^\circ$ & $0.002^\circ$ & $0.0$ & $0.0001$\\
+Accelerometer noise $3.2$\,mrad & $3.42^\circ$ & $0.040^\circ$ & $0.7$ & $0.0308$\\
+Gyro noise $2.4$\,mrad\,s$^{-1}$ & $3.42^\circ$ & $0.004^\circ$ & $0.1$ & $0.0030$\\
+Delay $2$ samples ($5$\,ms) & $3.33^\circ$ & --- & --- & ---\\
+Delay $3$ samples ($7.5$\,ms) & $3.29^\circ$ & --- & --- & ---\\
+\textbf{All, FF on, $5$\,ms delay} & $\bm{3.16^\circ}$ & $0.038^\circ$ & $0.5$ & $0.0308$\\
+\bottomrule
+\end{tabular}
+\caption{Nonlinearity budget. Total realistic degradation $-7.6\,\%$ from the
+ideal-sensor baseline.}
+\label{tab:nonlinearity-budget}
+\end{table}
+
+Feedforward removes the wheel drift and torque penalty from bearing friction
+completely (row~3 vs row~2), confirming it is mandatory rather than
+beneficial. Accelerometer noise dominates the torque activity and the tilt
+rms; gyro noise is an order of magnitude below it.
+
+\paragraph{Parametric robustness, nonlinear.} Sweeping $\bar{\bm{\Theta}}$
+from $\times 0.70$ to $\times 1.30$ with gains fixed: recovery ranges from
+$3.41^\circ$ to $3.00^\circ$, stable throughout. The $\rho_{\mathrm{scale}}$
+assumption does not affect the envelope.
+
+\FloatBarrier
+
+\subsubsection{Actuator design space}
+\label{sec:actuator-design}
+
+The recovery envelope across the $(\tau_{\max},\,\omega_{\mathrm{cap}})$
+plane, gains fixed at the Bryson set of \S\ref{sec:bryson}:
+
+\begin{table}[!t]
+\centering
+\small
+\begin{tabular}{@{}l|ccccc@{}}
+\toprule
+$\tau_{\max}$ \textbackslash\ $\omega_{\mathrm{cap}}$
+& $40$ & $60$ & $80$ & $120$ & $200$\\
+\midrule
+$0.10$ & $3.09$ & $3.53$ & $3.45$ & $3.45$ & $3.45$\\
+$0.15$ & $3.80$ & $4.61$ & $5.12$ & $5.16$ & $5.16$\\
+$\bm{0.20}$ & $4.25$ & $5.38$ & $6.15$ & $\bm{7.04}$ & $6.86$\\
+$0.30$ & $4.79$ & $6.36$ & $7.53$ & $9.21$ & $10.83$\\
+$0.40$ & $5.03$ & $6.92$ & $8.41$ & $10.76$ & $13.39$\\
+\bottomrule
+\end{tabular}
+\caption{Worst-case recovery angle [deg] across the actuator design space.
+Non-monotonic cells ($0.20$/$200$ worse than $0.20$/$120$): with fixed gains
+a larger cap lets the wheel run away. Raising $\omega_{\mathrm{cap}}$ requires
+re-running the gain grid.}
+\label{tab:actuator-chart}
+\end{table}
+
+Below $\tau_{\max} \approx 0.15$\,N\,m the cube is torque-limited and the
+wheel cap is irrelevant; above it, $\tau_{\max}$ and $\omega_{\mathrm{cap}}$
+multiply. Neither is worth relaxing alone.
+
+% --- FIGURE SLOT: actuator design chart contour ---
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.75\textwidth]{images/actuator_chart.pdf}
+  \caption{Contour of worst-case recovery [deg] over the actuator design
+  space, with the current operating point ($0.12$\,N\,m, $40$\,rad\,s$^{-1}$)
+  and the momentum/torque crossover line marked.}
+  \label{fig:actuator-chart}
+\end{figure}
+
+\FloatBarrier
+
+\subsubsection{Weight selection robustness}
+\label{sec:weight-robustness}
+
+The wheel-rate weight $\omega_{\mathrm{des}}$ was selected for robustness
+against plant uncertainty rather than for peak performance.
+
+\begin{center}
+\small
+\captionof{table}{Recovery angle [deg] at the shipping configuration,
+sweeping $\omega_{\mathrm{des}}$ against perturbation in $\bar{\bm{\Theta}}$.}
+\label{tab:qw-robustness}
+\begin{tabular}{@{}l|ccccc|l@{}}
+\toprule
+$\omega_{\mathrm{des}}$ & $\Theta\times0.8$ & $\times0.9$ & $\times1.0$
+& $\times1.1$ & $\times1.2$ & Verdict\\
+\midrule
+$5$ & $3.11$ & $3.05$ & $2.99$ & $0.00$ & $0.00$ & fails at $+10\,\%$\\
+$6$ & $3.07$ & $3.00$ & $2.94$ & $2.57$ & $0.00$ & fails at $+20\,\%$\\
+$8$ & $2.98$ & $2.92$ & $2.86$ & $2.80$ & $0.00$ & fails at $+20\,\%$\\
+$\bm{10}$ & $2.91$ & $2.85$ & $\bm{2.79}$ & $2.73$ & $2.68$ & survives\\
+$12$ & $2.84$ & $2.78$ & $2.72$ & $2.67$ & $2.62$ & survives, $3\,\%$ worse\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+$\omega_{\mathrm{des}} = 10$ costs $4\,\%$ against the fragile optimum at $5$
+and is the only value that holds across $\pm 20\,\%$ on $\bar{\bm{\Theta}}$
+--- the residual uncertainty from the print-density assumption
+($\rho_{\mathrm{scale}}$). Below $\omega_{\mathrm{des}} = 5$ there is a
+cliff: $4 \to 2.06^\circ$, $3 \to 1.58^\circ$, $2 \to 0.00^\circ$, as the
+peak gain magnitude climbs from $13$ to $29$ and the controller begins
+fighting the estimator.
+
+\FloatBarrier
+
+\subsubsection{Stage 1 --- planar panel}
+\label{sec:panel-results}
+
+The panel is demonstrated on hardware.
+
+\begin{center}
+\small
+\captionof{table}{Stage-1 panel, demonstrated on hardware.}
+\label{tab:panel-results}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Quantity} & \textbf{Value} & \textbf{Origin}\\
+\midrule
+Demonstrated recovery & $10^\circ$ & measured on hardware\\
+Settling time & $0.75$\,s & measured\\
+Peak wheel speed & $39.5$\,rad\,s$^{-1}$ ($99\,\%$ of cap) & measured\\
+Gain vector $\bm{K}$ & $[-1.0998,\; -0.1232,\; -0.001732]$ & $M_s = 1.000000$\\
+Closed-loop poles & $-9.72\pm0.76j$, $-5.05$ & \\
+Estimator penalty & $11.59^\circ \to 11.53^\circ$ ($0.5\,\%$) & simulated\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\FloatBarrier
+
+\subsubsection{Edge balance}
+\label{sec:edge-results}
+
+No equivalent simulation study exists for edge balance. Edge bring-up went
+directly from the reduced-attitude estimator design to staged hardware
+bring-up, validated on hardware rather than through a prior envelope study.
