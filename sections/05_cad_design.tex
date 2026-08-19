@@ -159,6 +159,69 @@ Figure~\ref{fig:dwg_3d} of Appendix~\ref{app:cad_3d}.}
 \label{fig:cube_3d}
 \end{figure}
 
+The model that supersedes that concept is shown in
+Figure~\ref{fig:armonia_assembly}. The left view is the assembly as it presents
+itself externally: the outer frame carrying the corner brackets and edge members
+that make ground contact, with the three wheel modules visible through the open
+faces and the avionics stack sitting on the upper deck of the inner structure.
+The right view is the same assembly with the wheels and frame members rendered
+transparent, so that what the inner structure actually has to hold --- battery
+pack, the three motor drivers, the flight controller and inertial measurement
+unit, the brake servos --- is visible in the position it occupies. Read together
+they are the picture of the constraint chain of Section~\ref{sec:massbudget}:
+the right view sets the minimum internal clear volume, the left view is the
+envelope that volume forces, and the interfaces of
+Table~\ref{tab:mech_interfaces} are the seams between them.
+Figure~\ref{fig:armonia_wheel_detail} is a detail view of the wheel modules
+themselves, showing the ballast bolt circle that carries the last of the sizing
+authority and the wheel-to-frame clearance that the model checks of
+Section~\ref{sec:cad_verification} sweep through a full rotation.
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}[b]{0.48\textwidth}
+  \centering
+  \adjincludegraphics[trim={0.34\width} {0.06\height} {0.34\width} {0.06\height},
+                      clip, width=\linewidth]{images/armonia_assembly_a1.jpg}
+  \\[0.4em]{\small (a) External assembly}
+\end{minipage}\hfill
+\begin{minipage}[b]{0.48\textwidth}
+  \centering
+  \adjincludegraphics[trim={0.34\width} {0.06\height} {0.34\width} {0.06\height},
+                      clip, width=\linewidth]{images/armonia_assembly_s1.jpg}
+  \\[0.4em]{\small (b) Internal packaging}
+\end{minipage}
+\caption[Three-axis cube CAD assembly, external and internal views]{The
+three-axis cube as modelled in CAD. \textbf{(a)}~External view: the outer frame
+with its corner brackets and edge contact features, the three orthogonal
+reaction-wheel modules seen through the open faces, and the avionics deck of the
+inner structure at the top. \textbf{(b)}~The same assembly with the wheels and
+frame members made transparent, showing the battery pack, motor drivers, flight
+controller and inertial measurement unit, and brake servos carried by the inner
+structure. The internal arrangement in (b) is what fixes the minimum clear
+volume and therefore the edge length $L$ of Section~\ref{sec:massbudget}; the
+controlled interfaces between the two are listed in
+Table~\ref{tab:mech_interfaces}.}
+\label{fig:armonia_assembly}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\adjincludegraphics[trim={0.06\width} {0\height} {0.01\width} {0\height},
+                    clip, width=0.92\textwidth]{images/armonia_assembly_b1.jpg}
+\caption[Detail view of the reaction-wheel modules]{Detail view of two of the
+three reaction-wheel modules of Figure~\ref{fig:armonia_assembly}. The bolts
+around each rim are the ballast masses: the wheel inertia $I_w$ is trimmed by
+how many of the holes on the pitch circle are populated, which is the authority
+the sizing closure of Section~\ref{sec:rw_sizing} spends last. Visible at this
+scale are the spoked web that carries hub torque out to the rim, the hub bolt
+pattern realising the wheel-to-rotor interface of
+Table~\ref{tab:mech_interfaces}, and the clearance $c_w$ between the swept wheel
+envelope and the surrounding frame members --- the gap verified through a full
+rotation of each wheel in Section~\ref{sec:cad_verification}.}
+\label{fig:armonia_wheel_detail}
+\end{figure}
+
 \subsection{CAD and Dimensional Verification}
 \label{sec:cad_verification}
 
@@ -170,8 +233,8 @@ the model realises them consistently and that the fabricated part matches the
 model.
 
 \paragraph{Model checks (pre-fabrication).} Interference and clearance
-verification on the wheel-to-subframe and inter-module clearances $c_w$ and $c_o$
-of Table~\ref{tab:cad_params}, through a full rotation of each wheel and across
+verification on the wheel-to-subframe and inter-module clearances $c_w$ and
+$c_o$, through a full rotation of each wheel and across
 all three axes simultaneously; orthogonality of the three motor axes; position of
 the centre of mass relative to the geometric centre, since the modelling of
 Section~\ref{sec:methodology} assumes a known offset; and the mass roll-up against
