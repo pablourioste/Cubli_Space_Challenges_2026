@@ -20,7 +20,7 @@ not repeated here.
 
 Figure~\ref{fig:system_loop} shows the closed control loop that ties the four
 subsystems together. The Teensy~4.1 runs estimation and control at
-\qty{1}{\kilo\hertz} and issues torque commands over CAN-FD to three moteus-n1
+\qty{1}{\kilo\hertz} and issues torque commands over -FD to three moteus-n1
 drivers, each closing a \qty{30}{\kilo\hertz} field-oriented current loop on its
 MN4006 motor. The resulting reaction torque acts on the cube body; the body's
 attitude is sensed by the BMI270 IMU and the rotor angle by the MA600 absolute
