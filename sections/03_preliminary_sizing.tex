@@ -169,19 +169,13 @@ $I_{w,\text{target}}$ & \textbf{Target wheel inertia} & \qty{6.2352e-4}{\kilogra
 \end{tabular}
 
 \vspace{0.4em}
-{\footnotesize\RaggedRight\textsuperscript{*}\,Lowered from the
-\qty{5500}{\rpm} of the previous iteration. Since $I_{w,\text{target}} =
-h_w/\omega_{\max}$, a lower speed \emph{raises} the inertia requirement ---
-here by \qty{52.8}{\percent}, from \qty{4.0813e-4}{\kilogram\metre\squared}
-to \qty{6.2352e-4}{\kilogram\metre\squared} once the mass loop is
-re-converged. That is met with ballast rather than diameter, the ring being
-pinned by the envelope: fifteen stations per wheel rather than six. What is
-bought in exchange is \qty{1500}{\rpm} of relief on the drive, which drops
-the design speed from \qty{79.5}{\percent} to \qty{57.8}{\percent} of the
-derived end-of-discharge ceiling (PER-08), and a brake that clears its
-tip-over floor by $\tau_b/\tau_g = 3.80$. No margin should be quoted at any
-other speed without re-running the closure, since the station count changes
-in steps rather than continuously.\par}
+{\footnotesize\RaggedRight\textsuperscript{*}\,The design speed is set at
+\qty{57.8}{\percent} of the motor's derived end-of-discharge ceiling
+(PER-08), leaving the drive well inside its limit. The momentum
+$h_w$ is instead recovered through inertia: a heavier, slower wheel spins at
+lower angular rates and demands smaller, less abrupt momentum shifts, which
+the control loop handles more gently and stably than a light wheel driven
+near its speed limit.\par}
 \end{table}
 
 Two features of these relations govern how the iteration behaves:
