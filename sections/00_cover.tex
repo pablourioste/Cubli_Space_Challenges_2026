@@ -26,14 +26,18 @@
 \definecolor{covermeta}{HTML}{404040}  % metadata label grey
 
 % ---------- Cover fields ----------
-% These are aliases, not values: the project name, document type, programme and
-% version come from the document-identity block in main.tex, which the running
-% header and the PDF metadata read from as well. Edit them there, not here, so
-% the cover and the header always agree (review comment CUBLI1-020).
+% These are aliases, not values: the project name, document type, programme,
+% version and issue date come from the document-identity block in main.tex,
+% which the running header and the PDF metadata read from as well. Edit them
+% there, not here, so the cover and the header always agree (review comment
+% CUBLI1-020). The date is \docdate rather than \today because the gate table of
+% Sec. 2.3 reports gate status as at the date of issue, and that date must not
+% change when the file is recompiled (review comment CUBLI1-015).
 \newcommand{\coverTitle}{\doctypename}
 \newcommand{\coverSubtitle}{\projectname}
 \newcommand{\coverTagline}{\doctagline}
 \newcommand{\coverVersion}{\docversion}
+\newcommand{\coverDate}{\docdate}
 \newcommand{\coverOrganization}{\programname}
 
 % Team list, laid out as an explicit three-column grid: names separated by & and
@@ -173,7 +177,7 @@
         \renewcommand{\arraystretch}{1.0}
         \begin{tabular}{@{}p{0.42\linewidth}@{\hspace{1.4em}}l@{}}
             \covermetarow{Document version}{\coverVersion}
-            \covermetarow{Date of issue}{\today}
+            \covermetarow{Date of issue}{\coverDate}
         \end{tabular}
     \end{minipage}
 

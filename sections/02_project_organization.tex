@@ -84,7 +84,10 @@ dates.
 
 The full-page schedule in Figure~\ref{fig:gantt} places every task of
 Section~\ref{sec:wbs} on the 23~July--20~August 2026 calendar, and
-Table~\ref{tab:gates} states the gate that closes each phase.
+Table~\ref{tab:gates} states the gate that closes each phase together with its
+status as at the date of issue. The plan is stated first, as it was baselined;
+what actually happened against it is recorded in the notes and the
+\emph{Schedule as run} paragraph that follow the table.
 
 \paragraph{Structure of the plan.}
 The first two weeks establish the analytical and design foundation: the dynamics
@@ -93,8 +96,8 @@ its wiring design on the hardware and electrical sides, and the simulation
 environment on the control side. These converge on 2~August, which carries two
 objectives: the first powered bring-up of the single-axis rig, taking the
 \qty{5}{\volt} rail, the driver and the encoder to verified open-loop operation
-(M1); and the freeze of the three-dimensional frame geometry, which closes the
-mass and inertia budget against the sizing analysis (M2). The frame freeze
+(M1); and the freeze of the three-dimensional frame geometry (M2a), against
+which the mass, inertia and CoM budget is then closed (M2b). The frame freeze
 releases the second procurement round on 5~August (M3), which is the last point
 at which parts can be ordered with useful delivery margin before cube assembly
 begins on 13~August.
@@ -129,35 +132,111 @@ short.
 
 \begin{table}[htbp]
 \centering
-\caption[Milestone gates, from kick-off to the final presentation]{Milestone
-gates, from kick-off to the final presentation, with the criterion that closes
-each one.}
+\caption[Milestone gates and their status at issue]{Milestone gates, from
+kick-off to the final presentation, with the criterion that closes each one and
+its status as at the date of issue (\docdate). \emph{Closed} means the criterion
+is met and the evidence is in this document; a gate whose criterion is only
+partly met is recorded as such and not as passed. The status column is the
+programme-level view of Appendix~\ref{app:verification}, which carries the
+per-requirement record.}
 \label{tab:gates}
 \small
-\begin{tabular}{@{}l L{7.6cm} l@{}}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}l L{6.3cm} c L{3.6cm}@{}}
 \toprule
-\textbf{Gate} & \textbf{Pass criterion} & \textbf{Date} \\
+\textbf{Gate} & \textbf{Pass criterion} & \textbf{Planned} & \textbf{Status at issue} \\
 \midrule
-G1 & Long-lead order placed; requirements and plan locked & 24 Jul \\
-G2 & Dynamics, linearisation and wheel sizing complete & 31 Jul \\
-M1 & 1-DoF rig bring-up: \qty{5}{\volt} rail trimmed under load, driver commutating, encoder verified at ${\le}\,\qty{1.5}{\milli\metre}$ gap & 2 Aug \\
-M2 & 3D frame geometry frozen at \qty{150}{\milli\metre}; mass, inertia and CoM budget closed against the sizing analysis & 2 Aug \\
-G4 & TDD v1 delivered for assessment & 3 Aug \\
-M3 & Procurement round 2 consolidated and ordered & 5 Aug \\
-M4 & 1-DoF closed loop live; disarm path and watchdog verified & 7 Aug \\
-M5 & Manufacturing package released for fabrication & 7 Aug \\
-M6 & Plant parameters measured on the rig and validated against simulation; measured torque, inertia and friction reconciled with the sizing analysis, or a re-sizing decision recorded & 9 Aug \\
-M7 & 1-DoF control design complete: plant, regulator, estimator and safety logic & 9 Aug \\
-G3 & 1-DoF rig balances $\geq$60 s unassisted & 12 Aug \\
-M8 & TDD v2 corrected and finally submitted & 14 Aug \\
-G5 & Cube integrated and powered; all axes addressable & 15 Aug \\
-G6 & Edge balance (S2a) for $\geq$60 s with disturbance recovery & 17 Aug \\
-G7 & Corner balance and commanded slew (S2b/c) & 19 Aug \\
-G8 & Face-to-edge jump-up (S3) captured on video (sacrificial scope) & 20 Aug \\
-G9 & Final presentation and demonstration & 20 Aug \\
+G1 & Long-lead order placed; requirements and plan locked & 24 Jul & Closed \\
+G2 & Dynamics, linearisation and wheel sizing complete & 31 Jul & Closed (Sec.~\ref{sec:sizing}) \\
+M1 & 1-DoF rig bring-up: \qty{5}{\volt} rail trimmed under load, driver commutating, encoder verified at ${\le}\,\qty{1.5}{\milli\metre}$ gap & 2 Aug & Closed \\
+M2a & 3D frame geometry frozen at \qty{150}{\milli\metre} & 2 Aug & Closed in CAD; CON-01 inspection open \\
+M2b & Mass, inertia and CoM budget closed against the sizing analysis & 2 Aug & \textbf{Open} --- see note \\
+G4 & TDD v1 delivered for assessment & 3 Aug & Closed \\
+M3 & Procurement round 2 consolidated and ordered & 5 Aug & Closed \\
+M4 & 1-DoF closed loop live; disarm path and watchdog verified & 7 Aug & Partly met --- see note \\
+M5 & Manufacturing package released for fabrication & 7 Aug & Closed --- see note \\
+M6 & Plant parameters measured on the rig and validated against simulation; measured torque, inertia and friction reconciled with the sizing analysis, or a re-sizing decision recorded & 9 Aug & \textbf{Open} --- see note \\
+M7 & 1-DoF control design complete: plant, regulator, estimator and safety logic & 9 Aug & Closed (Sec.~\ref{sec:control_algorithms}) \\
+G3 & 1-DoF rig balances $\geq$60 s unassisted & 12 Aug & Closed (Tab.~\ref{tab:balance_examples}) \\
+M8 & TDD v2 corrected and finally submitted & 14 Aug & Closed at this issue (slipped) \\
+G5 & Cube integrated and powered; all axes addressable & 15 Aug & Closed (App.~\ref{app:cad_mass}) \\
+G6 & Edge balance (S2a) for $\geq$60 s with disturbance recovery & 17 Aug & Partly met --- see note \\
+G7 & Corner balance and commanded slew (S2b/c) & 19 Aug & \textbf{Open} (Sec.~\ref{sec:test_3dof}) \\
+G8 & Face-to-edge jump-up (S3) captured on video (sacrificial scope) & 20 Aug & \textbf{Open} (sacrificial) \\
+G9 & Final presentation and demonstration & 20 Aug & Due at issue \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\paragraph{Notes on the gates not closed.} Five entries above are not a clean
+pass, and each is recorded here rather than absorbed into the status column.
+
+\begin{itemize}
+\item \textbf{M2b --- budget closure.} The v1 gate M2 bundled two separable
+things: freezing the frame geometry, and closing the mass, inertia and CoM
+budget against the sizing analysis. The first was done on the planned date and
+is what \qty{\cubeL}{\milli\metre} rests on; the second was not, and stating
+both as one passed gate overstated the design's position. They are therefore
+split. M2b remains open because the structure line of
+Table~\ref{tab:massbudget} is still an allowance rather than a CAD roll-up
+(\qty{\massStructAllow}{\gram} projected against \qty{\massStructBuilt}{\gram}
+implied by the weighed article), and because the CoM offset row of
+Table~\ref{tab:mass_verification} has no value. What \emph{is} closed is the
+mass cap: the integrated cube weighs \qty{\Mbuilt}{\kilo\gram} against the
+\qty{\Mcap}{\kilo\gram} of CON-02. M2b closes when the CAD mass properties are
+exported and the CoM offset measured, not before.
+
+\item \textbf{M2a --- geometry freeze.} Closed as a design action: the CAD is
+frozen at \qty{\cubeL}{\milli\metre} and every driving dimension of
+Table~\ref{tab:cad_params} is referred to it. The CON-01 \emph{inspection} ---
+measuring the built frame against that figure --- is still open in
+Appendix~\ref{app:verification}, so the gate is reported as frozen in CAD and
+unverified on the article. The related \qty{\cubeLan}{\milli\metre} versus
+\qty{\cubeL}{\milli\metre} discrepancy between the sizing run and the frozen
+value is a separate open decision, recorded in
+Section~\ref{sec:requirements} and in the footnote to
+Table~\ref{tab:spec_dims}.
+
+\item \textbf{M4 --- closed loop and safety path.} The closed loop is live and
+its result is Table~\ref{tab:balance_examples}. The second half of the
+criterion is not evidenced: FUN-08 (disarm from every mode) and FUN-09 (fall
+response) are both Open in Appendix~\ref{app:verification}. The gate is
+therefore partly met, and the safety-path demonstration is outstanding.
+
+\item \textbf{M5 --- manufacturing package.} Released in fact: the wheels,
+frame and rig parts of Table~\ref{tab:cad_parts} were fabricated from it and
+the cube is integrated. The route and status columns of that table were not
+back-filled after release, which is a documentation debt against this gate, not
+a build one.
+
+\item \textbf{M6 --- plant parameters.} Open. The parameters of
+Table~\ref{tab:params} --- $I_b$, $l$, $l_b$, $C_b$, $C_w$ --- have
+determination methods assigned by Section~\ref{sec:paramid} but no measured
+values, and are recorded as outstanding in Appendix~\ref{app:specs} rather than
+estimated. The 1-DoF controller was therefore designed and tuned without a
+measured plant; that it balances (G3) does not close M6, and the reconciliation
+against the sizing analysis that M6 asks for has not been performed.
+
+\item \textbf{G6 --- edge balance.} Edge balance has been achieved on the cube
+with the 1-DoF control law (Section~\ref{sec:test_3dof}), but the
+\qty{60}{\second} duration and the disturbance-recovery half of the criterion
+are not yet measured: PER-01 is Partial (rig verified, cube open) and PER-04 is
+Open. Recorded as partly met.
+\end{itemize}
+
+\paragraph{Schedule as run.} This document is issued at the end of the window
+it plans, so Table~\ref{tab:gates} is a record and not a forecast. The plan held
+its shape: the critical path ran as laid out and the protected item, the 1-DoF
+rig, delivered its balance result on time (G3, 12~Aug). Two things moved. The
+second assessed submission slipped from 14~to \docdate{} --- the corrections
+were larger than the one-week triage window assumed --- which compressed the
+final week further, exactly the risk Section~\ref{sec:schedule} flags above.
+And the analysis-side gates M2b and M6 were carried rather than closed: both
+are measurement tasks that were displaced by build and control work, which is
+the honest reason and is now visible in the register of
+Appendix~\ref{app:risks}. The sacrificial-scope decision was taken as written:
+G7 and G8 stand open at issue, and the demonstration presented on 20~August is
+the one the standing decision protects.
 
 \input{sections/02_project_organization_gantt}
 

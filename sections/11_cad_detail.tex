@@ -22,28 +22,48 @@ Appendix~\ref{app:specs}, and this table is subordinate to it.
 
 \begin{table}[htbp]
 \centering
-\caption[Driving CAD parameters]{Driving CAD parameters. Every dependent feature references these; no
-part carries a duplicated hard-coded value. Values are drawn from the
-specification sheet of Appendix~\ref{app:specs}.}
+\caption[Driving CAD parameters]{Driving CAD parameters. Every dependent feature
+references these; no part carries a duplicated hard-coded value. Released values
+are drawn from the specification sheet of Appendix~\ref{app:specs}. The last
+column states, for each parameter, whether it is released and --- where it is
+not --- what determines it and which gate closes it, so that an open row is an
+identified open item rather than an unexplained blank.}
 \label{tab:cad_params}
 \small
-\begin{tabular}{l L{6.6cm} c}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{l L{4.7cm} c L{4.6cm}}
 \toprule
-Symbol & Parameter & Value \\
+Symbol & Parameter & Value & Status and closure \\
 \midrule
-$L$         & Cube edge length (outer)                & \qty{\cubeL}{\milli\metre} \\
-$t_w$       & Frame wall thickness                    & \qty{\cubeWall}{\milli\metre} \\
-$D_w$       & Wheel outer diameter (Sec.~\ref{sec:rw_sizing}) & \qty{\wheelOD}{\milli\metre} \\
-$t_r$       & Wheel axial thickness (Sec.~\ref{sec:rw_sizing}) & \qty{\wheelT}{\milli\metre} \\
-$d_m$       & Motor axis offset from cube centre      & \textcolor{red}{TBD} \\
-$h_m$       & Motor mounting face height on its axis  & \textcolor{red}{TBD} \\
-$c_w$       & Wheel-to-subframe axial clearance       & \textcolor{red}{TBD} \\
-$c_o$       & Clearance between orthogonal wheel modules & \textcolor{red}{TBD} \\
-$V_{\min}$  & Minimum internal clear volume           & \textcolor{red}{TBD} \\
-$r_c$       & Corner contact feature radius           & \textcolor{red}{TBD} \\
+$L$         & Cube edge length (outer)                & \qty{\cubeL}{\milli\metre} & Released; frozen at M2a \\
+$t_w$       & Frame wall thickness                    & \qty{\cubeWall}{\milli\metre} & Released; frozen with $L$ \\
+$D_w$       & Wheel outer diameter (Sec.~\ref{sec:rw_sizing}) & \qty{\wheelOD}{\milli\metre} & Released; set by the envelope closure \\
+$t_r$       & Wheel axial thickness (Sec.~\ref{sec:rw_sizing}) & \qty{\wheelT}{\milli\metre} & Released; set by the inertia target \\
+\midrule
+$d_m$       & Motor axis offset from cube centre      & \textcolor{red}{Open} & Set by the motor/wheel/subframe stack-up; closes at M2b \\
+$h_m$       & Motor mounting face height on its axis  & \textcolor{red}{Open} & MN4006 boss height plus the subframe seat; closes at M2b \\
+$c_w$       & Wheel-to-subframe axial clearance       & \textcolor{red}{Open} & Interference check, Sec.~\ref{sec:cad_method}; closes at M2b \\
+$c_o$       & Clearance between orthogonal wheel modules & \textcolor{red}{Open} & Interference check between modules; closes at M2b \\
+$V_{\min}$  & Minimum internal clear volume           & \textcolor{red}{Open} & Follows from $L$, $t_w$ and the module stack-up; closes at M2b \\
+$r_c$       & Corner contact feature radius           & \textcolor{red}{Open} & Contact-patch design for corner balance; closes at M2b \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\paragraph{What the open rows mean.} Six of the ten driving parameters above are
+unreleased in this issue, and the distinction matters: they are not undecided,
+they are unextracted. The frame was frozen, fabricated and integrated against
+the four released values, so the built article realises a definite $d_m$, $h_m$,
+$c_w$, $c_o$, $V_{\min}$ and $r_c$ --- those dimensions physically exist on the
+cube of Figure~\ref{fig:dwg_3d}. What has not happened is the export of those
+dimensions back out of the model and into this table as the single source
+convention~1 of Section~\ref{sec:cad_method} requires. Until that is done the
+parametric chain is broken at six points: a downstream part referencing $c_w$
+has nothing to reference, and the mass and CoM roll-up that gate M2b asks for
+cannot be reproduced from the document. This is the reason M2b is recorded open
+in Table~\ref{tab:gates} rather than passed, and it is a documentation debt
+against a build that is otherwise complete --- which is a smaller problem than
+an unresolved design, but not a closed one.
 
 \subsection{Model Tree and Part List}
 \label{app:cad_tree}
