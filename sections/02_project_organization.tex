@@ -215,11 +215,24 @@ estimated. The 1-DoF controller was therefore designed and tuned without a
 measured plant; that it balances (G3) does not close M6, and the reconciliation
 against the sizing analysis that M6 asks for has not been performed.
 
-\item \textbf{G6 --- edge balance.} Edge balance has been achieved on the cube
-with the 1-DoF control law (Section~\ref{sec:test_3dof}), but the
-\qty{60}{\second} duration and the disturbance-recovery half of the criterion
-are not yet measured: PER-01 is Partial (rig verified, cube open) and PER-04 is
-Open. Recorded as partly met.
+\item \textbf{G6 --- edge balance.} Closed. Both halves of the criterion are
+now measured on the cube (Section~\ref{sec:test_3dof}): an armed edge hold of
+\qty{196.96}{\second}, more than three times the threshold, and recovery from a
+\qty{6.18}{\degree} release, above the \qty{5}{\degree} PER-04 case. Two
+caveats travel with the pass and are stated there rather than hidden here: the
+long hold carries an unexplained ${\approx}\,\qty{3.5}{\degree}$ excursion that
+self-recovers, and the release response rings down with an overshoot close to
+1:1, which points at lightly damped closed-loop edge poles. The gate is met;
+the dynamics behind it are not yet fully characterised.
+
+\item \textbf{G7 --- corner balance and slew.} Partly met, and the two halves
+differ. Corner balance has been demonstrated in both firmware configurations,
+but the longest armed windows to date are \qty{46.7}{\second} and
+\qty{50.4}{\second} --- short of the \qty{60}{\second} PER-02 threshold, and
+reported in Section~\ref{sec:test_3dof} as the longest window achieved rather
+than as a demonstrated hold. The commanded slew (FUN-03) has not been run at
+all and remains Open in Appendix~\ref{app:verification}. The gate therefore
+does not close, and the corner shortfall is the live item at issue.
 \end{itemize}
 
 \paragraph{Schedule as run.} This document is issued at the end of the window
@@ -232,9 +245,13 @@ final week further, exactly the risk Section~\ref{sec:schedule} flags above.
 And the analysis-side gates M2b and M6 were carried rather than closed: both
 are measurement tasks that were displaced by build and control work, which is
 the honest reason and is now visible in the register of
-Appendix~\ref{app:risks}. The sacrificial-scope decision was taken as written:
-G7 and G8 stand open at issue, and the demonstration presented on 20~August is
-the one the standing decision protects.
+Appendix~\ref{app:risks}. The sacrificial-scope decision was taken as written.
+Edge balance closed on time (G6); the corner reached balance but not yet the
+\qty{60}{\second} hold, and the slew was not run, so G7 stands partly met and
+G8 --- the jump-up, sacrificial by standing decision --- stands open. The
+demonstration presented on 20~August is therefore the one that decision
+protects: edge and corner balance, with the corner reported at the duration
+actually achieved.
 
 \input{sections/02_project_organization_gantt}
 
