@@ -111,6 +111,19 @@ CON-07 & The electronics shall fit within the frozen board outline, mounting pat
 \end{longtable}
 \end{small}
 
+\paragraph{Reading the table.} The three blocks answer different questions.
+The functional requirements state what the cube must do, each written so that
+it can be seen to happen or not: balance on an edge and on a corner, reject a
+disturbance, sequence its own modes, and stand down safely when the
+equilibrium is lost. The performance requirements attach numbers to those
+behaviours --- durations, angles, loop times, inertias, currents --- and are
+settled by a measurement rather than by a judgement, which is why they are
+verified almost entirely by test or by analysis. The design constraints are
+boundaries fixed before any analysis begins --- edge length, mass, wheel
+count, power source, bus topology --- and are checked by inspection of the
+built article; the sizing of Section~\ref{sec:sizing} works inside them rather
+than against them.
+
 \paragraph{Status at the time of writing.} PER-01 and PER-03 are verified on
 the single-axis rig (Section~\ref{sec:test_1dof}); PER-01 therefore stands
 verified for the rig and open for the integrated cube, since it is one
