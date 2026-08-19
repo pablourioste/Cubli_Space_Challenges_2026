@@ -9,43 +9,32 @@ Wheel seen from its spin axis = a DONUT (ring) held by N_spokes SPOKES.
     ID to the OD. Each hole therefore does TWO things: it ADDS steel
     hardware and it REMOVES plastic.
 
-GEOMETRY MODEL CHANGE (this revision):
-  Previously the hole axis ran AXIALLY -- parallel to the spin axis,
-  drilled through the wheel's FACE, positioned on a pitch circle
-  somewhere between R_inner and R_outer, with hole diameter capped by the
-  ring's radial width and hole depth equal to the thickness t.
-
-  The hole is now turned 90 degrees: its axis runs RADIALLY, drilled
-  through the ring's cross-section from the inner bore surface to the
-  outer rim surface. Consequences, all of them physical:
-    * hole DEPTH is now fixed at the ring width (R_outer - R_inner) --
-      it is a true ID-to-OD through-hole, not a free choice of pitch
-      radius. There is no more R_pcr to pick; the hole's centroid sits
-      at R_mean = (R_inner + R_outer)/2 by construction.
-    * hole DIAMETER is now capped by the wheel THICKNESS t (with an
-      axial wall to the front/back faces), not by the ring width. This
-      is the opposite constraint from before, and it is why the hole can
-      now be as fat as t allows, at a much shorter grip length
-      (~ring_width instead of ~t).
-    * the OWN-AXIS inertia term changes shape. A hole/bolt whose axis is
-      PARALLEL to the spin axis spins about its own long axis, so its
-      own-axis term is the familiar disc value k^2 = r^2/2. A hole/bolt
-      whose axis is RADIAL -- i.e. PERPENDICULAR to the spin axis -- is
-      instead a rod-like cylinder rotating about a TRANSVERSE axis
-      through its centroid, whose own-axis term is the standard solid
-      cylinder result k^2 = r^2/4 + w^2/12 (w = its length = ring width).
-      Both terms are still combined with the parallel-axis theorem using
-      the perpendicular offset from the spin axis to the hole's centroid,
-      which is now R_mean, not R_pcr.
-    * adjacent holes are now radial SLOTS (straight sides, not points),
-      and two radial lines from a common centre are closest together at
-      their SMALLER radius. So the min-gap / N_max capacity check, which
-      used to run at R_pcr, now runs at R_inner -- the true tightest
-      point between two neighbouring holes -- instead.
-    * the bolt is what retains the hardware, so no pocket floor exists
-      and no floor check is needed; see the retention section for the
-      new consideration this orientation raises (bolt head / nut now
-      bear on the curved ID/OD surfaces, not a flat face).
+GEOMETRY MODEL: the hole axis runs RADIALLY, drilled through the ring's
+cross-section from the inner bore surface to the outer rim surface.
+Consequences, all of them physical:
+  * hole DEPTH is fixed at the ring width (R_outer - R_inner) -- it is a
+    true ID-to-OD through-hole, not a free choice of pitch radius. There
+    is no R_pcr to pick; the hole's centroid sits at R_mean =
+    (R_inner + R_outer)/2 by construction.
+  * hole DIAMETER is capped by the wheel THICKNESS t (with an axial wall
+    to the front/back faces), not by the ring width. This is why the hole
+    can be as fat as t allows, at a much shorter grip length
+    (~ring_width instead of ~t).
+  * the OWN-AXIS inertia term is a rod-like one. A hole/bolt whose axis is
+    RADIAL -- i.e. PERPENDICULAR to the spin axis -- is a solid cylinder
+    rotating about a TRANSVERSE axis through its centroid, whose own-axis
+    term is k^2 = r^2/4 + w^2/12 (w = its length = ring width), NOT the
+    disc value r^2/2 that would apply to an axial hole. Both terms are
+    combined with the parallel-axis theorem using the perpendicular offset
+    R_mean from the spin axis to the hole's centroid.
+  * adjacent holes are radial SLOTS (straight sides, not points), and two
+    radial lines from a common centre are closest together at their
+    SMALLER radius. So the min-gap / N_max capacity check runs at
+    R_inner -- the true tightest point between two neighbouring holes.
+  * the bolt is what retains the hardware, so no pocket floor exists and
+    no floor check is needed; see the retention section for the
+    consideration this orientation raises (bolt head / nut bear on the
+    curved ID/OD surfaces, not a flat face).
 
 Net effect per hole (both mass and inertia):
     dm = m_hardware - m_plastic_removed          m_hardware = m_bolt + m_nut
@@ -53,29 +42,73 @@ Net effect per hole (both mass and inertia):
 Because rho_steel >> rho_petcf, dI > 0 and the station is a net win --
 but the plastic loss is NOT negligible and is accounted for here.
 
-WHAT THE DESIGN NOW IS: OD = 120 mm with 15 M6 stations, 172.5 g/wheel,
-reaching 111.7% of I_w_target. The diameter is NOT the sweep's choice --
-it is PINNED by D_w_FIXED_mm because three orthogonal wheel modules plus
-the battery have to fit inside the L = 150 mm cube. Left free, the
-minimum-mass rule picks a much larger ring (I_zz goes as m*R^2, so mass
-at a large radius is cheap inertia), but a wheel that does not fit the
-cube is not a candidate, so the envelope outranks the mass objective.
-The sweep is still computed and printed in full, as context for what the
-constraint costs.
 
-omega_max is 5500 rpm per electrical/MOTOR_SPEED.md and the TDD, lowered
-from 6000 rpm. I_w_target = h_w/omega_max, so a lower speed RAISES the
-requirement and demands more ballast: 6 stations per wheel instead of 3.
-Quote no margin at any other speed without re-running -- the 3-station
-wheel this file previously described reached only 96.9% of target at
-5000 rpm, contradicting an over-dimensioning claim made in an earlier
-revision of this docstring.
+=====================================================================
+THIS FILE NOW DESCRIBES THE AS-BUILT WHEEL, NOT A PAPER STUDY
+=====================================================================
+The wheel exists. It is OD = 120 mm, t = 20 mm, 10 mm ring width, with
+15 M6 bolt+nut stations, at 234.14 g. Everything in the input block is
+set to REPRODUCE that part, and the run confirms it: the solver is given
+no forced count and lands on 15 stations by itself.
 
-M IS A FIXED POINT, NOT AN ASSUMPTION: M sets I_w_target (Stage 1), which
-sets the ballast count, which sets the wheel mass, which feeds back into
-M via Stage 6. The current point converges at M = 1.6638 kg with 6
-stations per wheel, where Stage 6's roll-up reproduces the assumed value
-to within 0.0 g.
+The sizing basis is a HISTORICAL FACT about how the part was designed:
+    omega_max = 4000 rpm
+    M         = 1.800 kg      <- the cube mass the wheels were sized AGAINST
+    tau_b     = 5.0 N*m
+At that basis the requirement is 6.2352e-4 and the wheel delivers
+6.2715e-4 -- 100.6% of target. A wheel sized right at its requirement is
+exactly what "we sized the wheels for 4000 rpm and 1.8 kg" means, and the
+0.6% is just the rounding of 14.83 stations up to 15.
+
+M IS NOT A CONVERGED FIXED POINT ANY MORE, AND MUST NOT BE READ AS ONE.
+Earlier revisions of this file solved M self-consistently: Stage 6's
+roll-up was tuned until it reproduced the M that Stage 1 was run with.
+That is no longer what is happening, because the build came in LIGHTER
+than the sizing assumed. The two masses are now different numbers and
+both are real:
+
+    M          = 1.800 kg   the sizing basis (Stage 1). Historical.
+    M_ACTUAL_g = 1600.0 g   what the cube weighs (Stage 6 rolls up to it).
+
+The 200 g gap is not an unclosed loop or an error to be driven to zero.
+It is REALISED MARGIN: the inner and outer frames came in lighter than
+the allowance carried at design time, and because h_w scales with M, a
+lighter cube needs LESS wheel than the one already built. Stage 6
+reports the delta as negative and says Stage 1 stands, which is correct.
+Do not "fix" it by setting M = 1.6: that would re-solve to 12 stations
+and no longer describe the wheel in the workshop.
+
+WHAT THE MARGIN IS WORTH, at the actual 1.600 kg:
+  - the same wheel reaches 117.6% of target instead of 100.6%
+  - it still closes all the way down to 3400 rpm, which covers the whole
+    3500-4000 rpm operating band the drive is aimed at
+Both numbers are computed and printed by the run rather than asserted
+here, so they cannot drift out of date silently.
+
+THE DIAMETER IS NOT THE SWEEP'S CHOICE -- it is PINNED by D_w_FIXED_mm
+because three orthogonal wheel modules plus the battery have to fit inside
+the L = 149 mm cube. Left free, the minimum-mass rule picks a much larger
+ring (I_zz goes as m*R^2, so mass at a large radius is cheap inertia), but
+a wheel that does not fit the cube is not a candidate, so the envelope
+outranks the mass objective. The sweep is still computed and printed in
+full, as context for what the constraint costs.
+
+THICKNESS IS FIXED at 20 mm and is not a free variable. It is what keeps
+three orthogonal wheel modules clear of each other inside the cube. It is
+also not a useful lever even if it were free: scaling t scales the ring's
+mass and its inertia in the same proportion, so it barely moves the
+margin while it does move the mass budget.
+
+15 STATIONS, AND WHY THAT NUMBER IS NOT FORCED. num_holes is None -- the
+count is solved, not imposed. The requirement asks for 14.83 stations and
+N_round_to = 3 rounds that up to 15, which is also a multiple of the 3
+spokes, so the hole pattern and the spoke pattern share their symmetry.
+  Do still CLOCK THE HOLE PATTERN OFF THE SPOKES in CAD. With 15 holes at
+  24 deg and 3 spokes at 120 deg, every fifth hole shares a radial line
+  with a spoke, and an unclocked pattern would drill three of the fifteen
+  holes straight into a spoke root. This script models the ring as a plain
+  annulus and does NOT check hole/spoke interference -- that check belongs
+  in CAD and nowhere in this file pretends otherwise.
 
 Flow:
   STAGE 1  jump-up dynamics         -> required per-wheel inertia I_w_target
@@ -86,7 +119,8 @@ Flow:
                                        the 2 mm edge-to-edge gap rule
                                        (checked at R_inner) that caps N at
                                        N_max
-  STAGE 6  mass budget              -> closes the loop on the assumed cube mass
+  STAGE 6  mass budget              -> rolls the BOM up against M_ACTUAL_g
+                                       and reports the sizing margin
 """
 import math
 
@@ -94,90 +128,99 @@ import math
 # FIXED INPUT VARIABLES  (edit here)
 # =================================================================
 # --- cube / jump-up ---
-M          = 1.6638       # [kg]   total cube mass -- CONVERGED FIXED POINT
-                          #        (487.6 g structure allowance, 6 ballast
-                          #        stations per wheel, 5500 rpm).
-                          #        PROVISIONAL, and a CONVERGED FIXED POINT:
-                          #        Stage 6 totals 1176.2 g known hardware +
-                          #        487.6 g structure allowance = 1663.8 g,
-                          #        reproducing this assumption to within 0.0 g.
-                          #        The loop is real, not decorative: M sets
-                          #        I_w_target (Stage 1), which sets the ballast
-                          #        count, which sets the wheel mass, which
-                          #        feeds back into M via Stage 6.
-                          #        Revised from the previous 1.4654 kg /
-                          #        6000 rpm / 3-station point on two changes:
-                          #          - the structure allowance was raised
-                          #            374.0 -> 487.6 g (the 374 g figure was
-                          #            optimistic against the frame and
-                          #            subframe now in CAD);
-                          #          - the electronics estimate was raised
-                          #            74.2 -> 95.2 g on as-weighed figures
-                          #            (Teensy with headers, MA600 breakout
-                          #            plus its steel-backed ring magnet, and
-                          #            the ESP32 antenna and pigtail).
-                          #        omega_max was then dropped 6000 -> 5500 rpm.
-                          #        Because the station count rounds to
-                          #        multiples of 3, that lands the design on
-                          #        the N=6 step, which carries MORE inertia
-                          #        margin (106.2%) than the N=3 step did at
-                          #        6000 rpm (103.8%), at a cost of +63.8 g of
-                          #        cube mass. The N=6 step holds across a
-                          #        200.8 g band of structure allowance
-                          #        (364.1 - 564.9 g), against roughly 46 g of
-                          #        headroom at the old point -- so this design
-                          #        point absorbs a CAD overrun that the
-                          #        previous one did not.
-                          #        ~29% is still allowance -- revisit at CAD.
-L          = 0.149         # [m]    cube edge length
+M          = 1.800        # [kg]   THE SIZING BASIS -- the cube mass the wheels
+                          #        were designed against. NOT a converged fixed
+                          #        point and NOT the current best estimate of
+                          #        the cube's mass; see M_ACTUAL_g in Stage 6
+                          #        for that (1600.0 g).
+                          #        This value is HISTORICAL: it is what was on
+                          #        the table when the wheel was dimensioned, and
+                          #        changing it changes which wheel the file
+                          #        describes. At 1.800 kg the solver asks for
+                          #        14.83 stations and rounds to the 15 the part
+                          #        actually has. At the as-built 1.600 kg it
+                          #        would ask for 10.63 and round to 12, which is
+                          #        a different, lighter wheel that was never
+                          #        made.
+                          #        The 200 g by which the build undershot this
+                          #        number is REALISED MARGIN, not an open loop:
+                          #        h_w scales with M, so a lighter cube needs
+                          #        less wheel than the one already built. Stage 6
+                          #        quantifies it.
+M_ACTUAL_g = 1600.0       # [g]    WHAT THE CUBE ACTUALLY WEIGHS. Stage 6 rolls
+                          #        the BOM up against this, not against M.
+                          #        The inner and outer frames came in lighter
+                          #        than the allowance carried at design time,
+                          #        which is the whole source of the 200 g gap.
+L          = 0.149        # [m]    cube edge length
 g          = 9.81         # [m/s^2]
 eta        = 1.05         # [-]    energy margin (1.02-1.05 recommended)
-tau_b      = 5.0          # [N*m]  brake torque per wheel
-rpm_max    = 5500         # [rpm]  max wheel speed -- DESIGN VALUE, matches the
-                          #        TDD (tab:jumpup_budget and the dashed ceiling
-                          #        on the motor curve) and electrical/MOTOR_SPEED.md.
-                          #        Lowered from 6000 rpm. Since
-                          #        I_w_target = h_w/omega_max, a lower speed
-                          #        RAISES the inertia requirement and so demands
-                          #        more ballast -- here 6 stations per wheel
-                          #        instead of 3, +63.8 g of cube mass, in
-                          #        exchange for 500 rpm of relief on the drive
-                          #        and a wider tolerance band on the structure
-                          #        allowance (see the note on M above).
-                          #        NOTE: an earlier revision of this file
-                          #        claimed the design had been checked at
-                          #        5000 rpm as an over-dimensioning case. That
-                          #        claim did not survive the reduction to 3
-                          #        stations: the 3-station wheel closes at 6000
-                          #        but reaches only 96.9% of target at 5000. The
-                          #        6-station wheel set here closes at 5500 with
-                          #        106.2%. Re-run before quoting any margin at a
-                          #        speed other than the one set here.
+tau_b      = 5.0          # [N*m]  brake torque per wheel. UNCHANGED from the
+                          #        original sizing -- this is the value the
+                          #        wheel was actually designed against, and no
+                          #        brake re-spec is implied anywhere in this
+                          #        file.
+                          #        beta = tau_b/(tau_b - tau_g) multiplies h_w
+                          #        directly, so it is the cheapest lever in the
+                          #        model: it buys inertia relief without adding
+                          #        a gram to the wheel. The run prints a
+                          #        sensitivity table so the value of that lever
+                          #        is visible, but the DESIGN does not spend it
+                          #        -- 5.0 N*m is what the brake is specified at.
+                          #        It must stay above the tip floor
+                          #        tau_g = M*g*L/2 = 1.316 N*m, below which the
+                          #        cube cannot tip at all. It clears that by
+                          #        3.8x.
+rpm_max    = 4000         # [rpm]  max wheel speed -- the SIZING BASIS, and the
+                          #        top of the 3500-4000 rpm band the drive is
+                          #        aimed at. Since I_w_target = h_w/omega_max, a
+                          #        lower speed RAISES the inertia requirement,
+                          #        so 4000 is the LEAST demanding point in that
+                          #        band and the band's lower end is the case to
+                          #        check. The run does check it: at the actual
+                          #        1.600 kg this wheel still closes down to
+                          #        3400 rpm, so the whole band is covered.
+                          #        NOTE: the TDD (tab:jumpup_budget, the dashed
+                          #        ceiling on the motor curve), PER-07 in
+                          #        sections/01a_requirements.tex, and
+                          #        sections/03 and /06 all still assert
+                          #        5500 rpm. They are inconsistent with this
+                          #        file and must be updated together.
 case       = "corner"     # "edge" or "corner" -- corner sizes the design
 
 # --- wheel geometry ---
 # Named R_outer / R_inner / thickness below as well, after unit conversion,
 # so the geometry functions read the way the drawing does.
 ring_width_mm = 10.0      # [mm]  ring radial width (R_outer - R_inner), FIXED.
-                          #       This is now also the HOLE DEPTH: each M6
+                          #       This is also the HOLE DEPTH: each M6
                           #       station is a true ID-to-OD through-hole, so
                           #       its length is exactly the ring width, not a
                           #       free choice.
+                          #       Widening it is a LOSS, not a gain: R_outer is
+                          #       pinned by the envelope, so extra width pushes
+                          #       R_inner inward, parks the added plastic at a
+                          #       smaller radius, and eats N_max at the same
+                          #       time. 10 mm is the right value.
 spoke_w_mm    = 10.0      # [mm]  spoke width
 N_spokes      = 3         # [-]   number of spokes
-t_mm          = 20       # [mm]  UNIFORM thickness of ring + spokes. With
-                          #       radial holes this is now what caps the HOLE
-                          #       DIAMETER (with an axial wall to the front
-                          #       and back faces), the opposite role it had
-                          #       when holes were axial. 20 mm keeps the wheel
-                          #       axially thin so three orthogonal modules
-                          #       clear each other inside the 150 mm cube.
+t_mm          = 20        # [mm]  UNIFORM thickness of ring + spokes. FIXED --
+                          #       it is what keeps three orthogonal wheel
+                          #       modules clear of each other inside the cube,
+                          #       and it is not a free variable in this study.
+                          #       With radial holes it also caps the HOLE
+                          #       DIAMETER (with an axial wall to the front and
+                          #       back faces); at 20 mm a 6.4 mm hole leaves
+                          #       6.80 mm of wall on each face.
+                          #       Even if it were free it would be a poor
+                          #       lever: scaling t scales ring mass and ring
+                          #       inertia together, so the margin barely moves
+                          #       while the mass budget does.
 
 # --- hole pattern: ROUND M6 CLEARANCE THROUGH-HOLES, RADIAL ORIENTATION ---
 hole_diameter_mm = 6.4    # [mm]  DRILLED hole diameter, through the full
-                          #       ring width (ID to OD). 6.4 mm = ISO 273
-                          #       "medium" clearance for M6.
-                          #       (close fit 6.4 is standard; free fit 7.0.)
+                          #       ring width (ID to OD). 6.4 mm is the ISO 273
+                          #       CLOSE (fine) fit for M6; medium is 6.6 and
+                          #       free is 7.0.
                           #       This is the hole, not the thread: the bolt
                           #       shank is 6.0 mm, so there is 0.4 mm total
                           #       diametral slop for assembly.
@@ -191,10 +234,19 @@ hole_axial_center_mm = None  # [mm] axial position of the hole centreline
                           #       force it off-centre; the axial-fit check
                           #       below still polices it.
 num_holes     = None      # [-]   FORCED number of holes. None -> the script
-                          #       solves for the count that meets I_w_target
-                          #       and then caps it at N_max. Set an integer to
-                          #       impose a count; it is still gap-checked and
-                          #       still capped, with a warning if it was cut.
+                          #       SOLVES for the count that meets I_w_target and
+                          #       then caps it at N_max.
+                          #       DELIBERATELY None. The as-built wheel has 15
+                          #       stations and the solver reaches 15 on its own
+                          #       (14.83 rounded up to a multiple of 3), so the
+                          #       count is a RESULT here, not an input. That is
+                          #       the strongest available check that the inputs
+                          #       in this block really do describe the part that
+                          #       was built -- forcing the number would have
+                          #       thrown that check away.
+                          #       Set an integer to impose a count; it is still
+                          #       gap-checked and still capped, with a warning
+                          #       if it was cut.
 min_gap_mm    = 2.0       # [mm]  MINIMUM edge-to-edge separation between two
                           #       adjacent radial holes, measured on the
                           #       straight chord between their centrelines AT
@@ -206,31 +258,40 @@ min_gap_mm    = 2.0       # [mm]  MINIMUM edge-to-edge separation between two
 min_wall_mm   = 2.0       # [mm]  minimum AXIAL plastic wall between a hole
                           #       edge and the wheel's front / back face
 N_round_to    = 3         # [-]   round the solved hole count up to a multiple
-                          #       of this (3 keeps 3-fold symmetry with the
-                          #       3 spokes, so balance is unaffected)
+                          #       of this. 3 matches the 3 spokes, so the hole
+                          #       pattern and the spoke pattern share their
+                          #       symmetry -- which is a CLOCKING convenience,
+                          #       not a balance requirement: any N >= 2 evenly
+                          #       spaced identical masses at one radius is
+                          #       already statically and dynamically balanced.
+                          #       See the docstring for the clocking note that
+                          #       goes with it.
 
 # --- M6 hardware seated in each hole (bolt + nut) ---
 # Both masses are per-item and are the things to put on a scale. They enter
 # as POSITIVE mass; nothing about the hardware is modelled as a negative.
-mass_m6_bolt_g = 5.0      # [g]   ONE M6 bolt, head + shank, of the length
+mass_bolt_g   = 5.0       # [g]   ONE M6 bolt, head + shank, of the length
                           #       actually used. Strongly length-dependent:
-                          #       ISO 4762 M6x16 hex-socket cap is ~5.0 g.
-                          #       The radial hole is now only ring_width_mm
-                          #       (10 mm) deep instead of t_mm, so the grip
-                          #       length is much shorter than the old axial
-                          #       hole -- M6x16 through a 10 mm ring plus nut
-                          #       is the stand-in. MEASURE the real one.
-mass_m6_nut_g  = 2.5      # [g]   ONE M6 hex nut, MEASURED (ISO 4032 geometry
+                          #       ISO 4762 (DIN 912) M6x16 hex-socket cap is
+                          #       ~5.0-5.5 g. The radial hole is only
+                          #       ring_width_mm (10 mm) deep, so the grip
+                          #       length is short: M6x16 through a 10 mm ring
+                          #       plus a nut is the stand-in.
+                          #       MEASURE the real one -- at 15 stations a
+                          #       0.5 g error per bolt is 7.5 g per wheel and
+                          #       22.5 g on the cube, which is not noise.
+mass_nut_g    = 2.5       # [g]   ONE M6 hex nut, MEASURED (ISO 4032 geometry
                           #       predicts 2.617 g, so 2.5 g is within normal
                           #       tolerance -- see electrical/WHEEL_130_M6.md).
-mass_m6_washer_g = 0.0    # [g]   per-hole washer allowance, 0 if none used.
+mass_washer_g = 0.0       # [g]   per-hole washer allowance, 0 if none used.
                           #       An M6 plain washer is ~0.9 g; two of them is
-                          #       1.8 g per station, which is not nothing at
-                          #       this radius.
+                          #       1.8 g per station, and at 15 stations that is
+                          #       27 g per wheel -- NOT negligible here. If the
+                          #       build uses washers, put them in.
 
 # Radius of gyration of the hardware about its OWN axis (transverse, since
-# the hole/bolt now runs radially -- perpendicular to the spin axis). A
-# bolt+nut stack spanning ~10 mm of ring width sitting at R_mean ~ 55-65 mm
+# the hole/bolt runs radially -- perpendicular to the spin axis). A
+# bolt+nut stack spanning ~10 mm of ring width sitting at R_mean = 55 mm
 # has an own-axis term that is a few percent of its parallel-axis term.
 # Modelled as a solid cylinder of diameter hole_diameter and length
 # ring_width (k^2 = r^2/4 + ring_width^2/12), which slightly OVER-states it
@@ -242,19 +303,19 @@ rho_petcf  = 1290.0       # [kg/m^3]  ring + spokes
 rho_steel  = 7850.0       # [kg/m^3]  M6 bolts and nuts
 
 # --- sweep ---
-OD_list_mm = [80, 90, 100, 110, 120, 130, 140, 150,160,170,180]   # ring OUTER diameter
+OD_list_mm = [80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180]  # ring OD
 
 # --- FIXED ENVELOPE CONSTRAINT ---------------------------------------------
 # The wheel OD is IMPOSED by the packaging envelope, not chosen by the sweep.
 # Three orthogonal wheel modules plus the battery have to fit inside the
-# L = 150 mm cube, and that fixes the ring at 120 mm. The sweep is still run
+# L = 149 mm cube, and that fixes the ring at 120 mm. The sweep is still run
 # and printed in full, but only as CONTEXT: it shows what the constraint
 # costs. Set to None to hand selection back to the minimum-mass rule.
 #
-# Without this pin the selector picks OD = 180 mm, which is lighter per wheel
-# (I_zz goes as m*R^2, so mass at a large radius is cheap inertia) but does
-# not fit the cube. A design that does not fit is not a candidate, so the
-# constraint outranks the mass objective.
+# Without this pin the selector picks a larger ring, which is lighter per
+# wheel (I_zz goes as m*R^2, so mass at a large radius is cheap inertia) but
+# does not fit the cube. A design that does not fit is not a candidate, so
+# the constraint outranks the mass objective.
 D_w_FIXED_mm = 120.0
 
 # =================================================================
@@ -279,11 +340,41 @@ h_w        = h_w_ideal * beta
 I_w_target = h_w / omega_max
 
 print("=== STAGE 1: jump-up -> target wheel inertia ===")
-print(f"case={case}  M={M} kg  L={L*1e3:.0f} mm  tau_b={tau_b} N*m  rpm_max={rpm_max}")
-print(f"tau_g (floor)      = {tau_g:.3f} N*m")
-print(f"beta               = {beta:.3f}")
+print(f"case={case}  M={M} kg (SIZING BASIS)  L={L*1e3:.0f} mm  "
+      f"tau_b={tau_b} N*m  rpm_max={rpm_max}")
+print(f"tau_g (floor)      = {tau_g:.3f} N*m   "
+      f"(tau_b clears it by {tau_b/tau_g:.1f}x)")
+print(f"beta               = {beta:.4f}")
 print(f"h_w (per wheel)    = {h_w:.4f} kg*m^2/s")
 print(f"I_w_target         = {I_w_target*1e4:.4f} x1e-4 kg*m^2")
+print(f"NOTE: M = {M:.3f} kg is the mass the wheels were SIZED against. The")
+print(f"      cube actually weighs {M_ACTUAL_g/1e3:.3f} kg -- see Stage 6 for "
+      f"what that\n      {M*1e3 - M_ACTUAL_g:.0f} g of realised margin is "
+      f"worth.")
+
+# --- BRAKE TORQUE SENSITIVITY ---------------------------------------------
+# tau_b is the cheapest lever in the model: beta multiplies h_w directly, so
+# brake torque buys inertia relief without adding any wheel mass. The design
+# does NOT spend this lever -- 5.0 N*m is the specified value -- but the
+# table is printed so the size of the lever is visible, and so the cost of
+# the brake UNDER-delivering is on the record rather than left to guesswork.
+print(f"\n  brake torque sensitivity (tau_g = {tau_g:.3f} N*m at this M):")
+print(f"  {'tau_b':>7} | {'beta':>7} | {'I_w_target':>12} | {'vs design':>9}")
+print("  " + "-"*46)
+_I_at_design = h_w_ideal * beta / omega_max
+for _tb in (2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0):
+    if _tb <= tau_g:
+        print(f"  {_tb:>7.1f} | {'--':>7} | {'BELOW FLOOR':>12} | "
+              f"{'cannot tip':>9}")
+        continue
+    _b = _tb / (_tb - tau_g)
+    _It = h_w_ideal * _b / omega_max
+    _mark = " <- design" if _tb == tau_b else ""
+    print(f"  {_tb:>7.1f} | {_b:>7.4f} | {_It*1e4:>9.4f}e-4 | "
+          f"{_It/_I_at_design*100:>8.1f}%{_mark}")
+print("  Read downward from the design row: a brake that under-delivers")
+print("  RAISES the requirement, and the wheel has to absorb it out of the")
+print("  margin Stage 6 reports.\n")
 
 # --- BOTH CONTACT CASES, for the record -----------------------------------
 # The design is sized on the CORNER case, but the TDD reports both so the
@@ -292,7 +383,7 @@ print(f"I_w_target         = {I_w_target*1e4:.4f} x1e-4 kg*m^2")
 # of the cube and the brake, not of which feature it is standing on, so they
 # are shared. A wheel meeting the corner requirement meets the edge one with
 # the margin printed below.
-print("\n  contact case comparison (same M, L, eta, tau_b, omega_max):")
+print("  contact case comparison (same M, L, eta, tau_b, omega_max):")
 print(f"  {'case':<8} | {'C':>7} | {'h_w':>9} | {'I_w_target':>12} | "
       f"{'vs corner':>9}")
 print("  " + "-"*56)
@@ -354,9 +445,9 @@ def axial_center_for(t):
 
     hole_axial_center_mm is honoured if the user set it; otherwise the
     hole is centred at t/2, which maximises the axial wall on both faces
-    simultaneously. Unlike the old R_pcr choice, this position has NO
-    effect on I_zz about the spin axis (see STAGE 3) -- it only matters
-    for the axial-fit / wall check below.
+    simultaneously. This position has NO effect on I_zz about the spin
+    axis (see STAGE 3) -- it only matters for the axial-fit / wall check
+    below.
     """
     if hole_axial_center_mm is not None:
         return hole_axial_center_mm * 1e-3
@@ -366,10 +457,9 @@ def axial_center_for(t):
 def check_axial_fit(t, z_center, r_hole):
     """Enforce  r_hole < z_center < t - r_hole,  with walls.
 
-    Returns (ok, wall_front_mm, wall_back_mm, messages). Mirrors the old
-    radial-fit check, but across the wheel's thickness instead of the
-    ring's radial width, since the hole diameter is now capped by t
-    rather than by the ring width.
+    Returns (ok, wall_front_mm, wall_back_mm, messages). The check runs
+    across the wheel's thickness rather than the ring's radial width,
+    since the hole diameter is capped by t.
     """
     wall_front = z_center - r_hole             # plastic to the near face
     wall_back  = (t - z_center) - r_hole        # plastic to the far face
@@ -397,7 +487,7 @@ def check_axial_fit(t, z_center, r_hole):
 def edge_gap(N, R_check, r_hole):
     """Edge-to-edge gap [m] between two adjacent radial holes of N stations.
 
-    Each hole is now a radial SLOT running from R_inner to R_outer, not a
+    Each hole is a radial SLOT running from R_inner to R_outer, not a
     point. Two radial lines from a common centre, Delta_theta = 2*pi/N
     apart, are closest together at their SMALLER radius (the chord
     2*R*sin(Delta_theta/2) grows with R), so the tightest point between
@@ -442,8 +532,8 @@ def max_holes_for_gap(R_check, r_hole, gap_min):
 # =================================================================
 # The hole is a CYLINDER through the full ring width, axis RADIAL (i.e.
 # PERPENDICULAR to the spin axis):
-#     V   = pi * r_hole^2 * ring_width           (depth is now the ring
-#                                                 width, not t)
+#     V   = pi * r_hole^2 * ring_width           (depth is the ring width,
+#                                                 not t)
 #     m   = rho_petcf * V                       (mass removed, positive number,
 #                                                subtracted where it is used)
 # Its own-axis term about the SPIN axis is therefore NOT the disc value
@@ -475,13 +565,13 @@ m_removed  = rho_petcf * V_hole
 I0_removed = m_removed * (r_hole**2/4 + ring_width**2/12)   # own-axis, transverse
 
 # --- steel hardware added per hole: bolt + nut (+ washers) ---
-m_bolt     = mass_m6_bolt_g   * 1e-3
-m_nut      = mass_m6_nut_g    * 1e-3
-m_washer   = mass_m6_washer_g * 1e-3
+m_bolt     = mass_bolt_g   * 1e-3
+m_nut      = mass_nut_g    * 1e-3
+m_washer   = mass_washer_g * 1e-3
 m_hardware = m_bolt + m_nut + m_washer
 if m_hardware <= 0:
     raise ValueError("M6 hardware mass is zero or negative -- set "
-                     "mass_m6_bolt_g / mass_m6_nut_g.")
+                     "mass_bolt_g / mass_nut_g.")
 
 if hardware_own_axis_model == "cylinder":
     k2_hardware = r_hole**2/4 + ring_width**2/12   # fills the hole envelope,
@@ -493,7 +583,7 @@ else:
 I0_hardware = m_hardware * k2_hardware
 
 print("=== STAGE 3: radial M6 through-hole + bolt/nut (per station) ===")
-print(f"hole: d = {hole_diameter_mm:.2f} mm (M6 clearance), "
+print(f"hole: d = {hole_diameter_mm:.2f} mm (M6 close-fit clearance), "
       f"r = {r_hole*1e3:.2f} mm, THROUGH ring width = {ring_width_mm:.1f} mm")
 print(f"  hole area         = {math.pi*r_hole**2*1e6:8.2f} mm^2")
 print(f"  hole volume       = {V_hole*1e9:8.2f} mm^3")
@@ -517,10 +607,10 @@ print(f"NET mass per station = {(m_hardware - m_removed)*1e3:+8.3f} g "
 def wheel_properties(OD_mm, N_forced=None):
     """Full mass / I_zz model of one wheel at a given ring OD.
 
-    Returns a dict. Each hole is now a radial cylinder spanning the full
-    ring width, so its centroid radius is FORCED to R_mean =
-    (R_inner+R_outer)/2 -- there is no free pitch-circle choice any more.
-    The inertia bookkeeping is, for N holes:
+    Returns a dict. Each hole is a radial cylinder spanning the full ring
+    width, so its centroid radius is FORCED to R_mean =
+    (R_inner+R_outer)/2 -- there is no free pitch-circle choice. The
+    inertia bookkeeping is, for N holes:
 
         I_zz = I_ring + I_spokes
                - N * (I0_hole     + m_removed  * R_mean^2)    <- plastic gone
@@ -534,6 +624,10 @@ def wheel_properties(OD_mm, N_forced=None):
     The gap / N_max capacity check, by contrast, is NOT evaluated at
     R_mean: two adjacent radial slots are closest together at their
     SMALLER radius, so that check runs at R_inner (see edge_gap()).
+
+    N_exact -- the count the requirement alone asks for -- is computed and
+    returned WHETHER OR NOT N is forced, so a forced count can always be
+    read against what was actually needed.
     """
     m_ring, I_ring, R_inner, R_outer = ring_props(OD_mm)
     m_spk,  I_spk = spokes_props(R_inner)
@@ -555,25 +649,41 @@ def wheel_properties(OD_mm, N_forced=None):
     # two adjacent radial slots, not R_mean
     N_max = max_holes_for_gap(R_inner, r_hole, min_gap_mm*1e-3)
 
+    # --- what the requirement alone asks for (always computed) -------
+    I_needed = I_w_target - I_solid
+    if I_needed <= 0:
+        N_exact, N_solved = 0.0, 0
+        solve_note = "solid ring already meets target -- no ballast needed"
+    elif dI <= 0:
+        N_exact, N_solved = None, 0
+        solve_note = ("hardware is LIGHTER than the plastic it displaces "
+                      "(dI <= 0) -- holes would REDUCE inertia")
+    else:
+        N_exact  = I_needed / dI
+        N_solved = int(math.ceil(N_exact / N_round_to) * N_round_to)
+        solve_note = None
+
     # --- choose N ---------------------------------------------------
-    note    = None
-    capped  = False
-    N_exact = None
+    note   = solve_note
+    capped = False
     if N_forced is not None:
         N = int(N_forced)
-        note = "N forced by num_holes"
-    else:
-        I_needed = I_w_target - I_solid
-        if I_needed <= 0:
-            N = 0
-            note = "solid ring already meets target -- no ballast needed"
-        elif dI <= 0:
-            N = 0
-            note = ("hardware is LIGHTER than the plastic it displaces "
-                    "(dI <= 0) -- holes would REDUCE inertia")
+        if N_exact is None:
+            note = f"N forced to {N} by num_holes"
+        elif N_exact <= 0:
+            note = f"N FORCED to {N} by num_holes; no ballast required"
         else:
-            N_exact = I_needed / dI
-            N = int(math.ceil(N_exact / N_round_to) * N_round_to)
+            # Say which direction the override went. N/N_exact < 1 means the
+            # forced count is BELOW what the requirement asks -- calling that
+            # "0.26x over-ballasted" reads as a mild over-spec when it is
+            # actually a shortfall, so the two cases are worded separately.
+            _ratio = N / N_exact
+            _dir = ("over-ballasted" if _ratio >= 1.0
+                    else f"UNDER-ballasted, {N_exact - N:.2f} stations short")
+            note = (f"N FORCED to {N} by num_holes; the requirement alone "
+                    f"asks for {N_exact:.2f} ({_ratio:.2f}x -- {_dir})")
+    else:
+        N = N_solved
 
     if N > N_max:
         capped = True
@@ -596,7 +706,8 @@ def wheel_properties(OD_mm, N_forced=None):
     return dict(
         OD=OD_mm, R_inner=R_inner, R_outer=R_outer, R_mean=R_mean,
         m_solid=m_solid, I_solid=I_solid,
-        N=N, N_exact=N_exact, N_max=N_max, capped=capped, note=note,
+        N=N, N_exact=N_exact, N_solved=N_solved, N_max=N_max,
+        capped=capped, note=note, forced=(N_forced is not None),
         m_plastic=m_plastic, m_steel=m_steel, m_wheel=m_wheel,
         I_plastic=I_plastic, I_steel=I_steel, I_wheel=I_wheel,
         dI=dI, dm=dm, gap=gap,
@@ -611,15 +722,19 @@ print(f"fixed: ring_width={ring_width_mm:.1f} mm  spoke_w={spoke_w_mm:.1f} mm  "
       f"N_spokes={N_spokes}  t={t_mm:.1f} mm")
 print(f"       hole d={hole_diameter_mm:.2f} mm through  "
       f"min_gap={min_gap_mm:.1f} mm  min_wall={min_wall_mm:.1f} mm  "
-      f"N rounded to multiple of {N_round_to}")
+      f"solved N rounded to multiple of {N_round_to}")
 print("       R_mean = (R_inner+R_outer)/2, forced by the ID-to-OD hole  |  "
       "hole axial position = " +
       ("centred in t" if hole_axial_center_mm is None
        else f"{hole_axial_center_mm:.2f} mm (forced)"))
+if num_holes is not None:
+    print(f"       ** N is FORCED to {num_holes} by num_holes -- the 'need' "
+          f"column shows what the requirement alone asks for **")
 
 hdr = (f"\n{'OD':>5} | {'ID':>5} | {'R_mean':>6} | {'solid I':>8} | {'N':>4} | "
-       f"{'Nmax':>4} | {'PLASTIC g':>9} | {'STEEL g':>8} | {'TOTAL g':>8} || "
-       f"{'I_plast':>8} | {'I_steel':>8} | {'I_tot':>7} | {'gap mm':>7}")
+       f"{'need':>6} | {'Nmax':>4} | {'PLASTIC g':>9} | {'STEEL g':>8} | "
+       f"{'TOTAL g':>8} || {'I_plast':>8} | {'I_steel':>8} | {'I_tot':>7} | "
+       f"{'gap mm':>7}")
 print(hdr)
 print("-"*len(hdr))
 
@@ -629,6 +744,7 @@ for OD in OD_list_mm:
     rows.append(r)
 
     gap_txt = "   inf " if math.isinf(r['gap']) else f"{r['gap']*1e3:>7.2f}"
+    need_txt = "    --" if r['N_exact'] is None else f"{r['N_exact']:>6.2f}"
     flags = []
     if r['capped']:
         flags.append(f"CAPPED at N_max={r['N_max']}")
@@ -642,7 +758,8 @@ for OD in OD_list_mm:
     flag = ("  <-- " + " | ".join(flags)) if flags else ""
 
     print(f"{r['OD']:>5} | {(r['R_inner']*2e3):>5.0f} | {r['R_mean']*1e3:>6.1f} | "
-          f"{r['I_solid']*1e4:>8.4f} | {r['N']:>4d} | {r['N_max']:>4d} | "
+          f"{r['I_solid']*1e4:>8.4f} | {r['N']:>4d} | {need_txt} | "
+          f"{r['N_max']:>4d} | "
           f"{r['m_plastic']*1e3:>9.2f} | {r['m_steel']*1e3:>8.2f} | "
           f"{r['m_wheel']*1e3:>8.2f} || "
           f"{r['I_plastic']*1e4:>8.4f} | {r['I_steel']*1e4:>8.4f} | "
@@ -667,30 +784,28 @@ for r in rows:
           f"{tot/I_w_target*100:>13.1f}% | "
           f"{3*r['m_wheel']*1e3:>12.2f} | "
           f"{3*r['m_wheel']/M*100:>9.1f}%")
+print(f"(% of cube is against the {M:.3f} kg SIZING BASIS, matching the mass "
+      f"budget of\n Stage 6 and Table 'massbudget' in the TDD. Against the "
+      f"measured {M_ACTUAL_g/1e3:.3f} kg the\n shares are correspondingly "
+      f"larger.)")
 
 # =================================================================
 # SOLID vs MODIFIED SUMMARY  (the headline comparison)
 # =================================================================
 # Among the ODs that satisfy EVERY check (meets I_w_target, not cut short
-# by the gap rule, passes the radial wall rule), pick the LIGHTEST wheel.
+# by the gap rule, passes the axial wall rule), pick the LIGHTEST wheel.
 #
 # Minimum mass, not minimum diameter, is the correct objective. I_zz goes
 # as m*R^2, so mass parked at a large radius buys inertia quadratically
 # more cheaply than mass at a small one. Sizing on the smallest OD that
-# "works" therefore does the expensive thing: it forces the shortfall to
-# be made up with a large number of dense bolts, and three wheels of
-# ballast is mass the cube then has to throw. The sweep shows the effect
-# plainly -- the 90 mm ring needs 24 bolts (308 g/wheel) while a bare
-# 140 mm ring beats the target outright at 140 g/wheel.
+# "works" therefore does the expensive thing.
 #
 # "Capped" is NOT by itself disqualifying. A capped wheel is one that could
 # not take every hole that was asked for; if it still meets I_w_target with
 # the holes it can legally hold, it is a perfectly good wheel. What
 # disqualifies a design is failing the requirement or failing the wall
 # rule. (Capping only kills a design when the cap is why it fell short --
-# which the meets_target test already catches.) Treating capped as fatal
-# made a forced num_holes report "no OD passes" even when every OD met the
-# target with room to spare.
+# which the meets_target test already catches.)
 viable = [r for r in rows if r['meets_target'] and r['axial_ok']]
 if D_w_FIXED_mm is not None:
     # The envelope has already chosen the diameter; the sweep does not get a
@@ -733,15 +848,31 @@ else:
           f"{ring_width_mm:.1f} mm, t = {t_mm:.1f} mm)")
     print(f"  N holes = {sel['N']}  of N_max = {sel['N_max']}  "
           f"on R_mean = {sel['R_mean']*1e3:.2f} mm (radial hole centroid)")
-    if sel['N_exact'] is not None:
-        print(f"  (exact requirement was {sel['N_exact']:.2f} holes, "
-              f"rounded up to a multiple of {N_round_to})")
+    if sel['N_exact'] is not None and sel['N_exact'] > 0:
+        if sel['forced']:
+            print(f"  ** N was FORCED to {sel['N']}; the requirement alone "
+                  f"asks for {sel['N_exact']:.2f} stations.")
+        else:
+            print(f"  SOLVED, NOT FORCED: the requirement asks for "
+                  f"{sel['N_exact']:.2f} stations, rounded up to")
+            print(f"  a multiple of {N_round_to} -> {sel['N']}. This matches "
+                  f"the as-built part, which is the")
+            print(f"  check that the inputs above really do describe the wheel "
+                  f"that was made.")
     if sel['capped']:
         print(f"  NOTE: the hole count was CUT to {sel['N']} by the "
               f"{min_gap_mm:.1f} mm edge-gap rule (N_max = {sel['N_max']}).")
         print(f"        The wheel still meets the requirement at "
               f"{sel['I_wheel']/I_w_target*100:.1f}% of target, so the cap "
               f"cost margin, not closure.")
+    if sel['N'] % N_spokes == 0 and sel['N'] >= N_spokes:
+        print(f"  CLOCKING: {sel['N']} holes and {N_spokes} spokes share their "
+              f"symmetry, so every")
+        print(f"        {sel['N']//N_spokes}th hole sits on a spoke's radial "
+              f"line. Clock the pattern off the spokes")
+        print(f"        in CAD -- this script models the ring as a plain "
+              f"annulus and does NOT")
+        print(f"        check hole/spoke interference.")
     print()
     print(f"{'quantity':<26} | {'SOLID':>12} | {'MODIFIED':>12} | {'delta':>12}")
     print("-"*72)
@@ -760,14 +891,18 @@ else:
     print(f"{'relative change':<26} | {'--':>12} | {'--':>12} | "
           f"mass {dm_pct:+.1f}% / I {dI_pct:+.1f}%")
     print()
-    print(f"I_w_target            = {I_w_target*1e4:.4f} x1e-4 kg m^2")
+    print(f"I_w_target            = {I_w_target*1e4:.4f} x1e-4 kg m^2   "
+          f"(at the {M:.3f} kg sizing basis)")
     print(f"I_zz achieved         = {sel['I_wheel']*1e4:.4f} x1e-4 kg m^2  "
           f"({sel['I_wheel']/I_w_target*100:.1f}% of target)")
+    print(f"solid ring alone      = {sel['I_solid']*1e4:.4f} x1e-4 kg m^2  "
+          f"({sel['I_solid']/I_w_target*100:.1f}% of target -- "
+          f"ballast is genuinely required)")
     if sel['N'] >= 2:
         print(f"edge-to-edge gap      = {sel['gap']*1e3:.2f} mm   "
               f"(minimum {min_gap_mm:.1f} mm) "
               f"[{'OK' if sel['gap'] >= min_gap_mm*1e-3 else 'FAIL'}]")
-        print(f"chord at R_inner       = "
+        print(f"chord at R_inner      = "
               f"{2*sel['R_inner']*math.sin(math.pi/sel['N'])*1e3:.2f} mm "
               f"(tightest point between two adjacent radial slots)")
     else:
@@ -777,30 +912,102 @@ else:
           f"{sel['wall_back']:.2f} mm   (minimum {min_wall_mm:.1f} mm) "
           f"[{'OK' if sel['axial_ok'] else 'FAIL'}]")
     print(f"three wheels          = {3*sel['m_wheel']*1e3:.1f} g  "
-          f"({3*sel['m_wheel']/M*100:.1f}% of the {M:.3f} kg cube)")
-    if sel['N'] == 0:
-        print()
-        print("  The lightest compliant wheel carries NO ballast: at this")
-        print("  diameter the bare PET-CF ring already exceeds I_w_target, so")
-        print("  every bolt added would be mass with no requirement behind it.")
-        print("  The M6 hole pattern is retained as a TRIM feature -- see the")
-        print("  gap-rule table for how much upward trim is available, and the")
-        print("  demonstration below for what a populated pattern would cost.")
+          f"({3*sel['m_wheel']/M*100:.1f}% of the {M:.3f} kg sizing basis, "
+          f"{3*sel['m_wheel']/(M_ACTUAL_g/1e3)*100:.1f}% of the measured "
+          f"{M_ACTUAL_g/1e3:.3f} kg)")
+
+# =================================================================
+# WHAT THE REALISED MASS MARGIN IS WORTH
+# =================================================================
+# The build came in lighter than the sizing basis. Because h_w scales with
+# M, that is not merely a lighter cube -- it is a LOWER REQUIREMENT on a
+# wheel that has already been made. This block prices that, and finds the
+# speed floor the wheel actually holds, which is what decides whether the
+# 3500-4000 rpm operating band is covered.
+if sel is not None:
+    print("\n" + "="*72)
+    print("REALISED MASS MARGIN".center(72))
+    print("="*72)
+    _M_act = M_ACTUAL_g/1e3
+    # Stated as "lighter" rather than as a signed number: Stage 6 reports the
+    # same quantity from the other direction (measured - sized = -200 g), and
+    # two blocks printing the same fact with opposite signs reads like a
+    # contradiction even though both are right.
+    print(f"sized against M = {M:.3f} kg, built at {_M_act:.3f} kg "
+          f"-> {M*1e3 - M_ACTUAL_g:.1f} g LIGHTER than sized for")
+    print(f"\n{'M kg':>7} | {'tau_g':>7} | {'beta':>7} | {'I_target':>11} | "
+          f"{'margin':>8}")
+    print("-"*52)
+    for _lbl, _Mx in (("sized", M), ("actual", _M_act)):
+        _tg = _Mx*g*L/2
+        _b  = tau_b/(tau_b - _tg)
+        _It = math.sqrt(eta)*C*_Mx*L**1.5*_b/omega_max
+        print(f"{_Mx:>7.3f} | {_tg:>7.4f} | {_b:>7.4f} | {_It*1e4:>8.4f}e-4 | "
+              f"{sel['I_wheel']/_It*100:>7.1f}%  ({_lbl})")
+
+    # Speed floor at the actual mass: bisect for the rpm at which the wheel
+    # as built exactly meets its requirement. Below this it no longer closes.
+    _lo, _hi = 500.0, 12000.0
+    for _ in range(80):
+        _mid = 0.5*(_lo + _hi)
+        _tg = _M_act*g*L/2
+        _b  = tau_b/(tau_b - _tg)
+        _It = math.sqrt(eta)*C*_M_act*L**1.5*_b/(_mid*2*math.pi/60)
+        if sel['I_wheel'] < _It:
+            _lo = _mid
+        else:
+            _hi = _mid
+    print(f"\nSPEED FLOOR at the actual {_M_act:.3f} kg: this wheel meets "
+          f"target down to {_hi:.0f} rpm.")
+    _band_lo, _band_hi = 3500, 4000
+    if _hi <= _band_lo:
+        print(f"  The {_band_lo}-{_band_hi} rpm operating band is fully "
+              f"covered, with {_band_lo - _hi:.0f} rpm to spare\n"
+              f"  below its lower end.")
+    else:
+        print(f"  !! The {_band_lo}-{_band_hi} rpm band is NOT fully covered "
+              f"-- the wheel falls short\n     below {_hi:.0f} rpm.")
+    print("  (Requirement goes as 1/omega, so the BOTTOM of the band is the "
+          "demanding end.)")
+
+# =================================================================
+# BALLAST LADDER -- what each station buys and costs
+# =================================================================
+# Both masses are held fixed here, so this is a clean read of the ladder
+# the design sits on: what the neighbouring station counts would have given.
+if sel is not None:
+    print(f"\n=== Ballast ladder on the selected {sel['OD']:.0f} mm ring ===")
+    print(f"{'N':>4} | {'3-fold':>6} | {'wheel g':>8} | {'x3 g':>8} | "
+          f"{'I 1e-4':>8} | {'margin':>8} | {'gap mm':>7}")
+    print("-"*66)
+    for N in range(max(2, sel['N']-6), sel['N']+7, 3):
+        if N > sel['N_max']:
+            continue
+        m_w = sel['m_solid'] + N*sel['dm']
+        I_w = sel['I_solid'] + N*sel['dI']
+        gp  = edge_gap(N, sel['R_inner'], r_hole)
+        mark = "  <-- as built" if N == sel['N'] else ""
+        print(f"{N:>4} | {'yes' if N % N_spokes == 0 else 'no':>6} | "
+              f"{m_w*1e3:>8.2f} | {3*m_w*1e3:>8.2f} | {I_w*1e4:>8.4f} | "
+              f"{I_w/I_w_target*100:>7.1f}% | {gp*1e3:>7.2f}{mark}")
+    print(f"(margin is against the {M:.3f} kg sizing basis; at the actual "
+          f"{M_ACTUAL_g/1e3:.3f} kg every row\n gains about "
+          f"{(I_w_target/(math.sqrt(eta)*C*(M_ACTUAL_g/1e3)*L**1.5*(tau_b/(tau_b - (M_ACTUAL_g/1e3)*g*L/2))/omega_max) - 1)*100:.0f}%.)")
 
 # =================================================================
 # GAP-RULE DEMONSTRATION  (exercises the 2 mm constraint explicitly)
 # =================================================================
-# The selected wheel may need no ballast, which would leave the hole-pattern
-# checks untested in a normal run. This block forces the pattern onto the
-# selected ring and walks N upward through the cap, so the constraint is
-# visible rather than merely implemented.
+# The selected wheel uses fewer stations than the gap rule allows, which
+# would leave the hole-pattern checks untested in a normal run. This block
+# forces the pattern onto the selected ring and walks N upward through the
+# cap, so the constraint is visible rather than merely implemented.
 if sel is not None:
     print(f"\n=== Gap rule exercised on the selected {sel['OD']:.0f} mm ring "
           f"(gap checked at R_inner = {sel['R_inner']*1e3:.2f} mm) ===")
     print(f"{'N':>5} | {'chord mm':>9} | {'gap mm':>8} | {'verdict':<22} | "
           f"{'+mass g':>8} | {'+I 1e-4':>8}")
     print("-"*76)
-    _N_probe = sorted({3, 6, 12, sel['N_max'], sel['N_max']+1,
+    _N_probe = sorted({3, sel['N'], sel['N_max'], sel['N_max']+1,
                        sel['N_max']+3} - {0, 1, 2})
     for N in _N_probe:
         chord = 2*sel['R_inner']*math.sin(math.pi/N)
@@ -816,27 +1023,31 @@ if sel is not None:
               f"{d_mass*1e3:>+8.2f} | {d_I*1e4:>+8.4f}")
     print(f"N_max = {sel['N_max']} is the largest count with gap >= "
           f"{min_gap_mm:.1f} mm; the solver caps any request above it.")
-    print("(chord/gap use R_inner, the tightest point between adjacent "
-          "radial slots; +I uses R_mean, the hole's actual centroid radius.)")
+    print(f"The design uses {sel['N']}, leaving room for "
+          f"{sel['N_max'] - sel['N']} more stations if the requirement ever "
+          f"grows.")
+    print("(chord/gap use R_inner, the tightest point between adjacent radial")
+    print("slots; +I uses R_mean, the hole's actual centroid radius.)")
 
 # =================================================================
 # AXIAL FIT CHECK (independent of OD -- a round hole has no orientation)
 # =================================================================
 print("\n=== Axial fit of the M6 hole inside the wheel thickness ===")
 print(f"hole diameter      = {hole_diameter_mm:.2f} mm")
-print(f"wheel thickness    = {t_mm:.2f} mm")
+print(f"wheel thickness    = {t_mm:.2f} mm   (FIXED by the packaging envelope)")
 print(f"thickness needed   = {hole_diameter_mm + 2*min_wall_mm:.2f} mm  "
       f"(hole + 2 x {min_wall_mm:.1f} mm wall)")
 _slack = t_mm - hole_diameter_mm - 2*min_wall_mm
 print(f"slack              = {_slack:+.2f} mm  "
       f"[{'OK' if _slack >= 0 else 'TOO NARROW'}]")
-print("A round hole is rotationally symmetric, so there is a single axial")
-print("case -- the two hexagon orientations the old pocket model had to check")
-print("separately don't exist here either.")
+print("A round hole is rotationally symmetric, so there is a single axial case.")
 if hole_axial_center_mm is None:
     print(f"With the hole centred in t, the wall is "
           f"{_slack/2 + min_wall_mm:.2f} mm on each face, the maximum "
-          f"available.")
+          f"available --")
+    print(f"{(_slack/2 + min_wall_mm)/min_wall_mm:.1f}x the "
+          f"{min_wall_mm:.1f} mm minimum. The thickness is nowhere near "
+          f"driving this design.")
 
 # =================================================================
 # GAP-RULE CAPACITY TABLE  (N_max vs OD)
@@ -858,10 +1069,9 @@ for r in rows:
 # THROUGH-BOLT RETENTION LOAD
 # =================================================================
 # With a through-hole the bolt is the retention: the nut is threaded onto it
-# and clamps the ring, so nothing depends on a plastic floor any more. What
-# the joint must survive is the centrifugal pull of its own hardware mass,
-# reacted by the bolt in tension and by bearing of the head/nut faces on the
-# PET-CF.
+# and clamps the ring, so nothing depends on a plastic floor. What the joint
+# must survive is the centrifugal pull of its own hardware mass, reacted by
+# the bolt in tension and by bearing of the head/nut faces on the PET-CF.
 print("\n=== Through-bolt retention load ===")
 # Evaluated at the SELECTED wheel's R_mean (the hardware's actual centroid
 # radius now that the hole spans the full ring width), not at the largest
@@ -871,30 +1081,37 @@ print("\n=== Through-bolt retention load ===")
 # no wheel was selected, where a conservative bound is the right default.
 _r_max = sel['R_mean'] if sel is not None else max(r['R_mean'] for r in rows)
 F_c = m_hardware * omega_max**2 * _r_max
-_bearing_area = math.pi*((10.0e-3/2)**2 - r_hole**2)   # ~M6 head/nut face
+_M6_PROOF_N = 12.7e3     # M6 class 8.8 proof load: 20.1 mm^2 stress area
+                         # x 580 MPa proof stress.
+_bearing_area = math.pi*((10.0e-3/2)**2 - r_hole**2)   # M6 head/nut face,
+                                                        # 10 mm across flats
 print(f"hardware mass per station = {m_hardware*1e3:.2f} g "
       f"(bolt {m_bolt*1e3:.2f} + nut {m_nut*1e3:.2f}"
       + (f" + washer {m_washer*1e3:.2f}" if m_washer > 0 else "") + ")")
 print(f"at {rpm_max} rpm and R_mean = {_r_max*1e3:.1f} mm:")
 print(f"  F = m*omega^2*R = {F_c:.0f} N  ({F_c/9.81:.1f} kgf)")
-print(f"  vs M6 class 8.8 proof load ~ 12.7 kN -- the BOLT is not the "
-      f"limit ({F_c/12.7e3*100:.2f}% of proof).")
+print(f"  vs M6 class 8.8 proof load ~ {_M6_PROOF_N/1e3:.1f} kN -- the BOLT is "
+      f"not the limit ({F_c/_M6_PROOF_N*100:.2f}% of proof).")
 print(f"  bearing stress under the head/nut face "
       f"({_bearing_area*1e6:.1f} mm^2) = {F_c/_bearing_area/1e6:.2f} MPa,")
 print(f"  against PET-CF compressive strength of order 60-90 MPa -- also not "
       f"the limit.")
 print("  -> the through-bolt IS the retention feature. Use a nyloc or "
       "threadlocked nut so")
-print("     vibration cannot back it off; the old blind-pocket floor check is "
-      "obsolete.")
-print(f"  NOTE: F scales with omega^2 -- at 7327 rpm this becomes "
-      f"{m_hardware*(7327*2*math.pi/60)**2*_r_max:.0f} N.")
-print("  NOTE: with the hole now radial, the bolt head bears on the curved")
+print("     vibration cannot back it off.")
+print(f"  NOTE: F scales with omega^2. The previous design ceiling was "
+      f"5500 rpm; there this")
+print(f"     station would pull "
+      f"{m_hardware*(5500*2*math.pi/60)**2*_r_max:.0f} N "
+      f"({m_hardware*(5500*2*math.pi/60)**2*_r_max/_M6_PROOF_N*100:.2f}% of "
+      f"proof) -- still comfortable, so")
+print(f"     the joint is not what limits the speed.")
+print("  NOTE: the hole is radial, so the bolt head bears on the curved")
 print("     ID surface and the nut on the curved OD surface, not on a flat")
-print("     face as before. Spot-face both ends flat (or use a curved/")
-print("     spherical washer) so the head and nut seat squarely -- a washer")
-print("     resting on an unmachined curved surface bears on its edge, not")
-print("     its face, and the bearing-area figure above assumes a flat seat.")
+print("     face. Spot-face both ends flat (or use a curved/spherical")
+print("     washer) so the head and nut seat squarely -- a washer resting on")
+print("     an unmachined curved surface bears on its edge, not its face,")
+print("     and the bearing-area figure above assumes a flat seat.")
 
 
 # =================================================================
@@ -902,17 +1119,20 @@ print("     its face, and the bearing-area figure above assumes a flat seat.")
 # STAGE 6 -- MASS BUDGET  (DECOUPLED from stages 1-5)
 # =================================================================
 # Self-contained: it reads NOTHING from the sizing code above except the
-# assumed cube mass M, which it exists to CHECK. Every mass is a variable
+# two cube masses, which it exists to reconcile. Every mass is a variable
 # below -- edit the numbers there, not in the logic.
 #
-# WHY THIS MATTERS: M is not a free assumption. It is an input to
-# I_w_target (Stage 1), which sets the wheel, whose mass feeds back into
-# M. This stage closes that loop: it totals the real bill of materials
-# and compares it against the M assumed at the top of the file.
+# WHAT THIS STAGE NOW DOES, AND WHAT IT NO LONGER DOES:
+# It used to close a fixed-point loop -- the roll-up was tuned until it
+# reproduced the M that Stage 1 ran with. It no longer does that, because
+# the build came in lighter than the sizing basis and the two numbers are
+# legitimately different. This stage now reconciles the BOM against
+# M_ACTUAL_g and reports the gap to M as SIZING MARGIN.
 # =================================================================
 
-# --- what the sizing above ASSUMED, so we can check it ---
-M_ASSUMED_g = M * 1e3        # [g] the cube mass Stage 1 was run with
+# --- the two masses this stage reconciles ---
+M_SIZED_g = M * 1e3          # [g] the basis Stage 1 was run with (1800.0)
+# M_ACTUAL_g is set at the top of the file (1600.0).
 
 # Bill of materials.
 #   (label, unit_mass_g, qty, category)
@@ -926,21 +1146,21 @@ BOM = [
     ("TowerPro MG92B brake servo",        13.8,  3, "Motors"),
 
     # --- reaction wheels -------------------------------------------
-    # OD = 120 mm is a FIXED CONSTRAINT (D_w_FIXED_mm), not a sweep result:
-    # three orthogonal wheel modules plus the battery have to fit the
-    # 150 mm cube, so the diameter is imposed and the sweep is consulted
-    # only for what that diameter costs. At 120 mm the bare PET-CF ring
-    # falls short of I_w_target (3.0450 vs 4.0813 x1e-4), so this wheel IS
-    # ballasted: 6 RADIAL M6 bolt+nut stations (ID-to-OD through-holes, one
-    # per station, on R_mean = 55.0 mm) bring it to 4.3356e-4, i.e. 106.2%
-    # of target at 5500 rpm.
-    #   170.37 g = 125.37 g PET-CF (ring + 3 spokes, t = 20 mm, 10 mm width,
-    #              already net of the 6 drilled holes)
-    #            + 45.00 g steel (6 x 7.50 g bolt + nut)
+    # THE AS-BUILT WHEEL. OD = 120 mm is a FIXED CONSTRAINT
+    # (D_w_FIXED_mm), not a sweep result: three orthogonal wheel modules
+    # plus the battery have to fit the 149 mm cube. At 120 mm the bare
+    # PET-CF ring reaches only 3.0451 of the 6.2352 x1e-4 required at the
+    # 1.8 kg / 4000 rpm sizing basis, so this wheel IS ballasted: 15
+    # RADIAL M6 bolt+nut stations (ID-to-OD through-holes, one per
+    # station, on R_mean = 55.0 mm) bring it to 6.2715e-4, i.e. 100.6% of
+    # target.
+    #   234.14 g = 121.64 g PET-CF (ring + 3 spokes, t = 20 mm, 10 mm width,
+    #              already net of the 15 drilled holes)
+    #            + 112.50 g steel (15 x 7.50 g bolt + nut)
     # Net per station is +7.085 g (7.50 g hardware - 0.415 g displaced
-    # plastic). 18 bolts and 18 nuts on the cube. Kept as a literal so this
+    # plastic). 45 bolts and 45 nuts on the cube. Kept as a literal so this
     # stage stays decoupled from stages 1-5; update it if the wheel changes.
-    ("Reaction wheel (PET-CF, 120 mm, 6x M6 radial)", 170.37, 3, "Wheels"),
+    ("Reaction wheel (PET-CF, 120 mm, 15x M6 radial)", 234.14, 3, "Wheels"),
 
     # --- power -----------------------------------------------------
     ("Tattu R-Line V5.0 6S 1550 mAh LiPo, 22.2 V", 254.0, 1, "Power"),
@@ -948,10 +1168,9 @@ BOM = [
     ("LM2596 step-down regulator",         10.0,  1, "Power"),
 
     # --- control & sensing -----------------------------------------
-    # Revised upward from the first-pass estimate (74.2 -> 95.2 g total) on
-    # as-weighed rather than bare-board figures: the Teensy carries headers,
+    # As-weighed rather than bare-board figures: the Teensy carries headers,
     # the MA600 breakout is quoted with its steel-backed ring magnet, and the
-    # ESP32 figure now includes the antenna and its pigtail.
+    # ESP32 figure includes the antenna and its pigtail.
     ("mjbots moteus-n1 driver",            14.6,  3, "Electronics"),
     ("mjbots MA600 breakout + magnet",      6.0,  3, "Electronics"),
     ("Teensy 4.1",                         11.0,  1, "Electronics"),
@@ -969,7 +1188,7 @@ BOM = [
     ("4.7 nF cap (CAN)",                    1.0,  2, "Wiring"),
     ("1N5819 Schottky diode",               3.0,  1, "Wiring"),
 
-    # --- structure: NOT YET KNOWN, pending CAD ---------------------
+    # --- structure: still an allowance, pending a weighed CAD roll-up --
     # Declared explicitly rather than omitted, so the budget reports
     # them as missing instead of quietly totalling without them.
     ("Inner structure / motor subframe",   None,  1, "Structure"),
@@ -978,14 +1197,29 @@ BOM = [
 ]
 
 # Allowances for items above whose unit mass is still None. These are
-# ESTIMATES, flagged as such in the output and totalled separately, so
-# the known-hardware figure and the projected figure never get confused.
-# Raised 374.0 -> 487.6 g total, holding the same relative split, after the
-# 374 g figure proved optimistic against the frame and subframe now in CAD.
+# ESTIMATES, flagged as such in the output and totalled separately, so the
+# known-hardware figure and the projected figure never get confused.
+#
+# THIS IS THE DESIGN ALLOWANCE, and it is what closes the fixed point:
+# 1367.5 g of known hardware + 432.5 g of structure = 1800.0 g, reproducing
+# the M that Stage 1 was run with. Section 3 of the TDD is a design-phase
+# section and quotes this budget, not the as-built one.
+#
+# Revised DOWN from 487.6 g, holding the same relative split
+# (40.9 / 49.2 / 9.9 %). Its share of the total falls further than that
+# suggests, because the wheels grew over the same revision: ballasting for
+# 4000 rpm takes each wheel from 170.37 g to 234.14 g, so specified hardware
+# now dominates the budget in a way it did not before.
+#
+# SEPARATELY, the built cube weighed M_ACTUAL_g = 1600.0 g, which implies a
+# realised structure mass of 1600.0 - 1367.5 = 232.5 g -- 200 g under this
+# allowance. That is reported at the end of Stage 6 as realised margin. It is
+# deliberately NOT folded back into the allowance here: doing so would
+# re-solve the wheel to 12 stations and stop describing the part that exists.
 ALLOWANCE_g = {
-    "Inner structure / motor subframe": 199.5,
-    "Outer frame / contact features":   239.9,
-    "Fasteners / wiring harness":        48.2,
+    "Inner structure / motor subframe": 176.9,
+    "Outer frame / contact features":   212.8,
+    "Fasteners / wiring harness":        42.8,
 }
 
 CATEGORY_ORDER = ["Motors", "Wheels", "Power", "Electronics", "Wiring",
@@ -996,7 +1230,7 @@ print("STAGE 6: MASS BUDGET".center(72))
 print("="*72)
 
 # ---- itemised list ----------------------------------------------
-hdr6 = (f"\n{'Item':<38} | {'unit g':>7} | {'qty':>3} | {'total g':>8} | "
+hdr6 = (f"\n{'Item':<46} | {'unit g':>7} | {'qty':>3} | {'total g':>8} | "
         f"{'category':<11}")
 print(hdr6)
 print("-"*len(hdr6))
@@ -1008,31 +1242,31 @@ cat_known     = {c: 0.0 for c in CATEGORY_ORDER}
 for label, unit, qty, cat in BOM:
     if unit is None:
         unknown_items.append((label, qty, cat))
-        print(f"{label:<38} | {'--':>7} | {qty:>3} | {'UNKNOWN':>8} | {cat:<11}")
+        print(f"{label:<46} | {'--':>7} | {qty:>3} | {'UNKNOWN':>8} | {cat:<11}")
         continue
     tot = unit * qty
     known_total += tot
     cat_known[cat] = cat_known.get(cat, 0.0) + tot
-    print(f"{label:<38} | {unit:>7.2f} | {qty:>3} | {tot:>8.2f} | {cat:<11}")
+    print(f"{label:<46} | {unit:>7.2f} | {qty:>3} | {tot:>8.2f} | {cat:<11}")
 
 print("-"*len(hdr6))
-print(f"{'SUBTOTAL -- known hardware':<38} | {'':>7} | {'':>3} | "
+print(f"{'SUBTOTAL -- known hardware':<46} | {'':>7} | {'':>3} | "
       f"{known_total:>8.2f} |")
 
 # ---- allowances for the unknowns --------------------------------
 allow_total = 0.0
 if unknown_items:
-    print(f"\n--- Allowances for items with no measured mass "
-          f"({len(unknown_items)}) ---")
+    print(f"\n--- Structure allowance, ESTIMATED pending CAD "
+          f"({len(unknown_items)} items) ---")
     for label, qty, cat in unknown_items:
         a = ALLOWANCE_g.get(label)
         if a is None:
-            print(f"{label:<38} |  NO ALLOWANCE SET -- budget is incomplete")
+            print(f"{label:<46} |  NO ALLOWANCE SET -- budget is incomplete")
             continue
         tot = a * qty
         allow_total += tot
         cat_known[cat] = cat_known.get(cat, 0.0) + tot
-        print(f"{label:<38} | {a:>7.2f} | {qty:>3} | {tot:>8.2f} | "
+        print(f"{label:<46} | {a:>7.2f} | {qty:>3} | {tot:>8.2f} | "
               f"{cat:<11} (est.)")
 
 M_est_g = known_total + allow_total
@@ -1048,44 +1282,58 @@ for c in CATEGORY_ORDER:
 print("-"*45)
 print(f"{'TOTAL':<14} | {M_est_g:>9.2f} |")
 
-# ---- the actual comparison --------------------------------------
-print("\n=== Reconciliation against the assumed cube mass ===")
+# ---- reconciliation, against BOTH masses ------------------------
+print("\n=== Reconciliation: does the budget close the fixed point? ===")
 print(f"known hardware (measured/spec)   = {known_total:8.1f} g")
 print(f"structure allowance (ESTIMATED)  = {allow_total:8.1f} g")
-print(f"ESTIMATED TOTAL M                = {M_est_g:8.1f} g  "
+print(f"BOM TOTAL                        = {M_est_g:8.1f} g  "
       f"({M_est_g/1e3:.3f} kg)")
-print(f"ASSUMED M used in Stage 1        = {M_ASSUMED_g:8.1f} g  "
-      f"({M_ASSUMED_g/1e3:.3f} kg)")
+print(f"SIZING BASIS used in Stage 1     = {M_SIZED_g:8.1f} g  "
+      f"({M_SIZED_g/1e3:.3f} kg)")
+_resid = M_est_g - M_SIZED_g
+print(f"  residual (BOM - sizing basis)  = {_resid:+8.1f} g   "
+      f"[{'CONVERGED' if abs(_resid) <= 1.0 else 'DOES NOT CLOSE'}]")
+print(f"\n=== Separately: what the built article actually weighed ===")
+print(f"MEASURED cube mass               = {M_ACTUAL_g:8.1f} g  "
+      f"({M_ACTUAL_g/1e3:.3f} kg)")
+print(f"  implied structure mass         = {M_ACTUAL_g - known_total:8.1f} g "
+      f"(vs {allow_total:.1f} g allowed)")
+delta_g   = M_ACTUAL_g - M_SIZED_g
+delta_pct = delta_g / M_SIZED_g * 100
+print(f"  MARGIN (measured - sized)      = {delta_g:+8.1f} g  ({delta_pct:+.1f}%)")
 
-delta_g   = M_est_g - M_ASSUMED_g
-delta_pct = delta_g / M_ASSUMED_g * 100
-print(f"DELTA (estimate - assumed)       = {delta_g:+8.1f} g  ({delta_pct:+.1f}%)")
-
-CLOSURE_TOL_g = 1.0     # [g] treat |delta| under this as converged. The fixed
-                        # point is only ever reached to within the rounding of
-                        # the BOM literals, so an exact-zero test would flag a
-                        # converged design as open on a 0.04 g residual.
+CLOSURE_TOL_g = 1.0     # [g] rounding of the BOM literals
 if delta_g > CLOSURE_TOL_g:
-    print("\n  !! The build is HEAVIER than Stage 1 assumed.")
+    print("\n  !! The build is HEAVIER than the wheels were sized for.")
     print("     h_w scales as M*L^1.5, so the wheel requirement rises:")
-    scale = (M_est_g/M_ASSUMED_g)
+    scale = (M_ACTUAL_g/M_SIZED_g)
     print(f"     I_w_target would grow by x{scale:.3f} "
           f"-> {I_w_target*scale*1e4:.4f} x1e-4 kg*m^2")
-    print(f"     tau_g floor would rise to "
-          f"{M_est_g/1e3*g*L/2:.3f} N*m (tau_b = {tau_b} N*m)")
-    if tau_b <= M_est_g/1e3*g*L/2:
+    _tg_new = M_ACTUAL_g/1e3*g*L/2
+    print(f"     tau_g floor would rise to {_tg_new:.3f} N*m "
+          f"(tau_b = {tau_b} N*m)")
+    if tau_b <= _tg_new:
         print("     !! BRAKE TORQUE NOW BELOW THE FLOOR -- design does not close.")
     else:
-        beta_new = tau_b/(tau_b - M_est_g/1e3*g*L/2)
-        print(f"     beta would rise {beta:.3f} -> {beta_new:.3f}")
+        beta_new = tau_b/(tau_b - _tg_new)
+        print(f"     beta would rise {beta:.4f} -> {beta_new:.4f}")
         print(f"     combined I_w_target -> "
               f"{I_w_target*scale*(beta_new/beta)*1e4:.4f} x1e-4 kg*m^2")
-    print("     -> re-run Stage 1 with the updated M (step 6 of the closure).")
+    print("     -> re-size: the wheel that was built may no longer be enough.")
 else:
-    print("\n  OK: the build is at or under the assumed mass; Stage 1 stands.")
+    print(f"\n  OK: the build came in {-delta_g:.1f} g UNDER the sizing basis.")
+    print("  The wheels were sized for a heavier cube than the one that was")
+    print("  built, so the requirement they face is lower than the one they")
+    print("  were designed to -- see the REALISED MASS MARGIN block above for")
+    print("  what that is worth in margin and in speed floor.")
 
 if unknown_items:
     print(f"\n  NOTE: {len(unknown_items)} structural item(s) carry ESTIMATED "
-          f"allowances, not measured\n        masses. "
-          f"{allow_total/M_est_g*100:.0f}% of the total is allowance -- "
-          f"treat this as provisional\n        until CAD closes.")
+          f"allowances, not measured\n        masses -- "
+          f"{allow_total/M_est_g*100:.0f}% of the projected total. Treat the "
+          f"budget as provisional until\n        CAD closes. The measured "
+          f"cube implies the real structure came to "
+          f"{M_ACTUAL_g - known_total:.1f} g,\n        "
+          f"{allow_total - (M_ACTUAL_g - known_total):.1f} g under this "
+          f"allowance, but that is an outcome to be confirmed against a\n"
+          f"        weighed CAD roll-up, not a substitute for one.")

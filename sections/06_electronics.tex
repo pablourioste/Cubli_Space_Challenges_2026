@@ -157,10 +157,16 @@ measured point reaches
 \qty{0.45}{\newton\metre} at \qty{17.5}{\ampere}, above the
 \qty{16}{\ampere} peak rating in Table~\ref{tab:bom-supplied}, and that run
 terminated on the motor's thermal limit --- so the top of this envelope is a
-short-duration capability, not a continuous one. Third, speeds cross the
-\qty{5500}{\rpm} design ceiling of Section~\ref{sec:massbudget} only under the
-lighter loads, which is consistent with that ceiling being set by bus voltage
-and derating rather than by any inability of the motor to spin faster.
+short-duration capability, not a continuous one. Third, every load tested
+crosses the \qty{4000}{\rpm} design ceiling of Section~\ref{sec:massbudget},
+and does so at or below \qty{60}{\percent} throttle --- the heaviest
+propeller, which is the one that ran to the thermal limit, passes it at
+\qty{4079}{\rpm} on \qty{5.9}{\ampere}. The ceiling is therefore set by bus
+voltage and derating, not by any inability of the motor to reach the speed.
+This margin has widened with the revision of $\omega_{\max}$ from
+\qty{5500}{\rpm} to \qty{4000}{\rpm} (Section~\ref{sec:jumpup_target}): at the
+previous value only the lighter loads cleared the ceiling, whereas the drive
+now sustains the design speed across the whole of the measured envelope.
 
 \begin{figure}[tbp]
 \centering
@@ -169,7 +175,7 @@ and derating rather than by any inability of the motor to spin faster.
 phase current, for one motor driving four different loads. Symbols are
 measured points at throttle settings of 50, 55, 60, 65, 75, 85 and
 \qty{100}{\percent}; lines join successive points and are not fits. The
-dashed line in (b) is the \qty{5500}{\rpm} reaction-wheel design ceiling of
+dashed line in (b) is the \qty{4000}{\rpm} reaction-wheel design ceiling of
 Section~\ref{sec:massbudget}. Loads shown are propellers, not reaction wheels:
 the curves characterise the \emph{motor}, and the load-dependent spread
 between them does not carry over to this application. Manufacturer static

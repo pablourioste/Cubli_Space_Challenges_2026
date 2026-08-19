@@ -55,24 +55,23 @@ FUN-12 & D & Run the control loop with telemetry enabled and disabled; compare c
 
 \multicolumn{5}{@{}l}{\textbf{Performance}}\\
 \midrule
-PER-01 & T & Initialise the rig at rest at the upright equilibrium; release; time the balance. & Duration $\geq$ \qty{60}{\second}; no evident wheel-speed drift. & \textbf{Verified} \\
-PER-02 & T & As PER-01, on the integrated cube at the edge equilibrium. & Duration $\geq$ \qty{60}{\second}; no evident drift. & Open \\
-PER-03 & T & As PER-01, on the integrated cube at the corner equilibrium. & Duration $\geq$ \qty{60}{\second}; no evident drift. & Open \\
-PER-04 & T & Displace the rig by hand to a measured angle from the support; release. & Recovery from $\geq$ \qty{12}{\degree}, then PER-01 satisfied. & \textbf{Verified} (to \qty{24}{\degree}) \\
-PER-05 & T & As PER-04, on the cube, in each of the principal tilt directions. & Recovery from $\geq$ \qty{5}{\degree}, then PER-02 or PER-03 satisfied. & Open \\
-PER-06 & T & Instrument the control task; log per-cycle execution time over a full balancing run. & Loop rate \qty{1}{\kilo\hertz}; worst-case cycle $\leq$ \qty{1}{\milli\second}, not merely the mean. & Open \\
-PER-07 & A, I & Evaluate wheel inertia from the CAD mass properties and from the sizing calculator; confirm the ballast station count on the built wheel. & $I_w \geq$ \qty{4.0813e-4}{\kilogram\metre\squared}; CAD and calculator agree. & \textbf{Verified} (analysis) \\
-PER-08 & A, T & Spin-up test on the built wheel at end-of-discharge pack voltage (WBS E10). & Design speed reached and sustained on a depleted pack, not only a charged one. & Open \\
-PER-09 & A & Derive the achievable ceiling from $K_v$, winding resistance, modulation derate and end-of-discharge bus voltage; compare against the design speed. & Design speed $\leq$ \qty{80}{\percent} of the derived ceiling. & \textbf{Verified} (analysis, \qty{79.5}{\percent}) \\
-PER-10 & T & Log driver current throughout balancing and disturbance recovery. & Peak within the \qty{9}{\ampere} continuous rating. & Partial (rig) \\
-PER-11 & T & Spin-down test: brake from the design speed with the event logged at a rate resolving a few-millisecond transient. & Arrest within \qty{100}{\milli\second}. & Open \\
-PER-12 & T & Record a telemetry session; count logged samples per second of each field. & $\geq$ \qty{50}{\hertz} for state, command and wheel speed. & Open \\
+PER-01 & T & Initialise at rest at the upright equilibrium; release; time the balance. Run on the 1-DoF rig, then on the integrated cube at the edge equilibrium. & Duration $\geq$ \qty{60}{\second}; no evident wheel-speed drift, on each article. & Partial (rig verified; cube open) \\
+PER-02 & T & As PER-01, on the integrated cube at the corner equilibrium. & Duration $\geq$ \qty{60}{\second}; no evident drift. & Open \\
+PER-03 & T & Displace the rig by hand to a measured angle from the support; release. & Recovery from $\geq$ \qty{12}{\degree}, then PER-01 satisfied. & \textbf{Verified} (to \qty{24}{\degree}) \\
+PER-04 & T & As PER-03, on the cube, in each of the principal tilt directions. & Recovery from $\geq$ \qty{5}{\degree}, then PER-01 or PER-02 satisfied. & Open \\
+PER-05 & T & Instrument the control task; log per-cycle execution time over a full balancing run. & Loop rate \qty{1}{\kilo\hertz}; worst-case cycle $\leq$ \qty{1}{\milli\second}, not merely the mean. & Open \\
+PER-06 & A, I & Evaluate wheel inertia from the CAD mass properties and from the sizing calculator; confirm the ballast station count on the built wheel. & $I_w \geq$ \qty{6.2352e-4}{\kilogram\metre\squared}; CAD and calculator agree. & \textbf{Verified} (analysis, \qty{100.6}{\percent}) \\
+PER-07 & A, T & Spin-up test on the built wheel at end-of-discharge pack voltage (WBS E10). & Design speed reached and sustained on a depleted pack, not only a charged one. & Open \\
+PER-08 & A & Derive the achievable ceiling from $K_v$, winding resistance, modulation derate and end-of-discharge bus voltage; compare against the design speed. & Design speed $\leq$ \qty{80}{\percent} of the derived ceiling. & \textbf{Verified} (analysis, \qty{57.8}{\percent}) \\
+PER-09 & T & Log driver current throughout balancing and disturbance recovery. & Peak within the \qty{9}{\ampere} continuous rating. & Partial (rig) \\
+PER-10 & T & Spin-down test: brake from the design speed with the event logged at a rate resolving a few-millisecond transient. & Arrest within \qty{100}{\milli\second}. & Open \\
+PER-11 & T & Record a telemetry session; count logged samples per second of each field. & $\geq$ \qty{50}{\hertz} for state, command and wheel speed. & Open \\
 \midrule
 
 \multicolumn{5}{@{}l}{\textbf{Design constraint}}\\
 \midrule
 CON-01 & I & Measure the built frame against the CAD driving parameter. & Outer edge \qty{150}{\milli\metre} within the stated tolerance. & Open \\
-CON-02 & I & Weigh the integrated cube, ready to run. & $\leq$ \qty{1.7}{\kilo\gram}. & Open \\
+CON-02 & I & Weigh the integrated cube, ready to run. & $\leq$ \qty{1.85}{\kilo\gram}. & Open \\
 CON-03 & I & Inspect the assembled machine against the CAD model tree. & Three wheels on mutually orthogonal axes through a common centre. & Open \\
 CON-04 & I, D & Inspect the power architecture; run a full demonstration on pack power alone. & No tether or bench supply connected during the demonstration. & Open \\
 CON-05 & I & Inspect the bus route and termination against the layout drawings. & Linear chain, short stubs, termination at exactly the two ends. & Open \\

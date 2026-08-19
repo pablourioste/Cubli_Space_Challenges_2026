@@ -138,9 +138,15 @@ RAMP = ["#5598e7", "#2a78d6", "#1c5cab", "#0d366b"]
 INK       = "#000000"      # axis text and labels -- black for print
 INK_2     = "#333333"      # caption
 
-# Reaction-wheel design speed ceiling, from electrical/MOTOR_SPEED.md. Shown
-# on the TDD figure so the measured speeds read against the assumed limit.
-OMEGA_MAX_RPM = 6000
+# Reaction-wheel design speed ceiling, from the converged sizing point of
+# analysis/SIZING.py (Stage 1). Shown on the TDD figure so the measured speeds
+# read against the assumed limit.
+# Revised 6000 -> 4000 rpm. This figure had been left at 6000 through two
+# separate revisions of the sizing (6000 -> 5500 -> 4000), so the dashed line
+# in the TDD was two iterations stale. Keep it in step with rpm_max in
+# SIZING.py; the axis label below is drawn from this constant so there is only
+# one number to change.
+OMEGA_MAX_RPM = 4000
 
 # Marker shapes double the encoding, so the four curves remain separable in
 # greyscale print and under colour-vision deficiency -- standard practice for
@@ -248,8 +254,11 @@ def build_figure(panel_keys, figsize, caption=None, mark_omega_max=False):
             # limit the wheel sizing actually assumes.
             ax.axhline(OMEGA_MAX_RPM, color="#444444", linewidth=0.8,
                        linestyle="--", zorder=2)
+            # Label text is built from the constant rather than hardcoded --
+            # the two had drifted apart before, leaving the figure asserting a
+            # speed the sizing had already abandoned.
             ax.text(19.4, OMEGA_MAX_RPM - 130,
-                    r"design limit, 6000 rpm", fontsize=7,
+                    f"design limit, {OMEGA_MAX_RPM:.0f} rpm", fontsize=7,
                     color="#444444", ha="right", va="top")
 
     handles, labels = axes[0].get_legend_handles_labels()
