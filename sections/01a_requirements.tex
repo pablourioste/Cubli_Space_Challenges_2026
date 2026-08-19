@@ -82,7 +82,7 @@ PER-13 (D) & The reaction torque applied to the body during wheel spin-up shall 
 \multicolumn{4}{@{}l}{\textbf{Design constraint}}\\
 \midrule
 CON-01 & The cube outer edge length shall be \qty{150}{\milli\metre}. & All & I \\
-CON-02 & Total cube mass shall not exceed \qty{1.85}{\kilo\gram}. & Jump-up & I \\
+CON-02 & Total cube mass shall not exceed \qty{1.8}{\kilo\gram}. & Jump-up & I \\
 CON-03 & The system shall be actuated by exactly three mutually orthogonal reaction wheels. & All & I \\
 CON-04 & The cube shall operate from a single onboard 6S lithium-polymer pack, with no tether or external power during a demonstration. & All & I, D \\
 CON-05 & Driver communication shall use a single linear CAN-FD chain, terminated at exactly the two physical ends. & All & I \\
@@ -131,13 +131,20 @@ $L=\qty{149}{\milli\metre}$, $\omega_{\max}=\qty{4000}{\rpm}$, corner case ---
 and not at any lighter mass the build may achieve. That is deliberate: a
 derived requirement has to hold across the mass range the cube is permitted to
 occupy, so it is written against the heaviest case the design admits rather
-than the lightest it might reach. CON-02 is raised to \qty{1.85}{\kilo\gram}
-in this revision, from \qty{1.7}{\kilo\gram}, so that the sizing basis sits
-\emph{inside} the mass constraint with \qty{50}{\gram} to spare; at the
-previous cap the analysis of Section~\ref{sec:sizing} would have documented a
-design heavier than its own constraint permitted. The two requirements are
-therefore coupled, and CON-02 cannot be tightened again without re-deriving
-PER-06.
+than the lightest it might reach. CON-02 is raised to \qty{1.8}{\kilo\gram} in
+this revision, from \qty{1.7}{\kilo\gram}, which is exactly the sizing basis
+and not a round number above it; at the previous cap the analysis of
+Section~\ref{sec:sizing} would have documented a design heavier than its own
+constraint permitted. Constraint and analysis therefore state the same
+figure, which is the intended relation rather than an oversight: the cap is
+not spare allowance the build may grow into, it is the mass the wheel was
+sized to carry, and a cube exceeding it would not merely breach a constraint
+but fall outside the case PER-06 was derived for. The two requirements are
+coupled, and neither can be moved without re-deriving the other. Margin is
+taken in the build rather than in the requirement --- the integrated cube
+weighs \qty{1.626}{\kilo\gram} (Appendix~\ref{app:cad_mass}), \qty{174}{\gram}
+under the cap --- and that realised margin is deliberately left out of the
+sizing, which continues to run at \qty{1.8}{\kilo\gram}.
 
 \paragraph{Open items.} Several requirements rest on figures not yet fixed.
 PER-07 and PER-08 depend on the achievable wheel speed at end-of-discharge

@@ -170,12 +170,21 @@ $I_{w,\text{target}}$ & \textbf{Target wheel inertia} & \qty{6.2352e-4}{\kilogra
 
 \vspace{0.4em}
 {\footnotesize\RaggedRight\textsuperscript{*}\,The design speed is set at
-\qty{57.8}{\percent} of the motor's derived end-of-discharge ceiling
-(PER-08), leaving the drive well inside its limit. The momentum
-$h_w$ is instead recovered through inertia: a heavier, slower wheel spins at
-lower angular rates and demands smaller, less abrupt momentum shifts, which
-the control loop handles more gently and stably than a light wheel driven
-near its speed limit.\par}
+\qty{57.8}{\percent} of the motor's derived end-of-discharge ceiling (PER-08),
+against \qty{79.5}{\percent} at the \qty{5500}{\rpm} of the previous
+iteration. The reason for the reduction is electrical rather than dynamic:
+what the lower speed buys is back-EMF headroom at the bottom of the discharge
+curve --- so that the manoeuvre stays available on a depleted pack and not
+only on a fresh one --- together with a lower commutation frequency and a
+centrifugal ballast load that falls as $\omega^2$. It buys nothing on the
+control side, and is not claimed to: at a fixed $h_w$ the balancing authority
+is the motor torque and the time to saturation is $h_w/\tau$, neither of which
+depends on how the momentum is divided between inertia and speed. The momentum
+is recovered through inertia instead, and that is where the choice is paid
+for: holding $h_w$ at \qty{4000}{\rpm} rather than \qty{5500}{\rpm} takes each
+wheel from \qty{170.37}{\gram} to \qty{234.14}{\gram}, \qty{191}{\gram} over
+three, making the speed reduction the single largest driver of both the mass
+budget of Table~\ref{tab:massbudget} and the cap stated in CON-02.\par}
 \end{table}
 
 Two features of these relations govern how the iteration behaves:
